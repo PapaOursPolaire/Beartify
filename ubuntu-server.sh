@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# VERSION 188
+# VERSION 4444444
 
 perform_security_audit() {
     log "Audit de sécurité final..."
@@ -749,14 +749,12 @@ install_postgresql() {
     
     sudo apt install -y postgresql postgresql-contrib
     
-    # Configuration pour performances optimisées
-    PG_VERSION=$(sudo -u postgres psql -t -c "SELECT version();" | grep -oP '\d+\.\d+' | head -1 || echo "14")
+    # Détection de la version installée
+    PG_VERSION=$(ls /etc/postgresql/ | sort -V | tail -n 1)
     PG_CONFIG="/etc/postgresql/$PG_VERSION/main/postgresql.conf"
     
     sudo tee -a "$PG_CONFIG" > /dev/null <<EOF
-
 # === BEARTIFY OPTIMIZATIONS ===
-# Mémoire (pour 32GB RAM)
 shared_buffers = 8GB
 effective_cache_size = 24GB
 work_mem = 256MB
