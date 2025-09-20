@@ -1,4 +1,4 @@
-# VERSION 166
+# VERSION 169
 
 perform_security_audit() {
     log "Audit de sécurité final..."
@@ -377,6 +377,8 @@ if sudo -u postgres psql -d beartifydb -c "SELECT 1;" > /dev/null 2>&1; then
 else
     echo "❌ PostgreSQL: Erreur de connexion"
 fi
+
+EOF
 
 # Test Redis#!/bin/bash
 
@@ -1759,7 +1761,7 @@ public class BeartifyDemo {
     
     private static void handleRequest(Socket client) {
         try (BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-             PrintWriter out = new PrintWriter(client.getOutputStream(), true)) {
+                PrintWriter out = new PrintWriter(client.getOutputStream(), true)) {
             
             String requestLine = in.readLine();
             System.out.println("📡 Requête: " + requestLine);
