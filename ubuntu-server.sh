@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# VERSION 4444444
+# VERSION 26845951A
 
 perform_security_audit() {
     log "Audit de sécurité final..."
@@ -1164,8 +1164,6 @@ install_memcached() {
     log "Memcached configuré"
 }
 
-# MONITORING ET OBSERVABILITÉ
-
 install_monitoring() {
     if [[ "$INSTALL_MONITORING" =~ ^[Yy] ]]; then
         log "Installation du monitoring (Prometheus + Grafana)..."
@@ -1203,6 +1201,30 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9113']
 EOF
+
+        # Service systemd Prometheus
+        sudo tee /etc/systemd/system/prometheus.service > /dev/null <<EOF
+[Unit]
+Description=Prometheus Monitoring
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=nobody
+ExecStart=/opt/prometheus/prometheus \
+  --config.file=/etc/prometheus/prometheus.yml \
+  --storage.tsdb.path=/var/lib/prometheus \
+  --web.console.templates=/opt/prometheus/consoles \
+  --web.console.libraries=/opt/prometheus/console_libraries
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+        # Création du répertoire de stockage Prometheus
+        sudo mkdir -p /var/lib/prometheus
+        sudo chown nobody:nogroup /var/lib/prometheus
         
         # Service Node Exporter
         sudo tee /etc/systemd/system/node_exporter.service > /dev/null <<EOF
@@ -1330,8 +1352,6 @@ DASHBOARD
         log "Grafana admin password: $GRAFANA_PASS"
     fi
 }
-
-# STOCKAGE OBJET MINIO (OPTIONNEL)
 
 install_minio() {
     if [[ "$INSTALL_MINIO" =~ ^[Yy] ]]; then
