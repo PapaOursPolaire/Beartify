@@ -1,22 +1,31 @@
 #!/usr/bin/env bash
-# VERSION JTM REVIENS STP GAB
+# VERSION JTM REVIENS STP GAB stttttp
 
 perform_security_audit() {
     log "Audit de sécurité final..."
     
     # Vérification des services exposés
-    OPEN_PORTS=$(ss -tlnp | grep LISTEN | awk '{print $4}' | cut -d: -f2 | sort -n | uniq)
+    OPEN_PORTS=$(ss -tlnp | grep LISTEN | awk '{print $4}' | cut -d: -f2 | sort -n | uniq || true)
     
     echo "🔍 Ports ouverts détectés:"
     for port in $OPEN_PORTS; do
-        SERVICE=$(ss -tlnp | grep ":$port " | awk '{print $6}' | cut -d'"' -f2 | head -1)
-        echo "  Port $port - $SERVICE"
+        SERVICE=$(ss -tlnp | grep ":$port " | awk '{print $6}' | cut -d'"' -f2 | head -1 || true)
+        echo "  Port $port - ${SERVICE:-inconnu}"
     done
     
-    # Vérification des permissions critiques
+    # Vérification des permissions critiques (sans bloquer si accès refusé)
     echo "🔍 Vérification des permissions:"
-    ls -la "$MEDIA_ROOT" | head -5
-    ls -la "$BEARTIFY_HOME" | head -5
+    if [[ -d "$MEDIA_ROOT" ]]; then
+        ls -la "$MEDIA_ROOT" 2>/dev/null | head -5 || echo "⚠️ Impossible de lister $MEDIA_ROOT"
+    else
+        echo "⚠️ Répertoire $MEDIA_ROOT absent"
+    fi
+    
+    if [[ -d "$BEARTIFY_HOME" ]]; then
+        ls -la "$BEARTIFY_HOME" 2>/dev/null | head -5 || echo "⚠️ Impossible de lister $BEARTIFY_HOME"
+    else
+        echo "⚠️ Répertoire $BEARTIFY_HOME absent"
+    fi
     
     # Test de connectivité base de données
     echo "💾 Test base de données:"
@@ -27,21 +36,23 @@ perform_security_audit() {
     fi
     
     # Test Redis
-echo "📄 TEST CACHE:"
-if redis-cli ping > /dev/null 2>&1; then
-    echo "✅ Redis: Connecté"
-else
-    echo "❌ Redis: Erreur de connexion"
-fi
+    echo "📄 TEST CACHE:"
+    if redis-cli ping > /dev/null 2>&1; then
+        echo "✅ Redis: Connecté"
+    else
+        echo "❌ Redis: Erreur de connexion"
+    fi
+    
+    echo ""
+    
+    # Derniers logs d'erreur (ne bloque pas si vide)
+    echo "📋 DERNIERS LOGS (5 dernières erreurs):"
+    journalctl -u beartify --since="24 hours ago" -p err -n 5 --no-pager 2>/dev/null || echo "⚠️ Pas de logs disponibles"
+    
+    echo ""
+    echo "🩺 Health check terminé !"
+}
 
-echo ""
-
-# Derniers logs d'erreur
-echo "📋 DERNIERS LOGS (5 dernières erreurs):"
-journalctl -u beartify --since="24 hours ago" -p err -n 5 --no-pager
-
-echo ""
-echo "🩺 Health check terminé !"
 
     sudo chmod +x /usr/local/bin/beartify-health-check.sh
     
