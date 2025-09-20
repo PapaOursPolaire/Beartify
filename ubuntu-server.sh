@@ -1,4 +1,4 @@
-# VERSION 18974984
+# VERSION 111111111111
 
 perform_security_audit() {
     log "Audit de sécurité final..."
@@ -41,7 +41,6 @@ journalctl -u beartify --since="24 hours ago" -p err -n 5 --no-pager
 
 echo ""
 echo "🩺 Health check terminé !"
-EOF
 
     sudo chmod +x /usr/local/bin/beartify-health-check.sh
     
