@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# VERSION 26845951A
+# VERSION GAB
 
 perform_security_audit() {
     log "Audit de sécurité final..."
@@ -1407,8 +1407,12 @@ EOF
         log "Secret Key: $MINIO_SECRET_KEY"
         
         # Stockage des clés MinIO pour récupération ultérieure
-        echo "MINIO_ACCESS_KEY=\"$MINIO_ACCESS_KEY\"" >> "$BEARTIFY_HOME/.beartify_env"
-        echo "MINIO_SECRET_KEY=\"$MINIO_SECRET_KEY\"" >> "$BEARTIFY_HOME/.beartify_env"
+        echo "MINIO_ACCESS_KEY=\"$MINIO_ACCESS_KEY\"" | sudo tee -a "$BEARTIFY_HOME/.beartify_env" > /dev/null
+        echo "MINIO_SECRET_KEY=\"$MINIO_SECRET_KEY\"" | sudo tee -a "$BEARTIFY_HOME/.beartify_env" > /dev/null
+
+        sudo chown "$BEARTIFY_USER:$BEARTIFY_USER" "$BEARTIFY_HOME/.beartify_env"
+        sudo chmod 600 "$BEARTIFY_HOME/.beartify_env"
+
     fi
 }
 
