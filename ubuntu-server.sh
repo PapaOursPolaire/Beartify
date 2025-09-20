@@ -1,4 +1,4 @@
-# VERSION 146
+# VERSION 166
 
 perform_security_audit() {
     log "Audit de sécurité final..."
@@ -285,16 +285,6 @@ EOF
 
 # EXÉCUTION DU SCRIPT PRINCIPAL
 # Vérification que le script n'est pas sourcé
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    # Lancement de l'installation principale
-    main "$@"
-else
-    echo "Ce script doit être exécuté directement, pas sourcé."
-    exit 1
-fi
-
-# FIN DU SCRIPT D'INSTALLATION BEARTIFY
-
 # Note: Ce script est conçu pour être robuste et handle les erreurs.
 # En cas de problème, consultez les logs dans /var/log/ et /tmp/beartify-install-error-*
 # 
@@ -1939,3 +1929,10 @@ main() {
     show_installation_summary
 }
 
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    # Lancement de l'installation principale
+    main "$@"
+else
+    echo "Ce script doit être exécuté directement, pas sourcé."
+    exit 1
+fi
