@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# VERSION JTM REVIENS STP GAB stttttp
+# VERSION 5/12854
 
 perform_security_audit() {
     log "Audit de sécurité final..."
@@ -51,7 +51,6 @@ perform_security_audit() {
     
     echo ""
     echo "🩺 Health check terminé !"
-}
 
 
     sudo chmod +x /usr/local/bin/beartify-health-check.sh
