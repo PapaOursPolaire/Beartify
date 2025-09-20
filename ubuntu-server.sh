@@ -1,4 +1,5 @@
-# VERSION 8494648497789
+#!/usr/bin/env bash
+# VERSION 9816080184686
 
 perform_security_audit() {
     log "Audit de sécurité final..."
