@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# VERSION GAB
+# VERSION JTM REVIENS STP GAB
 
 perform_security_audit() {
     log "Audit de sécurité final..."
@@ -1428,10 +1428,8 @@ setup_media_tools() {
         normalize-audio \
         wavpack \
         musepack-tools \
-        mac \
         shntool \
         cuetools \
-        mpcchap \
         inotify-tools
     
     # Script de conversion automatique
