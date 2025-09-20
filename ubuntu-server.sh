@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# VERSION 9816080184686
+# VERSION 188
 
 perform_security_audit() {
     log "Audit de sécurité final..."
@@ -642,27 +642,30 @@ EOF
     log "Fail2ban configuré et démarré"
 }
 
-# INTERFACE GRAPHIQUE
-
 install_gui() {
     case $GUI_CHOICE in
         1)
-            log "Installation de KDE Plasma..."
-            sudo apt install -y kubuntu-desktop-minimal
+            log "Installation de KDE Plasma (léger)..."
+            sudo apt install -y plasma-desktop sddm
             sudo systemctl set-default graphical.target
+            sudo systemctl enable sddm
             ;;
         2)
-            log "Installation de GNOME..."
-            sudo apt install -y ubuntu-desktop-minimal
+            log "Installation de GNOME (minimal)..."
+            sudo apt install -y ubuntu-desktop-minimal gdm3
             sudo systemctl set-default graphical.target
+            sudo systemctl enable gdm3
             ;;
         3)
-            log "Mode serveur - pas d'interface graphique"
+            log "Mode serveur sélectionné - aucune interface graphique installée"
+            sudo systemctl set-default multi-user.target
+            ;;
+        *)
+            warn "Choix invalide, passage en mode serveur par défaut"
+            sudo systemctl set-default multi-user.target
             ;;
     esac
 }
-
-# STOCKAGE MULTIMÉDIA OPTIMISÉ
 
 setup_media_storage() {
     log "Création de l'arborescence multimédia..."
