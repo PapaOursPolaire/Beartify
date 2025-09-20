@@ -1,4 +1,4 @@
-# VERSION 111111111111
+# VERSION 222222222222222222222
 
 perform_security_audit() {
     log "Audit de sécurité final..."
@@ -379,7 +379,8 @@ fi
 
 EOF
 
-# Test Redis#!/bin/bash
+    sudo chmod +x /usr/local/bin/beartify-health-check.sh
+
 
 # BEARTIFY - Script d'installation automatique
 # Alternative Spotify auto-hébergée moderne et performante
