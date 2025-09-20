@@ -1,4 +1,4 @@
-# VERSION 222222222222222222222
+# VERSION 8494648497789
 
 perform_security_audit() {
     log "Audit de sécurité final..."
@@ -380,6 +380,7 @@ fi
 EOF
 
     sudo chmod +x /usr/local/bin/beartify-health-check.sh
+}
 
 
 # BEARTIFY - Script d'installation automatique
