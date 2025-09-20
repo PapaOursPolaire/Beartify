@@ -1,4 +1,4 @@
-# VERSION 144
+# VERSION 146
 
 perform_security_audit() {
     log "Audit de sécurité final..."
@@ -305,15 +305,6 @@ fi
 # 4. Relancer ce script
 #
 # Support et documentation : https://github.com/monrepo/beartify/
-    if redis-cli ping > /dev/null 2>&1; then
-        echo "  ✅ Redis: OK"
-    else
-        echo "  ❌ Redis: Erreur"
-    fi
-    
-    log "Audit de sécurité terminé"
-}
-
 # GESTION DES ERREURS ET NETTOYAGE
 
 cleanup_on_error() {
