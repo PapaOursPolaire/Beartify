@@ -1932,7 +1932,6 @@ EOFSITE
             error_exit "Échec du démarrage de Nginx. Voir: systemctl status nginx"
         fi
     else
-        error_exit "❌ Configuration Nginx INVALIDE. Vérifiez la syntaxe dans /etc/nginx/nginx.conf"
         warning "❌ Configuration Nginx invalide, application correctif..."
         emergency_nginx_fix
     fi
