@@ -1469,15 +1469,26 @@ EOF
 install_nginx_streaming() {
     info "Installation Nginx optimisé pour streaming..."
     
-    # Installation avec modules RTMP
-    apt install -y nginx-full libnginx-mod-rtmp nginx-extras
+    # Arrêter Nginx si déjà en cours d'exécution
+    systemctl stop nginx 2>/dev/null || true
     
-    # Configuration principale Nginx
+    # Installation avec tous les modules nécessaires
+    apt install -y nginx-full nginx-extras libnginx-mod-rtmp
+    
+    # Backup de la configuration originale
+    cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup 2>/dev/null || true
+    
+    # Configuration principale Nginx COMPLÈTE ET CORRIGÉE
     cat > /etc/nginx/nginx.conf << 'EOFNGINX'
 user www-data;
 worker_processes auto;
 worker_rlimit_nofile 100000;
 pid /run/nginx.pid;
+
+# Chargement des modules
+load_module modules/ngx_http_geoip_module.so;
+load_module modules/ngx_http_image_filter_module.so;
+load_module modules/ngx_rtmp_module.so;
 
 events {
     worker_connections 8192;
@@ -1487,7 +1498,7 @@ events {
 }
 
 http {
-    # Performance
+    # Paramètres de performance
     sendfile on;
     sendfile_max_chunk 512k;
     tcp_nopush on;
@@ -1499,7 +1510,7 @@ http {
     client_header_timeout 60s;
     send_timeout 120s;
     
-    # Buffer sizes
+    # Tailles des buffers
     client_body_buffer_size 128k;
     client_max_body_size 4G;
     client_header_buffer_size 4k;
@@ -1557,7 +1568,7 @@ http {
     limit_req_zone $binary_remote_addr zone=upload:10m rate=10r/s;
     limit_conn_zone $binary_remote_addr zone=addr:10m;
     
-    # Logging
+    # Format de logs
     log_format streaming '$remote_addr - $remote_user [$time_local] '
                         '"$request" $status $body_bytes_sent '
                         '"$http_referer" "$http_user_agent" '
@@ -1592,7 +1603,7 @@ http {
     include /etc/nginx/sites-enabled/*;
 }
 
-# RTMP Server pour streaming en direct
+# RTMP Server pour streaming en direct - CORRIGÉ
 rtmp {
     server {
         listen 1935;
@@ -1626,11 +1637,11 @@ rtmp {
             dash_nested on;
             dash_cleanup on;
             
-            # Transcoding pour adaptive streaming
-            exec ffmpeg -i rtmp://localhost:1935/live/$name
-                -c:v libx264 -preset veryfast -tune zerolatency -b:v 2500k -maxrate 2500k -bufsize 5000k -s 1920x1080 -profile:v high -level 4.2 -c:a aac -b:a 128k -ar 48000 -f flv rtmp://localhost:1935/hls/$name_1080p
-                -c:v libx264 -preset veryfast -tune zerolatency -b:v 1000k -maxrate 1000k -bufsize 2000k -s 1280x720 -profile:v main -level 3.1 -c:a aac -b:a 96k -ar 48000 -f flv rtmp://localhost:1935/hls/$name_720p
-                -c:v libx264 -preset veryfast -tune zerolatency -b:v 500k -maxrate 500k -bufsize 1000k -s 854x480 -profile:v main -level 3.0 -c:a aac -b:a 64k -ar 44100 -f flv rtmp://localhost:1935/hls/$name_480p;
+            # Transcoding pour adaptive streaming (optionnel - décommenter si FFmpeg installé)
+            # exec ffmpeg -i rtmp://localhost:1935/live/$name
+            #     -c:v libx264 -preset veryfast -tune zerolatency -b:v 2500k -maxrate 2500k -bufsize 5000k -s 1920x1080 -profile:v high -level 4.2 -c:a aac -b:a 128k -ar 48000 -f flv rtmp://localhost:1935/hls/$name_1080p
+            #     -c:v libx264 -preset veryfast -tune zerolatency -b:v 1000k -maxrate 1000k -bufsize 2000k -s 1280x720 -profile:v main -level 3.1 -c:a aac -b:a 96k -ar 48000 -f flv rtmp://localhost:1935/hls/$name_720p
+            #     -c:v libx264 -preset veryfast -tune zerolatency -b:v 500k -maxrate 500k -bufsize 1000k -s 854x480 -profile:v main -level 3.0 -c:a aac -b:a 64k -ar 44100 -f flv rtmp://localhost:1935/hls/$name_480p;
         }
         
         application hls {
@@ -1648,8 +1659,8 @@ rtmp {
     }
 }
 EOFNGINX
-    
-    # Configuration site Beartify
+
+    # Configuration site Beartify COMPLÈTE
     cat > /etc/nginx/sites-available/beartify << 'EOFSITE'
 upstream beartify_app {
     server 127.0.0.1:8080;
@@ -1888,30 +1899,66 @@ server {
 }
 EOFSITE
 
-    # Créer répertoires
+    # Créer tous les répertoires nécessaires
     mkdir -p /var/www/{hls,dash}/{live,adaptive}
     mkdir -p /var/cache/nginx/{streaming,media}
+    mkdir -p /var/log/nginx/
+    
+    # Permissions
     chown -R www-data:www-data /var/www/{hls,dash}
     chown -R www-data:www-data /var/cache/nginx
+    chown -R www-data:www-data /var/log/nginx
     chmod -R 755 /var/www/{hls,dash}
     
-    # SSL Let's Encrypt si domaine
+    # SSL Let's Encrypt si domaine configuré
     if [[ -n "$DOMAIN" && -n "$EMAIL" ]]; then
         info "Configuration SSL avec Let's Encrypt..."
-        certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos --email "$EMAIL" --redirect || true
-        systemctl enable certbot.timer
+        if command -v certbot >/dev/null 2>&1; then
+            certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos --email "$EMAIL" --redirect || {
+                warning "Échec de la configuration SSL, continuation sans SSL..."
+            }
+            systemctl enable certbot.timer >/dev/null 2>&1 || true
+        else
+            warning "Certbot non disponible, installation ignorée"
+        fi
     fi
     
     # Activer site
     ln -sf /etc/nginx/sites-available/beartify /etc/nginx/sites-enabled/
     rm -f /etc/nginx/sites-enabled/default
     
-    # Test et redémarrage
-    nginx -t
-    systemctl enable nginx
-    systemctl restart nginx
+    # Test de configuration CRITIQUE
+    info "Test de la configuration Nginx..."
+    if nginx -t 2>&1 | tee -a "$LOG_FILE"; then
+        success "✅ Configuration Nginx VALIDE"
+        
+        # Démarrage des services
+        systemctl enable nginx
+        if systemctl start nginx; then
+            success "Nginx démarré avec succès"
+            
+            # Vérification que Nginx écoute bien sur les ports
+            sleep 2
+            if ss -tln | grep -q ":80 "; then
+                success "Nginx écoute sur le port 80"
+            else
+                warning "Nginx ne semble pas écouter sur le port 80"
+            fi
+            
+            if ss -tln | grep -q ":1935 "; then
+                success "RTMP écoute sur le port 1935"
+            else
+                warning "RTMP ne semble pas écouter sur le port 1935"
+            fi
+            
+        else
+            error_exit "Échec du démarrage de Nginx. Voir: systemctl status nginx"
+        fi
+    else
+        error_exit "❌ Configuration Nginx INVALIDE. Vérifiez la syntaxe dans /etc/nginx/nginx.conf"
+    fi
     
-    success "Nginx configuré pour streaming avancé"
+    success "Nginx configuré pour streaming avancé avec succès"
 }
 
 # Installation Redis
