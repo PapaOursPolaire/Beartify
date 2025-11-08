@@ -3654,15 +3654,25 @@ main() {
     
     # Score global
     local score=0
-    [[ $ram_gb -ge 8 ]] && ((score+=3))
-    [[ $ram_gb -ge 4 ]] && [[ $ram_gb -lt 8 ]] && ((score+=2))
-    [[ $ram_gb -ge 2 ]] && [[ $ram_gb -lt 4 ]] && ((score+=1))
-    
-    [[ $disk_gb -ge 100 ]] && ((score+=2))
-    [[ $disk_gb -ge 50 ]] && [[ $disk_gb -lt 100 ]] && ((score+=1))
-    
-    [[ $cpu_cores -ge 4 ]] && ((score+=2))
-    [[ $cpu_cores -ge 2 ]] && [[ $cpu_cores -lt 4 ]] && ((score+=1))
+    if [[ $ram_gb -ge 8 ]]; then
+        score=$((score + 3))
+    elif [[ $ram_gb -ge 4 ]]; then
+        score=$((score + 2))
+    elif [[ $ram_gb -ge 2 ]]; then
+        score=$((score + 1))
+    fi
+
+    if [[ $disk_gb -ge 100 ]]; then
+        score=$((score + 2))
+    elif [[ $disk_gb -ge 50 ]]; then
+        score=$((score + 1))
+    fi
+
+    if [[ $cpu_cores -ge 4 ]]; then
+        score=$((score + 2))
+    elif [[ $cpu_cores -ge 2 ]]; then
+        score=$((score + 1))
+    fi
     
     echo
     if [[ $score -ge 7 ]]; then
@@ -3958,15 +3968,25 @@ main() {
     
     # Score global
     local score=0
-    [[ $ram_gb -ge 8 ]] && ((score+=3))
-    [[ $ram_gb -ge 4 ]] && [[ $ram_gb -lt 8 ]] && ((score+=2))
-    [[ $ram_gb -ge 2 ]] && [[ $ram_gb -lt 4 ]] && ((score+=1))
-    
-    [[ $disk_gb -ge 100 ]] && ((score+=2))
-    [[ $disk_gb -ge 50 ]] && [[ $disk_gb -lt 100 ]] && ((score+=1))
-    
-    [[ $cpu_cores -ge 4 ]] && ((score+=2))
-    [[ $cpu_cores -ge 2 ]] && [[ $cpu_cores -lt 4 ]] && ((score+=1))
+    if [[ $ram_gb -ge 8 ]]; then
+        score=$((score + 3))
+    elif [[ $ram_gb -ge 4 ]]; then
+        score=$((score + 2))
+    elif [[ $ram_gb -ge 2 ]]; then
+        score=$((score + 1))
+    fi
+
+    if [[ $disk_gb -ge 100 ]]; then
+        score=$((score + 2))
+    elif [[ $disk_gb -ge 50 ]]; then
+        score=$((score + 1))
+    fi
+
+    if [[ $cpu_cores -ge 4 ]]; then
+        score=$((score + 2))
+    elif [[ $cpu_cores -ge 2 ]]; then
+        score=$((score + 1))
+    fi
     
     echo
     if [[ $score -ge 7 ]]; then
