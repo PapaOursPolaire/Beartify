@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script d'Installation Ubuntu Serveur pour Streaming Multimédia avec Beartify
-# Version : 72.8 - ENHANCED & DEBUGGED
+# Version : 92.8 - ENHANCED & DEBUGGED
 # Description: Installation automatisée d'un serveur streaming optimisé pour Beartify
 # Compatible: Ubuntu Server 20.04+, Debian 11+
 
@@ -17,7 +17,7 @@ CYAN='\033[0;36m'
 NC='\033[0m'
 
 # Variables globales
-SCRIPT_VERSION="4.0"
+SCRIPT_VERSION="92.8"
 LOG_FILE="/tmp/ubuntu_beartify_install_$(date +%Y%m%d_%H%M%S).log"
 BEARTIFY_USER="beartify"
 BEARTIFY_HOME="/home/$BEARTIFY_USER"
@@ -34,7 +34,7 @@ DB_CHOICE=""
 INSTALL_MONITORING=""
 INSTALL_MINIO=""
 INSTALL_TYPE=""
-BEARTIFY_PASSWORD=""
+AUTO_MODE=false
 
 # Fonctions utilitaires
 log() {
@@ -947,7 +947,7 @@ Author=PapaOursPolaire
 Copyright=GPL v3
 License=GPL v3
 Type=sddm-theme
-Version=2.0
+Version=92.8
 Website=https://github.com/PapaOursPolaire
 MainScript=Main.qml
 ConfigFile=theme.conf
