@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script d'Installation Ubuntu Serveur pour Streaming Multimédia avec Beartify
-# Version : 72.8 - ENHANCED & DEBUGGED
+# Version : 82.8 - ENHANCED & DEBUGGED
 # Description: Installation automatisée d'un serveur streaming optimisé pour Beartify
 # Compatible: Ubuntu Server 20.04+, Debian 11+
 
@@ -3702,3 +3702,4 @@ else
     warning "Ce script doit être exécuté directement, pas sourcé."
     echo "Utilisez: sudo bash ${BASH_SOURCE[0]}"
 fi
+
