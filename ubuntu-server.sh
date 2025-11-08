@@ -1485,10 +1485,10 @@ worker_processes auto;
 worker_rlimit_nofile 100000;
 pid /run/nginx.pid;
 
-# Chargement des modules
-load_module modules/ngx_http_geoip_module.so;
-load_module modules/ngx_http_image_filter_module.so;
-load_module modules/ngx_rtmp_module.so;
+# Modules - COMMENTÉS car peuvent causer des erreurs si non disponibles
+# load_module modules/ngx_http_geoip_module.so;
+# load_module modules/ngx_http_image_filter_module.so;
+# load_module modules/ngx_rtmp_module.so;
 
 events {
     worker_connections 8192;
@@ -1603,7 +1603,7 @@ http {
     include /etc/nginx/sites-enabled/*;
 }
 
-# RTMP Server pour streaming en direct - CORRIGÉ
+# RTMP Server pour streaming en direct - VERSION SIMPLIFIÉE
 rtmp {
     server {
         listen 1935;
@@ -1620,7 +1620,7 @@ rtmp {
             allow publish 192.168.0.0/16;
             deny publish all;
             
-            # HLS
+            # HLS uniquement (plus stable)
             hls on;
             hls_path /var/www/hls/live;
             hls_fragment 3s;
@@ -1628,29 +1628,6 @@ rtmp {
             hls_continuous on;
             hls_cleanup on;
             hls_nested on;
-            
-            # DASH
-            dash on;
-            dash_path /var/www/dash/live;
-            dash_fragment 3s;
-            dash_playlist_length 60s;
-            dash_nested on;
-            dash_cleanup on;
-            
-            # Transcoding pour adaptive streaming (optionnel - décommenter si FFmpeg installé)
-            # exec ffmpeg -i rtmp://localhost:1935/live/$name
-            #     -c:v libx264 -preset veryfast -tune zerolatency -b:v 2500k -maxrate 2500k -bufsize 5000k -s 1920x1080 -profile:v high -level 4.2 -c:a aac -b:a 128k -ar 48000 -f flv rtmp://localhost:1935/hls/$name_1080p
-            #     -c:v libx264 -preset veryfast -tune zerolatency -b:v 1000k -maxrate 1000k -bufsize 2000k -s 1280x720 -profile:v main -level 3.1 -c:a aac -b:a 96k -ar 48000 -f flv rtmp://localhost:1935/hls/$name_720p
-            #     -c:v libx264 -preset veryfast -tune zerolatency -b:v 500k -maxrate 500k -bufsize 1000k -s 854x480 -profile:v main -level 3.0 -c:a aac -b:a 64k -ar 44100 -f flv rtmp://localhost:1935/hls/$name_480p;
-        }
-        
-        application hls {
-            live on;
-            hls on;
-            hls_path /var/www/hls/adaptive;
-            hls_nested on;
-            hls_fragment 3s;
-            hls_playlist_length 60s;
         }
         
         application vod {
@@ -1956,9 +1933,78 @@ EOFSITE
         fi
     else
         error_exit "❌ Configuration Nginx INVALIDE. Vérifiez la syntaxe dans /etc/nginx/nginx.conf"
+        warning "❌ Configuration Nginx invalide, application correctif..."
+        emergency_nginx_fix
     fi
     
     success "Nginx configuré pour streaming avancé avec succès"
+}
+
+# Ajoutez cette fonction après la fonction install_nginx_streaming()
+emergency_nginx_fix() {
+    info "🔧 Application correctif d'urgence Nginx..."
+    
+    # Arrêter Nginx
+    systemctl stop nginx 2>/dev/null || true
+    
+    # Configuration minimaliste de secours
+    cat > /etc/nginx/nginx.conf << 'EOF'
+user www-data;
+worker_processes auto;
+pid /run/nginx.pid;
+
+events {
+    worker_connections 768;
+}
+
+http {
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 65;
+    types_hash_max_size 2048;
+    
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+    
+    access_log /var/log/nginx/access.log;
+    error_log /var/log/nginx/error.log;
+    
+    gzip on;
+    
+    include /etc/nginx/conf.d/*.conf;
+    include /etc/nginx/sites-enabled/*;
+}
+EOF
+
+    # Configuration site Beartify minimaliste
+    cat > /etc/nginx/sites-available/beartify << 'EOF'
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+    
+    location /media/ {
+        alias /srv/media/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+}
+EOF
+
+    # Test configuration
+    if nginx -t; then
+        systemctl start nginx
+        success "Correctif Nginx appliqué avec succès"
+    else
+        error_exit "Impossible de réparer Nginx. Configuration critique."
+    fi
 }
 
 # Installation Redis
