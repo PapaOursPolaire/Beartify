@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script d'Installation Ubuntu Serveur pour Streaming Multimédia avec Beartify
-# Version : 82.8 - ENHANCED & DEBUGGED
+# Version : 72.8 - ENHANCED & DEBUGGED
 # Description: Installation automatisée d'un serveur streaming optimisé pour Beartify
 # Compatible: Ubuntu Server 20.04+, Debian 11+
 
@@ -2963,34 +2963,136 @@ show_installation_summary() {
         echo "  🔒 Sécurité: UFW + Fail2ban actifs"
         echo "  🌐 Proxy: Nginx + RTMP + HLS/DASH"
         echo "  ⚡ Cache: Redis 6GB configuré"
-        echo "  📊 Monitoring: $(if [[ "$INSTALL_MONITORING" =~ ^[Yy] ]]; then echo "- 3000 (Grafana)\n- 9090 (Prometheus)"; fi)
-$(if [[ "$INSTALL_JELLYFIN" =~ ^[Yy] ]]; then echo "- 8096 (Jellyfin)"; fi)
-$(if [[ "$INSTALL_ICECAST" =~ ^[Yy] ]]; then echo "- 8000 (Icecast)"; fi)
+        echo "  📊 Monitoring: $(if [[ "$INSTALL_MONITORING" =~ ^[Yy] ]]; then echo "Activé"; else echo "Désactivé"; fi)"
+        
+        if [[ "$INSTALL_JELLYFIN" =~ ^[Yy] ]]; then
+            echo "  🎬 Jellyfin: Port 8096"
+        fi
+        
+        if [[ "$INSTALL_ICECAST" =~ ^[Yy] ]]; then
+            echo "  📻 Icecast: Port 8000"
+        fi
+        
+        echo
+        echo -e "${CYAN}📊 PORTS OUVERTS:${NC}"
+        echo "  🌐 Web: 80, 443, 8080"
+        echo "  📊 Monitoring: 3000 (Grafana), 9090 (Prometheus)"
+        [[ "$INSTALL_JELLYFIN" =~ ^[Yy] ]] && echo "  🎬 Jellyfin: 8096"
+        [[ "$INSTALL_ICECAST" =~ ^[Yy] ]] && echo "  📻 Icecast: 8000"
+        echo "  🔴 Redis: 6379"
+        echo "  📡 Streaming: 1935 (RTMP), 8000-8999"
+        
+        echo
+        echo -e "${CYAN}🎵 FORMATS SUPPORTÉS:${NC}"
+        echo "  Audio: MP3, FLAC, OGG, M4A, WAV, AAC, OPUS"
+        echo "  Vidéo: MP4, WebM, MKV, AVI"
+        echo "  Paroles: LRC, TXT"
+        echo "  Métadonnées: JSON, XML"
+        
+        echo
+        echo -e "${CYAN}✨ FONCTIONNALITÉS:${NC}"
+        echo "  ✓ Adaptive bitrate streaming (HLS/DASH)"
+        echo "  ✓ Range requests support"
+        echo "  ✓ Redis caching"
+        echo "  ✓ RTMP live streaming"
+        echo "  ✓ Metadata extraction"
+        echo "  ✓ Synchronized lyrics"
+        echo "  ✓ Hardware transcoding ready"
+        echo "  ✓ Prometheus metrics"
+        echo "  ✓ Health monitoring"
+        echo "  ✓ SSL/TLS support"
+        echo "  ✓ Rate limiting"
+        echo "  ✓ CORS enabled"
+        
+        echo
+        echo -e "${CYAN}📁 STRUCTURE:${NC}"
+        echo "  Utilisateur: $BEARTIFY_USER"
+        echo "  Home: $BEARTIFY_HOME"
+        echo "  Médias: $MEDIA_ROOT"
+        echo "  Backup: $BACKUP_ROOT"
+        echo "  Base: $DB_NAME"
+        
+    elif [[ "$INSTALL_TYPE" == "2" ]]; then
+        echo -e "${YELLOW}🛠️ SERVICES INDIVIDUELS INSTALLÉS${NC}"
+        echo "  Services choisis installés avec succès"
+    else
+        echo -e "${YELLOW}🔧 RÉPARATION APPLIQUÉE${NC}"
+        echo "  Problème GNOME lockscreen corrigé"
+    fi
+    
+    echo
+    echo -e "${CYAN}📄 LOGS:${NC}"
+    echo "  Fichier de log: $LOG_FILE"
+    echo
+    echo -e "${CYAN}🚀 PROCHAINES ÉTAPES:${NC}"
+    echo "  1. Redémarrez le système: sudo reboot"
+    echo "  2. Vérifiez l'installation: $BEARTIFY_HOME/post-install.sh"
+    echo "  3. Accédez à l'interface: http://localhost:8080"
+    echo "  4. Gérez les services: beartify status"
+    echo
+    echo -e "${GREEN}✅ Tout est configuré et prêt à l'emploi !${NC}"
+    
+    # Sauvegarde des informations d'installation
+    save_installation_info
+}
 
-SUPPORTED FORMATS:
-Audio: MP3, FLAC, OGG, M4A, WAV, AAC, OPUS
-Video: MP4, WebM, MKV, AVI
-Lyrics: LRC, TXT
-Metadata: JSON, XML
+# Sauvegarde des informations d'installation
+save_installation_info() {
+    cat > "$BEARTIFY_HOME/INSTALLATION_INFO.txt" << EOF
+🎵 BEARTIFY STREAMING SERVER - INFORMATION D'INSTALLATION
+=========================================================
 
-FEATURES:
-- Adaptive bitrate streaming (HLS/DASH)
-- Range requests support
-- Redis caching
-- RTMP live streaming
-- Metadata extraction
-- Synchronized lyrics
-- Hardware transcoding ready
-- Prometheus metrics
-- Health monitoring
-- SSL/TLS support
-- Rate limiting
-- CORS enabled
+Date: $(date)
+Version: $SCRIPT_VERSION
+User: $BEARTIFY_USER
+Home: $BEARTIFY_HOME
 
-LOG FILE: $LOG_FILE
+CONFIGURATION:
+- Interface: $(case $GUI_CHOICE in 1) echo "KDE Plasma";; 2) echo "GNOME";; 3) echo "XFCE";; 4) echo "Serveur";; esac)
+- Base de données: $(case $DB_CHOICE in 1) echo "MariaDB";; 2) echo "PostgreSQL";; 3) echo "MySQL";; esac)
+- Monitoring: $(if [[ "$INSTALL_MONITORING" =~ ^[Yy] ]]; then echo "Activé"; else echo "Désactivé"; fi)
+- Jellyfin: $(if [[ "$INSTALL_JELLYFIN" =~ ^[Yy] ]]; then echo "Activé (port 8096)"; else echo "Désactivé"; fi)
+- Icecast: $(if [[ "$INSTALL_ICECAST" =~ ^[Yy] ]]; then echo "Activé (port 8000)"; else echo "Désactivé"; fi)
+
+PORTS:
+- Beartify: 8080
+- Nginx: 80, 443
+- RTMP: 1935
+- Redis: 6379
+$(if [[ "$INSTALL_MONITORING" =~ ^[Yy] ]]; then echo "- Grafana: 3000\n- Prometheus: 9090"; fi)
+$(if [[ "$INSTALL_JELLYFIN" =~ ^[Yy] ]]; then echo "- Jellyfin: 8096"; fi)
+$(if [[ "$INSTALL_ICECAST" =~ ^[Yy] ]]; then echo "- Icecast: 8000"; fi)
+
+COMMANDES UTILES:
+- Status: beartify status
+- Logs: beartify logs
+- Monitoring: beartify-monitor
+- Test: beartify-test
+- Post-install: $BEARTIFY_HOME/post-install.sh
+
+FICHIERS IMPORTANTS:
+- Logs: $LOG_FILE
+- Configuration: $BEARTIFY_HOME/config/
+- Médias: $MEDIA_ROOT
+- Scripts: $BEARTIFY_HOME/scripts/
+
+BASE DE DONNÉES:
+- Nom: $DB_NAME
+- Utilisateur: $DB_USER
+- Mot de passe: $DB_PASS
+
+$(if [[ -n "$BEARTIFY_PASSWORD" ]]; then echo "UTILISATEUR:\n- Login: $BEARTIFY_USER\n- Mot de passe: [celui que vous avez défini]"; fi)
+
+SUPPORT:
+- Consultez les logs en cas de problème: $LOG_FILE
+- Redémarrez si nécessaire: sudo reboot
+- Vérifiez les services: sudo systemctl status beartify nginx redis-server
+
+$(date) - Installation Beartify v$SCRIPT_VERSION terminée avec succès!
 EOF
     
     chown "$BEARTIFY_USER:$BEARTIFY_USER" "$BEARTIFY_HOME/INSTALLATION_INFO.txt"
+    success "Informations d'installation sauvegardées dans: $BEARTIFY_HOME/INSTALLATION_INFO.txt"
 }
 
 # Menu principal
@@ -3702,4 +3804,3 @@ else
     warning "Ce script doit être exécuté directement, pas sourcé."
     echo "Utilisez: sudo bash ${BASH_SOURCE[0]}"
 fi
-
