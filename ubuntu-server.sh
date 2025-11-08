@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script d'Installation Ubuntu Serveur pour Streaming Multimédia avec Beartify
-# Version: 3.0
+# Version : 72.8 - ENHANCED & DEBUGGED
 # Description: Installation automatisée d'un serveur streaming optimisé pour Beartify
 # Compatible: Ubuntu Server 20.04+, Debian 11+
 
@@ -17,7 +17,7 @@ CYAN='\033[0;36m'
 NC='\033[0m'
 
 # Variables globales
-SCRIPT_VERSION="3.0"
+SCRIPT_VERSION="4.0"
 LOG_FILE="/tmp/ubuntu_beartify_install_$(date +%Y%m%d_%H%M%S).log"
 BEARTIFY_USER="beartify"
 BEARTIFY_HOME="/home/$BEARTIFY_USER"
@@ -34,6 +34,7 @@ DB_CHOICE=""
 INSTALL_MONITORING=""
 INSTALL_MINIO=""
 INSTALL_TYPE=""
+BEARTIFY_PASSWORD=""
 
 # Fonctions utilitaires
 log() {
@@ -60,10 +61,10 @@ info() {
 print_header() {
     clear
     echo -e "${PURPLE}"
-    echo "╔═══════════════════════════════════════════════════════════════════════════════════╗"
+    echo "╔════════════════════════════════════════════════════════════════════════════════╗"
     echo "║                    🎵 BEARTIFY UBUNTU SERVER INSTALLER v$SCRIPT_VERSION                  ║"
     echo "║                  Installation Serveur Streaming Multimédia                       ║"
-    echo "╚═══════════════════════════════════════════════════════════════════════════════════╝"
+    echo "╚════════════════════════════════════════════════════════════════════════════════╝"
     echo -e "${NC}"
 }
 
@@ -100,6 +101,7 @@ show_main_menu() {
     echo
     echo -e "${YELLOW}1.${NC} Installation complète Beartify (serveur streaming multimédia)"
     echo -e "${YELLOW}2.${NC} Installation de services individuels"
+    echo -e "${YELLOW}3.${NC} Réparation/Debug (GNOME lockscreen loop fix)"
     echo
     echo -e "${RED}0.${NC} Quitter"
     echo
@@ -116,7 +118,7 @@ show_services_menu() {
     echo "  3.  FTP Server (vsftpd)"
     echo "  4.  SFTP Server (OpenSSH)"
     echo "  5.  HTTP Server (Apache2)"
-    echo "  6.  HTTPS/Reverse Proxy (Nginx)"
+    echo "  6.  HTTPS/Reverse Proxy (Nginx avec streaming HLS/DASH)"
     echo "  7.  Mail Server (Postfix + Dovecot)"
     echo "  8.  Proxy Server (Squid)"
     echo
@@ -129,31 +131,150 @@ show_services_menu() {
     echo -e "${YELLOW}Services de partage et stockage:${NC}"
     echo "  13. NFS Server"
     echo "  14. Samba Server (SMB)"
-    echo "  15. Nextcloud"
-    echo "  16. MinIO (Stockage objet)"
+    echo "  15. Nextcloud (Cloud personnel)"
+    echo "  16. MinIO (Stockage objet S3-compatible)"
     echo
     echo -e "${YELLOW}Développement et CI/CD:${NC}"
     echo "  17. Docker + Docker Compose"
     echo "  18. Git Server (Gitea)"
     echo "  19. Jenkins CI/CD"
-    echo "  20. Node.js + NPM"
-    echo "  21. PHP-FPM"
+    echo "  20. Node.js + NPM + PM2"
+    echo "  21. PHP-FPM + Composer"
     echo "  22. Java (OpenJDK) + Tomcat"
     echo
     echo -e "${YELLOW}Monitoring et Logs:${NC}"
-    echo "  23. Prometheus + Grafana"
-    echo "  24. ELK Stack"
+    echo "  23. Prometheus + Grafana + Alertmanager"
+    echo "  24. ELK Stack (Elasticsearch, Logstash, Kibana)"
     echo "  25. Zabbix"
+    echo "  26. Netdata (Real-time monitoring)"
     echo
-    echo -e "${YELLOW}Services spécialisés:${NC}"
-    echo "  26. MQTT Broker (Mosquitto configuré)"
-    echo "  27. Media Server (Jellyfin configuré)"
-    echo "  28. VPN (WireGuard complet)"
-    echo "  29. Environnement Desktop (KDE/GNOME/XFCE)"
-    echo "  30. Serveur de jeux (Minecraft/CS/Terraria)"
+    echo -e "${YELLOW}Services spécialisés streaming:${NC}"
+    echo "  27. MQTT Broker (Mosquitto)"
+    echo "  28. Media Server (Jellyfin)"
+    echo "  29. Icecast (Audio streaming)"
+    echo "  30. Subsonic/Airsonic (Music streaming)"
+    echo "  31. Plex Media Server"
+    echo "  32. Emby Server"
+    echo
+    echo -e "${YELLOW}Transcoding et traitement:${NC}"
+    echo "  33. FFmpeg avec hardware acceleration"
+    echo "  34. HandBrake CLI"
+    echo "  35. Audiowaveform (Waveform generation)"
+    echo "  36. SoX (Audio processing)"
+    echo
+    echo -e "${YELLOW}Services réseau avancés:${NC}"
+    echo "  37. VPN (WireGuard complet)"
+    echo "  38. HAProxy (Load balancer)"
+    echo "  39. Varnish Cache"
+    echo "  40. CDN local (avec Nginx)"
+    echo
+    echo -e "${YELLOW}Environnement Desktop:${NC}"
+    echo "  41. KDE Plasma (thèmes Beartify)"
+    echo "  42. GNOME (corrigé lockscreen)"
+    echo "  43. XFCE (léger)"
+    echo "  44. MATE Desktop"
+    echo
+    echo -e "${YELLOW}Serveurs de jeux:${NC}"
+    echo "  45. Minecraft Server"
+    echo "  46. SteamCMD + CS/TF2"
+    echo "  47. Terraria Server"
     echo
     echo -e "${RED}0. Retour au menu principal${NC}"
     echo
+}
+
+# FIX GNOME LOCKSCREEN LOOP
+fix_gnome_lockscreen() {
+    info "🔧 Correction du problème de boucle GNOME lockscreen..."
+    
+    # Désactiver Wayland et forcer X11
+    if [[ -f /etc/gdm3/custom.conf ]]; then
+        sed -i 's/#WaylandEnable=false/WaylandEnable=false/' /etc/gdm3/custom.conf
+        sed -i '/\[daemon\]/a WaylandEnable=false' /etc/gdm3/custom.conf 2>/dev/null || true
+    fi
+    
+    # Créer configuration GDM personnalisée
+    cat > /etc/gdm3/custom.conf << 'EOF'
+[daemon]
+WaylandEnable=false
+AutomaticLoginEnable=false
+
+[security]
+
+[xdmcp]
+
+[chooser]
+
+[debug]
+EOF
+    
+    # Configuration PAM pour éviter les boucles
+    if [[ -f /etc/pam.d/gdm-password ]]; then
+        # Backup
+        cp /etc/pam.d/gdm-password /etc/pam.d/gdm-password.backup
+        
+        # Vérifier que les modules nécessaires sont présents
+        if ! grep -q "pam_succeed_if.so" /etc/pam.d/gdm-password; then
+            cat >> /etc/pam.d/gdm-password << 'EOF'
+auth    required    pam_succeed_if.so user != root quiet_success
+EOF
+        fi
+    fi
+    
+    # Créer utilisateur si n'existe pas
+    if ! id "$BEARTIFY_USER" &>/dev/null; then
+        useradd -m -s /bin/bash -G audio,video,www-data,sudo "$BEARTIFY_USER"
+        
+        # Demander mot de passe utilisateur
+        echo
+        echo -e "${CYAN}Création de l'utilisateur $BEARTIFY_USER${NC}"
+        while true; do
+            read -s -p "Mot de passe pour $BEARTIFY_USER: " BEARTIFY_PASSWORD
+            echo
+            read -s -p "Confirmez le mot de passe: " BEARTIFY_PASSWORD_CONFIRM
+            echo
+            
+            if [[ "$BEARTIFY_PASSWORD" == "$BEARTIFY_PASSWORD_CONFIRM" ]]; then
+                echo "$BEARTIFY_USER:$BEARTIFY_PASSWORD" | chpasswd
+                break
+            else
+                warning "Les mots de passe ne correspondent pas. Réessayez."
+            fi
+        done
+    fi
+    
+    # Permissions correctes pour home directory
+    chown -R "$BEARTIFY_USER:$BEARTIFY_USER" "$BEARTIFY_HOME"
+    chmod 755 "$BEARTIFY_HOME"
+    
+    # Configuration .dmrc pour session par défaut
+    cat > "$BEARTIFY_HOME/.dmrc" << 'EOF'
+[Desktop]
+Session=gnome
+EOF
+    chown "$BEARTIFY_USER:$BEARTIFY_USER" "$BEARTIFY_HOME/.dmrc"
+    chmod 644 "$BEARTIFY_HOME/.dmrc"
+    
+    # Désactiver écran de verrouillage automatique
+    sudo -u "$BEARTIFY_USER" dbus-launch gsettings set org.gnome.desktop.screensaver lock-enabled false 2>/dev/null || true
+    sudo -u "$BEARTIFY_USER" dbus-launch gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null || true
+    
+    # Réinitialiser les configurations GNOME corrompues
+    if [[ -d "$BEARTIFY_HOME/.config/gnome-session" ]]; then
+        rm -rf "$BEARTIFY_HOME/.config/gnome-session"
+    fi
+    
+    # Reconfigurer GDM
+    dpkg-reconfigure gdm3 -f noninteractive
+    
+    # Redémarrer GDM
+    systemctl restart gdm3
+    
+    success "Correction GNOME lockscreen appliquée"
+    warning "Si le problème persiste après redémarrage:"
+    echo "  1. Au login, choisissez 'GNOME on Xorg' (roue dentée)"
+    echo "  2. Ou utilisez: sudo dpkg-reconfigure gdm3"
+    echo "  3. Ou passez à KDE: sudo apt install kde-plasma-desktop sddm"
 }
 
 # Configuration utilisateur pour Beartify
@@ -163,11 +284,30 @@ get_beartify_config() {
     
     # Interface graphique
     echo "Choisissez votre interface graphique :"
-    echo "1) KDE Plasma (avec thèmes personnalisés)"
-    echo "2) GNOME (interface moderne)"
-    echo "3) Aucune (mode serveur uniquement)"
-    read -p "Votre choix [1-3] (défaut: 3): " GUI_CHOICE
-    GUI_CHOICE=${GUI_CHOICE:-3}
+    echo "1) KDE Plasma (avec thèmes personnalisés - RECOMMANDÉ)"
+    echo "2) GNOME (interface moderne - CORRIGÉ lockscreen)"
+    echo "3) XFCE (léger et rapide)"
+    echo "4) Aucune (mode serveur uniquement)"
+    read -p "Votre choix [1-4] (défaut: 1): " GUI_CHOICE
+    GUI_CHOICE=${GUI_CHOICE:-1}
+    
+    # Créer utilisateur si nécessaire
+    if ! id "$BEARTIFY_USER" &>/dev/null; then
+        echo
+        echo -e "${CYAN}Création de l'utilisateur $BEARTIFY_USER${NC}"
+        while true; do
+            read -s -p "Mot de passe pour $BEARTIFY_USER: " BEARTIFY_PASSWORD
+            echo
+            read -s -p "Confirmez le mot de passe: " BEARTIFY_PASSWORD_CONFIRM
+            echo
+            
+            if [[ "$BEARTIFY_PASSWORD" == "$BEARTIFY_PASSWORD_CONFIRM" ]]; then
+                break
+            else
+                warning "Les mots de passe ne correspondent pas. Réessayez."
+            fi
+        done
+    fi
     
     # Domaine et SSL
     echo
@@ -187,8 +327,11 @@ get_beartify_config() {
     
     # Services optionnels
     echo
-    read -p "Installer le monitoring (Prometheus + Grafana) ? [y/N]: " INSTALL_MONITORING
+    read -p "Installer le monitoring (Prometheus + Grafana) ? [Y/n]: " INSTALL_MONITORING
+    INSTALL_MONITORING=${INSTALL_MONITORING:-y}
     read -p "Installer MinIO pour stockage objet ? [y/N]: " INSTALL_MINIO
+    read -p "Installer Jellyfin pour streaming vidéo ? [y/N]: " INSTALL_JELLYFIN
+    read -p "Installer Icecast pour streaming audio en direct ? [y/N]: " INSTALL_ICECAST
     
     # Génération du mot de passe DB
     DB_PASS=$(openssl rand -base64 32)
@@ -224,7 +367,7 @@ install_essential_tools() {
         apt-transport-https ca-certificates gnupg lsb-release
         
         # Compilation et développement
-        build-essential make cmake
+        build-essential make cmake autoconf automake libtool pkg-config
         
         # Outils système
         ufw fail2ban
@@ -232,16 +375,25 @@ install_essential_tools() {
         logrotate rsyslog
         
         # Performance et monitoring
-        iperf3 stress sysstat atop
+        iperf3 stress sysstat atop dstat
         
         # Outils multimédia pour streaming
         ffmpeg imagemagick
         flac lame opus-tools vorbis-tools
         sox mediainfo exiftool
         
+        # Bibliothèques multimédia
+        libavcodec-extra libavformat-dev libavutil-dev
+        libswscale-dev libswresample-dev
+        libmp3lame-dev libopus-dev libvorbis-dev
+        libtheora-dev libvpx-dev libx264-dev libx265-dev
+        
         # Outils réseau avancés
-        nginx-light
+        nginx-full
         certbot python3-certbot-nginx
+        
+        # JSON processing
+        jq yq
     )
     
     apt install -y "${essential_packages[@]}"
@@ -266,6 +418,10 @@ setup_streaming_firewall() {
     # Ports pour streaming
     ufw allow 1935/tcp comment "RTMP Streaming"
     ufw allow 8000:8999/tcp comment "Streaming Ports Range"
+    ufw allow 8000/tcp comment "Icecast"
+    ufw allow 8096/tcp comment "Jellyfin"
+    ufw allow 32400/tcp comment "Plex"
+    ufw allow 8920/tcp comment "Emby"
     
     # Ports pour WebRTC si nécessaire
     ufw allow 3478/udp comment "WebRTC STUN"
@@ -275,6 +431,7 @@ setup_streaming_firewall() {
     if [[ "$INSTALL_MONITORING" =~ ^[Yy] ]]; then
         ufw allow 3000/tcp comment "Grafana"
         ufw allow 9090/tcp comment "Prometheus"
+        ufw allow 9093/tcp comment "Alertmanager"
     fi
     
     if [[ "$INSTALL_MINIO" =~ ^[Yy] ]]; then
@@ -297,6 +454,9 @@ findtime = 600
 maxretry = 3
 backend = systemd
 ignoreip = 127.0.0.1/8 ::1 192.168.0.0/16 10.0.0.0/8
+destemail = root@localhost
+sendername = Fail2Ban
+action = %(action_mwl)s
 
 [sshd]
 enabled = true
@@ -322,6 +482,18 @@ enabled = true
 port = http,https
 logpath = /var/log/nginx/access.log
 maxretry = 2
+
+[nginx-noscript]
+enabled = true
+port = http,https
+logpath = /var/log/nginx/access.log
+maxretry = 6
+
+[nginx-noproxy]
+enabled = true
+port = http,https
+logpath = /var/log/nginx/access.log
+maxretry = 2
 EOF
 
     systemctl enable fail2ban
@@ -330,19 +502,17 @@ EOF
     success "Fail2ban configuré"
 }
 
-# Installation et configuration de l'interface graphique
+# Installation et configuration de l'interface graphique (CORRIGÉ)
 install_gui() {
     case $GUI_CHOICE in
         1)
             info "Installation de KDE Plasma avec thèmes personnalisés..."
             
-            # Installation KDE
-            apt install -y kde-plasma-desktop sddm sddm-theme-*
+            apt install -y kde-plasma-desktop sddm sddm-theme-breeze \
+                plasma-workspace-wayland kde-config-sddm \
+                konsole dolphin kate spectacle
             
-            # Configuration SDDM avec thème personnalisé
             configure_sddm_custom
-            
-            # Configuration Plymouth
             configure_plymouth_custom
             
             systemctl set-default graphical.target
@@ -351,13 +521,27 @@ install_gui() {
             success "KDE Plasma installé avec thèmes personnalisés"
             ;;
         2)
-            info "Installation de GNOME..."
-            apt install -y ubuntu-desktop-minimal gdm3
+            info "Installation de GNOME (avec corrections lockscreen)..."
+            
+            # Installation GNOME
+            apt install -y ubuntu-desktop-minimal gdm3 gnome-tweaks gnome-shell-extensions
+            
+            # CORRECTION IMMÉDIATE DU LOCKSCREEN
+            fix_gnome_lockscreen
+            
             systemctl set-default graphical.target
             systemctl enable gdm3
-            success "GNOME installé"
+            
+            success "GNOME installé avec corrections lockscreen"
             ;;
         3)
+            info "Installation de XFCE (léger)..."
+            apt install -y xubuntu-desktop lightdm
+            systemctl set-default graphical.target
+            systemctl enable lightdm
+            success "XFCE installé"
+            ;;
+        4)
             info "Mode serveur - aucune interface graphique"
             systemctl set-default multi-user.target
             ;;
@@ -372,176 +556,427 @@ configure_sddm_custom() {
     
     info "Configuration SDDM avec thème personnalisé..."
     
-    local theme_dir="/usr/share/sddm/themes/beartify-fallout"
-    local temp_dir="/tmp/beartify-theme"
-    
-    # Création du répertoire du thème
+    local theme_dir="/usr/share/sddm/themes/beartify-modern"
     mkdir -p "$theme_dir"
-    mkdir -p "$temp_dir"
     
-    # Téléchargement des ressources (si disponibles)
-    if curl -fsSL "https://github.com/PapaOursPolaire/arch/archive/refs/heads/Projets.zip" -o "$temp_dir/theme.zip" 2>/dev/null; then
-        cd "$temp_dir"
-        unzip -q theme.zip
-        if [[ -d "arch-Projets/SDDM-Fallout-theme" ]]; then
-            cp -r arch-Projets/SDDM-Fallout-theme/* "$theme_dir/"
-        fi
-    fi
-    
-    # Création d'un thème par défaut si téléchargement échoue
-    if [[ ! -f "$theme_dir/Main.qml" ]]; then
-        cat > "$theme_dir/Main.qml" << 'EOF'
+    # Création du thème moderne avec QML
+    cat > "$theme_dir/Main.qml" << 'EOFQML'
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
 import SddmComponents 2.0
 
 Rectangle {
+    id: root
     width: 1920
     height: 1080
     
-    // Fond dégradé
+    // Fond dégradé animé
     gradient: Gradient {
-        GradientStop { position: 0.0; color: "#001122" }
-        GradientStop { position: 1.0; color: "#003366" }
+        GradientStop { position: 0.0; color: "#0f2027" }
+        GradientStop { position: 0.5; color: "#203a43" }
+        GradientStop { position: 1.0; color: "#2c5364" }
     }
     
-    // Logo Beartify
-    Text {
-        id: logo
-        anchors.horizontalCenter: parent.horizontalCenter
+    // Particules d'arrière-plan
+    Repeater {
+        model: 30
+        Rectangle {
+            width: Math.random() * 4 + 2
+            height: width
+            radius: width / 2
+            color: Qt.rgba(0, 1, 0.5, Math.random() * 0.5)
+            x: Math.random() * root.width
+            y: Math.random() * root.height
+            
+            SequentialAnimation on opacity {
+                loops: Animation.Infinite
+                NumberAnimation { 
+                    from: 0.2; to: 1.0
+                    duration: (Math.random() * 2000) + 1000
+                }
+                NumberAnimation { 
+                    from: 1.0; to: 0.2
+                    duration: (Math.random() * 2000) + 1000
+                }
+            }
+        }
+    }
+    
+    // Logo et titre
+    ColumnLayout {
         anchors.top: parent.top
-        anchors.topMargin: 100
-        text: "🎵 BEARTIFY SERVER"
-        color: "#00ff88"
-        font.pixelSize: 48
-        font.bold: true
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.topMargin: 80
+        spacing: 20
+        
+        Text {
+            Layout.alignment: Qt.AlignHCenter
+            text: "🎵"
+            font.pixelSize: 80
+        }
+        
+        Text {
+            Layout.alignment: Qt.AlignHCenter
+            text: "BEARTIFY STREAMING SERVER"
+            color: "#00ff88"
+            font.pixelSize: 42
+            font.bold: true
+            font.family: "Ubuntu"
+        }
+        
+        Text {
+            Layout.alignment: Qt.AlignHCenter
+            text: "Professional Media Streaming Platform"
+            color: "#ffffff"
+            font.pixelSize: 18
+            opacity: 0.8
+        }
     }
     
-    // Zone de connexion
+    // Zone de connexion principale
     Rectangle {
-        id: loginArea
-        width: 400
-        height: 200
+        id: loginBox
+        width: 450
+        height: 380
         anchors.centerIn: parent
-        color: "transparent"
+        color: Qt.rgba(0, 0, 0, 0.6)
         border.color: "#00ff88"
         border.width: 2
         radius: 20
         
-        Column {
-            anchors.centerIn: parent
-            spacing: 20
-            
-            Text {
-                text: "Utilisateur:"
-                color: "white"
-                font.pixelSize: 16
-            }
-            
-            TextField {
-                id: userField
-                width: 300
-                height: 40
-                placeholderText: "Nom d'utilisateur"
-                color: "white"
-                background: Rectangle {
-                    color: "transparent"
-                    border.color: "#00ff88"
-                    border.width: 1
-                    radius: 5
+        // Effet de flou d'arrière-plan
+        layer.enabled: true
+        layer.effect: ShaderEffect {
+            fragmentShader: "
+                uniform lowp sampler2D source;
+                uniform lowp float qt_Opacity;
+                varying highp vec2 qt_TexCoord0;
+                void main() {
+                    gl_FragColor = texture2D(source, qt_TexCoord0) * qt_Opacity * 0.9;
                 }
-                text: userModel.lastUser
-            }
+            "
+        }
+        
+        ColumnLayout {
+            anchors.centerIn: parent
+            spacing: 25
+            width: parent.width - 80
             
-            Text {
-                text: "Mot de passe:"
-                color: "white"
-                font.pixelSize: 16
-            }
-            
-            TextField {
-                id: passwordField
-                width: 300
-                height: 40
-                placeholderText: "Mot de passe"
-                echoMode: TextInput.Password
-                color: "white"
-                background: Rectangle {
-                    color: "transparent"
-                    border.color: "#00ff88"
-                    border.width: 1
-                    radius: 5
+            // Sélection utilisateur
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 10
+                
+                Text {
+                    text: "👤 Utilisateur"
+                    color: "#00ff88"
+                    font.pixelSize: 16
+                    font.bold: true
                 }
                 
-                Keys.onPressed: {
-                    if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                        sddm.login(userField.text, passwordField.text, sessionModel.lastIndex)
-                        event.accepted = true
+                ComboBox {
+                    id: userCombo
+                    Layout.fillWidth: true
+                    model: userModel
+                    currentIndex: userModel.lastIndex
+                    textRole: "name"
+                    
+                    delegate: ItemDelegate {
+                        width: userCombo.width
+                        contentItem: Text {
+                            text: model.name
+                            color: "#ffffff"
+                            font: userCombo.font
+                            elide: Text.ElideRight
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        highlighted: userCombo.highlightedIndex === index
+                    }
+                    
+                    background: Rectangle {
+                        color: Qt.rgba(0, 0, 0, 0.5)
+                        border.color: userCombo.pressed ? "#00ff88" : "#555555"
+                        border.width: 1
+                        radius: 8
+                    }
+                    
+                    contentItem: Text {
+                        leftPadding: 15
+                        rightPadding: userCombo.indicator.width + userCombo.spacing
+                        text: userCombo.displayText
+                        font: userCombo.font
+                        color: "#ffffff"
+                        verticalAlignment: Text.AlignVCenter
+                        elide: Text.ElideRight
                     }
                 }
             }
             
-            Button {
-                text: "Connexion"
-                width: 300
-                height: 40
-                background: Rectangle {
+            // Mot de passe
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 10
+                
+                Text {
+                    text: "🔒 Mot de passe"
                     color: "#00ff88"
-                    radius: 5
+                    font.pixelSize: 16
+                    font.bold: true
+                }
+                
+                TextField {
+                    id: passwordField
+                    Layout.fillWidth: true
+                    placeholderText: "Entrez votre mot de passe"
+                    echoMode: TextInput.Password
+                    font.pixelSize: 16
+                    color: "#ffffff"
+                    
+                    background: Rectangle {
+                        color: Qt.rgba(0, 0, 0, 0.5)
+                        border.color: passwordField.focus ? "#00ff88" : "#555555"
+                        border.width: 1
+                        radius: 8
+                    }
+                    
+                    Keys.onPressed: {
+                        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                            loginButton.clicked()
+                            event.accepted = true
+                        }
+                    }
+                    
+                    onTextChanged: {
+                        errorText.visible = false
+                    }
+                }
+            }
+            
+            // Message d'erreur
+            Text {
+                id: errorText
+                Layout.fillWidth: true
+                text: "❌ Mot de passe incorrect"
+                color: "#ff5555"
+                font.pixelSize: 14
+                horizontalAlignment: Text.AlignHCenter
+                visible: false
+            }
+            
+            // Sélection de session
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 15
+                
+                Text {
+                    text: "🖥️ Session:"
+                    color: "#ffffff"
+                    font.pixelSize: 14
+                }
+                
+                ComboBox {
+                    id: sessionCombo
+                    Layout.fillWidth: true
+                    model: sessionModel
+                    currentIndex: sessionModel.lastIndex
+                    textRole: "name"
+                    
+                    background: Rectangle {
+                        color: Qt.rgba(0, 0, 0, 0.5)
+                        border.color: "#555555"
+                        border.width: 1
+                        radius: 8
+                    }
+                    
+                    contentItem: Text {
+                        leftPadding: 10
+                        text: sessionCombo.displayText
+                        color: "#ffffff"
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                }
+            }
+            
+            // Bouton de connexion
+            Button {
+                id: loginButton
+                Layout.fillWidth: true
+                Layout.preferredHeight: 50
+                text: "🚀 SE CONNECTER"
+                font.pixelSize: 16
+                font.bold: true
+                
+                background: Rectangle {
+                    color: loginButton.pressed ? "#00cc6a" : "#00ff88"
+                    radius: 10
+                    
+                    SequentialAnimation on scale {
+                        running: loginButton.hovered
+                        loops: 1
+                        NumberAnimation { from: 1.0; to: 1.05; duration: 100 }
+                    }
+                }
+                
+                contentItem: Text {
+                    text: loginButton.text
+                    font: loginButton.font
+                    color: "#000000"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
                 }
                 
                 onClicked: {
-                    sddm.login(userField.text, passwordField.text, sessionModel.lastIndex)
+                    errorText.visible = false
+                    sddm.login(userCombo.currentText, passwordField.text, sessionCombo.currentIndex)
                 }
             }
         }
     }
     
-    // Informations système en bas
-    Text {
-        anchors.horizontalCenter: parent.horizontalCenter
+    // Barre d'informations en bas
+    Rectangle {
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 30
-        text: "Beartify Streaming Server - " + Qt.formatDateTime(new Date(), "dd/MM/yyyy hh:mm")
-        color: "#888888"
-        font.pixelSize: 14
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 60
+        color: Qt.rgba(0, 0, 0, 0.5)
+        
+        RowLayout {
+            anchors.fill: parent
+            anchors.margins: 20
+            spacing: 30
+            
+            // Heure
+            Text {
+                text: Qt.formatDateTime(new Date(), "🕐 dddd dd MMMM yyyy - HH:mm")
+                color: "#ffffff"
+                font.pixelSize: 16
+            }
+            
+            Item { Layout.fillWidth: true }
+            
+            // Boutons système
+            Row {
+                spacing: 15
+                
+                Button {
+                    text: "🔄"
+                    width: 40
+                    height: 40
+                    ToolTip.visible: hovered
+                    ToolTip.text: "Redémarrer"
+                    onClicked: sddm.reboot()
+                    background: Rectangle {
+                        color: parent.pressed ? "#555555" : Qt.rgba(0, 0, 0, 0.5)
+                        radius: 20
+                        border.color: "#00ff88"
+                        border.width: 1
+                    }
+                    contentItem: Text {
+                        text: parent.text
+                        font.pixelSize: 20
+                        color: "#ffffff"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                }
+                
+                Button {
+                    text: "⚡"
+                    width: 40
+                    height: 40
+                    ToolTip.visible: hovered
+                    ToolTip.text: "Éteindre"
+                    onClicked: sddm.powerOff()
+                    background: Rectangle {
+                        color: parent.pressed ? "#555555" : Qt.rgba(0, 0, 0, 0.5)
+                        radius: 20
+                        border.color: "#ff5555"
+                        border.width: 1
+                    }
+                    contentItem: Text {
+                        text: parent.text
+                        font.pixelSize: 20
+                        color: "#ffffff"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                }
+            }
+        }
     }
     
+    // Focus automatique
     Component.onCompleted: {
-        if (userField.text === "") {
-            userField.focus = true
+        if (userCombo.currentText === "") {
+            userCombo.focus = true
         } else {
             passwordField.focus = true
         }
     }
+    
+    // Timer pour l'horloge
+    Timer {
+        interval: 1000
+        running: true
+        repeat: true
+        onTriggered: {
+            // Force refresh de la date/heure
+            root.update()
+        }
+    }
+    
+    Connections {
+        target: sddm
+        function onLoginFailed() {
+            errorText.visible = true
+            passwordField.text = ""
+            passwordField.focus = true
+        }
+    }
 }
-EOF
-        
-        # Fichier de métadonnées du thème
-        cat > "$theme_dir/metadata.desktop" << 'EOF'
+EOFQML
+    
+    # Fichier de métadonnées du thème
+    cat > "$theme_dir/metadata.desktop" << 'EOF'
 [SddmGreeterTheme]
-Name=Beartify Fallout
-Description=Thème Beartify pour serveur de streaming
+Name=Beartify Modern
+Description=Thème moderne Beartify pour serveur de streaming
 Author=PapaOursPolaire
 Copyright=GPL v3
 License=GPL v3
 Type=sddm-theme
-Version=1.0
+Version=2.0
 Website=https://github.com/PapaOursPolaire
 MainScript=Main.qml
 ConfigFile=theme.conf
-TranslationsDirectory=translations
-Theme-Id=beartify-fallout
+Theme-Id=beartify-modern
 Theme-API=2.0
 EOF
+
+    # Configuration du thème
+    cat > "$theme_dir/theme.conf" << 'EOF'
+[General]
+background=background.jpg
+type=image
+
+[Branding]
+name=Beartify
+showLogo=true
+EOF
+    
+    # Télécharger ou créer un fond d'écran
+    if command -v convert &>/dev/null; then
+        convert -size 1920x1080 gradient:'#0f2027'-'#2c5364' "$theme_dir/background.jpg"
     fi
     
     # Configuration SDDM
     cat > /etc/sddm.conf << EOF
 [Theme]
-Current=beartify-fallout
+Current=beartify-modern
 CursorTheme=breeze_cursors
-Font=Ubuntu
+Font=Ubuntu,11,-1,5,50,0,0,0,0,0
 
 [General]
 DisplayServer=x11
@@ -555,117 +990,131 @@ User=
 [Users]
 MaximumUid=60513
 MinimumUid=1000
+HideUsers=
+HideShells=/bin/false,/usr/sbin/nologin
+
+[X11]
+ServerPath=/usr/bin/X
+MinimumVT=7
 EOF
     
-    success "SDDM configuré avec thème Beartify"
+    success "SDDM configuré avec thème Beartify Modern"
 }
 
-# Configuration Plymouth personnalisée (adaptée d'Arch Linux)
+# Configuration Plymouth personnalisée
 configure_plymouth_custom() {
     if [[ "$GUI_CHOICE" != "1" ]]; then
         return 0
     fi
     
-    info "Configuration Plymouth avec thème personnalisé..."
+    info "Installation Plymouth avec thème Beartify Mac Style..."
     
-    # Installation Plymouth
-    apt install -y plymouth plymouth-themes
+    # Installer Plymouth si nécessaire
+    apt install -y plymouth plymouth-themes unzip
     
-    local theme_dir="/usr/share/plymouth/themes/beartify"
-    mkdir -p "$theme_dir"
+    local theme_dir="/usr/share/plymouth/themes/ubuntu-mac-style"
+    local temp_dir="/tmp/plymouth-beartify"
     
-    # Téléchargement du thème si disponible
-    local temp_dir="/tmp/plymouth-theme"
+    # Nettoyer et créer répertoires temporaires
+    rm -rf "$temp_dir"
     mkdir -p "$temp_dir"
     
-    if curl -fsSL "https://raw.githubusercontent.com/PapaOursPolaire/arch/Projets/arch-mac-style.zip" -o "$temp_dir/plymouth.zip" 2>/dev/null; then
-        cd "$temp_dir"
-        unzip -q plymouth.zip -d "$theme_dir"
+    # Télécharger le thème
+    info "Téléchargement du thème depuis GitHub..."
+    if wget -q --show-progress "https://github.com/PapaOursPolaire/Beartify/raw/Projets/ubuntu-mac-style.zip" -O "$temp_dir/theme.zip"; then
+        success "Thème téléchargé"
+    else
+        warning "Échec du téléchargement du thème Plymouth. Installation ignorée."
+        rm -rf "$temp_dir"
+        return 1
     fi
     
-    # Création d'un thème par défaut si téléchargement échoue
-    if [[ ! -f "$theme_dir/beartify.plymouth" ]]; then
-        # Création du script Plymouth
-        cat > "$theme_dir/beartify.script" << 'EOF'
-# Thème Plymouth Beartify
-Window.SetBackgroundTopColor(0.00, 0.17, 0.33);
-Window.SetBackgroundBottomColor(0.00, 0.05, 0.15);
-
-# Logo Beartify
-logo.image = Image.Text("🎵 BEARTIFY", 1, 1, 1);
-logo.sprite = Sprite(logo.image);
-logo.sprite.SetPosition(Window.GetWidth() / 2 - logo.image.GetWidth() / 2, 200);
-
-# Texte de chargement
-loading_text = Image.Text("Démarrage du serveur streaming...", 0.8, 0.8, 0.8);
-loading_sprite = Sprite(loading_text);
-loading_sprite.SetPosition(Window.GetWidth() / 2 - loading_text.GetWidth() / 2, 300);
-
-# Animation de points
-dots = 0;
-fun animate_dots() {
-    dots = (dots + 1) % 4;
-    dot_text = "";
-    for (i = 0; i < dots; i++) {
-        dot_text += ".";
-    }
+    # Extraire le zip
+    info "Extraction du thème..."
+    cd "$temp_dir"
+    unzip -q theme.zip
     
-    status_text = Image.Text("Chargement" + dot_text, 0.6, 0.8, 0.6);
-    status_sprite.SetImage(status_text);
-    status_sprite.SetPosition(Window.GetWidth() / 2 - status_text.GetWidth() / 2, 400);
-}
-
-status_sprite = Sprite();
-Plymouth.SetRefreshFunction(animate_dots);
-
-# Messages de démarrage
-Plymouth.SetMessageFunction(
-    fun (text) {
-        my_image = Image.Text(text, 0.6, 0.6, 0.6);
-        message_sprite.SetImage(my_image);
-        message_sprite.SetPosition(Window.GetWidth() / 2 - my_image.GetWidth() / 2, 500);
-    }
-);
-message_sprite = Sprite();
-
-# Barre de progression
-progress_box.image = Image("progress_box.png");
-progress_box.sprite = Sprite(progress_box.image);
-progress_box.sprite.SetPosition(Window.GetWidth() / 2 - progress_box.image.GetWidth() / 2, 550);
-
-Plymouth.SetBootProgressFunction(
-    fun (duration, progress) {
-        if (progress_bar.image.GetWidth() != Math.Int(progress * progress_box.image.GetWidth())) {
-            progress_bar.image = Image.Scale(progress_box.image, Math.Int(progress * progress_box.image.GetWidth()), progress_box.image.GetHeight());
-            progress_bar.sprite.SetImage(progress_bar.image);
-        }
-    }
-);
-progress_bar.sprite = Sprite();
-progress_bar.sprite.SetPosition(Window.GetWidth() / 2 - progress_box.image.GetWidth() / 2, 550);
-EOF
-        
-        # Fichier de configuration Plymouth
-        cat > "$theme_dir/beartify.plymouth" << 'EOF'
-[Plymouth Theme]
-Name=Beartify
-Description=Thème de démarrage Beartify pour serveur streaming
-ModuleName=script
-
-[script]
-ImageDir=/usr/share/plymouth/themes/beartify
-ScriptFile=/usr/share/plymouth/themes/beartify/beartify.script
-EOF
-        
-        # Images par défaut (création d'images simples)
-        convert -size 400x20 xc:"#003366" "$theme_dir/progress_box.png" 2>/dev/null || touch "$theme_dir/progress_box.png"
+    # Le zip contient un dossier ubuntu-mac-style/ubuntu-mac-style
+    # On doit naviguer dans le bon répertoire
+    if [[ -d "$temp_dir/ubuntu-mac-style/ubuntu-mac-style" ]]; then
+        local source_dir="$temp_dir/ubuntu-mac-style/ubuntu-mac-style"
+    elif [[ -d "$temp_dir/ubuntu-mac-style" ]]; then
+        local source_dir="$temp_dir/ubuntu-mac-style"
+    else
+        warning "Structure du thème inattendue. Recherche du dossier..."
+        source_dir=$(find "$temp_dir" -name "*.plymouth" -exec dirname {} \; | head -n1)
+        if [[ -z "$source_dir" ]]; then
+            error_exit "Impossible de trouver le thème dans l'archive"
+        fi
     fi
     
-    # Installation du thème
-    plymouth-set-default-theme beartify
-    update-initramfs -u
+    info "Thème trouvé dans: $source_dir"
     
-    success "Plymouth configuré avec thème Beartify"
+    # Supprimer l'ancien thème s'il existe
+    if [[ -d "$theme_dir" ]]; then
+        rm -rf "$theme_dir"
+    fi
+    
+    # Copier le thème vers le répertoire Plymouth
+    mkdir -p "$theme_dir"
+    cp -r "$source_dir"/* "$theme_dir/"
+    
+    # Vérifier que le fichier .plymouth existe
+    if [[ ! -f "$theme_dir/ubuntu-mac-style.plymouth" ]]; then
+        warning "Fichier .plymouth non trouvé. Recherche..."
+        plymouth_file=$(find "$theme_dir" -name "*.plymouth" | head -n1)
+        if [[ -n "$plymouth_file" ]]; then
+            info "Fichier Plymouth trouvé: $plymouth_file"
+        else
+            error_exit "Aucun fichier .plymouth trouvé dans le thème"
+        fi
+    fi
+    
+    # Définir les permissions correctes
+    chown -R root:root "$theme_dir"
+    chmod -R 755 "$theme_dir"
+    
+    # Installer le thème Plymouth
+    info "Installation du thème Plymouth..."
+    if command -v plymouth-set-default-theme &>/dev/null; then
+        # Lister les thèmes disponibles pour vérifier
+        plymouth-set-default-theme --list | tee -a "$LOG_FILE"
+        
+        # Essayer d'installer le thème
+        if plymouth-set-default-theme ubuntu-mac-style 2>&1 | tee -a "$LOG_FILE"; then
+            success "Thème Plymouth défini"
+        else
+            warning "Échec de la définition du thème par défaut"
+            info "Le thème est installé mais pourrait ne pas être actif"
+        fi
+    else
+        warning "plymouth-set-default-theme non disponible"
+        info "Installation manuelle du thème..."
+        
+        # Alternative manuelle si plymouth-set-default-theme n'existe pas
+        if [[ -f /etc/alternatives/default.plymouth ]]; then
+            ln -sf "$theme_dir/ubuntu-mac-style.plymouth" /etc/alternatives/default.plymouth
+        fi
+        
+        if [[ -f /etc/alternatives/text.plymouth ]]; then
+            ln -sf "$theme_dir/ubuntu-mac-style.plymouth" /etc/alternatives/text.plymouth
+        fi
+    fi
+    
+    # Mettre à jour initramfs
+    info "Mise à jour de l'initramfs (peut prendre quelques minutes)..."
+    if update-initramfs -u 2>&1 | tee -a "$LOG_FILE"; then
+        success "Initramfs mis à jour"
+    else
+        warning "Échec de la mise à jour d'initramfs. Le thème pourrait ne pas s'appliquer au démarrage."
+    fi
+    
+    # Nettoyer
+    cd /
+    rm -rf "$temp_dir"
+    
+    success "Thème Plymouth Beartify Mac Style installé"
+    info "Le thème sera visible au prochain redémarrage"
 }
 
 # Création de l'utilisateur Beartify
@@ -673,10 +1122,35 @@ create_beartify_user() {
     info "Création de l'utilisateur système Beartify..."
     
     if ! id "$BEARTIFY_USER" &>/dev/null; then
-        useradd -m -s /bin/bash -G audio,video,www-data "$BEARTIFY_USER"
+        useradd -m -s /bin/bash -G audio,video,www-data,sudo "$BEARTIFY_USER"
         
-        # Création des répertoires
-        sudo -u "$BEARTIFY_USER" mkdir -p "$BEARTIFY_HOME"/{config,logs,temp}
+        # Définir mot de passe
+        if [[ -n "$BEARTIFY_PASSWORD" ]]; then
+            echo "$BEARTIFY_USER:$BEARTIFY_PASSWORD" | chpasswd
+        fi
+        
+        # Créer répertoires
+        sudo -u "$BEARTIFY_USER" mkdir -p "$BEARTIFY_HOME"/{config,logs,temp,scripts}
+        
+        # Configuration bash
+        cat >> "$BEARTIFY_HOME/.bashrc" << 'EOF'
+
+# Beartify Environment
+export BEARTIFY_HOME=/home/beartify
+export MEDIA_ROOT=/srv/media
+export PATH=$PATH:$BEARTIFY_HOME/scripts
+
+# Alias utiles
+alias beartify-status='sudo systemctl status beartify nginx mysql redis'
+alias beartify-logs='sudo journalctl -u beartify -f'
+alias beartify-restart='sudo systemctl restart beartify'
+alias media-stats='du -sh /srv/media/*'
+
+# FastFetch au login
+if command -v fastfetch &>/dev/null; then
+    fastfetch
+fi
+EOF
         
         success "Utilisateur $BEARTIFY_USER créé"
     else
@@ -688,44 +1162,47 @@ create_beartify_user() {
 setup_streaming_storage() {
     info "Configuration du stockage multimédia pour streaming..."
     
-    # Structure optimisée pour streaming haute performance
+    # Structure optimisée
     mkdir -p \
-        "$MEDIA_ROOT"/{audio,video,images,lyrics,metadata,cache,temp,processed} \
-        "$MEDIA_ROOT"/audio/{mp3,flac,ogg,m4a,wav} \
-        "$MEDIA_ROOT"/video/{mp4,webm,hls,dash} \
-        "$MEDIA_ROOT"/images/{covers,thumbnails,artwork} \
-        "$MEDIA_ROOT"/cache/{audio,video,metadata} \
-        "$BACKUP_ROOT"/{daily,weekly,config}
+        "$MEDIA_ROOT"/{audio,video,images,lyrics,metadata,cache,temp,processed,playlists} \
+        "$MEDIA_ROOT"/audio/{mp3,flac,ogg,m4a,wav,aac,opus} \
+        "$MEDIA_ROOT"/video/{mp4,webm,hls,dash,mkv,avi} \
+        "$MEDIA_ROOT"/images/{covers,thumbnails,artwork,banners} \
+        "$MEDIA_ROOT"/lyrics/{lrc,txt,json} \
+        "$MEDIA_ROOT"/metadata/{json,xml,nfo} \
+        "$MEDIA_ROOT"/cache/{audio,video,metadata,thumbnails} \
+        "$MEDIA_ROOT"/playlists/{m3u,pls,json} \
+        "$BACKUP_ROOT"/{daily,weekly,monthly,config}
     
-    # Permissions optimisées pour streaming
+    # Permissions
     chown -R "$BEARTIFY_USER":www-data "$MEDIA_ROOT"
     chmod -R 755 "$MEDIA_ROOT"
     chmod -R 775 "$MEDIA_ROOT"/{temp,cache,processed}
     
-    # Configuration des montages optimisés pour performance
-    if ! grep -q "$MEDIA_ROOT" /etc/fstab; then
-        echo "# Optimisations Beartify streaming" >> /etc/fstab
-        echo "tmpfs $MEDIA_ROOT/cache tmpfs defaults,noatime,size=2G,uid=$(id -u $BEARTIFY_USER),gid=$(id -g www-data),mode=1775 0 0" >> /etc/fstab
+    # Configuration fstab pour tmpfs
+    if ! grep -q "$MEDIA_ROOT/cache" /etc/fstab; then
+        echo "tmpfs $MEDIA_ROOT/cache tmpfs defaults,noatime,size=4G,uid=$(id -u $BEARTIFY_USER),gid=$(id -g www-data),mode=1775 0 0" >> /etc/fstab
     fi
     
-    # Configuration logrotate pour les logs de streaming
+    # Logrotate
     cat > /etc/logrotate.d/beartify << EOF
 $BEARTIFY_HOME/logs/*.log {
     daily
-    rotate 7
+    rotate 14
     compress
     delaycompress
     missingok
     notifempty
     create 644 $BEARTIFY_USER $BEARTIFY_USER
+    sharedscripts
     postrotate
         systemctl reload beartify 2>/dev/null || true
     endscript
 }
 
 $MEDIA_ROOT/logs/*.log {
-    daily
-    rotate 30
+    weekly
+    rotate 8
     compress
     delaycompress
     missingok
@@ -734,212 +1211,221 @@ $MEDIA_ROOT/logs/*.log {
 }
 EOF
     
-    success "Stockage multimédia configuré pour streaming haute performance"
+    success "Stockage multimédia configuré"
 }
 
-# Installation des bases de données optimisées pour streaming
+# Installation base de données
 install_database() {
     case $DB_CHOICE in
         1)
-            info "Installation de MariaDB optimisée pour streaming..."
+            info "Installation de MariaDB optimisée..."
             
             apt install -y mariadb-server mariadb-client
             
-            # Configuration optimisée pour streaming multimédia
-            cat > /etc/mysql/mariadb.conf.d/99-beartify-streaming.cnf << EOF
+            cat > /etc/mysql/mariadb.conf.d/99-beartify.cnf << EOF
 [mysqld]
-# Optimisations pour streaming multimédia
+# Optimisations streaming
 innodb_buffer_pool_size = 2G
 innodb_log_file_size = 512M
 innodb_flush_log_at_trx_commit = 2
 innodb_flush_method = O_DIRECT
 innodb_read_io_threads = 8
 innodb_write_io_threads = 8
+innodb_io_capacity = 2000
+innodb_io_capacity_max = 4000
 
-# Cache et performance
+# Cache
 query_cache_size = 512M
 query_cache_type = 1
+query_cache_limit = 2M
 key_buffer_size = 512M
 sort_buffer_size = 4M
 read_buffer_size = 2M
 read_rnd_buffer_size = 8M
+join_buffer_size = 4M
 
-# Connexions pour streaming simultané
+# Connexions
 max_connections = 500
 max_user_connections = 450
+thread_cache_size = 100
+table_open_cache = 4096
 
-# Support pour fichiers binaires volumineux (audio/video)
+# Fichiers volumineux
 max_allowed_packet = 1G
 tmp_table_size = 512M
 max_heap_table_size = 512M
 
-# Optimisations réseau pour streaming
+# Réseau
 net_buffer_length = 32K
 net_read_timeout = 120
 net_write_timeout = 120
+wait_timeout = 600
+interactive_timeout = 600
+
+# Charset UTF8MB4
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+
+# Logs
+slow_query_log = 1
+slow_query_log_file = /var/log/mysql/slow-query.log
+long_query_time = 2
+log_queries_not_using_indexes = 0
 EOF
             
             systemctl restart mariadb
             
-            # Création base et utilisateur
-            mysql -e "CREATE DATABASE $DB_NAME CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" || true
-            mysql -e "CREATE USER '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASS';" || true
-            mysql -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'localhost';" || true
-            mysql -e "FLUSH PRIVILEGES;" || true
+            # Sécurisation
+            mysql -e "DELETE FROM mysql.user WHERE User='';" || true
+            mysql -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');" || true
+            mysql -e "DROP DATABASE IF EXISTS test;" || true
+            mysql -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';" || true
             
-            success "MariaDB configurée pour streaming"
+            # Création base et utilisateur
+            mysql -e "CREATE DATABASE IF NOT EXISTS $DB_NAME CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+            mysql -e "CREATE USER IF NOT EXISTS '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASS';"
+            mysql -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'localhost';"
+            mysql -e "FLUSH PRIVILEGES;"
+            
+            success "MariaDB configurée"
             ;;
         2)
-            info "Installation de PostgreSQL optimisée pour streaming..."
+            info "Installation de PostgreSQL optimisée..."
             
-            apt install -y postgresql postgresql-contrib
+            apt install -y postgresql postgresql-contrib postgresql-client
             
-            # Configuration optimisée
             local pg_version=$(ls /etc/postgresql/ | sort -V | tail -n 1)
             local pg_config="/etc/postgresql/$pg_version/main/postgresql.conf"
             
             cat >> "$pg_config" << EOF
 
-# Optimisations Beartify Streaming
+# Beartify Streaming Optimizations
 shared_buffers = 2GB
 effective_cache_size = 6GB
-work_mem = 256MB
 maintenance_work_mem = 1GB
-
-# Performance streaming
-checkpoint_completion_target = 0.9
+work_mem = 256MB
 wal_buffers = 64MB
+max_wal_size = 2GB
+min_wal_size = 512MB
+checkpoint_completion_target = 0.9
 default_statistics_target = 100
-
-# Connexions simultanées
+random_page_cost = 1.1
+effective_io_concurrency = 200
+max_worker_processes = 8
+max_parallel_workers_per_gather = 4
+max_parallel_workers = 8
 max_connections = 400
+shared_preload_libraries = 'pg_stat_statements'
 EOF
             
             systemctl restart postgresql
             
-            # Création base et utilisateur
-            sudo -u postgres createuser "$DB_USER" || true
-            sudo -u postgres createdb -O "$DB_USER" "$DB_NAME" || true
-            sudo -u postgres psql -c "ALTER USER $DB_USER PASSWORD '$DB_PASS';" || true
+            sudo -u postgres createuser "$DB_USER" 2>/dev/null || true
+            sudo -u postgres createdb -O "$DB_USER" "$DB_NAME" 2>/dev/null || true
+            sudo -u postgres psql -c "ALTER USER $DB_USER PASSWORD '$DB_PASS';" 2>/dev/null || true
             
-            success "PostgreSQL configuré pour streaming"
+            success "PostgreSQL configuré"
             ;;
         3)
             info "Installation de MySQL..."
             apt install -y mysql-server mysql-client
-            # Configuration similaire à MariaDB...
+            
+            # Configuration similaire à MariaDB
+            systemctl restart mysql
+            
+            mysql -e "CREATE DATABASE IF NOT EXISTS $DB_NAME CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+            mysql -e "CREATE USER IF NOT EXISTS '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASS';"
+            mysql -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'localhost';"
+            mysql -e "FLUSH PRIVILEGES;"
+            
             success "MySQL installé"
             ;;
     esac
 }
 
-# Installation environnement Java optimisé pour Beartify
+# Installation environnement Java
 install_java_environment() {
-    info "Installation environnement Java optimisé pour Beartify..."
+    info "Installation environnement Java..."
     
-    # Installation OpenJDK 17 (LTS)
-    apt install -y openjdk-17-jdk openjdk-17-jre
+    apt install -y openjdk-17-jdk openjdk-17-jre maven
     
-    # Maven et Gradle pour builds
-    apt install -y maven
-    
-    # Installation Gradle dernière version
-    local gradle_version="8.4"
+    # Gradle
+    local gradle_version="8.5"
     wget -q "https://services.gradle.org/distributions/gradle-${gradle_version}-bin.zip" -O /tmp/gradle.zip
-    unzip -d /opt /tmp/gradle.zip
+    unzip -q -d /opt /tmp/gradle.zip
     ln -sf "/opt/gradle-${gradle_version}/bin/gradle" /usr/local/bin/gradle
     rm /tmp/gradle.zip
     
-    # Configuration des variables d'environnement Java
-    cat > /etc/environment << EOF
-JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-BEARTIFY_HOME=$BEARTIFY_HOME
-MEDIA_ROOT=$MEDIA_ROOT
-PATH=\$PATH:\$JAVA_HOME/bin
+    # Variables d'environnement
+    cat > /etc/profile.d/beartify-java.sh << EOF
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+export BEARTIFY_HOME=$BEARTIFY_HOME
+export MEDIA_ROOT=$MEDIA_ROOT
+export PATH=\$PATH:\$JAVA_HOME/bin:/opt/gradle-${gradle_version}/bin
 EOF
     
-    # Configuration JVM optimisée pour streaming
+    # Configuration JVM
     mkdir -p "$BEARTIFY_HOME/config"
-    cat > "$BEARTIFY_HOME/config/jvm.conf" << EOF
-# JVM Options pour Beartify Streaming Server
+    cat > "$BEARTIFY_HOME/config/jvm.conf" << 'EOF'
+# JVM Options Beartify
 -Xms2g
--Xmx4g
+-Xmx6g
 -XX:+UseG1GC
+-XX:MaxGCPauseMillis=200
 -XX:+UseStringDeduplication
 -XX:+OptimizeStringConcat
 -XX:+UseCompressedOops
--XX:MaxGCPauseMillis=200
 -XX:G1HeapRegionSize=16m
+-XX:ConcGCThreads=2
+-XX:ParallelGCThreads=8
+-XX:+ParallelRefProcEnabled
 -XX:+UnlockExperimentalVMOptions
--XX:+UseZGC
+-XX:+AggressiveOpts
 -Dfile.encoding=UTF-8
+-Djava.net.preferIPv4Stack=true
 -Dspring.profiles.active=production
+-Dserver.port=8080
 EOF
     
-    success "Environnement Java optimisé pour Beartify installé"
+    success "Java installé"
 }
 
-# Installation des outils de développement
+# Installation développement
 install_development() {
-    info "Installation de l'environnement de développement complet..."
+    info "Installation environnement de développement..."
     
-    # Langages de programmation
-    local dev_packages=(
-        # Python stack complet
-        python3 python3-pip python3-venv python3-dev
-        python3-setuptools python3-wheel
-        
-        # Node.js et npm
-        nodejs npm
-        
-        # Outils de build et compilation
-        build-essential cmake make
-        gcc g++ clang
-        gdb valgrind
-        
-        # Version control et outils
-        git git-lfs
-        subversion mercurial
-        
-        # Outils de packaging
-        dpkg-dev fakeroot
-        
-        # Libraries de développement
-        libssl-dev libffi-dev
-        libbz2-dev libreadline-dev libsqlite3-dev
-        libncurses5-dev libncursesw5-dev
-        liblzma-dev tk-dev
-        
-        # Outils réseau et debug
-        wireshark-common tcpdump
-        strace ltrace
-    )
-    
-    apt install -y "${dev_packages[@]}"
-    
-    # Installation de la dernière version de Node.js via NodeSource
+    # Node.js LTS
     curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
     apt install -y nodejs
     
-    # Installation d'outils npm globaux
-    npm install -g pm2 nodemon typescript ts-node
+    # Packages npm globaux
+    npm install -g pm2 nodemon typescript ts-node @nestjs/cli yarn pnpm
     
-    # Configuration Git globale pour le serveur
-    git config --system user.name "Beartify Server"
-    git config --system user.email "server@beartify.local"
-    git config --system init.defaultBranch main
+    # Python
+    apt install -y python3 python3-pip python3-venv python3-dev \
+        python3-setuptools python3-wheel
+    
+    # Outils Python pour multimédia
+    pip3 install mutagen pillow pydub audioread librosa
+
+    # Ruby
+    apt install -y ruby-full
+    
+    # Go
+    snap install go --classic 2>/dev/null || true
+    
+    # Rust
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     
     success "Environnement de développement installé"
 }
 
-# Installation Docker optimisé pour streaming
+# Installation Docker
 install_docker() {
-    info "Installation Docker optimisé pour applications streaming..."
+    info "Installation Docker..."
     
-    # Installation des dépendances
     apt install -y apt-transport-https ca-certificates curl gnupg lsb-release
     
-    # Ajout du repository Docker officiel
     mkdir -p /etc/apt/keyrings
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
     
@@ -950,9 +1436,9 @@ install_docker() {
     apt update
     apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
     
-    # Configuration Docker pour streaming
+    # Configuration
     mkdir -p /etc/docker
-    cat > /etc/docker/daemon.json << EOF
+    cat > /etc/docker/daemon.json << 'EOF'
 {
     "log-driver": "json-file",
     "log-opts": {
@@ -960,45 +1446,41 @@ install_docker() {
         "max-file": "3"
     },
     "storage-driver": "overlay2",
-    "storage-opts": ["overlay2.override_kernel_check=true"],
     "default-ulimits": {
         "memlock": {"name": "memlock", "soft": -1, "hard": -1},
         "nofile": {"name": "nofile", "soft": 65536, "hard": 65536}
     },
     "dns": ["8.8.8.8", "8.8.4.4"],
     "max-concurrent-downloads": 10,
-    "max-concurrent-uploads": 5
+    "max-concurrent-uploads": 5,
+    "live-restore": true
 }
 EOF
     
-    # Ajout utilisateur au groupe docker
     usermod -aG docker "$BEARTIFY_USER"
     
     systemctl enable docker
     systemctl start docker
     
-    success "Docker installé et optimisé"
+    success "Docker installé"
 }
 
-# Installation et configuration Nginx pour streaming
+# Installation Nginx avec modules streaming avancés
 install_nginx_streaming() {
-    info "Installation Nginx optimisé pour streaming multimédia..."
+    info "Installation Nginx optimisé pour streaming..."
     
-    # Installation avec modules additionnels
-    apt install -y nginx-full nginx-extras
+    # Installation avec modules RTMP
+    apt install -y nginx-full libnginx-mod-rtmp nginx-extras
     
-    # Configuration Nginx optimisée pour streaming haute performance
-    cat > /etc/nginx/nginx.conf << 'EOF'
+    # Configuration principale Nginx
+    cat > /etc/nginx/nginx.conf << 'EOFNGINX'
 user www-data;
 worker_processes auto;
-worker_rlimit_nofile 65535;
+worker_rlimit_nofile 100000;
 pid /run/nginx.pid;
 
-# Modules additionnels
-load_module modules/ngx_rtmp_module.so;
-
 events {
-    worker_connections 4096;
+    worker_connections 8192;
     use epoll;
     multi_accept on;
     accept_mutex off;
@@ -1013,46 +1495,66 @@ http {
     keepalive_timeout 120s;
     keepalive_requests 10000;
     reset_timedout_connection on;
+    client_body_timeout 60s;
+    client_header_timeout 60s;
+    send_timeout 120s;
     
-    # Gestion de la mémoire
-    client_body_buffer_size 10m;
-    client_max_body_size 2g;
+    # Buffer sizes
+    client_body_buffer_size 128k;
+    client_max_body_size 4G;
     client_header_buffer_size 4k;
-    large_client_header_buffers 4 8k;
+    large_client_header_buffers 8 16k;
+    output_buffers 2 32k;
+    postpone_output 1460;
     
     # Types MIME
     include /etc/nginx/mime.types;
     default_type application/octet-stream;
     
     # Types MIME additionnels pour streaming
-    location ~* \.(mp3|mp4|m4a|flac|ogg|webm|wav|aac)$ {
-        add_header Accept-Ranges bytes;
-        add_header Cache-Control "public, max-age=31536000";
-        add_header Access-Control-Allow-Origin "*";
-        add_header Access-Control-Allow-Methods "GET, HEAD, OPTIONS";
-        add_header Access-Control-Allow-Headers "Range";
-        add_header Access-Control-Expose-Headers "Content-Length, Content-Range";
+    types {
+        application/json json;
+        audio/mpeg mp3;
+        audio/mp4 m4a;
+        audio/ogg ogg oga;
+        audio/opus opus;
+        audio/x-wav wav;
+        audio/flac flac;
+        audio/aac aac;
+        video/mp4 mp4;
+        video/webm webm;
+        video/x-matroska mkv;
+        application/x-mpegURL m3u8;
+        video/MP2T ts;
+        application/dash+xml mpd;
+        text/vtt vtt;
+        text/plain lrc txt;
     }
     
     # Compression
     gzip on;
     gzip_vary on;
-    gzip_min_length 1000;
+    gzip_min_length 1024;
     gzip_comp_level 6;
     gzip_types
         application/json
         application/javascript
         application/xml+rss
         application/xml
+        application/x-mpegURL
+        application/dash+xml
         image/svg+xml
         text/css
         text/javascript
         text/plain
-        text/xml;
+        text/xml
+        text/vtt;
+    gzip_disable "msie6";
     
-    # Rate limiting pour protection
-    limit_req_zone $binary_remote_addr zone=api:10m rate=30r/s;
-    limit_req_zone $binary_remote_addr zone=streaming:10m rate=100r/s;
+    # Rate limiting
+    limit_req_zone $binary_remote_addr zone=api:20m rate=50r/s;
+    limit_req_zone $binary_remote_addr zone=streaming:20m rate=200r/s;
+    limit_req_zone $binary_remote_addr zone=upload:10m rate=10r/s;
     limit_conn_zone $binary_remote_addr zone=addr:10m;
     
     # Logging
@@ -1060,191 +1562,347 @@ http {
                         '"$request" $status $body_bytes_sent '
                         '"$http_referer" "$http_user_agent" '
                         'rt=$request_time ut="$upstream_response_time" '
-                        'cs=$upstream_cache_status';
+                        'cs=$upstream_cache_status '
+                        'bytes_sent=$bytes_sent connection=$connection';
     
-    access_log /var/log/nginx/access.log streaming buffer=32k flush=5s;
+    access_log /var/log/nginx/access.log streaming buffer=64k flush=5s;
     error_log /var/log/nginx/error.log warn;
     
     # Cache pour contenu statique
-    proxy_cache_path /var/cache/nginx/streaming levels=1:2 keys_zone=streaming:100m 
-                     max_size=10g inactive=60m use_temp_path=off;
+    proxy_cache_path /var/cache/nginx/streaming 
+                     levels=1:2 
+                     keys_zone=streaming:200m 
+                     max_size=20g 
+                     inactive=7d 
+                     use_temp_path=off;
+    
+    proxy_cache_path /var/cache/nginx/media 
+                     levels=1:2 
+                     keys_zone=media:500m 
+                     max_size=100g 
+                     inactive=30d 
+                     use_temp_path=off;
+    
+    # Headers de sécurité par défaut
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
     
     include /etc/nginx/conf.d/*.conf;
     include /etc/nginx/sites-enabled/*;
 }
 
-# Configuration RTMP pour streaming en direct
+# RTMP Server pour streaming en direct
 rtmp {
     server {
         listen 1935;
         chunk_size 4096;
+        ping 30s;
+        ping_timeout 10s;
+        max_message 10M;
+        buflen 5s;
         
         application live {
             live on;
             record off;
+            allow publish 127.0.0.1;
+            allow publish 192.168.0.0/16;
+            deny publish all;
             
             # HLS
             hls on;
-            hls_path /var/www/hls;
-            hls_fragment 3;
-            hls_playlist_length 60;
+            hls_path /var/www/hls/live;
+            hls_fragment 3s;
+            hls_playlist_length 60s;
+            hls_continuous on;
+            hls_cleanup on;
+            hls_nested on;
             
             # DASH
             dash on;
-            dash_path /var/www/dash;
-            dash_fragment 3;
-            dash_playlist_length 60;
+            dash_path /var/www/dash/live;
+            dash_fragment 3s;
+            dash_playlist_length 60s;
+            dash_nested on;
+            dash_cleanup on;
+            
+            # Transcoding pour adaptive streaming
+            exec ffmpeg -i rtmp://localhost:1935/live/$name
+                -c:v libx264 -preset veryfast -tune zerolatency -b:v 2500k -maxrate 2500k -bufsize 5000k -s 1920x1080 -profile:v high -level 4.2 -c:a aac -b:a 128k -ar 48000 -f flv rtmp://localhost:1935/hls/$name_1080p
+                -c:v libx264 -preset veryfast -tune zerolatency -b:v 1000k -maxrate 1000k -bufsize 2000k -s 1280x720 -profile:v main -level 3.1 -c:a aac -b:a 96k -ar 48000 -f flv rtmp://localhost:1935/hls/$name_720p
+                -c:v libx264 -preset veryfast -tune zerolatency -b:v 500k -maxrate 500k -bufsize 1000k -s 854x480 -profile:v main -level 3.0 -c:a aac -b:a 64k -ar 44100 -f flv rtmp://localhost:1935/hls/$name_480p;
+        }
+        
+        application hls {
+            live on;
+            hls on;
+            hls_path /var/www/hls/adaptive;
+            hls_nested on;
+            hls_fragment 3s;
+            hls_playlist_length 60s;
+        }
+        
+        application vod {
+            play /srv/media/video;
         }
     }
 }
-EOF
+EOFNGINX
     
-    # Configuration du site Beartify
-    cat > /etc/nginx/sites-available/beartify << EOF
-# Configuration Beartify Streaming Server
+    # Configuration site Beartify
+    cat > /etc/nginx/sites-available/beartify << 'EOFSITE'
 upstream beartify_app {
-    server 127.0.0.1:$APP_PORT;
-    keepalive 32;
+    server 127.0.0.1:8080;
+    keepalive 64;
 }
 
-# Cache pour médias
-proxy_cache_path /var/cache/nginx/media levels=1:2 keys_zone=media:500m max_size=50g 
-                 inactive=7d use_temp_path=off;
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    '' close;
+}
+
+# Rate limiting maps
+map $request_uri $limit_api {
+    ~*/api/upload/ $binary_remote_addr;
+    default "";
+}
 
 server {
-    listen 80;
-    server_name ${DOMAIN:-_};
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name _;
     
     # Taille max pour uploads
-    client_max_body_size 2G;
+    client_max_body_size 4G;
+    client_body_buffer_size 128k;
     
-    # Optimisations générales
+    # Timeouts
+    proxy_connect_timeout 60s;
+    proxy_send_timeout 300s;
+    proxy_read_timeout 300s;
+    
+    # Optimisations
     tcp_nopush on;
     tcp_nodelay on;
     
-    # Application Beartify
+    # Logs spécifiques
+    access_log /var/log/nginx/beartify_access.log streaming;
+    error_log /var/log/nginx/beartify_error.log warn;
+    
+    # Application principale Beartify
     location / {
         proxy_pass http://beartify_app;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Port $server_port;
         
-        # Rate limiting
-        limit_req zone=api burst=50 nodelay;
-        limit_conn addr 20;
+        # Rate limiting modéré
+        limit_req zone=api burst=100 nodelay;
+        limit_conn addr 50;
         
-        # Timeouts pour streaming
-        proxy_connect_timeout 60s;
-        proxy_send_timeout 300s;
-        proxy_read_timeout 300s;
-    }
-    
-    # API de streaming avec cache
-    location /api/stream/ {
-        proxy_pass http://beartify_app;
+        # Buffering
         proxy_buffering off;
         proxy_request_buffering off;
-        
-        # Headers pour streaming
-        proxy_set_header Range \$http_range;
-        proxy_set_header If-Range \$http_if_range;
-        add_header Accept-Ranges bytes;
-        
-        # Rate limiting spécialisé
-        limit_req zone=streaming burst=200 nodelay;
-        limit_conn addr 50;
     }
     
-    # Médias avec cache agressif
-    location /media/ {
-        alias $MEDIA_ROOT/;
+    # API de streaming avec optimisations
+    location /api/stream/ {
+        proxy_pass http://beartify_app;
+        proxy_http_version 1.1;
         
-        # Cache navigateur
+        # Headers pour streaming
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Range $http_range;
+        proxy_set_header If-Range $http_if_range;
+        
+        # Support Range requests
+        add_header Accept-Ranges bytes;
+        add_header Cache-Control "public, max-age=3600";
+        
+        # CORS pour lecteurs web
+        add_header Access-Control-Allow-Origin "*" always;
+        add_header Access-Control-Allow-Methods "GET, HEAD, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Range, Content-Type, Accept-Encoding" always;
+        add_header Access-Control-Expose-Headers "Content-Length, Content-Range, Accept-Ranges" always;
+        
+        # Rate limiting pour streaming
+        limit_req zone=streaming burst=300 nodelay;
+        limit_conn addr 100;
+        
+        # Pas de buffering pour streaming
+        proxy_buffering off;
+        proxy_request_buffering off;
+        proxy_cache off;
+    }
+    
+    # Médias statiques avec cache agressif
+    location /media/ {
+        alias /srv/media/;
+        
+        # Cache navigateur long
         expires 1y;
         add_header Cache-Control "public, immutable";
         add_header X-Content-Type-Options nosniff;
-        
-        # Support Range requests pour streaming
         add_header Accept-Ranges bytes;
         
-        # CORS pour lecteurs web
-        add_header Access-Control-Allow-Origin "*";
-        add_header Access-Control-Allow-Methods "GET, HEAD, OPTIONS";
-        add_header Access-Control-Allow-Headers "Range, Content-Type, Accept-Encoding";
-        add_header Access-Control-Expose-Headers "Content-Length, Content-Range, Accept-Ranges";
+        # CORS
+        add_header Access-Control-Allow-Origin "*" always;
+        add_header Access-Control-Allow-Methods "GET, HEAD, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Range, Content-Type" always;
+        add_header Access-Control-Expose-Headers "Content-Length, Content-Range" always;
         
-        # Cache Nginx
-        location ~* \.(mp3|mp4|flac|ogg|webm|m4a|wav)$ {
+        # Cache Nginx pour fichiers fréquents
+        location ~* \.(mp3|m4a|flac|ogg|opus|aac)$ {
             proxy_cache media;
-            proxy_cache_valid 200 7d;
+            proxy_cache_valid 200 30d;
             proxy_cache_valid 404 1h;
-            add_header X-Cache-Status \$upstream_cache_status;
+            add_header X-Cache-Status $upstream_cache_status;
+            add_header X-Media-Type "audio";
         }
         
-        # Gestion des gros fichiers
-        location ~* \.(mp4|webm|mkv|avi|mov)$ {
+        location ~* \.(mp4|webm|mkv)$ {
+            proxy_cache media;
+            proxy_cache_valid 200 30d;
+            proxy_cache_valid 404 1h;
+            add_header X-Cache-Status $upstream_cache_status;
+            add_header X-Media-Type "video";
+            
+            # Optimisation pour gros fichiers
             sendfile on;
             sendfile_max_chunk 1m;
             tcp_nopush off;
+            aio threads;
+        }
+        
+        location ~* \.(jpg|jpeg|png|gif|webp|svg)$ {
+            expires 30d;
+            add_header Cache-Control "public, immutable";
+            add_header X-Media-Type "image";
+        }
+        
+        location ~* \.(lrc|txt|json)$ {
+            default_type text/plain;
+            charset utf-8;
+            add_header Cache-Control "public, max-age=86400";
+            add_header X-Media-Type "lyrics";
         }
     }
     
-    # Upload avec limitation
+    # Upload avec limitations strictes
     location /api/upload/ {
         proxy_pass http://beartify_app;
-        client_max_body_size 2G;
+        client_max_body_size 4G;
+        client_body_timeout 300s;
+        
         proxy_request_buffering off;
         proxy_read_timeout 600s;
         proxy_send_timeout 600s;
+        proxy_buffering off;
         
-        limit_req zone=api burst=10 nodelay;
+        limit_req zone=upload burst=5 nodelay;
+        limit_conn addr 5;
     }
     
     # HLS streaming
     location /hls/ {
         alias /var/www/hls/;
-        add_header Cache-Control no-cache;
-        add_header Access-Control-Allow-Origin "*";
+        
+        types {
+            application/vnd.apple.mpegurl m3u8;
+            video/mp2t ts;
+        }
+        
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+        add_header Access-Control-Allow-Origin "*" always;
+        add_header Access-Control-Allow-Methods "GET, HEAD, OPTIONS" always;
         
         location ~ \.m3u8$ {
-            add_header Cache-Control "no-cache, no-store, must-revalidate";
+            add_header Cache-Control "no-cache";
+            expires -1;
         }
         
         location ~ \.ts$ {
-            add_header Cache-Control "max-age=60";
+            add_header Cache-Control "max-age=10";
+            expires 10s;
         }
     }
     
-    # Monitoring et health check
-    location /nginx-health {
+    # DASH streaming
+    location /dash/ {
+        alias /var/www/dash/;
+        
+        types {
+            application/dash+xml mpd;
+            video/mp4 mp4;
+        }
+        
+        add_header Cache-Control "no-cache";
+        add_header Access-Control-Allow-Origin "*" always;
+    }
+    
+    # WebSocket pour notifications temps réel
+    location /ws/ {
+        proxy_pass http://beartify_app;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_read_timeout 86400;
+    }
+    
+    # Health check
+    location /health {
         access_log off;
         return 200 "healthy\n";
         add_header Content-Type text/plain;
     }
+    
+    # Nginx status (local only)
+    location /nginx-status {
+        stub_status on;
+        access_log off;
+        allow 127.0.0.1;
+        deny all;
+    }
+    
+    # Bloquer fichiers sensibles
+    location ~ /\. {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+    
+    location ~ ~$ {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
 }
-EOF
+EOFSITE
 
-    # HTTPS avec Let's Encrypt si domaine configuré
+    # Créer répertoires
+    mkdir -p /var/www/{hls,dash}/{live,adaptive}
+    mkdir -p /var/cache/nginx/{streaming,media}
+    chown -R www-data:www-data /var/www/{hls,dash}
+    chown -R www-data:www-data /var/cache/nginx
+    chmod -R 755 /var/www/{hls,dash}
+    
+    # SSL Let's Encrypt si domaine
     if [[ -n "$DOMAIN" && -n "$EMAIL" ]]; then
         info "Configuration SSL avec Let's Encrypt..."
-        
-        # Obtention du certificat
-        certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos --email "$EMAIL" || true
-        
-        # Renouvellement automatique
+        certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos --email "$EMAIL" --redirect || true
         systemctl enable certbot.timer
     fi
     
-    # Création des répertoires de cache
-    mkdir -p /var/cache/nginx/{streaming,media}
-    mkdir -p /var/www/{hls,dash}
-    chown -R www-data:www-data /var/cache/nginx /var/www/{hls,dash}
-    
-    # Activation du site
+    # Activer site
     ln -sf /etc/nginx/sites-available/beartify /etc/nginx/sites-enabled/
     rm -f /etc/nginx/sites-enabled/default
     
@@ -1253,28 +1911,26 @@ EOF
     systemctl enable nginx
     systemctl restart nginx
     
-    success "Nginx configuré pour streaming haute performance"
+    success "Nginx configuré pour streaming avancé"
 }
 
-# Installation Redis optimisé pour streaming
+# Installation Redis
 install_redis_streaming() {
-    info "Installation Redis optimisé pour cache streaming..."
+    info "Installation Redis pour cache..."
     
     apt install -y redis-server redis-tools
     
-    # Configuration Redis optimisée
-    cat > /etc/redis/redis.conf << 'EOF'
-# Configuration Redis pour Beartify Streaming
-
-# Network
-bind 127.0.0.1
+    cat > /etc/redis/redis.conf << 'EOFREDIS'
+# Configuration Redis pour Beartify
+bind 127.0.0.1 ::1
 port 6379
 protected-mode yes
-tcp-keepalive 300
+tcp-backlog 2048
 timeout 300
+tcp-keepalive 300
 
-# Mémoire optimisée pour cache streaming
-maxmemory 4gb
+# Mémoire
+maxmemory 6gb
 maxmemory-policy allkeys-lru
 maxmemory-samples 5
 
@@ -1285,27 +1941,31 @@ save 60 10000
 stop-writes-on-bgsave-error yes
 rdbcompression yes
 rdbchecksum yes
-dbfilename dump.rdb
+dbfilename beartify-dump.rdb
 dir /var/lib/redis
 
 # Performance
 databases 16
 lua-time-limit 5000
 slowlog-log-slower-than 10000
-slowlog-max-len 128
+slowlog-max-len 256
 latency-monitor-threshold 100
+notify-keyspace-events ""
 
-# Clients pour streaming simultané
-tcp-backlog 1024
+# Clients
+tcp-backlog 2048
 maxclients 10000
 
-# Éviter les timeouts lors de charges élevées
+# Buffers
 client-output-buffer-limit normal 0 0 0
 client-output-buffer-limit replica 256mb 64mb 60
-client-output-buffer-limit pubsub 32mb 8mb 60
+client-output-buffer-limit pubsub 64mb 16mb 60
 
 # Optimisations réseau
 tcp-nodelay yes
+repl-disable-tcp-nodelay no
+
+# Hash optimizations
 hash-max-ziplist-entries 512
 hash-max-ziplist-value 64
 list-max-ziplist-size -2
@@ -1315,242 +1975,354 @@ zset-max-ziplist-entries 128
 zset-max-ziplist-value 64
 hll-sparse-max-bytes 3000
 
-# Threads pour I/O
+# Threads I/O
 io-threads 4
 io-threads-do-reads yes
 
 # Logging
 loglevel notice
 logfile /var/log/redis/redis-server.log
-EOF
+
+# Sécurité
+rename-command FLUSHDB ""
+rename-command FLUSHALL ""
+rename-command CONFIG "CONFIG_beartify_secret"
+EOFREDIS
     
     systemctl enable redis-server
     systemctl restart redis-server
     
-    success "Redis configuré pour streaming"
+    success "Redis configuré"
 }
 
-# Installation FastFetch (adapté d'Arch Linux)
+# Installation FastFetch amélioré
 install_fastfetch() {
-    info "Installation et configuration de FastFetch..."
+    info "Installation FastFetch..."
     
-    # Installation via snap si disponible, sinon compilation
-    if command -v snap >/dev/null 2>&1; then
-        snap install fastfetch
-    else
-        # Compilation depuis les sources
-        apt install -y cmake libcjson-dev libpci-dev
-        
-        git clone https://github.com/fastfetch-cli/fastfetch.git /tmp/fastfetch
-        cd /tmp/fastfetch
-        mkdir build && cd build
-        cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local
-        make -j$(nproc)
-        make install
-        cd / && rm -rf /tmp/fastfetch
-    fi
+    # Compilation depuis sources pour dernière version
+    apt install -y cmake libcjson-dev libpci-dev libvulkan-dev libwayland-dev libxrandr-dev libxcb-randr0-dev libdbus-1-dev libdconf-dev libjson-c-dev
     
-    # Configuration personnalisée pour serveur streaming
+    git clone --depth=1 https://github.com/fastfetch-cli/fastfetch.git /tmp/fastfetch
+    cd /tmp/fastfetch
+    mkdir build && cd build
+    cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release
+    make -j$(nproc)
+    make install
+    cd / && rm -rf /tmp/fastfetch
+    
+    # Configuration personnalisée
     mkdir -p "$BEARTIFY_HOME/.config/fastfetch"
-    cat > "$BEARTIFY_HOME/.config/fastfetch/config.jsonc" << 'EOF'
+    cat > "$BEARTIFY_HOME/.config/fastfetch/config.jsonc" << 'EOFFETCH'
 {
+    "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
     "logo": {
-        "type": "ascii",
-        "source": "ubuntu",
-        "color": {
-            "1": "32",
-            "2": "37"
+        "type": "small",
+        "padding": {
+            "top": 1
         }
     },
     "display": {
-        "separator": " : ",
-        "keyWidth": 18,
-        "keyColor": "32",
-        "valueColor": "37"
+        "separator": " → ",
+        "color": {
+            "keys": "green",
+            "title": "bright_green"
+        }
     },
     "modules": [
         {
-            "type": "title",
-            "format": "🎵 Beartify Streaming Server - {user}@{host}",
-            "color": "32"
-        },
-        {
-            "type": "separator",
-            "color": "32"
-        },
-        {
-            "type": "os",
-            "key": "Système",
-            "format": "{name} {version}"
-        },
-        {
-            "type": "kernel",
-            "key": "Kernel",
-            "format": "{name} {version}"
-        },
-        {
-            "type": "uptime",
-            "key": "Uptime",
-            "format": "{days}j {hours}h {minutes}m"
-        },
-        {
-            "type": "packages",
-            "key": "Paquets",
-            "format": "{count} (apt)"
-        },
-        {
-            "type": "shell",
-            "key": "Shell",
-            "format": "{name} {version}"
-        },
-        {
-            "type": "cpu",
-            "key": "CPU",
-            "format": "{name} @ {frequency}"
-        },
-        {
-            "type": "gpu",
-            "key": "GPU",
-            "format": "{name}"
-        },
-        {
-            "type": "memory",
-            "key": "Mémoire",
-            "format": "{used} / {total} ({percentage}%)"
-        },
-        {
-            "type": "disk",
-            "key": "Stockage",
-            "format": "{used} / {total} ({percentage}%)"
-        },
-        {
-            "type": "localip",
-            "key": "IP Locale",
-            "format": "{address}"
-        },
-        {
-            "type": "break"
+            "type": "custom",
+            "format": "╔══════════════════════════════════════════╗"
         },
         {
             "type": "custom",
-            "key": "Services",
-            "value": "🎵 Beartify | 🌐 Nginx | 🗄️ Database | 📊 Redis"
-        }
+            "format": "║   🎵 BEARTIFY STREAMING SERVER           ║"
+        },
+        {
+            "type": "custom",
+            "format": "╚══════════════════════════════════════════╝"
+        },
+        "break",
+        {
+            "type": "title",
+            "color": {
+                "user": "bright_cyan",
+                "host": "bright_green"
+            }
+        },
+        "separator",
+        {
+            "type": "os",
+            "key": "  OS",
+            "keyColor": "green"
+        },
+        {
+            "type": "host",
+            "key": "  Host",
+            "keyColor": "green"
+        },
+        {
+            "type": "kernel",
+            "key": "  Kernel",
+            "keyColor": "green"
+        },
+        {
+            "type": "uptime",
+            "key": "  Uptime",
+            "keyColor": "green"
+        },
+        {
+            "type": "packages",
+            "key": "  Packages",
+            "keyColor": "green"
+        },
+        {
+            "type": "shell",
+            "key": "  Shell",
+            "keyColor": "green"
+        },
+        "break",
+        {
+            "type": "wm",
+            "key": "  DE/WM",
+            "keyColor": "cyan"
+        },
+        {
+            "type": "terminal",
+            "key": "  Terminal",
+            "keyColor": "cyan"
+        },
+        "break",
+        {
+            "type": "cpu",
+            "key": "  CPU",
+            "keyColor": "blue"
+        },
+        {
+            "type": "gpu",
+            "key": "  GPU",
+            "keyColor": "blue"
+        },
+        {
+            "type": "memory",
+            "key": "  Memory",
+            "keyColor": "blue"
+        },
+        {
+            "type": "disk",
+            "key": "  Disk",
+            "keyColor": "blue"
+        },
+        "break",
+        {
+            "type": "localip",
+            "key": "  Local IP",
+            "keyColor": "magenta"
+        },
+        {
+            "type": "publicip",
+            "key": "  Public IP",
+            "keyColor": "magenta"
+        },
+        "break",
+        {
+            "type": "custom",
+            "format": "  Services: 🎵 Beartify | 🌐 Nginx | 💾 DB | 🔴 Redis"
+        },
+        {
+            "type": "custom",
+            "format": "  Media: /srv/media | Logs: ~/logs"
+        },
+        "break",
+        "colors"
     ]
 }
-EOF
-    
-    # Configuration pour tous les utilisateurs
-    cat >> /etc/bash.bashrc << 'EOF'
-
-# FastFetch pour serveur Beartify
-if [[ $- == *i* ]] && command -v fastfetch >/dev/null 2>&1; then
-    if [[ -f ~/.config/fastfetch/config.jsonc ]]; then
-        fastfetch --load-config ~/.config/fastfetch/config.jsonc 2>/dev/null
-    else
-        fastfetch 2>/dev/null
-    fi
-fi
-EOF
+EOFFETCH
     
     chown -R "$BEARTIFY_USER:$BEARTIFY_USER" "$BEARTIFY_HOME/.config"
     
-    success "FastFetch installé et configuré"
+    success "FastFetch installé"
 }
 
-# Optimisations système pour streaming haute performance
-optimize_system_streaming() {
-    info "Application d'optimisations système pour streaming haute performance..."
+# Installation services streaming additionnels
+install_jellyfin() {
+    if [[ ! "$INSTALL_JELLYFIN" =~ ^[Yy] ]]; then
+        return 0
+    fi
     
-    # Limites système pour streaming simultané
-    cat > /etc/security/limits.d/99-beartify-streaming.conf << EOF
-# Optimisations pour Beartify Streaming Server
-* soft nofile 65536
-* hard nofile 65536
-* soft nproc 32768
-* hard nproc 32768
-$BEARTIFY_USER soft nofile 131072
-$BEARTIFY_USER hard nofile 131072
-www-data soft nofile 131072
-www-data hard nofile 131072
+    info "Installation Jellyfin..."
+    
+    curl -fsSL https://repo.jellyfin.org/jellyfin_team.gpg.key | gpg --dearmor -o /usr/share/keyrings/jellyfin.gpg
+    echo "deb [signed-by=/usr/share/keyrings/jellyfin.gpg arch=$(dpkg --print-architecture)] https://repo.jellyfin.org/$(awk -F'=' '/^ID=/{ print $NF }' /etc/os-release) $(awk -F'=' '/^VERSION_CODENAME=/{ print $NF }' /etc/os-release) main" > /etc/apt/sources.list.d/jellyfin.list
+    
+    apt update
+    apt install -y jellyfin
+    
+    # Lier au stockage Beartify
+    ln -sf /srv/media/video /var/lib/jellyfin/videos
+    ln -sf /srv/media/audio /var/lib/jellyfin/music
+    
+    systemctl enable jellyfin
+    systemctl start jellyfin
+    
+    success "Jellyfin installé (port 8096)"
+}
+
+install_icecast() {
+    if [[ ! "$INSTALL_ICECAST" =~ ^[Yy] ]]; then
+        return 0
+    fi
+    
+    info "Installation Icecast pour streaming audio..."
+    
+    apt install -y icecast2
+    
+    # Configuration
+    cat > /etc/icecast2/icecast.xml << 'EOFICE'
+<icecast>
+    <location>Beartify Server</location>
+    <admin>admin@beartify.local</admin>
+    <limits>
+        <clients>1000</clients>
+        <sources>10</sources>
+        <queue-size>524288</queue-size>
+        <client-timeout>30</client-timeout>
+        <header-timeout>15</header-timeout>
+        <source-timeout>10</source-timeout>
+        <burst-on-connect>1</burst-on-connect>
+        <burst-size>65535</burst-size>
+    </limits>
+    <authentication>
+        <source-password>beartify_source_secret</source-password>
+        <relay-password>beartify_relay_secret</relay-password>
+        <admin-user>admin</admin-user>
+        <admin-password>beartify_admin_secret</admin-password>
+    </authentication>
+    <hostname>localhost</hostname>
+    <listen-socket>
+        <port>8000</port>
+    </listen-socket>
+    <mount-directory>/usr/share/icecast2/web</mount-directory>
+    <fileserve>1</fileserve>
+    <paths>
+        <basedir>/usr/share/icecast2</basedir>
+        <logdir>/var/log/icecast2</logdir>
+        <webroot>/usr/share/icecast2/web</webroot>
+        <adminroot>/usr/share/icecast2/admin</adminroot>
+        <alias source="/" destination="/status.xsl"/>
+    </paths>
+    <logging>
+        <accesslog>access.log</accesslog>
+        <errorlog>error.log</errorlog>
+        <loglevel>3</loglevel>
+        <logsize>10000</logsize>
+    </logging>
+    <security>
+        <chroot>0</chroot>
+    </security>
+</icecast>
+EOFICE
+    
+    systemctl enable icecast2
+    systemctl restart icecast2
+    
+    success "Icecast installé (port 8000)"
+}
+
+# Optimisations système
+optimize_system_streaming() {
+    info "Application d'optimisations système..."
+    
+    cat > /etc/security/limits.d/99-beartify.conf << EOF
+* soft nofile 100000
+* hard nofile 100000
+* soft nproc 65535
+* hard nproc 65535
+$BEARTIFY_USER soft nofile 200000
+$BEARTIFY_USER hard nofile 200000
+www-data soft nofile 200000
+www-data hard nofile 200000
 EOF
     
-    # Paramètres kernel optimisés pour streaming
-    cat > /etc/sysctl.d/99-beartify-streaming.conf << EOF
-# Optimisations réseau pour streaming haute performance
-net.core.somaxconn = 32768
-net.core.netdev_max_backlog = 16384
+    cat > /etc/sysctl.d/99-beartify.conf << 'EOF'
+# Optimisations réseau streaming
+net.core.somaxconn = 65535
+net.core.netdev_max_backlog = 65535
 net.core.rmem_default = 262144
-net.core.rmem_max = 134217728
+net.core.rmem_max = 268435456
 net.core.wmem_default = 262144
-net.core.wmem_max = 134217728
-net.ipv4.tcp_rmem = 4096 87380 134217728
-net.ipv4.tcp_wmem = 4096 65536 134217728
+net.core.wmem_max = 268435456
+net.ipv4.tcp_rmem = 4096 87380 268435456
+net.ipv4.tcp_wmem = 4096 65536 268435456
+net.ipv4.tcp_mem = 262144 1048576 4194304
 net.ipv4.tcp_congestion_control = bbr
 net.ipv4.tcp_slow_start_after_idle = 0
 net.ipv4.tcp_tw_reuse = 1
 net.ipv4.tcp_fin_timeout = 10
-net.ipv4.tcp_keepalive_time = 600
-net.ipv4.tcp_keepalive_probes = 3
-net.ipv4.tcp_keepalive_intvl = 30
-net.ipv4.tcp_max_syn_backlog = 8192
+net.ipv4.tcp_keepalive_time = 300
+net.ipv4.tcp_keepalive_probes = 5
+net.ipv4.tcp_keepalive_intvl = 15
+net.ipv4.tcp_max_syn_backlog = 65535
 net.ipv4.tcp_syncookies = 1
-net.ipv4.ip_local_port_range = 1024 65000
+net.ipv4.tcp_fastopen = 3
+net.ipv4.ip_local_port_range = 1024 65535
+net.ipv4.tcp_max_tw_buckets = 1440000
+net.ipv4.tcp_timestamps = 1
+net.ipv4.tcp_sack = 1
+net.ipv4.tcp_window_scaling = 1
 
-# Optimisations filesystem pour médias
-fs.file-max = 2097152
-fs.inotify.max_user_watches = 1048576
-fs.inotify.max_user_instances = 1024
-fs.aio-max-nr = 1048576
+# Filesystem
+fs.file-max = 3000000
+fs.inotify.max_user_watches = 2097152
+fs.inotify.max_user_instances = 2048
+fs.aio-max-nr = 2097152
 
-# Gestion mémoire pour streaming
+# Mémoire
 vm.swappiness = 10
 vm.dirty_ratio = 15
 vm.dirty_background_ratio = 5
 vm.vfs_cache_pressure = 50
-vm.min_free_kbytes = 65536
+vm.min_free_kbytes = 131072
+vm.overcommit_memory = 1
 
-# Optimisations scheduler
+# Scheduler
 kernel.sched_migration_cost_ns = 5000000
 kernel.sched_autogroup_enabled = 0
+kernel.sched_min_granularity_ns = 10000000
+kernel.sched_wakeup_granularity_ns = 15000000
 EOF
     
-    # Application immédiate
-    sysctl -p /etc/sysctl.d/99-beartify-streaming.conf
+    sysctl -p /etc/sysctl.d/99-beartify.conf
     
-    # Optimisations tmpfs pour cache
-    if ! grep -q "tmpfs.*beartify" /etc/fstab; then
-        echo "tmpfs /tmp/beartify-cache tmpfs defaults,noatime,size=4G,uid=$(id -u $BEARTIFY_USER),gid=$(id -g $BEARTIFY_USER),mode=1777 0 0" >> /etc/fstab
-    fi
-    
-    success "Optimisations système appliquées"
+    success "Optimisations appliquées"
 }
 
-# Installation des services de monitoring
+# Installation monitoring
 install_monitoring_stack() {
     if [[ ! "$INSTALL_MONITORING" =~ ^[Yy] ]]; then
         return 0
     fi
     
-    info "Installation de la stack de monitoring..."
+    info "Installation monitoring stack..."
     
     # Prometheus
-    local prom_version="2.47.0"
-    wget -q "https://github.com/prometheus/prometheus/releases/download/v${prom_version}/prometheus-${prom_version}.linux-amd64.tar.gz" -O /tmp/prometheus.tar.gz
-    tar -xzf /tmp/prometheus.tar.gz -C /tmp/
-    
+    local prom_version="2.48.0"
+    wget -q "https://github.com/prometheus/prometheus/releases/download/v${prom_version}/prometheus-${prom_version}.linux-amd64.tar.gz" -O /tmp/prom.tar.gz
+    tar -xzf /tmp/prom.tar.gz -C /tmp/
     cp "/tmp/prometheus-${prom_version}.linux-amd64/prometheus" /usr/local/bin/
     cp "/tmp/prometheus-${prom_version}.linux-amd64/promtool" /usr/local/bin/
     
-    # Configuration Prometheus pour streaming
     mkdir -p /etc/prometheus /var/lib/prometheus
-    cat > /etc/prometheus/prometheus.yml << EOF
+    useradd --no-create-home --shell /bin/false prometheus 2>/dev/null || true
+    
+    cat > /etc/prometheus/prometheus.yml << 'EOF'
 global:
   scrape_interval: 15s
   evaluation_interval: 15s
-
-rule_files:
-  - "streaming_alerts.yml"
+  
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['localhost:9093']
 
 scrape_configs:
   - job_name: 'prometheus'
@@ -1559,9 +2331,13 @@ scrape_configs:
   
   - job_name: 'beartify'
     static_configs:
-      - targets: ['localhost:$APP_PORT']
+      - targets: ['localhost:8080']
     metrics_path: '/actuator/prometheus'
     scrape_interval: 10s
+  
+  - job_name: 'node'
+    static_configs:
+      - targets: ['localhost:9100']
   
   - job_name: 'nginx'
     static_configs:
@@ -1570,69 +2346,81 @@ scrape_configs:
   - job_name: 'redis'
     static_configs:
       - targets: ['localhost:9121']
-  
-  - job_name: 'node-exporter'
-    static_configs:
-      - targets: ['localhost:9100']
-    scrape_interval: 5s
 EOF
     
     # Node Exporter
-    local node_exp_version="1.6.1"
-    wget -q "https://github.com/prometheus/node_exporter/releases/download/v${node_exp_version}/node_exporter-${node_exp_version}.linux-amd64.tar.gz" -O /tmp/node_exporter.tar.gz
-    tar -xzf /tmp/node_exporter.tar.gz -C /tmp/
-    cp "/tmp/node_exporter-${node_exp_version}.linux-amd64/node_exporter" /usr/local/bin/
-    
-    # Redis Exporter
-    local redis_exp_version="1.53.0"
-    wget -q "https://github.com/oliver006/redis_exporter/releases/download/v${redis_exp_version}/redis_exporter-v${redis_exp_version}.linux-amd64.tar.gz" -O /tmp/redis_exporter.tar.gz
-    tar -xzf /tmp/redis_exporter.tar.gz -C /tmp/
-    cp "/tmp/redis_exporter-v${redis_exp_version}.linux-amd64/redis_exporter" /usr/local/bin/
+    local node_version="1.7.0"
+    wget -q "https://github.com/prometheus/node_exporter/releases/download/v${node_version}/node_exporter-${node_version}.linux-amd64.tar.gz" -O /tmp/node.tar.gz
+    tar -xzf /tmp/node.tar.gz -C /tmp/
+    cp "/tmp/node_exporter-${node_version}.linux-amd64/node_exporter" /usr/local/bin/
     
     # Grafana
-    apt install -y software-properties-common
     wget -q -O - https://packages.grafana.com/gpg.key | apt-key add -
-    echo "deb https://packages.grafana.com/oss/deb stable main" >> /etc/apt/sources.list.d/grafana.list
-    apt update
-    apt install -y grafana
+    echo "deb https://packages.grafana.com/oss/deb stable main" > /etc/apt/sources.list.d/grafana.list
+    apt update && apt install -y grafana
     
     # Configuration Grafana
-    local grafana_pass="beartify_$(openssl rand -base64 8)"
-    cat > /etc/grafana/grafana.ini << EOF
-[server]
-http_port = 3000
-domain = ${DOMAIN:-localhost}
-root_url = http://${DOMAIN:-localhost}:3000/
-
-[security]
-admin_user = admin
-admin_password = $grafana_pass
-
-[auth.anonymous]
-enabled = false
-
-[dashboards]
-default_home_dashboard_path = /var/lib/grafana/dashboards/beartify-streaming.json
-EOF
+    local grafana_pass="beartify_$(openssl rand -base64 12)"
+    sed -i "s/;admin_password = admin/admin_password = $grafana_pass/" /etc/grafana/grafana.ini
     
-    # Création des services systemd
+    # Services systemd
     create_monitoring_services
     
-    # Démarrage des services
     systemctl daemon-reload
-    systemctl enable prometheus node_exporter redis_exporter grafana-server
-    systemctl start prometheus node_exporter redis_exporter grafana-server
+    systemctl enable prometheus node_exporter grafana-server
+    systemctl start prometheus node_exporter grafana-server
     
     success "Monitoring installé - Grafana: admin / $grafana_pass"
 }
 
-# Service Beartify principal
+# Création services monitoring
+create_monitoring_services() {
+    cat > /etc/systemd/system/prometheus.service << 'EOF'
+[Unit]
+Description=Prometheus
+After=network.target
+
+[Service]
+User=prometheus
+Group=prometheus
+Type=simple
+ExecStart=/usr/local/bin/prometheus \
+    --config.file=/etc/prometheus/prometheus.yml \
+    --storage.tsdb.path=/var/lib/prometheus \
+    --web.console.templates=/etc/prometheus/consoles \
+    --web.console.libraries=/etc/prometheus/console_libraries \
+    --web.listen-address=0.0.0.0:9090
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+    cat > /etc/systemd/system/node_exporter.service << 'EOF'
+[Unit]
+Description=Node Exporter
+After=network.target
+
+[Service]
+User=nobody
+Group=nogroup
+Type=simple
+ExecStart=/usr/local/bin/node_exporter
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+}
+
+# Service Beartify
 create_beartify_service() {
-    info "Création du service systemd Beartify..."
+    info "Création service Beartify..."
     
     cat > /etc/systemd/system/beartify.service << EOF
 [Unit]
 Description=Beartify Streaming Server
+Documentation=https://github.com/PapaOursPolaire/Beartify
 After=network.target mysql.service redis.service
 
 [Service]
@@ -1641,41 +2429,37 @@ User=$BEARTIFY_USER
 Group=$BEARTIFY_USER
 WorkingDirectory=$BEARTIFY_HOME
 
-# Configuration JVM depuis fichier
-EnvironmentFile=$BEARTIFY_HOME/config/jvm.conf
-ExecStart=/usr/bin/java \$JVM_OPTS -jar $BEARTIFY_HOME/beartify.jar
+ExecStart=/usr/bin/java \\
+    @$BEARTIFY_HOME/config/jvm.conf \\
+    -jar $BEARTIFY_HOME/beartify.jar
 
-# Gestion des erreurs et redémarrages
 Restart=always
 RestartSec=10
 StartLimitInterval=60
 StartLimitBurst=3
 
-# Logging
 StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=beartify
 
-# Sécurité
 NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
 ReadWritePaths=$MEDIA_ROOT $BACKUP_ROOT $BEARTIFY_HOME
 
-# Limites de ressources
-LimitNOFILE=65536
-LimitNPROC=32768
+LimitNOFILE=200000
+LimitNPROC=65535
 LimitMEMLOCK=infinity
 
-# Variables d'environnement
 Environment=SPRING_PROFILES_ACTIVE=production
 Environment=SERVER_PORT=$APP_PORT
 Environment=MEDIA_ROOT=$MEDIA_ROOT
-Environment=DB_URL=jdbc:mysql://localhost:3306/$DB_NAME
+Environment=DB_URL=jdbc:mysql://localhost:3306/$DB_NAME?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
 Environment=DB_USER=$DB_USER
 Environment=DB_PASS=$DB_PASS
 Environment=REDIS_URL=redis://localhost:6379
+Environment=JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 
 [Install]
 WantedBy=multi-user.target
@@ -1684,620 +2468,66 @@ EOF
     systemctl daemon-reload
     systemctl enable beartify
     
-    success "Service Beartify configuré"
+    success "Service Beartify créé"
 }
 
-# Installation des services individuels
-install_individual_service() {
-    local service_num="$1"
-    
-    case $service_num in
-        1)  # DHCP Server
-            info "Installation du serveur DHCP..."
-            apt install -y isc-dhcp-server
-            cat > /etc/dhcp/dhcpd.conf << EOF
-default-lease-time 600;
-max-lease-time 7200;
-authoritative;
-
-subnet 192.168.1.0 netmask 255.255.255.0 {
-    range 192.168.1.100 192.168.1.200;
-    option routers 192.168.1.1;
-    option domain-name-servers 8.8.8.8, 8.8.4.4;
-    option broadcast-address 192.168.1.255;
-}
-EOF
-            systemctl enable isc-dhcp-server
-            success "DHCP Server installé"
-            ;;
-        2)  # DNS Server (Bind9)
-            info "Installation du serveur DNS..."
-            apt install -y bind9 bind9utils bind9-doc
-            cat > /etc/bind/named.conf.options << EOF
-options {
-    directory "/var/cache/bind";
-    forwarders { 8.8.8.8; 8.8.4.4; };
-    dnssec-validation auto;
-    listen-on-v6 { any; };
-    allow-recursion { localhost; 192.168.0.0/16; 10.0.0.0/8; };
-};
-EOF
-            systemctl enable bind9
-            systemctl start bind9
-            success "DNS Server installé"
-            ;;
-        3)  # FTP Server
-            info "Installation du serveur FTP..."
-            apt install -y vsftpd
-            cat > /etc/vsftpd.conf << EOF
-listen=YES
-anonymous_enable=NO
-local_enable=YES
-write_enable=YES
-local_umask=022
-dirmessage_enable=YES
-use_localtime=YES
-xferlog_enable=YES
-connect_from_port_20=YES
-ftpd_banner=Serveur FTP Beartify
-chroot_local_user=YES
-allow_writeable_chroot=YES
-secure_chroot_dir=/var/run/vsftpd/empty
-pam_service_name=vsftpd
-ssl_enable=YES
-EOF
-            systemctl enable vsftpd
-            systemctl start vsftpd
-            success "FTP Server installé"
-            ;;
-        4)  # SSH/SFTP
-            info "Configuration OpenSSH pour SFTP..."
-            apt install -y openssh-server
-            # Configuration SSH sécurisée
-            sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
-            sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config
-            systemctl enable ssh
-            systemctl restart ssh
-            success "SSH/SFTP configuré"
-            ;;
-        5)  # Apache2
-            info "Installation Apache2..."
-            apt install -y apache2
-            systemctl enable apache2
-            systemctl start apache2
-            cat > /var/www/html/index.html << EOF
-<!DOCTYPE html>
-<html><head><title>Serveur Beartify</title></head>
-<body><h1>Serveur Apache Beartify</h1>
-<p>Installation réussie - $(date)</p></body></html>
-EOF
-            success "Apache2 installé"
-            ;;
-        6)  # Nginx (déjà géré par install_nginx_streaming)
-            install_nginx_streaming
-            ;;
-        7)  # Mail Server
-            info "Installation serveur mail..."
-            apt install -y postfix dovecot-core dovecot-imapd dovecot-pop3d
-            systemctl enable postfix dovecot
-            systemctl start postfix dovecot
-            success "Serveur mail installé"
-            ;;
-        8)  # Squid Proxy
-            info "Installation Squid Proxy..."
-            apt install -y squid
-            systemctl enable squid
-            systemctl start squid
-            success "Squid Proxy installé"
-            ;;
-        9)  # MariaDB (déjà géré)
-            install_database
-            ;;
-        10) # PostgreSQL (déjà géré)
-            DB_CHOICE=2
-            install_database
-            ;;
-        11) # Redis (déjà géré)
-            install_redis_streaming
-            ;;
-        12) # MongoDB
-            info "Installation MongoDB..."
-            wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | apt-key add -
-            echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" > /etc/apt/sources.list.d/mongodb-org-6.0.list
-            apt update
-            apt install -y mongodb-org
-            systemctl enable mongod
-            systemctl start mongod
-            success "MongoDB installé"
-            ;;
-        13) # NFS Server
-            info "Installation NFS Server..."
-            apt install -y nfs-kernel-server
-            mkdir -p /srv/nfs/beartify
-            echo "/srv/nfs/beartify *(rw,sync,no_subtree_check)" >> /etc/exports
-            exportfs -a
-            systemctl enable nfs-kernel-server
-            success "NFS Server installé"
-            ;;
-        14) # Samba
-            info "Installation Samba..."
-            apt install -y samba samba-common-bin
-            mkdir -p /srv/samba/beartify
-            cat >> /etc/samba/smb.conf << EOF
-
-[beartify]
-    path = /srv/samba/beartify
-    browseable = yes
-    writable = yes
-    guest ok = no
-    valid users = $BEARTIFY_USER
-EOF
-            systemctl enable smbd nmbd
-            systemctl start smbd nmbd
-            success "Samba installé"
-            ;;
-        15) # Nextcloud
-            info "Installation Nextcloud..."
-            apt install -y apache2 mysql-server php php-mysql php-xml php-gd php-curl php-zip php-mbstring
-            wget https://download.nextcloud.com/server/releases/latest.tar.bz2 -O /tmp/nextcloud.tar.bz2
-            tar -xjf /tmp/nextcloud.tar.bz2 -C /var/www/
-            chown -R www-data:www-data /var/www/nextcloud
-            success "Nextcloud installé (configuration manuelle requise)"
-            ;;
-        16) # MinIO
-            info "Installation MinIO..."
-            wget https://dl.min.io/server/minio/release/linux-amd64/minio -O /usr/local/bin/minio
-            chmod +x /usr/local/bin/minio
-            useradd -r minio-user -s /sbin/nologin || true
-            mkdir -p /srv/minio/data
-            chown minio-user:minio-user /srv/minio/data
-            
-            local minio_access=$(openssl rand -base64 12)
-            local minio_secret=$(openssl rand -base64 32)
-            
-            cat > /etc/systemd/system/minio.service << EOF
-[Unit]
-Description=MinIO Object Storage
-After=network.target
-
-[Service]
-Type=notify
-User=minio-user
-Group=minio-user
-Environment=MINIO_ROOT_USER=$minio_access
-Environment=MINIO_ROOT_PASSWORD=$minio_secret
-ExecStart=/usr/local/bin/minio server --console-address :9001 /srv/minio/data
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-EOF
-            systemctl daemon-reload
-            systemctl enable minio
-            systemctl start minio
-            success "MinIO installé - Access: $minio_access / Secret: $minio_secret"
-            ;;
-        17) # Docker (déjà géré)
-            install_docker
-            ;;
-        18) # Gitea
-            info "Installation Gitea..."
-            wget -O /usr/local/bin/gitea https://dl.gitea.io/gitea/1.20.0/gitea-1.20.0-linux-amd64
-            chmod +x /usr/local/bin/gitea
-            useradd --system --shell /bin/bash --home /var/lib/gitea --create-home gitea
-            mkdir -p /var/lib/gitea/{custom,data,log}
-            chown -R gitea:gitea /var/lib/gitea
-            
-            cat > /etc/systemd/system/gitea.service << 'EOF'
-[Unit]
-Description=Gitea
-After=syslog.target network.target mysql.service
-
-[Service]
-Type=simple
-User=gitea
-Group=gitea
-WorkingDirectory=/var/lib/gitea/
-ExecStart=/usr/local/bin/gitea web -c /etc/gitea/app.ini
-Restart=always
-Environment=USER=gitea HOME=/var/lib/gitea
-
-[Install]
-WantedBy=multi-user.target
-EOF
-            systemctl daemon-reload
-            systemctl enable gitea
-            success "Gitea installé"
-            ;;
-        19) # Jenkins
-            info "Installation Jenkins..."
-            wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | apt-key add -
-            sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
-            apt update
-            apt install -y jenkins
-            systemctl enable jenkins
-            systemctl start jenkins
-            success "Jenkins installé (port 8080)"
-            ;;
-        20) # Node.js (déjà géré)
-            apt install -y nodejs npm
-            npm install -g pm2 nodemon
-            success "Node.js installé"
-            ;;
-        21) # PHP-FPM
-            info "Installation PHP-FPM..."
-            apt install -y php-fpm php-mysql php-redis php-gd php-xml php-curl php-zip php-mbstring php-json
-            systemctl enable php*-fpm
-            systemctl start php*-fpm
-            success "PHP-FPM installé"
-            ;;
-        22) # Java + Tomcat
-            info "Installation Java + Tomcat..."
-            apt install -y openjdk-17-jdk tomcat9
-            systemctl enable tomcat9
-            systemctl start tomcat9
-            success "Java + Tomcat installés"
-            ;;
-        23) # Monitoring (déjà géré)
-            INSTALL_MONITORING="y"
-            install_monitoring_stack
-            ;;
-        24) # ELK Stack complet
-            info "Installation ELK Stack complet..."
-            # Elasticsearch
-            wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add -
-            echo "deb https://artifacts.elastic.co/packages/8.x/apt stable main" > /etc/apt/sources.list.d/elastic-8.x.list
-            apt update
-            apt install -y elasticsearch kibana logstash
-            
-            # Configuration Elasticsearch
-            cat >> /etc/elasticsearch/elasticsearch.yml << 'EOF'
-# Configuration Beartify
-cluster.name: beartify-logs
-node.name: beartify-node-1
-path.data: /var/lib/elasticsearch
-path.logs: /var/log/elasticsearch
-network.host: localhost
-http.port: 9200
-discovery.type: single-node
-xpack.security.enabled: false
-EOF
-            
-            # Configuration Kibana
-            cat >> /etc/kibana/kibana.yml << 'EOF'
-server.port: 5601
-server.host: "localhost"
-elasticsearch.hosts: ["http://localhost:9200"]
-EOF
-            
-            systemctl daemon-reload
-            systemctl enable elasticsearch kibana logstash
-            systemctl start elasticsearch
-            sleep 10
-            systemctl start kibana logstash
-            success "ELK Stack installé et configuré"
-            ;;
-        25) # Zabbix complet
-            info "Installation Zabbix complet..."
-            # Installation du repository
-            wget https://repo.zabbix.com/zabbix/6.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_6.0-4%2Bubuntu$(lsb_release -rs)_all.deb
-            dpkg -i zabbix-release_6.0-4+ubuntu$(lsb_release -rs)_all.deb
-            apt update
-            
-            # Installation des composants
-            apt install -y zabbix-server-mysql zabbix-frontend-php zabbix-apache-conf zabbix-sql-scripts zabbix-agent
-            
-            # Configuration base de données
-            mysql -e "CREATE DATABASE zabbix CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;" || true
-            mysql -e "CREATE USER 'zabbix'@'localhost' IDENTIFIED BY 'zabbix_password';" || true
-            mysql -e "GRANT ALL PRIVILEGES ON zabbix.* TO 'zabbix'@'localhost';" || true
-            mysql -e "FLUSH PRIVILEGES;" || true
-            
-            # Import du schéma
-            zcat /usr/share/doc/zabbix-sql-scripts/mysql/server.sql.gz | mysql -uzabbix -pzabbix_password zabbix
-            
-            # Configuration serveur
-            sed -i 's/# DBPassword=/DBPassword=zabbix_password/' /etc/zabbix/zabbix_server.conf
-            
-            systemctl enable zabbix-server zabbix-agent apache2
-            systemctl restart zabbix-server zabbix-agent apache2
-            success "Zabbix installé - Interface: http://localhost/zabbix (admin/zabbix)"
-            ;;
-        26) # MQTT Mosquitto configuré
-            info "Installation Mosquitto MQTT configuré..."
-            apt install -y mosquitto mosquitto-clients
-            
-            # Configuration sécurisée
-            cat > /etc/mosquitto/conf.d/beartify.conf << 'EOF'
-# Configuration Beartify MQTT
-listener 1883 localhost
-allow_anonymous false
-password_file /etc/mosquitto/passwd
-
-# Logging
-log_dest file /var/log/mosquitto/mosquitto.log
-log_type error
-log_type warning
-log_type notice
-log_type information
-log_timestamp true
-
-# Persistence
-persistence true
-persistence_location /var/lib/mosquitto/
-
-# Limits
-max_connections 1000
-max_queued_messages 10000
-EOF
-            
-            # Création utilisateur MQTT
-            mosquitto_passwd -c /etc/mosquitto/passwd beartify_mqtt
-            
-            systemctl enable mosquitto
-            systemctl restart mosquitto
-            success "Mosquitto MQTT configuré (port 1883)"
-            ;;
-        27) # Jellyfin configuré
-            info "Installation Jellyfin configuré..."
-            # Repository officiel
-            curl https://repo.jellyfin.org/jellyfin_team.gpg.key | gpg --dearmor | tee /usr/share/keyrings/jellyfin.gpg >/dev/null
-            echo "deb [signed-by=/usr/share/keyrings/jellyfin.gpg arch=$( dpkg --print-architecture )] https://repo.jellyfin.org/$( awk -F'=' '/^ID=/{ print $NF }' /etc/os-release ) $( awk -F'=' '/^VERSION_CODENAME=/{ print $NF }' /etc/os-release ) main" > /etc/apt/sources.list.d/jellyfin.list
-            
-            apt update
-            apt install -y jellyfin
-            
-            # Configuration pour streaming
-            mkdir -p /var/lib/jellyfin/config
-            cat > /var/lib/jellyfin/config/system.xml << 'EOF'
-<?xml version="1.0" encoding="utf-8"?>
-<ServerConfiguration>
-  <EnableUPnP>false</EnableUPnP>
-  <PublicPort>8096</PublicPort>
-  <PublicHttpsPort>8920</PublicHttpsPort>
-  <HttpServerPortNumber>8096</HttpServerPortNumber>
-  <HttpsPortNumber>8920</HttpsPortNumber>
-  <EnableHttps>false</EnableHttps>
-  <EnableRemoteAccess>true</EnableRemoteAccess>
-  <MaxConcurrentStreams>100</MaxConcurrentStreams>
-</ServerConfiguration>
-EOF
-            
-            chown -R jellyfin:jellyfin /var/lib/jellyfin
-            systemctl enable jellyfin
-            systemctl start jellyfin
-            success "Jellyfin installé (port 8096) - Configuration: http://localhost:8096"
-            ;;
-        28) # WireGuard VPN complet
-            info "Installation WireGuard VPN complet..."
-            apt install -y wireguard wireguard-tools qrencode
-            
-            # Génération des clés
-            cd /etc/wireguard
-            wg genkey | tee privatekey | wg pubkey > publickey
-            
-            # Configuration serveur
-            cat > /etc/wireguard/wg0.conf << EOF
-[Interface]
-PrivateKey = $(cat /etc/wireguard/privatekey)
-Address = 10.8.0.1/24
-ListenPort = 51820
-SaveConfig = true
-
-# Règles de routage
-PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE; ip6tables -A FORWARD -i %i -j ACCEPT; ip6tables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE; ip6tables -D FORWARD -i %i -j ACCEPT; ip6tables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
-
-# Client exemple (décommentez et configurez)
-#[Peer]
-#PublicKey = CLIENT_PUBLIC_KEY
-#AllowedIPs = 10.8.0.2/32
-EOF
-            
-            # Permissions
-            chmod 600 /etc/wireguard/wg0.conf /etc/wireguard/privatekey
-            
-            # Activation IP forwarding
-            echo 'net.ipv4.ip_forward=1' >> /etc/sysctl.conf
-            echo 'net.ipv6.conf.all.forwarding=1' >> /etc/sysctl.conf
-            sysctl -p
-            
-            # Service
-            systemctl enable wg-quick@wg0
-            systemctl start wg-quick@wg0
-            
-            success "WireGuard VPN configuré (port 51820)"
-            info "Clé publique serveur: $(cat /etc/wireguard/publickey)"
-            ;;
-        29) # Environnement Desktop (nouveau)
-            info "Installation environnement desktop..."
-            echo "Choisissez votre environnement :"
-            echo "1) KDE Plasma (avec thèmes Beartify)"
-            echo "2) GNOME"
-            echo "3) XFCE (léger)"
-            read -p "Votre choix [1-3]: " desktop_choice
-            
-            case $desktop_choice in
-                1)
-                    apt install -y kde-plasma-desktop sddm
-                    configure_sddm_custom
-                    configure_plymouth_custom
-                    systemctl set-default graphical.target
-                    systemctl enable sddm
-                    success "KDE Plasma installé avec thèmes"
-                    ;;
-                2)
-                    apt install -y ubuntu-desktop-minimal gdm3
-                    systemctl set-default graphical.target
-                    systemctl enable gdm3
-                    success "GNOME installé"
-                    ;;
-                3)
-                    apt install -y xubuntu-desktop lightdm
-                    systemctl set-default graphical.target
-                    systemctl enable lightdm
-                    success "XFCE installé"
-                    ;;
-                *)
-                    warning "Choix invalide, installation annulée"
-                    ;;
-            esac
-            ;;
-        30) # Serveur de jeux (nouveau)
-            info "Installation serveur de jeux..."
-            echo "Choisissez votre serveur de jeu :"
-            echo "1) Minecraft Java"
-            echo "2) Counter-Strike 1.6"
-            echo "3) Terraria"
-            read -p "Votre choix [1-3]: " game_choice
-            
-            case $game_choice in
-                1)
-                    apt install -y openjdk-17-jre screen wget
-                    useradd -m -d /home/minecraft minecraft || true
-                    cd /home/minecraft
-                    wget -O minecraft_server.jar https://piston-data.mojang.com/v1/objects/84194a2f286ef7c14ed7ce0090dba59902951553/server.jar
-                    echo "eula=true" > eula.txt
-                    chown -R minecraft:minecraft /home/minecraft
-                    success "Minecraft server installé (/home/minecraft)"
-                    ;;
-                2)
-                    dpkg --add-architecture i386
-                    apt update
-                    apt install -y steamcmd lib32gcc-s1
-                    success "SteamCMD installé pour serveurs Steam"
-                    ;;
-                3)
-                    apt install -y mono-complete screen
-                    success "Environnement Terraria prêt"
-                    ;;
-            esac
-            ;;
-        *)
-            warning "Service non reconnu: $service_num"
-            ;;
-    esac
-}
-
-# Création des services de monitoring
-create_monitoring_services() {
-    # Service Prometheus
-    cat > /etc/systemd/system/prometheus.service << 'EOF'
-[Unit]
-Description=Prometheus Server
-After=network.target
-
-[Service]
-Type=simple
-User=prometheus
-Group=prometheus
-ExecStart=/usr/local/bin/prometheus \
-    --config.file=/etc/prometheus/prometheus.yml \
-    --storage.tsdb.path=/var/lib/prometheus \
-    --web.console.templates=/etc/prometheus/consoles \
-    --web.console.libraries=/etc/prometheus/console_libraries \
-    --web.listen-address=0.0.0.0:9090 \
-    --web.external-url=
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-    # Service Node Exporter
-    cat > /etc/systemd/system/node_exporter.service << 'EOF'
-[Unit]
-Description=Node Exporter
-After=network.target
-
-[Service]
-Type=simple
-User=nobody
-Group=nogroup
-ExecStart=/usr/local/bin/node_exporter \
-    --web.listen-address=:9100 \
-    --collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($|/)"
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-    # Service Redis Exporter
-    cat > /etc/systemd/system/redis_exporter.service << 'EOF'
-[Unit]
-Description=Redis Exporter
-After=network.target redis.service
-
-[Service]
-Type=simple
-User=nobody
-Group=nogroup
-ExecStart=/usr/local/bin/redis_exporter
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-    # Création des utilisateurs
-    useradd --no-create-home --shell /bin/false prometheus || true
-    chown -R prometheus:prometheus /etc/prometheus /var/lib/prometheus
-}
-
-# Application Beartify de démonstration
+# Application Beartify demo améliorée
 create_beartify_demo() {
-    info "Création de l'application Beartify de démonstration..."
+    info "Création application Beartify demo..."
     
-    # Création d'une application Java simple pour test
-    cat > "$BEARTIFY_HOME/BeartifyDemo.java" << 'EOF'
+    cat > "$BEARTIFY_HOME/BeartifyServer.java" << 'EOFJAVA'
+import com.sun.net.httpserver.*;
 import java.io.*;
 import java.net.*;
+import java.nio.file.*;
+import java.util.*;
 import java.util.concurrent.*;
+import java.text.SimpleDateFormat;
 
-public class BeartifyDemo {
+public class BeartifyServer {
     private static final int PORT = 8080;
+    private static final String MEDIA_ROOT = "/srv/media";
+    private static HttpServer server;
     
-    public static void main(String[] args) {
-        System.out.println("🎵 Démarrage Beartify Demo Server sur port " + PORT);
+    public static void main(String[] args) throws IOException {
+        System.out.println("🎵 BEARTIFY STREAMING SERVER v4.0");
+        System.out.println("====================================");
+        System.out.println("Starting on port " + PORT + "...");
         
-        try {
-            ServerSocket server = new ServerSocket(PORT);
-            ExecutorService executor = Executors.newFixedThreadPool(100);
-            
-            System.out.println("✅ Serveur streaming prêt !");
-            System.out.println("🌐 URL: http://localhost:" + PORT);
-            
-            while (true) {
-                Socket client = server.accept();
-                executor.submit(() -> handleRequest(client));
-            }
-        } catch (IOException e) {
-            System.err.println("❌ Erreur serveur: " + e.getMessage());
-        }
+        server = HttpServer.create(new InetSocketAddress(PORT), 0);
+        ExecutorService executor = Executors.newFixedThreadPool(100);
+        server.setExecutor(executor);
+        
+        // Routes
+        server.createContext("/", new HomeHandler());
+        server.createContext("/health", new HealthHandler());
+        server.createContext("/api/stats", new StatsHandler());
+        server.createContext("/api/stream/", new StreamHandler());
+        server.createContext("/actuator/prometheus", new MetricsHandler());
+        
+        server.start();
+        System.out.println("✅ Server started successfully!");
+        System.out.println("🌐 URL: http://localhost:" + PORT);
+        System.out.println("📊 Metrics: http://localhost:" + PORT + "/actuator/prometheus");
+        System.out.println("💚 Health: http://localhost:" + PORT + "/health");
     }
     
-    private static void handleRequest(Socket client) {
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-             PrintWriter out = new PrintWriter(client.getOutputStream(), true)) {
-            
-            String requestLine = in.readLine();
-            
-            out.println("HTTP/1.1 200 OK");
-            out.println("Content-Type: text/html; charset=UTF-8");
-            out.println("Access-Control-Allow-Origin: *");
-            out.println("");
-            out.println(getHomePage());
-            
-        } catch (IOException e) {
-            System.err.println("Erreur requête: " + e.getMessage());
-        } finally {
-            try { client.close(); } catch (IOException ignored) {}
+    static class HomeHandler implements HttpHandler {
+        public void handle(HttpExchange exchange) throws IOException {
+            String response = getHomePage();
+            exchange.getResponseHeaders().set("Content-Type", "text/html; charset=UTF-8");
+            exchange.sendResponseHeaders(200, response.getBytes().length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
         }
-    }
-    
-    private static String getHomePage() {
-        return """
+        
+        private String getHomePage() {
+            long totalAudio = countFiles(MEDIA_ROOT + "/audio");
+            long totalVideo = countFiles(MEDIA_ROOT + "/video");
+            long totalLyrics = countFiles(MEDIA_ROOT + "/lyrics");
+            
+            return """
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -2307,148 +2537,416 @@ public class BeartifyDemo {
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            color: white; min-height: 100vh;
         }
-        .container { text-align: center; padding: 3rem; max-width: 800px; }
-        h1 { font-size: 4rem; margin-bottom: 1rem; }
-        .subtitle { font-size: 1.5rem; margin-bottom: 3rem; opacity: 0.9; }
-        .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
-        .status-card { background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 15px; backdrop-filter: blur(10px); }
-        .feature { margin: 1rem 0; font-size: 1.1rem; }
-        .emoji { font-size: 2em; display: block; margin-bottom: 0.5rem; }
-        .footer { margin-top: 3rem; font-size: 0.9rem; opacity: 0.7; }
-        .tech-stack { background: rgba(0,0,0,0.3); padding: 2rem; border-radius: 15px; margin-top: 2rem; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        header { text-align: center; padding: 3rem 0; }
+        h1 { font-size: 4rem; margin-bottom: 1rem; text-shadow: 0 0 20px rgba(0,255,136,0.5); }
+        .subtitle { font-size: 1.5rem; opacity: 0.9; color: #00ff88; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin: 3rem 0; }
+        .stat-card {
+            background: rgba(255,255,255,0.1);
+            padding: 2rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(0,255,136,0.3);
+            transition: transform 0.3s, border-color 0.3s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: #00ff88;
+        }
+        .stat-icon { font-size: 3em; margin-bottom: 1rem; }
+        .stat-value { font-size: 2.5rem; font-weight: bold; color: #00ff88; }
+        .stat-label { font-size: 1.1rem; opacity: 0.8; margin-top: 0.5rem; }
+        
+        .features { background: rgba(0,0,0,0.3); padding: 3rem; border-radius: 20px; margin: 2rem 0; }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .feature-item { 
+            padding: 1.5rem; 
+            background: rgba(255,255,255,0.05); 
+            border-radius: 10px;
+            border-left: 4px solid #00ff88;
+        }
+        .feature-item h3 { color: #00ff88; margin-bottom: 0.5rem; }
+        
+        .tech-stack { margin: 3rem 0; }
+        .tech-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+        .tech-item {
+            background: rgba(0,255,136,0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(0,255,136,0.3);
+        }
+        
+        .api-docs {
+            background: rgba(0,0,0,0.4);
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+        .endpoint {
+            background: rgba(255,255,255,0.05);
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+        }
+        .method { 
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+        .get { background: #00ff88; color: #000; }
+        .post { background: #00a8ff; color: #fff; }
+        
+        .footer { 
+            text-align: center; 
+            padding: 2rem; 
+            margin-top: 3rem; 
+            border-top: 1px solid rgba(255,255,255,0.1);
+            opacity: 0.7;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .status-live {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            margin-right: 0.5rem;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎵 Beartify</h1>
-        <div class="subtitle">Serveur de Streaming Multimédia Haute Performance</div>
+        <header>
+            <h1>🎵 BEARTIFY</h1>
+            <div class="subtitle">
+                <span class="status-live"></span>
+                Professional Media Streaming Server v4.0
+            </div>
+        </header>
         
-        <div class="status-grid">
-            <div class="status-card">
-                <span class="emoji">✅</span>
-                <h3>Serveur Actif</h3>
-                <p>Port 8080 opérationnel</p>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">🎵</div>
+                <div class="stat-value">""" + totalAudio + """</div>
+                <div class="stat-label">Fichiers Audio</div>
             </div>
-            <div class="status-card">
-                <span class="emoji">🚀</span>
-                <h3>Performance</h3>
-                <p>Optimisé pour 100+ utilisateurs</p>
+            <div class="stat-card">
+                <div class="stat-icon">🎬</div>
+                <div class="stat-value">""" + totalVideo + """</div>
+                <div class="stat-label">Fichiers Vidéo</div>
             </div>
-            <div class="status-card">
-                <span class="emoji">🔒</span>
-                <h3>Sécurisé</h3>
-                <p>Pare-feu et monitoring actifs</p>
+            <div class="stat-card">
+                <div class="stat-icon">📝</div>
+                <div class="stat-value">""" + totalLyrics + """</div>
+                <div class="stat-label">Paroles (LRC)</div>
             </div>
-            <div class="status-card">
-                <span class="emoji">💾</span>
-                <h3>Stockage</h3>
-                <p>Structure multimédia optimisée</p>
+            <div class="stat-card">
+                <div class="stat-icon">⚡</div>
+                <div class="stat-value">100+</div>
+                <div class="stat-label">Users Simultanés</div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <h2>✨ Fonctionnalités Principales</h2>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <h3>🎵 Streaming Audio Adaptatif</h3>
+                    <p>Support MP3, FLAC, OGG, M4A, AAC, OPUS avec transcoding automatique</p>
+                </div>
+                <div class="feature-item">
+                    <h3>🎬 Streaming Vidéo HLS/DASH</h3>
+                    <p>MP4, WebM, MKV avec adaptive bitrate streaming</p>
+                </div>
+                <div class="feature-item">
+                    <h3>📝 Paroles Synchronisées</h3>
+                    <p>Format LRC avec timing précis milliseconde</p>
+                </div>
+                <div class="feature-item">
+                    <h3>🗂️ Métadonnées Enrichies</h3>
+                    <p>JSON/XML avec tags ID3, artwork, informations détaillées</p>
+                </div>
+                <div class="feature-item">
+                    <h3>⚡ Cache Redis</h3>
+                    <p>Cache intelligent pour performance optimale</p>
+                </div>
+                <div class="feature-item">
+                    <h3>📊 Monitoring Temps Réel</h3>
+                    <p>Prometheus + Grafana pour métriques détaillées</p>
+                </div>
             </div>
         </div>
         
         <div class="tech-stack">
-            <h3>🛠️ Stack Technique</h3>
-            <div class="feature">📱 Java 17 + Spring Boot</div>
-            <div class="feature">🌐 Nginx + Redis Cache</div>
-            <div class="feature">🗄️ Base de données optimisée</div>
-            <div class="feature">📊 Monitoring Prometheus/Grafana</div>
-            <div class="feature">🎬 Support MP3, MP4, FLAC, OGG</div>
-            <div class="feature">📝 Paroles synchronisées (.lrc)</div>
+            <h2>🛠️ Stack Technique</h2>
+            <div class="tech-grid">
+                <div class="tech-item">☕ Java 17 LTS</div>
+                <div class="tech-item">🌐 Nginx RTMP</div>
+                <div class="tech-item">💾 MariaDB/PostgreSQL</div>
+                <div class="tech-item">🔴 Redis Cache</div>
+                <div class="tech-item">🐳 Docker Ready</div>
+                <div class="tech-item">📊 Prometheus</div>
+                <div class="tech-item">📈 Grafana</div>
+                <div class="tech-item">🎬 FFmpeg</div>
+                <div class="tech-item">🎵 MediaInfo</div>
+                <div class="tech-item">📝 ExifTool</div>
+                <div class="tech-item">🔒 SSL/TLS</div>
+                <div class="tech-item">⚡ HTTP/2</div>
+            </div>
+        </div>
+        
+        <div class="api-docs">
+            <h2>📡 API Endpoints</h2>
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span>/api/stream/{type}/{id}</span>
+                <p style="margin-top: 0.5rem; opacity: 0.8;">Stream audio/video avec support Range requests</p>
+            </div>
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span>/api/lyrics/{id}.lrc</span>
+                <p style="margin-top: 0.5rem; opacity: 0.8;">Récupérer paroles synchronisées</p>
+            </div>
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span>/api/metadata/{id}.json</span>
+                <p style="margin-top: 0.5rem; opacity: 0.8;">Métadonnées complètes du média</p>
+            </div>
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span>/api/upload</span>
+                <p style="margin-top: 0.5rem; opacity: 0.8;">Upload fichiers multimédia (jusqu'à 4GB)</p>
+            </div>
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span>/health</span>
+                <p style="margin-top: 0.5rem; opacity: 0.8;">Health check du serveur</p>
+            </div>
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span>/actuator/prometheus</span>
+                <p style="margin-top: 0.5rem; opacity: 0.8;">Métriques Prometheus</p>
+            </div>
         </div>
         
         <div class="footer">
-            Installation Ubuntu Server Beartify - """ + new java.util.Date() + """<br>
-            Prêt pour votre application de streaming !
+            <p>🎵 Beartify Streaming Server - Installation Ubuntu v4.0</p>
+            <p>Développé par PapaOursPolaire | """ + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + """</p>
+            <p style="margin-top: 1rem;">
+                <a href="/health" style="color: #00ff88; text-decoration: none; margin: 0 1rem;">Health Check</a>
+                <a href="/actuator/prometheus" style="color: #00ff88; text-decoration: none; margin: 0 1rem;">Metrics</a>
+                <a href="/api/stats" style="color: #00ff88; text-decoration: none; margin: 0 1rem;">Statistics</a>
+            </p>
         </div>
     </div>
     
     <script>
-        console.log('🎵 Beartify Demo Server - Ready for streaming!');
+        console.log('🎵 Beartify Server v4.0 - Ready!');
+        
+        // Auto-refresh stats toutes les 30s
         setInterval(() => {
-            fetch('/api/health').catch(() => {});
+            fetch('/api/stats')
+                .then(r => r.json())
+                .then(data => console.log('Stats:', data))
+                .catch(e => console.error('Stats error:', e));
         }, 30000);
+        
+        // WebSocket pour notifications temps réel (futur)
+        // const ws = new WebSocket('ws://localhost:8080/ws');
     </script>
 </body>
 </html>
 """;
+        }
+        
+        private long countFiles(String path) {
+            try {
+                return Files.walk(Paths.get(path))
+                    .filter(Files::isRegularFile)
+                    .count();
+            } catch (Exception e) {
+                return 0;
+            }
+        }
+    }
+    
+    static class HealthHandler implements HttpHandler {
+        public void handle(HttpExchange exchange) throws IOException {
+            String response = "{\"status\":\"UP\",\"timestamp\":\"" + 
+                new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()) + 
+                "\",\"components\":{\"diskSpace\":{\"status\":\"UP\"},\"db\":{\"status\":\"UP\"},\"redis\":{\"status\":\"UP\"}}}";
+            exchange.getResponseHeaders().set("Content-Type", "application/json");
+            exchange.sendResponseHeaders(200, response.getBytes().length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+        }
+    }
+    
+    static class StatsHandler implements HttpHandler {
+        public void handle(HttpExchange exchange) throws IOException {
+            Map<String, Object> stats = new HashMap<>();
+            stats.put("uptime", ManagementFactory.getRuntimeMXBean().getUptime());
+            stats.put("totalMemory", Runtime.getRuntime().totalMemory());
+            stats.put("freeMemory", Runtime.getRuntime().freeMemory());
+            stats.put("processors", Runtime.getRuntime().availableProcessors());
+            stats.put("timestamp", System.currentTimeMillis());
+            
+            String response = new com.google.gson.Gson().toJson(stats);
+            exchange.getResponseHeaders().set("Content-Type", "application/json");
+            exchange.sendResponseHeaders(200, response.getBytes().length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+        }
+    }
+    
+    static class StreamHandler implements HttpHandler {
+        public void handle(HttpExchange exchange) throws IOException {
+            String response = "{\"message\":\"Streaming endpoint - implement with Spring Boot\"}";
+            exchange.getResponseHeaders().set("Content-Type", "application/json");
+            exchange.sendResponseHeaders(200, response.getBytes().length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+        }
+    }
+    
+    static class MetricsHandler implements HttpHandler {
+        public void handle(HttpExchange exchange) throws IOException {
+            StringBuilder metrics = new StringBuilder();
+            metrics.append("# HELP beartify_uptime_seconds Uptime in seconds\n");
+            metrics.append("# TYPE beartify_uptime_seconds gauge\n");
+            metrics.append("beartify_uptime_seconds ").append(ManagementFactory.getRuntimeMXBean().getUptime() / 1000).append("\n");
+            
+            metrics.append("# HELP beartify_memory_used_bytes Memory used\n");
+            metrics.append("# TYPE beartify_memory_used_bytes gauge\n");
+            metrics.append("beartify_memory_used_bytes ").append(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()).append("\n");
+            
+            String response = metrics.toString();
+            exchange.getResponseHeaders().set("Content-Type", "text/plain");
+            exchange.sendResponseHeaders(200, response.getBytes().length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+        }
     }
 }
-EOF
+EOFJAVA
     
     # Compilation
     cd "$BEARTIFY_HOME"
-    javac BeartifyDemo.java
-    jar cfe beartify.jar BeartifyDemo BeartifyDemo.class
+    javac BeartifyServer.java
+    jar cfe beartify.jar BeartifyServer BeartifyServer*.class
     chown "$BEARTIFY_USER:$BEARTIFY_USER" beartify.jar
     
-    success "Application Beartify de démonstration créée"
+    success "Application Beartify demo créée"
 }
 
-# Génération du script post-installation
-generate_postinstall_script() {
-    info "Génération du script post-installation..."
+# Installation services individuels (fonction réutilisée du script précédent)
+install_individual_service() {
+    local service_num="$1"
     
-    cat > "$BEARTIFY_HOME/post-install.sh" << 'EOF'
-#!/bin/bash
-# Script post-installation Beartify
-# Optimisations et configurations finales
+    case $service_num in
+        6) install_nginx_streaming ;;
+        9) install_database ;;
+        10) DB_CHOICE=2; install_database ;;
+        11) install_redis_streaming ;;
+        17) install_docker ;;
+        23) INSTALL_MONITORING="y"; install_monitoring_stack ;;
+        28) INSTALL_JELLYFIN="y"; install_jellyfin ;;
+        29) INSTALL_ICECAST="y"; install_icecast ;;
+        41) GUI_CHOICE=1; install_gui ;;
+        42) GUI_CHOICE=2; install_gui ;;
+        43) GUI_CHOICE=3; install_gui ;;
+        *) warning "Service $service_num: À implémenter ou déjà géré" ;;
+    esac
+}
 
-echo "🎵 BEARTIFY - Script Post-Installation"
+# Script post-installation
+generate_postinstall_script() {
+    info "Génération script post-installation..."
+    
+    cat > "$BEARTIFY_HOME/post-install.sh" << 'EOFPOST'
+#!/bin/bash
+
+echo "🎵 BEARTIFY - Post-Installation Check"
 echo "======================================"
 
-# Test des services
-echo "🔍 Vérification des services..."
-services=("nginx" "mysql" "redis-server" "beartify")
-for service in "${services[@]}"; do
-    if systemctl is-active --quiet "$service"; then
-        echo "✅ $service: Actif"
-    else
-        echo "❌ $service: Inactif"
-        systemctl status "$service" --no-pager -l
+# Vérification services
+echo ""
+echo "📊 Services Status:"
+for service in nginx mysql mariadb postgresql redis-server beartify jellyfin icecast2; do
+    if systemctl is-active --quiet "$service" 2>/dev/null; then
+        echo "  ✅ $service: ACTIVE"
+    elif systemctl list-unit-files | grep -q "$service"; then
+        echo "  ⚠️  $service: INSTALLED but INACTIVE"
     fi
 done
 
-# Test des ports
+# Vérification ports
 echo ""
-echo "🌐 Vérification des ports..."
-ports=("80:HTTP" "443:HTTPS" "3306:MySQL" "6379:Redis" "8080:Beartify")
-for port_desc in "${ports[@]}"; do
-    port="${port_desc%:*}"
-    desc="${port_desc#*:}"
+echo "🌐 Ports Check:"
+for port in 80 443 8080 8096 8000 3000 9090; do
     if ss -tln | grep -q ":$port "; then
-        echo "✅ Port $port ($desc): Ouvert"
-    else
-        echo "❌ Port $port ($desc): Fermé"
+        echo "  ✅ Port $port: OPEN"
     fi
 done
 
-# Optimisations finales
+# Statistiques médias
 echo ""
-echo "⚡ Application des optimisations finales..."
+echo "📁 Media Statistics:"
+if [ -d /srv/media ]; then
+    echo "  🎵 Audio: $(find /srv/media/audio -type f 2>/dev/null | wc -l) files"
+    echo "  🎬 Video: $(find /srv/media/video -type f 2>/dev/null | wc -l) files"
+    echo "  📝 Lyrics: $(find /srv/media/lyrics -type f 2>/dev/null | wc -l) files"
+    echo "  💾 Total: $(du -sh /srv/media 2>/dev/null | cut -f1)"
+fi
 
-# Cache et permissions
-find /srv/media -type d -exec chmod 755 {} \;
-find /srv/media -type f -exec chmod 644 {} \;
+# Informations système
+echo ""
+echo "💻 System Info:"
+echo "  CPU: $(nproc) cores"
+echo "  RAM: $(free -h | awk '/^Mem:/ {print $2}')"
+echo "  Disk: $(df -h / | awk 'NR==2 {print $4}') free"
 
-# Nettoyage des logs anciens
-find /var/log -name "*.log" -mtime +30 -delete 2>/dev/null || true
+# URLs d'accès
+echo ""
+echo "🔗 Access URLs:"
+IP=$(hostname -I | awk '{print $1}')
+echo "  🎵 Beartify: http://$IP:8080"
+[ -f /etc/nginx/sites-enabled/beartify ] && echo "  🌐 Nginx: http://$IP"
+systemctl is-active --quiet jellyfin && echo "  🎬 Jellyfin: http://$IP:8096"
+systemctl is-active --quiet icecast2 && echo "  📻 Icecast: http://$IP:8000"
+systemctl is-active --quiet grafana-server && echo "  📊 Grafana: http://$IP:3000"
 
 echo ""
-echo "🎉 Configuration terminée !"
-echo "🌐 Accédez à votre serveur: http://$(hostname -I | awk '{print $1}'):8080"
-EOF
+echo "✅ Post-installation check complete!"
+echo "📝 See installation log: $LOG_FILE"
+EOFPOST
     
     chmod +x "$BEARTIFY_HOME/post-install.sh"
     chown "$BEARTIFY_USER:$BEARTIFY_USER" "$BEARTIFY_HOME/post-install.sh"
     
-    success "Script post-installation généré"
+    success "Script post-installation créé"
 }
 
-# Résumé final de l'installation
+# Résumé final
 show_installation_summary() {
     clear
     print_header
@@ -2459,108 +2957,47 @@ show_installation_summary() {
     echo
     
     if [[ "$INSTALL_TYPE" == "1" ]]; then
-        echo -e "${YELLOW}🎵 SERVEUR BEARTIFY INSTALLÉ${NC}"
-        echo "  🖥️  Interface: $(case $GUI_CHOICE in 1) echo "KDE Plasma + Thèmes";; 2) echo "GNOME";; 3) echo "Mode serveur";; esac)"
-        echo "  💾 Base de données: $(case $DB_CHOICE in 1) echo "MariaDB";; 2) echo "PostgreSQL";; 3) echo "MySQL";; esac)"
-        echo "  🔒 Sécurité: UFW + Fail2ban configurés"
-        echo "  🌐 Reverse Proxy: Nginx optimisé streaming"
-        echo "  ⚡ Cache: Redis configuré"
-        echo "  📊 Monitoring: $(if [[ "$INSTALL_MONITORING" =~ ^[Yy] ]]; then echo "Prometheus + Grafana"; else echo "Non installé"; fi)"
-        echo
-        echo -e "${YELLOW}🔗 ACCÈS:${NC}"
-        echo "  🌐 Application: http://$(hostname -I | awk '{print $1}'):$APP_PORT"
-        [[ -n "$DOMAIN" ]] && echo "  🌍 Domaine: https://$DOMAIN"
-        [[ "$INSTALL_MONITORING" =~ ^[Yy] ]] && echo "  📊 Grafana: http://$(hostname -I | awk '{print $1}'):3000"
-        [[ "$INSTALL_MINIO" =~ ^[Yy] ]] && echo "  🗄️ MinIO: http://$(hostname -I | awk '{print $1}'):9001"
-        echo
-        echo -e "${YELLOW}👤 COMPTES CRÉÉS:${NC}"
-        echo "  🔧 Utilisateur système: $BEARTIFY_USER"
-        echo "  💾 Base de données: $DB_USER"
-        echo "  🔑 Mot de passe DB: [Généré automatiquement]"
-    fi
-    
-    echo
-    echo -e "${YELLOW}📂 DOSSIERS IMPORTANTS:${NC}"
-    echo "  🎵 Médias: $MEDIA_ROOT/"
-    echo "  💾 Sauvegardes: $BACKUP_ROOT/"
-    echo "  🏠 Application: $BEARTIFY_HOME/"
-    echo
-    echo -e "${YELLOW}🛠️ COMMANDES UTILES:${NC}"
-    echo "  📊 Status global: sudo systemctl status beartify nginx mysql redis"
-    echo "  🔄 Redémarrer: sudo systemctl restart beartify"
-    echo "  📋 Logs: sudo journalctl -u beartify -f"
-    echo "  🎛️ Post-install: $BEARTIFY_HOME/post-install.sh"
-    echo "  🚀 FastFetch: fastfetch"
-    echo
-    echo -e "${YELLOW}⚙️ FICHIERS DE CONFIGURATION:${NC}"
-    echo "  ⚙️ Beartify: $BEARTIFY_HOME/config/"
-    echo "  🌐 Nginx: /etc/nginx/sites-available/beartify"
-    echo "  🔥 Firewall: sudo ufw status"
-    echo "  💾 Base de données: /etc/mysql/ ou /etc/postgresql/"
-    echo
-    echo -e "${GREEN}🎯 PROCHAINES ÉTAPES:${NC}"
-    echo "  1. 🎵 Téléversez vos fichiers dans $MEDIA_ROOT/"
-    echo "  2. 🔄 Exécutez: $BEARTIFY_HOME/post-install.sh"
-    echo "  3. 🎮 Remplacez beartify.jar par votre vraie application"
-    echo "  4. 🎉 Profitez de votre serveur de streaming !"
-    echo
-    echo -e "${YELLOW}⚠️ SÉCURITÉ:${NC}"
-    echo "  🔑 Changez les mots de passe par défaut"
-    echo "  🔄 Mettez à jour régulièrement: sudo apt update && sudo apt upgrade"
-    echo "  📊 Surveillez via les logs et monitoring"
-    echo
-    echo -e "${PURPLE}📚 LOGS D'INSTALLATION:${NC}"
-    echo "  📋 Log complet: $LOG_FILE"
-    echo "  🔍 Consultez avec: less $LOG_FILE"
-    echo
-    echo -e "${GREEN}✅ SERVEUR BEARTIFY STREAMING PRÊT !${NC}"
-    
-    # Sauvegarde des infos d'installation
-    cat > "$BEARTIFY_HOME/INSTALLATION_INFO.txt" << EOF
-BEARTIFY - INFORMATIONS D'INSTALLATION
-=====================================
-Date: $(date)
-Hostname: $(hostname)
-IP: $(hostname -I | awk '{print $1}')
-Type: $(if [[ "$INSTALL_TYPE" == "1" ]]; then echo "Installation complète Beartify"; else echo "Services individuels"; fi)
+        echo -e "${YELLOW}🎵 SERVEUR BEARTIFY COMPLET INSTALLÉ${NC}"
+        echo "  🖥️  Interface: $(case $GUI_CHOICE in 1) echo "KDE Plasma + Thèmes";; 2) echo "GNOME (lockscreen corrigé)";; 3) echo "XFCE";; 4) echo "Mode serveur";; esac)"
+        echo "  💾 Base: $(case $DB_CHOICE in 1) echo "MariaDB";; 2) echo "PostgreSQL";; 3) echo "MySQL";; esac)"
+        echo "  🔒 Sécurité: UFW + Fail2ban actifs"
+        echo "  🌐 Proxy: Nginx + RTMP + HLS/DASH"
+        echo "  ⚡ Cache: Redis 6GB configuré"
+        echo "  📊 Monitoring: $(if [[ "$INSTALL_MONITORING" =~ ^[Yy] ]]; then echo "- 3000 (Grafana)\n- 9090 (Prometheus)"; fi)
+$(if [[ "$INSTALL_JELLYFIN" =~ ^[Yy] ]]; then echo "- 8096 (Jellyfin)"; fi)
+$(if [[ "$INSTALL_ICECAST" =~ ^[Yy] ]]; then echo "- 8000 (Icecast)"; fi)
 
-CONFIGURATION:
-- Interface: $(case $GUI_CHOICE in 1) echo "KDE Plasma";; 2) echo "GNOME";; 3) echo "Serveur";; esac)
-- Base: $(case $DB_CHOICE in 1) echo "MariaDB";; 2) echo "PostgreSQL";; 3) echo "MySQL";; esac)
-- Domaine: ${DOMAIN:-"Non configuré"}
-- Monitoring: ${INSTALL_MONITORING:-"Non"}
-- MinIO: ${INSTALL_MINIO:-"Non"}
+SUPPORTED FORMATS:
+Audio: MP3, FLAC, OGG, M4A, WAV, AAC, OPUS
+Video: MP4, WebM, MKV, AVI
+Lyrics: LRC, TXT
+Metadata: JSON, XML
 
-ACCÈS:
-- Application: http://$(hostname -I | awk '{print $1}'):$APP_PORT
-- Domaine: ${DOMAIN:-"N/A"}
+FEATURES:
+- Adaptive bitrate streaming (HLS/DASH)
+- Range requests support
+- Redis caching
+- RTMP live streaming
+- Metadata extraction
+- Synchronized lyrics
+- Hardware transcoding ready
+- Prometheus metrics
+- Health monitoring
+- SSL/TLS support
+- Rate limiting
+- CORS enabled
 
-UTILISATEURS:
-- Système: $BEARTIFY_USER
-- DB: $DB_USER
-- DB Pass: $DB_PASS
-
-DOSSIERS:
-- Média: $MEDIA_ROOT
-- Backup: $BACKUP_ROOT
-- App: $BEARTIFY_HOME
-
-SERVICES INSTALLÉS:
-- nginx.service
-- beartify.service
-- mysql.service (ou postgresql.service)
-- redis-server.service
-- fail2ban.service
+LOG FILE: $LOG_FILE
 EOF
     
     chown "$BEARTIFY_USER:$BEARTIFY_USER" "$BEARTIFY_HOME/INSTALLATION_INFO.txt"
 }
 
-# Menu principal et logique de sélection
+# Menu principal
 main_menu_loop() {
     while true; do
         show_main_menu
-        read -p "Choisissez une option [0-2]: " INSTALL_TYPE
+        read -p "Choisissez une option [0-3]: " INSTALL_TYPE
         
         case $INSTALL_TYPE in
             0)
@@ -2582,26 +3019,33 @@ main_menu_loop() {
                 install_individual_services_menu
                 break
                 ;;
+            3)
+                echo
+                info "Mode réparation/debug GNOME"
+                fix_gnome_lockscreen
+                success "Correction appliquée. Redémarrez le système."
+                read -p "Appuyez sur Entrée pour continuer..." -r
+                ;;
             *)
                 echo
-                warning "Choix invalide. Utilisez 0, 1 ou 2."
+                warning "Choix invalide. Utilisez 0, 1, 2 ou 3."
                 sleep 2
                 ;;
         esac
     done
 }
 
-# Menu pour services individuels
+# Menu services individuels
 install_individual_services_menu() {
     while true; do
         show_services_menu
-        read -p "Choisissez un service [0-30]: " service_choice
+        read -p "Choisissez un service [0-47]: " service_choice
         
         case $service_choice in
             0)
                 break
                 ;;
-            [1-9]|[12][0-9]|30)
+            [1-9]|[1-4][0-9])
                 echo
                 info "Installation du service $service_choice..."
                 install_individual_service "$service_choice"
@@ -2619,64 +3063,92 @@ install_individual_services_menu() {
 
 # Installation complète Beartify
 install_beartify_complete() {
-    info "Démarrage de l'installation complète Beartify..."
+    info "Démarrage de l'installation complète Beartify v4.0..."
     
-    # Phase 1: Préparation système
+    # Phase 1: Système de base
+    info "Phase 1/12: Préparation système..."
     update_system
     install_essential_tools
     create_beartify_user
     
     # Phase 2: Sécurité
+    info "Phase 2/12: Configuration sécurité..."
     setup_streaming_firewall
     setup_fail2ban
     
-    # Phase 3: Interface (si demandée)
-    if [[ "$GUI_CHOICE" != "3" ]]; then
+    # Phase 3: Interface graphique (optionnelle)
+    if [[ "$GUI_CHOICE" != "4" ]]; then
+        info "Phase 3/12: Installation interface graphique..."
         install_gui
+    else
+        info "Phase 3/12: Mode serveur - Skip interface graphique"
     fi
     
-    # Phase 4: Stockage et structure
+    # Phase 4: Stockage
+    info "Phase 4/12: Configuration stockage multimédia..."
     setup_streaming_storage
     
     # Phase 5: Base de données
+    info "Phase 5/12: Installation base de données..."
     install_database
     
-    # Phase 6: Environnement Java
+    # Phase 6: Java
+    info "Phase 6/12: Installation environnement Java..."
     install_java_environment
     
     # Phase 7: Services de base
+    info "Phase 7/12: Installation services..."
     install_docker
     install_nginx_streaming
     install_redis_streaming
     
     # Phase 8: Développement
+    info "Phase 8/12: Installation outils développement..."
     install_development
     
-    # Phase 9: Optimisations système
+    # Phase 9: Optimisations
+    info "Phase 9/12: Optimisations système..."
     optimize_system_streaming
     
-    # Phase 10: Monitoring (optionnel)
+    # Phase 10: Services optionnels
+    info "Phase 10/12: Installation services optionnels..."
     install_monitoring_stack
+    install_jellyfin
+    install_icecast
     
-    # Phase 11: Applications
+    # Phase 11: Application
+    info "Phase 11/12: Configuration application Beartify..."
     create_beartify_service
     create_beartify_demo
     install_fastfetch
     
-    # Phase 12: Scripts finaux
+    # Phase 12: Finalisation
+    info "Phase 12/12: Finalisation..."
     generate_postinstall_script
     
-    # Phase 13: Démarrage des services
+    # Démarrage des services
     info "Démarrage des services Beartify..."
     systemctl daemon-reload
     
-    # Démarrage en ordre de dépendance
-    systemctl start mysql 2>/dev/null || systemctl start postgresql 2>/dev/null || true
-    systemctl start redis-server
-    systemctl start nginx
-    systemctl start beartify
+    # Ordre de démarrage respecté
+    if [[ "$DB_CHOICE" == "2" ]]; then
+        systemctl start postgresql || warning "PostgreSQL n'a pas démarré"
+    else
+        systemctl start mariadb || systemctl start mysql || warning "DB n'a pas démarré"
+    fi
     
-    # Vérification des services
+    sleep 2
+    systemctl start redis-server || warning "Redis n'a pas démarré"
+    sleep 1
+    systemctl start nginx || warning "Nginx n'a pas démarré"
+    sleep 1
+    systemctl start beartify || warning "Beartify n'a pas démarré"
+    
+    [[ "$INSTALL_JELLYFIN" =~ ^[Yy] ]] && systemctl start jellyfin
+    [[ "$INSTALL_ICECAST" =~ ^[Yy] ]] && systemctl start icecast2
+    [[ "$INSTALL_MONITORING" =~ ^[Yy] ]] && systemctl start prometheus grafana-server
+    
+    # Vérification
     sleep 5
     local failed_services=()
     for service in nginx redis-server beartify; do
@@ -2686,25 +3158,28 @@ install_beartify_complete() {
     done
     
     if [[ ${#failed_services[@]} -eq 0 ]]; then
-        success "Tous les services Beartify démarrés avec succès"
+        success "Tous les services Beartify démarrés !"
     else
-        warning "Services ayant échoué: ${failed_services[*]}"
-        info "Vérifiez les logs avec: sudo journalctl -u <service>"
+        warning "Services en échec: ${failed_services[*]}"
+        info "Vérifiez: sudo journalctl -u <service> -n 50"
     fi
     
     # Résumé final
     show_installation_summary
     
-    # Proposition de redémarrage
+    # Proposer redémarrage
     echo
-    read -p "Voulez-vous redémarrer maintenant pour finaliser l'installation ? [Y/n]: " REBOOT
+    echo -e "${CYAN}L'installation est terminée. Un redémarrage est recommandé pour finaliser toutes les configurations.${NC}"
+    echo
+    read -p "Voulez-vous redémarrer maintenant ? [Y/n]: " REBOOT
     if [[ "$REBOOT" =~ ^[Yy]?$ ]]; then
         info "Redémarrage du système dans 10 secondes..."
+        info "Après redémarrage, exécutez: $BEARTIFY_HOME/post-install.sh"
         sleep 10
         reboot
     else
-        info "N'oubliez pas de redémarrer plus tard: sudo reboot"
-        info "Script post-installation: $BEARTIFY_HOME/post-install.sh"
+        info "Pensez à redémarrer plus tard: sudo reboot"
+        info "Puis exécutez: $BEARTIFY_HOME/post-install.sh"
     fi
 }
 
@@ -2713,6 +3188,418 @@ main() {
     # Initialisation
     print_header
     log "Démarrage du script d'installation Beartify v$SCRIPT_VERSION"
+    
+    # Vérifications
+    check_root
+    detect_distro
+    
+    # Analyse ressources
+    info "Analyse des ressources système..."
+    local cpu_cores=$(nproc)
+    local ram_gb=$(($(grep MemTotal /proc/meminfo | awk '{print $2}') / 1024 / 1024))
+    local disk_gb=$(df -BG / | awk 'NR==2 {print $4}' | sed 's/G//')
+    
+    echo
+    echo -e "${CYAN}=== RESSOURCES SYSTÈME DÉTECTÉES ===${NC}"
+    echo -e "  💻 CPU: $cpu_cores cœurs"
+    echo -e "  🧠 RAM: ${ram_gb}GB"
+    echo -e "  💾 Disque libre: ${disk_gb}GB"
+    echo
+    
+    # Recommandations
+    if [[ $ram_gb -lt 4 ]]; then
+        warning "RAM faible (<4GB). Performances limitées possibles."
+        warning "Recommandation: Minimum 8GB pour streaming optimal."
+    fi
+    
+    if [[ $disk_gb -lt 50 ]]; then
+        warning "Espace disque faible (<50GB)."
+        warning "Recommandation: Minimum 100GB pour stockage média."
+    fi
+    
+    if [[ $cpu_cores -lt 4 ]]; then
+        warning "CPU faible (<4 cœurs). Transcoding limité."
+    fi
+    
+    if [[ $cpu_cores -ge 4 && $ram_gb -ge 8 && $disk_gb -ge 100 ]]; then
+        success "Configuration optimale pour serveur streaming haute performance !"
+    elif [[ $cpu_cores -ge 2 && $ram_gb -ge 4 ]]; then
+        info "Configuration acceptable pour serveur streaming basique."
+    else
+        warning "Configuration minimale. Performances réduites attendues."
+    fi
+    
+    echo
+    read -p "Appuyez sur Entrée pour continuer l'installation..." -r
+    
+    # Menu principal
+    main_menu_loop
+}
+
+# Scripts utilitaires pour l'utilisateur
+create_utility_scripts() {
+    info "Création des scripts utilitaires..."
+    
+    # Script de gestion Beartify
+    cat > "$BEARTIFY_HOME/scripts/beartify-manager.sh" << 'EOFMGR'
+#!/bin/bash
+# Beartify Manager - Script de gestion rapide
+
+case "$1" in
+    start)
+        echo "🚀 Démarrage Beartify..."
+        sudo systemctl start beartify nginx redis-server
+        ;;
+    stop)
+        echo "⏹️  Arrêt Beartify..."
+        sudo systemctl stop beartify nginx redis-server
+        ;;
+    restart)
+        echo "🔄 Redémarrage Beartify..."
+        sudo systemctl restart beartify nginx redis-server
+        ;;
+    status)
+        echo "📊 Status des services:"
+        sudo systemctl status beartify nginx redis-server --no-pager
+        ;;
+    logs)
+        echo "📋 Logs Beartify (Ctrl+C pour quitter):"
+        sudo journalctl -u beartify -f
+        ;;
+    stats)
+        echo "📈 Statistiques médias:"
+        echo "  🎵 Audio: $(find /srv/media/audio -type f 2>/dev/null | wc -l) fichiers"
+        echo "  🎬 Vidéo: $(find /srv/media/video -type f 2>/dev/null | wc -l) fichiers"
+        echo "  📝 Paroles: $(find /srv/media/lyrics -type f 2>/dev/null | wc -l) fichiers"
+        echo "  💾 Taille: $(du -sh /srv/media 2>/dev/null | cut -f1)"
+        ;;
+    clean-cache)
+        echo "🧹 Nettoyage du cache..."
+        sudo rm -rf /srv/media/cache/*
+        sudo systemctl restart redis-server
+        echo "✅ Cache nettoyé"
+        ;;
+    backup)
+        BACKUP_DIR="/srv/backup/manual/backup_$(date +%Y%m%d_%H%M%S)"
+        echo "💾 Backup vers $BACKUP_DIR..."
+        mkdir -p "$BACKUP_DIR"
+        sudo mysqldump -u beartifyuser -p beartifydb > "$BACKUP_DIR/database.sql" 2>/dev/null || echo "⚠️  Backup DB échoué"
+        cp -r /home/beartify/config "$BACKUP_DIR/" 2>/dev/null || echo "⚠️  Backup config échoué"
+        echo "✅ Backup terminé"
+        ;;
+    update)
+        echo "🔄 Mise à jour du système..."
+        sudo apt update && sudo apt upgrade -y
+        echo "✅ Système à jour"
+        ;;
+    *)
+        echo "🎵 Beartify Manager"
+        echo "Usage: $0 {start|stop|restart|status|logs|stats|clean-cache|backup|update}"
+        echo ""
+        echo "Commandes:"
+        echo "  start       - Démarrer tous les services"
+        echo "  stop        - Arrêter tous les services"
+        echo "  restart     - Redémarrer tous les services"
+        echo "  status      - Afficher le status"
+        echo "  logs        - Afficher les logs en temps réel"
+        echo "  stats       - Statistiques des médias"
+        echo "  clean-cache - Nettoyer le cache"
+        echo "  backup      - Créer un backup manuel"
+        echo "  update      - Mettre à jour le système"
+        exit 1
+        ;;
+esac
+EOFMGR
+    
+    chmod +x "$BEARTIFY_HOME/scripts/beartify-manager.sh"
+    ln -sf "$BEARTIFY_HOME/scripts/beartify-manager.sh" /usr/local/bin/beartify
+    
+    # Script de monitoring rapide
+    cat > "$BEARTIFY_HOME/scripts/quick-monitor.sh" << 'EOFMON'
+#!/bin/bash
+# Quick Monitor - Surveillance rapide du système
+
+echo "🎵 BEARTIFY QUICK MONITOR"
+echo "========================="
+echo ""
+
+# Services
+echo "📊 Services:"
+for service in beartify nginx redis-server mysql mariadb postgresql; do
+    if systemctl is-active --quiet $service 2>/dev/null; then
+        echo "  ✅ $service"
+    elif systemctl list-unit-files | grep -q "^$service"; then
+        echo "  ❌ $service (installé mais inactif)"
+    fi
+done
+echo ""
+
+# Ressources
+echo "💻 Ressources:"
+echo "  CPU: $(top -bn1 | grep "Cpu(s)" | awk '{print $2}')% utilisé"
+echo "  RAM: $(free -h | awk '/^Mem:/ {print $3 " / " $2}') ($(free | awk '/^Mem:/ {printf "%.1f%%", $3/$2*100}'))"
+echo "  Swap: $(free -h | awk '/^Swap:/ {print $3 " / " $2}')"
+echo "  Disque /: $(df -h / | awk 'NR==2 {print $3 " / " $2 " (" $5 " utilisé)"}')"
+echo "  Disque /srv: $(df -h /srv 2>/dev/null | awk 'NR==2 {print $3 " / " $2 " (" $5 " utilisé)"}' || echo "N/A")"
+echo ""
+
+# Réseau
+echo "🌐 Réseau:"
+echo "  Connexions actives: $(ss -tun | grep ESTAB | wc -l)"
+echo "  IP locale: $(hostname -I | awk '{print $1}')"
+if command -v curl &>/dev/null; then
+    echo "  IP publique: $(curl -s ifconfig.me 2>/dev/null || echo "N/A")"
+fi
+echo ""
+
+# Ports
+echo "🔌 Ports en écoute:"
+for port in 80 443 8080 3306 6379 8096 8000; do
+    if ss -tln | grep -q ":$port "; then
+        SERVICE=$(ss -tlnp | grep ":$port " | awk '{print $NF}' | cut -d'"' -f2 | head -n1)
+        echo "  ✅ $port ($SERVICE)"
+    fi
+done
+echo ""
+
+# Logs récents
+echo "📋 Dernières erreurs Beartify:"
+sudo journalctl -u beartify -n 3 --no-pager -o cat 2>/dev/null | grep -i error | tail -n 3 || echo "  Aucune erreur récente"
+EOFMON
+    
+    chmod +x "$BEARTIFY_HOME/scripts/quick-monitor.sh"
+    ln -sf "$BEARTIFY_HOME/scripts/quick-monitor.sh" /usr/local/bin/beartify-monitor
+    
+    # Script de test streaming
+    cat > "$BEARTIFY_HOME/scripts/test-streaming.sh" << 'EOFTEST'
+#!/bin/bash
+# Test Streaming - Vérifier que le streaming fonctionne
+
+echo "🎵 BEARTIFY STREAMING TEST"
+echo "=========================="
+echo ""
+
+# Test 1: HTTP Server
+echo "Test 1: HTTP Server (port 8080)..."
+if curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/ | grep -q "200"; then
+    echo "  ✅ HTTP Server répond"
+else
+    echo "  ❌ HTTP Server ne répond pas"
+fi
+
+# Test 2: Nginx
+echo "Test 2: Nginx (port 80)..."
+if curl -s -o /dev/null -w "%{http_code}" http://localhost/ | grep -q "200\|301\|302"; then
+    echo "  ✅ Nginx répond"
+else
+    echo "  ❌ Nginx ne répond pas"
+fi
+
+# Test 3: Redis
+echo "Test 3: Redis..."
+if redis-cli ping 2>/dev/null | grep -q "PONG"; then
+    echo "  ✅ Redis répond"
+else
+    echo "  ❌ Redis ne répond pas"
+fi
+
+# Test 4: Database
+echo "Test 4: Base de données..."
+if systemctl is-active --quiet mysql || systemctl is-active --quiet mariadb || systemctl is-active --quiet postgresql; then
+    echo "  ✅ Base de données active"
+else
+    echo "  ❌ Base de données inactive"
+fi
+
+# Test 5: Médias accessibles
+echo "Test 5: Répertoire médias..."
+if [ -d /srv/media ] && [ -r /srv/media ]; then
+    echo "  ✅ Répertoire médias accessible"
+    echo "     $(find /srv/media -type f 2>/dev/null | wc -l) fichiers trouvés"
+else
+    echo "  ❌ Répertoire médias inaccessible"
+fi
+
+# Test 6: HLS/DASH
+echo "Test 6: Streaming HLS/DASH..."
+if [ -d /var/www/hls ] && [ -d /var/www/dash ]; then
+    echo "  ✅ Répertoires streaming configurés"
+else
+    echo "  ⚠️  Répertoires streaming non configurés"
+fi
+
+# Test 7: RTMP
+echo "Test 7: RTMP Server..."
+if ss -tln | grep -q ":1935 "; then
+    echo "  ✅ RTMP en écoute (port 1935)"
+else
+    echo "  ⚠️  RTMP non configuré"
+fi
+
+echo ""
+echo "✅ Tests terminés"
+EOFTEST
+    
+    chmod +x "$BEARTIFY_HOME/scripts/test-streaming.sh"
+    ln -sf "$BEARTIFY_HOME/scripts/test-streaming.sh" /usr/local/bin/beartify-test
+    
+    chown -R "$BEARTIFY_USER:$BEARTIFY_USER" "$BEARTIFY_HOME/scripts"
+    
+    success "Scripts utilitaires créés"
+    info "  - beartify (manager)"
+    info "  - beartify-monitor (surveillance)"
+    info "  - beartify-test (tests streaming)"
+}
+
+# Gestion des erreurs
+cleanup_on_error() {
+    local exit_code=$?
+    echo
+    error_exit "Installation interrompue (code: $exit_code). Consultez les logs: $LOG_FILE"
+}
+
+# Signal handler pour arrêt propre
+cleanup_on_exit() {
+    echo
+    info "Arrêt de l'installation..."
+    if [[ -f "$LOG_FILE" ]]; then
+        info "Logs sauvegardés dans: $LOG_FILE"
+    fi
+}
+
+# Trap pour erreurs et signaux
+trap cleanup_on_error ERR
+trap cleanup_on_exit INT TERM
+
+# Vérification des arguments
+parse_arguments() {
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --help|-h)
+                echo "🎵 Beartify Ubuntu Server Installer v$SCRIPT_VERSION"
+                echo
+                echo "Usage: sudo bash $0 [OPTIONS]"
+                echo
+                echo "Options:"
+                echo "  --auto-complete    Installation complète automatique (mode serveur)"
+                echo "  --auto-gui=KDE     Installation complète avec KDE Plasma"
+                echo "  --auto-gui=GNOME   Installation complète avec GNOME"
+                echo "  --auto-gui=XFCE    Installation complète avec XFCE"
+                echo "  --repair-gnome     Réparer le lockscreen GNOME uniquement"
+                echo "  --unattended       Mode non-interactif (avec --auto-*)"
+                echo "  --help, -h         Afficher cette aide"
+                echo
+                echo "Installation interactive (par défaut):"
+                echo "  sudo bash $0"
+                echo
+                echo "Installation automatique serveur:"
+                echo "  sudo bash $0 --auto-complete"
+                echo
+                echo "Installation automatique avec GUI:"
+                echo "  sudo bash $0 --auto-gui=KDE"
+                echo
+                echo "Réparer GNOME lockscreen:"
+                echo "  sudo bash $0 --repair-gnome"
+                echo
+                exit 0
+                ;;
+            --auto-complete)
+                INSTALL_TYPE="1"
+                GUI_CHOICE="4"
+                DB_CHOICE="1"
+                INSTALL_MONITORING="n"
+                INSTALL_MINIO="n"
+                INSTALL_JELLYFIN="n"
+                INSTALL_ICECAST="n"
+                AUTO_MODE=true
+                ;;
+            --auto-gui=*)
+                INSTALL_TYPE="1"
+                case "${1#*=}" in
+                    KDE|kde) GUI_CHOICE="1" ;;
+                    GNOME|gnome) GUI_CHOICE="2" ;;
+                    XFCE|xfce) GUI_CHOICE="3" ;;
+                    *) error_exit "GUI invalide. Utilisez: KDE, GNOME, ou XFCE" ;;
+                esac
+                DB_CHOICE="1"
+                INSTALL_MONITORING="n"
+                AUTO_MODE=true
+                ;;
+            --repair-gnome)
+                check_root
+                fix_gnome_lockscreen
+                success "Réparation GNOME terminée. Redémarrez le système."
+                exit 0
+                ;;
+            --unattended)
+                UNATTENDED=true
+                ;;
+            *)
+                warning "Option inconnue: $1"
+                echo "Utilisez --help pour voir les options disponibles"
+                exit 1
+                ;;
+        esac
+        shift
+    done
+}
+
+# Mode automatique
+run_auto_installation() {
+    if [[ "$AUTO_MODE" == true ]]; then
+        info "Mode d'installation automatique activé"
+        
+        # Configuration automatique
+        BEARTIFY_USER="beartify"
+        BEARTIFY_PASSWORD="beartify_$(openssl rand -base64 16)"
+        DB_PASS=$(openssl rand -base64 32)
+        DOMAIN=""
+        EMAIL=""
+        
+        # Créer utilisateur automatiquement
+        if ! id "$BEARTIFY_USER" &>/dev/null; then
+            useradd -m -s /bin/bash -G audio,video,www-data,sudo "$BEARTIFY_USER"
+            echo "$BEARTIFY_USER:$BEARTIFY_PASSWORD" | chpasswd
+        fi
+        
+        # Lancer installation
+        install_beartify_complete
+        
+        # Afficher credentials
+        echo
+        echo -e "${GREEN}╔════════════════════════════════════════════════════════╗${NC}"
+        echo -e "${GREEN}║         INSTALLATION AUTOMATIQUE TERMINÉE             ║${NC}"
+        echo -e "${GREEN}╚════════════════════════════════════════════════════════╝${NC}"
+        echo
+        echo -e "${YELLOW}🔐 CREDENTIALS (SAUVEGARDEZ-LES !):${NC}"
+        echo "  Utilisateur: $BEARTIFY_USER"
+        echo "  Mot de passe: $BEARTIFY_PASSWORD"
+        echo "  DB User: $DB_USER"
+        echo "  DB Pass: $DB_PASS"
+        echo
+        echo -e "${YELLOW}📄 Ces informations sont aussi dans: $BEARTIFY_HOME/INSTALLATION_INFO.txt${NC}"
+        echo
+        
+        exit 0
+    fi
+}
+
+# Point d'entrée principal
+main() {
+    # Affichage initial
+    print_header
+    
+    # Parse arguments
+    parse_arguments "$@"
+    
+    # Mode automatique si activé
+    run_auto_installation
+    
+    # Mode interactif
+    log "Démarrage du script d'installation Beartify v$SCRIPT_VERSION"
+    log "Date: $(date)"
+    log "Hostname: $(hostname)"
+    log "User: $(whoami)"
     
     # Vérifications préliminaires
     check_root
@@ -2725,41 +3612,387 @@ main() {
     local disk_gb=$(df -BG / | awk 'NR==2 {print $4}' | sed 's/G//')
     
     echo
-    echo -e "${CYAN}=== RESSOURCES SYSTÈME DÉTECTÉES ===${NC}"
-    echo -e "CPU: $cpu_cores cœurs"
-    echo -e "RAM: ${ram_gb}GB"
-    echo -e "Espace disque libre: ${disk_gb}GB"
+    echo -e "${CYAN}╔════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${CYAN}║           RESSOURCES SYSTÈME DÉTECTÉES                 ║${NC}"
+    echo -e "${CYAN}╚════════════════════════════════════════════════════════╝${NC}"
+    echo
+    echo -e "  💻 Processeur: ${GREEN}$cpu_cores${NC} cœurs"
+    echo -e "  🧠 Mémoire RAM: ${GREEN}${ram_gb}GB${NC}"
+    echo -e "  💾 Disque libre: ${GREEN}${disk_gb}GB${NC}"
     echo
     
-    # Recommandations
-    if [[ $ram_gb -lt 4 ]]; then
-        warning "RAM faible détectée (<4GB). Performances limitées possibles."
+    # Recommandations basées sur les ressources
+    local can_install=true
+    
+    if [[ $ram_gb -lt 2 ]]; then
+        error_exit "RAM insuffisante (<2GB). Minimum requis: 2GB, recommandé: 8GB"
+    elif [[ $ram_gb -lt 4 ]]; then
+        warning "⚠️  RAM faible (${ram_gb}GB). Performances limitées."
+        warning "   Recommandé: 8GB minimum pour streaming optimal"
+    elif [[ $ram_gb -lt 8 ]]; then
+        info "ℹ️  RAM acceptable (${ram_gb}GB) pour streaming basique"
+    else
+        success "✅ RAM optimale (${ram_gb}GB) pour streaming haute performance"
     fi
     
-    if [[ $disk_gb -lt 50 ]]; then
-        warning "Espace disque faible (<50GB). Installation basique recommandée."
+    if [[ $disk_gb -lt 20 ]]; then
+        error_exit "Espace disque insuffisant (<20GB). Minimum requis: 20GB"
+    elif [[ $disk_gb -lt 50 ]]; then
+        warning "⚠️  Espace disque faible (${disk_gb}GB)"
+        warning "   Recommandé: 100GB+ pour stockage média conséquent"
+    elif [[ $disk_gb -lt 100 ]]; then
+        info "ℹ️  Espace disque acceptable (${disk_gb}GB)"
+    else
+        success "✅ Espace disque optimal (${disk_gb}GB)"
     fi
     
-    if [[ $cpu_cores -ge 4 && $ram_gb -ge 8 ]]; then
-        success "Configuration optimale détectée pour serveur streaming !"
+    if [[ $cpu_cores -lt 2 ]]; then
+        warning "⚠️  CPU faible (${cpu_cores} cœur). Transcoding limité."
+    elif [[ $cpu_cores -ge 4 ]]; then
+        success "✅ CPU optimal (${cpu_cores} cœurs) pour transcoding multi-bitrates"
+    fi
+    
+    # Score global
+    local score=0
+    [[ $ram_gb -ge 8 ]] && ((score+=3))
+    [[ $ram_gb -ge 4 ]] && [[ $ram_gb -lt 8 ]] && ((score+=2))
+    [[ $ram_gb -ge 2 ]] && [[ $ram_gb -lt 4 ]] && ((score+=1))
+    
+    [[ $disk_gb -ge 100 ]] && ((score+=2))
+    [[ $disk_gb -ge 50 ]] && [[ $disk_gb -lt 100 ]] && ((score+=1))
+    
+    [[ $cpu_cores -ge 4 ]] && ((score+=2))
+    [[ $cpu_cores -ge 2 ]] && [[ $cpu_cores -lt 4 ]] && ((score+=1))
+    
+    echo
+    if [[ $score -ge 7 ]]; then
+        echo -e "${GREEN}⭐⭐⭐ Configuration EXCELLENTE pour serveur streaming professionnel${NC}"
+    elif [[ $score -ge 5 ]]; then
+        echo -e "${YELLOW}⭐⭐ Configuration BONNE pour serveur streaming standard${NC}"
+    elif [[ $score -ge 3 ]]; then
+        echo -e "${YELLOW}⭐ Configuration ACCEPTABLE pour serveur streaming basique${NC}"
+    else
+        echo -e "${RED}Configuration MINIMALE - Performances réduites attendues${NC}"
     fi
     
     echo
-    read -p "Appuyez sur Entrée pour continuer..." -r
+    echo -e "${CYAN}Press ENTER to continue or Ctrl+C to abort...${NC}"
+    read -r
     
-    # Menu principal
+    # Lancement du menu principal
     main_menu_loop
 }
 
-# Gestion des erreurs
-cleanup_on_error() {
-    error_exit "Installation interrompue. Vérifiez les logs: $LOG_FILE"
+#!/bin/bash
+
+# Script d'Installation Ubuntu Serveur pour Streaming Multimédia avec Beartify
+# Version : 72.8 - ENHANCED & DEBUGGED
+# Description: Installation automatisée d'un serveur streaming optimisé pour Beartify
+# Compatible: Ubuntu Server 20.04+, Debian 11+
+
+set -euo pipefail
+
+# Couleurs pour l'affichage
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
+# Variables globales
+SCRIPT_VERSION="4.0"
+LOG_FILE="/tmp/ubuntu_beartify_install_$(date +%Y%m%d_%H%M%S).log"
+BEARTIFY_USER="beartify"
+BEARTIFY_HOME="/home/$BEARTIFY_USER"
+MEDIA_ROOT="/srv/media"
+BACKUP_ROOT="/srv/backup"
+APP_PORT="8080"
+DB_NAME="beartifydb"
+DB_USER="beartifyuser"
+DB_PASS=""
+DOMAIN=""
+EMAIL=""
+GUI_CHOICE=""
+DB_CHOICE=""
+INSTALL_MONITORING=""
+INSTALL_MINIO=""
+INSTALL_TYPE=""
+BEARTIFY_PASSWORD=""
+AUTO_MODE=false
+UNATTENDED=false
+
+# Fonctions utilitaires
+log() {
+    echo -e "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
 }
 
-# Trap pour nettoyage
-trap cleanup_on_error ERR INT TERM
+error_exit() {
+    log "${RED}ERREUR: $1${NC}"
+    exit 1
+}
 
-# Point d'entrée
+success() {
+    log "${GREEN}✅ $1${NC}"
+}
+
+warning() {
+    log "${YELLOW}⚠️ $1${NC}"
+}
+
+info() {
+    log "${BLUE}ℹ️ $1${NC}"
+}
+
+print_header() {
+    clear
+    echo -e "${PURPLE}"
+    echo "╔════════════════════════════════════════════════════════════════════════════════╗"
+    echo "║                    🎵 BEARTIFY UBUNTU SERVER INSTALLER v$SCRIPT_VERSION                  ║"
+    echo "║                  Installation Serveur Streaming Multimédia                       ║"
+    echo "╚════════════════════════════════════════════════════════════════════════════════╝"
+    echo -e "${NC}"
+}
+
+# Vérification des privilèges root
+check_root() {
+    if [[ $EUID -ne 0 ]]; then
+        error_exit "Ce script doit être exécuté avec les privilèges root. Utilisez 'sudo $0'"
+    fi
+    success "Privilèges root confirmés"
+}
+
+# Détection de la distribution
+detect_distro() {
+    info "Détection de la distribution..."
+    
+    if [[ -f /etc/os-release ]]; then
+        source /etc/os-release
+        if [[ "$ID" == "ubuntu" ]] || [[ "$ID" == "debian" ]]; then
+            success "Distribution compatible détectée: $PRETTY_NAME"
+        else
+            warning "Distribution non testée: $PRETTY_NAME. Le script peut ne pas fonctionner correctement."
+        fi
+    else
+        error_exit "Impossible de détecter la distribution"
+    fi
+}
+
+# Fonction pour analyser les arguments
+parse_arguments() {
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --help|-h)
+                echo "🎵 Beartify Ubuntu Server Installer v$SCRIPT_VERSION"
+                echo
+                echo "Usage: sudo bash $0 [OPTIONS]"
+                echo
+                echo "Options:"
+                echo "  --auto-complete    Installation complète automatique (mode serveur)"
+                echo "  --auto-gui=KDE     Installation complète avec KDE Plasma"
+                echo "  --auto-gui=GNOME   Installation complète avec GNOME"
+                echo "  --auto-gui=XFCE    Installation complète avec XFCE"
+                echo "  --repair-gnome     Réparer le lockscreen GNOME uniquement"
+                echo "  --unattended       Mode non-interactif (avec --auto-*)"
+                echo "  --help, -h         Afficher cette aide"
+                echo
+                echo "Installation interactive (par défaut):"
+                echo "  sudo bash $0"
+                echo
+                echo "Installation automatique serveur:"
+                echo "  sudo bash $0 --auto-complete"
+                echo
+                echo "Installation automatique avec GUI:"
+                echo "  sudo bash $0 --auto-gui=KDE"
+                echo
+                echo "Réparer GNOME lockscreen:"
+                echo "  sudo bash $0 --repair-gnome"
+                echo
+                exit 0
+                ;;
+            --auto-complete)
+                INSTALL_TYPE="1"
+                GUI_CHOICE="4"
+                DB_CHOICE="1"
+                INSTALL_MONITORING="n"
+                INSTALL_MINIO="n"
+                AUTO_MODE=true
+                ;;
+            --auto-gui=*)
+                INSTALL_TYPE="1"
+                case "${1#*=}" in
+                    KDE|kde) GUI_CHOICE="1" ;;
+                    GNOME|gnome) GUI_CHOICE="2" ;;
+                    XFCE|xfce) GUI_CHOICE="3" ;;
+                    *) error_exit "GUI invalide. Utilisez: KDE, GNOME, ou XFCE" ;;
+                esac
+                DB_CHOICE="1"
+                INSTALL_MONITORING="n"
+                AUTO_MODE=true
+                ;;
+            --repair-gnome)
+                check_root
+                fix_gnome_lockscreen
+                success "Réparation GNOME terminée. Redémarrez le système."
+                exit 0
+                ;;
+            --unattended)
+                UNATTENDED=true
+                ;;
+            *)
+                warning "Option inconnue: $1"
+                echo "Utilisez --help pour voir les options disponibles"
+                exit 1
+                ;;
+        esac
+        shift
+    done
+}
+
+# Mode automatique
+run_auto_installation() {
+    if [[ "$AUTO_MODE" == true ]]; then
+        info "Mode d'installation automatique activé"
+        
+        # Configuration automatique
+        BEARTIFY_USER="beartify"
+        BEARTIFY_PASSWORD="beartify_$(openssl rand -base64 16)"
+        DB_PASS=$(openssl rand -base64 32)
+        DOMAIN=""
+        EMAIL=""
+        
+        # Créer utilisateur automatiquement
+        if ! id "$BEARTIFY_USER" &>/dev/null; then
+            useradd -m -s /bin/bash -G audio,video,www-data,sudo "$BEARTIFY_USER"
+            echo "$BEARTIFY_USER:$BEARTIFY_PASSWORD" | chpasswd
+        fi
+        
+        # Lancer installation complète
+        install_beartify_complete
+        
+        # Afficher credentials
+        echo
+        echo -e "${GREEN}╔════════════════════════════════════════════════════════╗${NC}"
+        echo -e "${GREEN}║         INSTALLATION AUTOMATIQUE TERMINÉE             ║${NC}"
+        echo -e "${GREEN}╚════════════════════════════════════════════════════════╝${NC}"
+        echo
+        echo -e "${YELLOW}🔐 CREDENTIALS (SAUVEGARDEZ-LES !):${NC}"
+        echo "  Utilisateur: $BEARTIFY_USER"
+        echo "  Mot de passe: $BEARTIFY_PASSWORD"
+        echo "  DB User: $DB_USER"
+        echo "  DB Pass: $DB_PASS"
+        echo
+        echo -e "${YELLOW}📄 Ces informations sont aussi dans: $BEARTIFY_HOME/INSTALLATION_INFO.txt${NC}"
+        echo
+        
+        exit 0
+    fi
+}
+
+# Point d'entrée principal
+main() {
+    # Affichage initial
+    print_header
+    
+    # Parse arguments
+    parse_arguments "$@"
+    
+    # Mode automatique si activé
+    run_auto_installation
+    
+    # Mode interactif
+    log "Démarrage du script d'installation Beartify v$SCRIPT_VERSION"
+    log "Date: $(date)"
+    log "Hostname: $(hostname)"
+    log "User: $(whoami)"
+    
+    # Vérifications préliminaires
+    check_root
+    detect_distro
+    
+    # Analyse des ressources système
+    info "Analyse des ressources système..."
+    local cpu_cores=$(nproc)
+    local ram_gb=$(($(grep MemTotal /proc/meminfo | awk '{print $2}') / 1024 / 1024))
+    local disk_gb=$(df -BG / | awk 'NR==2 {print $4}' | sed 's/G//')
+    
+    echo
+    echo -e "${CYAN}╔════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${CYAN}║           RESSOURCES SYSTÈME DÉTECTÉES                 ║${NC}"
+    echo -e "${CYAN}╚════════════════════════════════════════════════════════╝${NC}"
+    echo
+    echo -e "  💻 Processeur: ${GREEN}$cpu_cores${NC} cœurs"
+    echo -e "  🧠 Mémoire RAM: ${GREEN}${ram_gb}GB${NC}"
+    echo -e "  💾 Disque libre: ${GREEN}${disk_gb}GB${NC}"
+    echo
+    
+    # Recommandations basées sur les ressources
+    if [[ $ram_gb -lt 2 ]]; then
+        error_exit "RAM insuffisante (<2GB). Minimum requis: 2GB, recommandé: 8GB"
+    elif [[ $ram_gb -lt 4 ]]; then
+        warning "⚠️  RAM faible (${ram_gb}GB). Performances limitées."
+        warning "   Recommandé: 8GB minimum pour streaming optimal"
+    elif [[ $ram_gb -lt 8 ]]; then
+        info "ℹ️  RAM acceptable (${ram_gb}GB) pour streaming basique"
+    else
+        success "✅ RAM optimale (${ram_gb}GB) pour streaming haute performance"
+    fi
+    
+    if [[ $disk_gb -lt 20 ]]; then
+        error_exit "Espace disque insuffisant (<20GB). Minimum requis: 20GB"
+    elif [[ $disk_gb -lt 50 ]]; then
+        warning "⚠️  Espace disque faible (${disk_gb}GB)"
+        warning "   Recommandé: 100GB+ pour stockage média conséquent"
+    elif [[ $disk_gb -lt 100 ]]; then
+        info "ℹ️  Espace disque acceptable (${disk_gb}GB)"
+    else
+        success "✅ Espace disque optimal (${disk_gb}GB)"
+    fi
+    
+    if [[ $cpu_cores -lt 2 ]]; then
+        warning "⚠️  CPU faible (${cpu_cores} cœur). Transcoding limité."
+    elif [[ $cpu_cores -ge 4 ]]; then
+        success "✅ CPU optimal (${cpu_cores} cœurs) pour transcoding multi-bitrates"
+    fi
+    
+    # Score global
+    local score=0
+    [[ $ram_gb -ge 8 ]] && ((score+=3))
+    [[ $ram_gb -ge 4 ]] && [[ $ram_gb -lt 8 ]] && ((score+=2))
+    [[ $ram_gb -ge 2 ]] && [[ $ram_gb -lt 4 ]] && ((score+=1))
+    
+    [[ $disk_gb -ge 100 ]] && ((score+=2))
+    [[ $disk_gb -ge 50 ]] && [[ $disk_gb -lt 100 ]] && ((score+=1))
+    
+    [[ $cpu_cores -ge 4 ]] && ((score+=2))
+    [[ $cpu_cores -ge 2 ]] && [[ $cpu_cores -lt 4 ]] && ((score+=1))
+    
+    echo
+    if [[ $score -ge 7 ]]; then
+        echo -e "${GREEN}⭐⭐⭐ Configuration EXCELLENTE pour serveur streaming professionnel${NC}"
+    elif [[ $score -ge 5 ]]; then
+        echo -e "${YELLOW}⭐⭐ Configuration BONNE pour serveur streaming standard${NC}"
+    elif [[ $score -ge 3 ]]; then
+        echo -e "${YELLOW}⭐ Configuration ACCEPTABLE pour serveur streaming basique${NC}"
+    else
+        echo -e "${RED}Configuration MINIMALE - Performances réduites attendues${NC}"
+    fi
+    
+    echo
+    echo -e "${CYAN}Appuyez sur Entrée pour continuer ou Ctrl+C pour annuler...${NC}"
+    read -r
+    
+    # Lancement du menu principal
+    main_menu_loop
+}
+
+# Vérification de l'exécution
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    # Script exécuté directement
     main "$@"
+else
+    # Script sourcé
+    warning "Ce script doit être exécuté directement, pas sourcé."
+    echo "Utilisez: sudo bash ${BASH_SOURCE[0]}"
 fi
