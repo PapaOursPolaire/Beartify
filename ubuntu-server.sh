@@ -510,7 +510,7 @@ install_gui() {
             
             apt install -y kde-plasma-desktop sddm sddm-theme-breeze \
                 plasma-workspace-wayland kde-config-sddm \
-                konsole dolphin kate spectacle
+                konsole dolphin kate
             
             configure_sddm_custom
             configure_plymouth_custom
