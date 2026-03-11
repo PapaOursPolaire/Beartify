@@ -1,0 +1,48 @@
+2025-07-23 06:54:40        21625742170  21527236143  22 files
+beartify@papaours:~/Downloads$ 7z x saison-1.rar
+
+7-Zip 23.01 (x64) : Copyright (c) 1999-2023 Igor Pavlov : 2023-06-20
+ 64-bit locale=fr_FR.UTF-8 Threads:4 OPEN_MAX:1024
+
+Scanning the drive for archives:
+1 file, 21527241694 bytes (21 GiB)
+
+Extracting archive: saison-1.rar
+--
+Path = saison-1.rar
+Type = Rar5
+Physical Size = 21527241694
+Solid = -
+Blocks = 22
+Encrypted = -
+Multivolume = -
+Volumes = 1
+
+ERROR: Unsupported Method : The.Originals.2013.S01E18.MULTi.VF2.1080p.WEBRip.10bits.x265.DDP5.1-Jarod.mkv
+ERROR: Unsupported Method : The.Originals.2013.S01E19.MULTi.VF2.1080p.WEBRip.10bits.x265.DDP5.1-Jarod.mkv
+ERROR: Unsupported Method : The.Originals.2013.S01E20.MULTi.VF2.1080p.WEBRip.10bits.x265.DDP5.1-Jarod.mkv
+ERROR: Unsupported Method : The.Originals.2013.S01E21.MULTi.VF2.1080p.WEBRip.10bits.x265.DDP5.1-Jarod.mkv
+ERROR: Unsupported Method : The.Originals.2013.S01E22.Final.MULTi.VF2.1080p.WEBRip.10bits.x265.DDP5.1-Jarod.mkv
+ERROR: Unsupported Method : The.Originals.2013.S01E01.MULTi.VF2.1080p.WEBRip.10bits.x265.DDP5.1-Jarod.mkv
+ERROR: Unsupported Method : The.Originals.2013.S01E02.MULTi.VF2.1080p.WEBRip.10bits.x265.DDP5.1-Jarod.mkv
+ERROR: Unsupported Method : The.Originals.2013.S01E03.MULTi.VF2.1080p.WEBRip.10bits.x265.DDP5.1-Jarod.mkv
+ERROR: Unsupported Method : The.Originals.2013.S01E04.MULTi.VF2.1080p.WEBRip.10bits.x265.DDP5.1-Jarod.mkv
+ERROR: Unsupported Method : The.Originals.2013.S01E05.MULTi.VF2.1080p.WEBRip.10bits.x265.DDP5.1-Jarod.mkv
+ERROR: Unsupported Method : The.Originals.2013.S01E06.MULTi.VF2.1080p.WEBRip.10bits.x265.DDP5.1-Jarod.mkv
+ERROR: Unsupported Method : The.Originals.2013.S01E07.MULTi.VF2.1080p.WEBRip.10bits.x265.DDP5.1-Jarod.mkv
+ERROR: Unsupported Method : The.Originals.2013.S01E08.MULTi.VF2.1080p.WEBRip.10bits.x265.DDP5.1-Jarod.mkv
+ERROR: Unsupported Method : The.Originals.2013.S01E09.MULTi.VF2.1080p.WEBRip.10bits.x265.DDP5.1-Jarod.mkv
+ERROR: Unsupported Method : The.Originals.2013.S01E10.MULTi.VF2.1080p.WEBRip.10bits.x265.DDP5.1-Jarod.mkv
+ERROR: Unsupported Method : The.Originals.2013.S01E11.MULTi.VF2.1080p.WEBRip.10bits.x265.DDP5.1-Jarod.mkv
+ERROR: Unsupported Method : The.Originals.2013.S01E12.MULTi.VF2.1080p.WEBRip.10bits.x265.DDP5.1-Jarod.mkv
+ERROR: Unsupported Method : The.Originals.2013.S01E13.MULTi.VF2.1080p.WEBRip.10bits.x265.DDP5.1-Jarod.mkv
+ERROR: Unsupported Method : The.Originals.2013.S01E14.MULTi.VF2.1080p.WEBRip.10bits.x265.DDP5.1-Jarod.mkv
+ERROR: Unsupported Method : The.Originals.2013.S01E15.MULTi.1080p.WEBRip.10bits.x265.DDP5.1.REPACK-Jarod.mkv
+ERROR: Unsupported Method : The.Originals.2013.S01E16.MULTi.1080p.WEBRip.10bits.x265.DDP5.1.REPACK-Jarod.mkv
+ERROR: Unsupported Method : The.Originals.2013.S01E17.MULTi.VF2.1080p.WEBRip.10bits.x265.DDP5.1-Jarod.mkv
+
+Sub items Errors: 22
+
+Archives with Errors: 1
+
+Sub items Errors: 22
