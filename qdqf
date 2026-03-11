@@ -1,1 +1,1 @@
-cc3349a0-e9a1-47aa-bf6b-483a9a9ab5ae
+echo url="https://www.duckdns.org/update?domains=grizzly-stream&token=cc3349a0-e9a1-47aa-bf6b-483a9a9ab5ae&ip=" | curl -k -o ~/duckdns/duck.log -K -
