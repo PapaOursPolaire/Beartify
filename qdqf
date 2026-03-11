@@ -1,5 +1,0 @@
-grizzly-stream.duckdns.org {
-
-    reverse_proxy 192.168.0.19:8096
-
-}
