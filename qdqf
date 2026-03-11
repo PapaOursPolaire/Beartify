@@ -1,1 +1,22 @@
-echo url="https://www.duckdns.org/update?domains=grizzly-stream&token=cc3349a0-e9a1-47aa-bf6b-483a9a9ab5ae&ip=" | curl -k -o ~/duckdns/duck.log -K -
+beartify@papaours:~/duckdns$ sudo nano /etc/caddy/Caddyfile
+beartify@papaours:~/duckdns$ sudo nano /etc/caddy/Caddyfile
+beartify@papaours:~/duckdns$ sudo systemctl restart caddy
+Job for caddy.service failed because the control process exited with error code.
+See "systemctl status caddy.service" and "journalctl -xeu caddy.service" for details.
+beartify@papaours:~/duckdns$ sudo nano /etc/caddy/Caddyfile
+beartify@papaours:~/duckdns$ 
+beartify@papaours:~/duckdns$ sudo systemctl restart caddy
+Job for caddy.service failed because the control process exited with error code.
+See "systemctl status caddy.service" and "journalctl -xeu caddy.service" for details.
+beartify@papaours:~/duckdns$ systel
+systel: command not found
+beartify@papaours:~/duckdns$ systemctl status caddy.service
+× caddy.service - Caddy
+     Loaded: loaded (/usr/lib/systemd/system/caddy.service; enabled; preset: enabled)
+     Active: failed (Result: exit-code) since Wed 2026-03-11 17:54:09 UTC; 14s ago
+       Docs: https://caddyserver.com/docs/
+    Process: 11230 ExecStart=/usr/bin/caddy run --environ --config /etc/caddy/Caddyfile (code=exited, status=1/FAIL>
+   Main PID: 11230 (code=exited, status=1/FAILURE)
+     Status: "loading new config: http app module: start: listening on :80: listen tcp :80: bind: address already i>
+        CPU: 26ms
+
