@@ -1,22 +1,29 @@
-beartify@papaours:~/duckdns$ sudo nano /etc/caddy/Caddyfile
-beartify@papaours:~/duckdns$ sudo nano /etc/caddy/Caddyfile
+beartify@papaours:~/duckdns$ sudo systemctl stop nginx
+beartify@papaours:~/duckdns$ sudo systemctl disable nginx
+Synchronizing state of nginx.service with SysV service script with /usr/lib/systemd/systemd-sysv-install.
+Executing: /usr/lib/systemd/systemd-sysv-install disable nginx
+Removed "/etc/systemd/system/multi-user.target.wants/nginx.service".
 beartify@papaours:~/duckdns$ sudo systemctl restart caddy
-Job for caddy.service failed because the control process exited with error code.
-See "systemctl status caddy.service" and "journalctl -xeu caddy.service" for details.
-beartify@papaours:~/duckdns$ sudo nano /etc/caddy/Caddyfile
-beartify@papaours:~/duckdns$ 
-beartify@papaours:~/duckdns$ sudo systemctl restart caddy
-Job for caddy.service failed because the control process exited with error code.
-See "systemctl status caddy.service" and "journalctl -xeu caddy.service" for details.
-beartify@papaours:~/duckdns$ systel
-systel: command not found
-beartify@papaours:~/duckdns$ systemctl status caddy.service
-× caddy.service - Caddy
+beartify@papaours:~/duckdns$ systemctl status caddy
+● caddy.service - Caddy
      Loaded: loaded (/usr/lib/systemd/system/caddy.service; enabled; preset: enabled)
-     Active: failed (Result: exit-code) since Wed 2026-03-11 17:54:09 UTC; 14s ago
+     Active: active (running) since Wed 2026-03-11 17:56:35 UTC; 11s ago
        Docs: https://caddyserver.com/docs/
-    Process: 11230 ExecStart=/usr/bin/caddy run --environ --config /etc/caddy/Caddyfile (code=exited, status=1/FAIL>
-   Main PID: 11230 (code=exited, status=1/FAILURE)
-     Status: "loading new config: http app module: start: listening on :80: listen tcp :80: bind: address already i>
-        CPU: 26ms
+   Main PID: 12517 (caddy)
+      Tasks: 9 (limit: 38328)
+     Memory: 10.2M (peak: 11.1M)
+        CPU: 104ms
+     CGroup: /system.slice/caddy.service
+             └─12517 /usr/bin/caddy run --environ --config /etc/caddy/Caddyfile
+beartify@papaours:~/duckdns$ sudo nano /etc/caddy/Caddyfile
+beartify@papaours:~/duckdns$ sudo systemctl reload caddy
+beartify@papaours:~/duckdns$ sudo systemctl restart caddy
+beartify@papaours:~/duckdns$ curl ifconfig.me
+178.51.230.147beartify@papaours:~/duckdns$ ping grizzly-stream.duckdns.org
+PING grizzly-stream.duckdns.org (178.51.230.147) 56(84) bytes of data.
+^C
+--- grizzly-stream.duckdns.org ping statistics ---
+19 packets transmitted, 0 received, 100% packet loss, time 18438ms
+
+beartify@papaours:~/duckdns$ 
 
