@@ -1,6 +1,15 @@
-#!/bin/bash
+papaours@papaours:~$ nslookup grizzly-stream.duckdns.org
+Server:         212.224.129.90
+Address:        212.224.129.90#53
 
-DOMAIN="grizzly-stream"
-TOKEN="cc3349a0-e9a1-47aa-bf6b-483a9a9ab5ae"
+Non-authoritative answer:
+Name:   grizzly-stream.duckdns.org
+Address: 91.86.180.242
+;; Got SERVFAIL reply from 212.224.129.90, trying next server
+;; communications error to 212.224.129.94#53: timed out
+;; communications error to 212.224.129.94#53: timed out
+;; Got SERVFAIL reply from 212.224.129.94
+** server can't find grizzly-stream.duckdns.org: SERVFAIL
 
-curl -s "https://www.duckdns.org/update?domains=${DOMAIN}&token=${TOKEN}&ip=" >> /opt/duckdns/duck.log
+papaours@papaours:~$ curl ifconfig.me
+91.86.180.242papaours@papaours:~$ 
