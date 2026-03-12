@@ -1,16 +1,5 @@
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
 
-cc3349a0-e9a1-47aa-bf6b-483a9a9ab5ae
-
-sudo apt install -y curl
-
-sudo mkdir -p /opt/duckdns
-sudo tee /opt/duckdns/duck.sh > /dev/null <<'EOF'
-#!/bin/sh
-# Remplace monjelly et TON_TOKEN par ton sous-domaine et token DuckDNS
-DOMAIN="monjelly"
-TOKEN="TON_TOKEN"
-URL="https://www.duckdns.org/update?domains=${grizzly-stream}&token=${cc3349a0-e9a1-47aa-bf6b-483a9a9ab5ae}&ip="
-curl -s "${URL}" >> /opt/duckdns/duck.log
-EOF
-
-sudo chmod +x /opt/duckdns/duck.sh
+sudo apt update
+sudo apt install -y caddy
