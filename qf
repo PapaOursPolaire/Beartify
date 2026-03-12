@@ -1,15 +1,3 @@
-papaours@papaours:~$ nslookup grizzly-stream.duckdns.org
-Server:         212.224.129.90
-Address:        212.224.129.90#53
-
-Non-authoritative answer:
-Name:   grizzly-stream.duckdns.org
-Address: 91.86.180.242
-;; Got SERVFAIL reply from 212.224.129.90, trying next server
-;; communications error to 212.224.129.94#53: timed out
-;; communications error to 212.224.129.94#53: timed out
-;; Got SERVFAIL reply from 212.224.129.94
-** server can't find grizzly-stream.duckdns.org: SERVFAIL
-
-papaours@papaours:~$ curl ifconfig.me
-91.86.180.242papaours@papaours:~$ 
+grizzly-stream.duckdns.org {
+    reverse_proxy 127.0.0.1:8096
+}
