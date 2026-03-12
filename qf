@@ -1,5 +1,33 @@
-grizzly-stream.duckdns.org {
+papaours@papaours:~$ curl http://192.168.0.18:8096
+papaours@papaours:~$ curl http://192.168.0.18:8096
+papaours@papaours:~$ ss -tulpn | grep 8096
+tcp   LISTEN 0      512          0.0.0.0:8096       0.0.0.0:*                                          
+papaours@papaours:~$ cat /etc/jellyfin/network.xml
+cat: /etc/jellyfin/network.xml: Permission non accordée
+papaours@papaours:~$ sudo cat /etc/jellyfin/network.xml
+<NetworkConfiguration>
+  <EnableIPV6>false</EnableIPV6>
+  <EnableRemoteAccess>true</EnableRemoteAccess>
+  <LocalNetworkSubnets></LocalNetworkSubnets>
+  <LocalNetworkAddresses></LocalNetworkAddresses>
+  <KnownProxies></KnownProxies>
+  <EnablePublishedServerUriByRequest>false</EnablePublishedServerUriByRequest>
+  <RemoteIPFilter></RemoteIPFilter>
+  <IsRemoteIPFilterBlacklist>false</IsRemoteIPFilterBlacklist>
+</NetworkConfiguration>
 
- reverse_proxy 127.0.0.1:8096
+papaours@papaours:~$ sudo ufw status
+Status: active
 
-}
+To                         Action      From
+--                         ------      ----
+22/tcp                     ALLOW       Anywhere                  
+80/tcp                     ALLOW       Anywhere                  
+443/tcp                    ALLOW       Anywhere                  
+8096/tcp                   ALLOW       Anywhere                  
+22/tcp (v6)                ALLOW       Anywhere (v6)             
+80/tcp (v6)                ALLOW       Anywhere (v6)             
+443/tcp (v6)               ALLOW       Anywhere (v6)             
+8096/tcp (v6)              ALLOW       Anywhere (v6)             
+
+papaours@papaours:~$ 
