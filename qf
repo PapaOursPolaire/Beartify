@@ -1,3 +1,308 @@
-deb http://deb.debian.org/debian trixie main contrib non-free non-free-firmware
-deb http://deb.debian.org/debian trixie-updates main contrib non-free non-free-firmware
-deb http://security.debian.org/debian-security trixie-security main contrib non-free non-free-firmware
+[2026-03-12 18:50:11.082 +01:00] [INF] Setting cache path: "/var/cache/jellyfin"
+[2026-03-12 18:50:11.279 +01:00] [INF] Kestrel is listening on "0.0.0.0"
+[2026-03-12 18:50:11.302 +01:00] [INF] Jellyfin version: "10.11.6"
+[2026-03-12 18:50:11.304 +01:00] [INF] Environment Variables: ["[JELLYFIN_ADDITIONAL_OPTS, ]", "[JELLYFIN_LOG_DIR, /var/log/jellyfin]", "[JELLYFIN_ARGS, $JELLYFIN_WEB_OPT $JELLYFIN_FFMPEG_OPT $JELLYFIN_SERVICE_OPT $JELLYFIN_NOWEBAPP_OPT $JELLYFIN_ADDITIONAL_OPTS --datadir $JELLYFIN_DATA_DIR --configdir $JELLYFIN_CONFIG_DIR --logdir $JELLYFIN_LOG_DIR --cachedir $JELLYFIN_CACHE_DIR]", "[JELLYFIN_DATA_DIR, /var/lib/jellyfin]", "[JELLYFIN_FFMPEG_OPT, --ffmpeg=/usr/lib/jellyfin-ffmpeg/ffmpeg]", "[JELLYFIN_CACHE_DIR, /var/cache/jellyfin]", "[JELLYFIN_CONFIG_DIR, /etc/jellyfin]", "[JELLYFIN_WEB_OPT, --webdir=/usr/share/jellyfin/web]", "[JELLYFIN_USER, jellyfin]"]
+[2026-03-12 18:50:11.306 +01:00] [INF] Arguments: ["/usr/lib/jellyfin/bin/jellyfin.dll", "--webdir=/usr/share/jellyfin/web", "--ffmpeg=/usr/lib/jellyfin-ffmpeg/ffmpeg"]
+[2026-03-12 18:50:11.306 +01:00] [INF] Operating system: "Debian GNU/Linux 13 (trixie)"
+[2026-03-12 18:50:11.306 +01:00] [INF] Architecture: X64
+[2026-03-12 18:50:11.307 +01:00] [INF] 64-Bit Process: True
+[2026-03-12 18:50:11.307 +01:00] [INF] User Interactive: True
+[2026-03-12 18:50:11.307 +01:00] [INF] Processor count: 4
+[2026-03-12 18:50:11.307 +01:00] [INF] Program data path: "/var/lib/jellyfin"
+[2026-03-12 18:50:11.307 +01:00] [INF] Log directory path: "/var/log/jellyfin"
+[2026-03-12 18:50:11.307 +01:00] [INF] Config directory path: "/etc/jellyfin"
+[2026-03-12 18:50:11.307 +01:00] [INF] Cache path: "/var/cache/jellyfin"
+[2026-03-12 18:50:11.307 +01:00] [INF] Temp directory path: "/tmp/jellyfin"
+[2026-03-12 18:50:11.307 +01:00] [INF] Web resources path: "/usr/share/jellyfin/web"
+[2026-03-12 18:50:11.307 +01:00] [INF] Application directory: "/usr/lib/jellyfin/bin/"
+[2026-03-12 18:50:11.319 +01:00] [INF] Storage path `"/var/lib/jellyfin/data"` (Fixed) successfully checked with "403.1GiB" free which is over the minimum of "2GiB".
+[2026-03-12 18:50:11.319 +01:00] [INF] Storage path `"/var/cache/jellyfin"` (Fixed) successfully checked with "403.1GiB" free which is over the minimum of "2GiB".
+[2026-03-12 18:50:11.319 +01:00] [INF] Storage path `"/var/lib/jellyfin"` (Fixed) successfully checked with "403.1GiB" free which is over the minimum of "2GiB".
+[2026-03-12 18:50:11.353 +01:00] [INF] Setting cache path: "/var/cache/jellyfin"
+[2026-03-12 18:50:11.395 +01:00] [INF] SQLite connection string: "Data Source=/var/lib/jellyfin/data/jellyfin.db;Cache=Default;Default Timeout=30;Pooling=True"
+[2026-03-12 18:50:11.400 +01:00] [INF] SQLITE connection pragma command set to: 
+"PRAGMA locking_mode=NORMAL;
+PRAGMA journal_size_limit=134217728;
+PRAGMA synchronous=1;
+PRAGMA temp_store=2;
+"
+[2026-03-12 18:50:11.401 +01:00] [INF] The database locking mode has been set to: NoLock.
+[2026-03-12 18:50:11.426 +01:00] [INF] Initialise Migration service.
+[2026-03-12 18:50:11.427 +01:00] [INF] System initialisation detected. Seed data.
+[2026-03-12 18:50:12.357 +01:00] [INF] Seed migration null-"CleanMusicArtist".
+[2026-03-12 18:50:12.362 +01:00] [INF] Seed migration ef103419-8451-40d8-9f34-d1a8e93a1679-"CreateUserLoggingConfigFile".
+[2026-03-12 18:50:12.363 +01:00] [INF] Seed migration 4124c2cd-e939-4ffb-9be9-9b311c413638-"DisableTranscodingThrottling".
+[2026-03-12 18:50:12.364 +01:00] [INF] Seed migration cf6fabc2-9fbe-4933-84a5-ffe52ef22a58-"FixAudioData".
+[2026-03-12 18:50:12.364 +01:00] [INF] Seed migration null-"FixDates".
+[2026-03-12 18:50:12.365 +01:00] [INF] Seed migration 615dfa9e-2497-4dbb-a472-61938b752c5b-"FixPlaylistOwner".
+[2026-03-12 18:50:12.365 +01:00] [INF] Seed migration 3793eb59-bc8c-456c-8b9f-bd5a62a42978-"MigrateActivityLogDb".
+[2026-03-12 18:50:12.365 +01:00] [INF] Seed migration 5bd72f41-e6f3-4f60-90aa-09869abe0e22-"MigrateAuthenticationDb".
+[2026-03-12 18:50:12.365 +01:00] [INF] Seed migration 06387815-c3cc-421f-a888-fb5f9992bea8-"MigrateDisplayPreferencesDb".
+[2026-03-12 18:50:12.366 +01:00] [INF] Seed migration null-"MigrateKeyframeData".
+[2026-03-12 18:50:12.366 +01:00] [INF] Seed migration null-"MigrateLibraryDb".
+[2026-03-12 18:50:12.366 +01:00] [INF] Seed migration null-"MigrateLibraryDbCompatibilityCheck".
+[2026-03-12 18:50:12.366 +01:00] [INF] Seed migration null-"MigrateLibraryUserData".
+[2026-03-12 18:50:12.366 +01:00] [INF] Seed migration null-"MigrateRatingLevels".
+[2026-03-12 18:50:12.366 +01:00] [INF] Seed migration 5c4b82a2-f053-4009-bd05-b6fcad82f14c-"MigrateUserDb".
+[2026-03-12 18:50:12.367 +01:00] [INF] Seed migration null-"MoveExtractedFiles".
+[2026-03-12 18:50:12.367 +01:00] [INF] Seed migration null-"RefreshInternalDateModified".
+[2026-03-12 18:50:12.367 +01:00] [INF] Seed migration a81f75e0-8f43-416f-a5e8-516ccab4d8cc-"RemoveDownloadImagesInAdvance".
+[2026-03-12 18:50:12.367 +01:00] [INF] Seed migration acbe17b7-8435-4a83-8b64-6fcf162cb9bd-"RemoveDuplicateExtras".
+[2026-03-12 18:50:12.367 +01:00] [INF] Seed migration 96c156a2-7a13-4b3b-a8b8-fb80c94d20c0-"RemoveDuplicatePlaylistChildren".
+[2026-03-12 18:50:12.368 +01:00] [INF] Seed migration null-"ReseedFolderFlag".
+[2026-03-12 18:50:12.368 +01:00] [INF] Seed migration 9b354818-94d5-4b68-ac49-e35cb85f9d84-"CreateNetworkConfiguration".
+[2026-03-12 18:50:12.368 +01:00] [INF] Seed migration a8e61960-7726-4450-8f3d-82c12daabbcb-"MigrateEncodingOptions".
+[2026-03-12 18:50:12.368 +01:00] [INF] Seed migration a6dcacf4-c057-4ef9-80d3-61cef9ddb4f0-"MigrateMusicBrainzTimeout".
+[2026-03-12 18:50:12.368 +01:00] [INF] Seed migration 4fb5c950-1991-11ee-9b4b-0800200c9a66-"MigrateNetworkConfiguration".
+[2026-03-12 18:50:12.368 +01:00] [INF] Seed migration e73b777d-cd5c-4e71-957a-b86b3660b7cf-"RenameEnableGroupingIntoCollections".
+[2026-03-12 18:50:12.374 +01:00] [INF] Migration system initialisation completed.
+[2026-03-12 18:50:12.379 +01:00] [INF] There are 0 migrations for stage PreInitialisation.
+[2026-03-12 18:50:12.385 +01:00] [INF] Setting cache path: "/var/cache/jellyfin"
+[2026-03-12 18:50:12.390 +01:00] [INF] Loading assemblies
+[2026-03-12 18:50:12.420 +01:00] [INF] Defined LAN subnets: ["127.0.0.1/8", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
+[2026-03-12 18:50:12.420 +01:00] [INF] Defined LAN exclusions: []
+[2026-03-12 18:50:12.420 +01:00] [INF] Used LAN subnets: ["127.0.0.1/8", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
+[2026-03-12 18:50:12.421 +01:00] [INF] Filtered interface addresses: ["127.0.0.1", "192.168.0.18"]
+[2026-03-12 18:50:12.421 +01:00] [INF] Bind Addresses ["0.0.0.0"]
+[2026-03-12 18:50:12.422 +01:00] [INF] Remote IP filter is "Allowlist"
+[2026-03-12 18:50:12.422 +01:00] [INF] Filtered subnets: []
+[2026-03-12 18:50:12.530 +01:00] [INF] SQLite connection string: "Data Source=/var/lib/jellyfin/data/jellyfin.db;Cache=Default;Default Timeout=30;Pooling=True"
+[2026-03-12 18:50:12.530 +01:00] [INF] SQLITE connection pragma command set to: 
+"PRAGMA locking_mode=NORMAL;
+PRAGMA journal_size_limit=134217728;
+PRAGMA synchronous=1;
+PRAGMA temp_store=2;
+"
+[2026-03-12 18:50:12.530 +01:00] [INF] The database locking mode has been set to: NoLock.
+[2026-03-12 18:50:12.534 +01:00] [INF] Prepare system for possible migrations
+[2026-03-12 18:50:12.568 +01:00] [INF] A migration will attempt to modify the jellyfin.db, will attempt to backup the file now.
+[2026-03-12 18:50:12.568 +01:00] [INF] Jellyfin database has been backed up as "20260312055012"
+[2026-03-12 18:50:12.571 +01:00] [INF] There are 0 migrations for stage CoreInitialisation.
+[2026-03-12 18:50:12.573 +01:00] [INF] Perform migration "20200514181226_AddActivityLog"
+[2026-03-12 18:50:12.603 +01:00] [INF] Migration "20200514181226_AddActivityLog" was successfully applied
+[2026-03-12 18:50:12.603 +01:00] [INF] Perform migration "20200613202153_AddUsers"
+[2026-03-12 18:50:12.628 +01:00] [INF] Migration "20200613202153_AddUsers" was successfully applied
+[2026-03-12 18:50:12.628 +01:00] [INF] Perform migration "20200728005145_AddDisplayPreferences"
+[2026-03-12 18:50:12.645 +01:00] [INF] Migration "20200728005145_AddDisplayPreferences" was successfully applied
+[2026-03-12 18:50:12.645 +01:00] [INF] Perform migration "20200905220533_FixDisplayPreferencesIndex"
+[2026-03-12 18:50:12.653 +01:00] [INF] Migration "20200905220533_FixDisplayPreferencesIndex" was successfully applied
+[2026-03-12 18:50:12.654 +01:00] [INF] Perform migration "20201004171403_AddMaxActiveSessions"
+[2026-03-12 18:50:12.666 +01:00] [INF] Migration "20201004171403_AddMaxActiveSessions" was successfully applied
+[2026-03-12 18:50:12.666 +01:00] [INF] Perform migration "20201204223655_AddCustomDisplayPreferences"
+[2026-03-12 18:50:12.688 +01:00] [INF] Migration "20201204223655_AddCustomDisplayPreferences" was successfully applied
+[2026-03-12 18:50:12.688 +01:00] [INF] Perform migration "20210320181425_AddIndexesAndCollations"
+[2026-03-12 18:50:12.707 +01:00] [WRN] An operation of type '"SqlOperation"' will be attempted while a rebuild of table '"ImageInfos"' is pending. The database may not be in an expected state. Review the SQL generated by this migration to help diagnose any failures. Consider moving these operations to a subsequent migration.
+[2026-03-12 18:50:12.707 +01:00] [WRN] An operation of type '"SqlOperation"' will be attempted while a rebuild of table '"ImageInfos"' is pending. The database may not be in an expected state. Review the SQL generated by this migration to help diagnose any failures. Consider moving these operations to a subsequent migration.
+[2026-03-12 18:50:12.708 +01:00] [WRN] An operation of type '"SqlOperation"' will be attempted while a rebuild of table '"Permissions"' is pending. The database may not be in an expected state. Review the SQL generated by this migration to help diagnose any failures. Consider moving these operations to a subsequent migration.
+[2026-03-12 18:50:12.709 +01:00] [WRN] An operation of type '"SqlOperation"' will be attempted while a rebuild of table '"Permissions"' is pending. The database may not be in an expected state. Review the SQL generated by this migration to help diagnose any failures. Consider moving these operations to a subsequent migration.
+[2026-03-12 18:50:12.709 +01:00] [WRN] An operation of type '"SqlOperation"' will be attempted while a rebuild of table '"Preferences"' is pending. The database may not be in an expected state. Review the SQL generated by this migration to help diagnose any failures. Consider moving these operations to a subsequent migration.
+[2026-03-12 18:50:12.709 +01:00] [WRN] An operation of type '"SqlOperation"' will be attempted while a rebuild of table '"Preferences"' is pending. The database may not be in an expected state. Review the SQL generated by this migration to help diagnose any failures. Consider moving these operations to a subsequent migration.
+[2026-03-12 18:50:12.710 +01:00] [WRN] An operation of type '"SqlOperation"' will be attempted while a rebuild of table '"Users"' is pending. The database may not be in an expected state. Review the SQL generated by this migration to help diagnose any failures. Consider moving these operations to a subsequent migration.
+[2026-03-12 18:50:12.710 +01:00] [WRN] An operation of type '"SqlOperation"' will be attempted while a rebuild of table '"Users"' is pending. The database may not be in an expected state. Review the SQL generated by this migration to help diagnose any failures. Consider moving these operations to a subsequent migration.
+[2026-03-12 18:50:12.717 +01:00] [INF] Migration "20210320181425_AddIndexesAndCollations" was successfully applied
+[2026-03-12 18:50:12.717 +01:00] [INF] Perform migration "20210407110544_NullableCustomPrefValue"
+[2026-03-12 18:50:12.730 +01:00] [INF] Migration "20210407110544_NullableCustomPrefValue" was successfully applied
+[2026-03-12 18:50:12.730 +01:00] [INF] Perform migration "20210814002109_AddDevices"
+[2026-03-12 18:50:12.750 +01:00] [INF] Migration "20210814002109_AddDevices" was successfully applied
+[2026-03-12 18:50:12.750 +01:00] [INF] Perform migration "20221022080052_AddIndexActivityLogsDateCreated"
+[2026-03-12 18:50:12.759 +01:00] [INF] Migration "20221022080052_AddIndexActivityLogsDateCreated" was successfully applied
+[2026-03-12 18:50:12.760 +01:00] [INF] Perform migration "20230526173516_RemoveEasyPassword"
+[2026-03-12 18:50:12.777 +01:00] [INF] Migration "20230526173516_RemoveEasyPassword" was successfully applied
+[2026-03-12 18:50:12.777 +01:00] [INF] Perform migration "20230626233818_AddTrickplayInfos"
+[2026-03-12 18:50:12.788 +01:00] [INF] Migration "20230626233818_AddTrickplayInfos" was successfully applied
+[2026-03-12 18:50:12.788 +01:00] [INF] Perform migration "20230923170422_UserCastReceiver"
+[2026-03-12 18:50:12.799 +01:00] [INF] Migration "20230923170422_UserCastReceiver" was successfully applied
+[2026-03-12 18:50:12.800 +01:00] [INF] Perform migration "20240729140605_AddMediaSegments"
+[2026-03-12 18:50:12.810 +01:00] [INF] Migration "20240729140605_AddMediaSegments" was successfully applied
+[2026-03-12 18:50:12.810 +01:00] [INF] Perform migration "20240928082930_MarkSegmentProviderIdNonNullable"
+[2026-03-12 18:50:12.826 +01:00] [INF] Migration "20240928082930_MarkSegmentProviderIdNonNullable" was successfully applied
+[2026-03-12 18:50:12.827 +01:00] [INF] Perform migration "20241020103111_LibraryDbMigration"
+[2026-03-12 18:50:12.871 +01:00] [INF] Migration "20241020103111_LibraryDbMigration" was successfully applied
+[2026-03-12 18:50:12.871 +01:00] [INF] Perform migration "20241111131257_AddedCustomDataKey"
+[2026-03-12 18:50:12.892 +01:00] [INF] Migration "20241111131257_AddedCustomDataKey" was successfully applied
+[2026-03-12 18:50:12.892 +01:00] [INF] Perform migration "20241111135439_AddedCustomDataKeyKey"
+[2026-03-12 18:50:12.935 +01:00] [INF] Migration "20241111135439_AddedCustomDataKeyKey" was successfully applied
+[2026-03-12 18:50:12.935 +01:00] [INF] Perform migration "20241112152323_FixAncestorIdConfig"
+[2026-03-12 18:50:12.970 +01:00] [INF] Migration "20241112152323_FixAncestorIdConfig" was successfully applied
+[2026-03-12 18:50:12.970 +01:00] [INF] Perform migration "20241112232041_FixMediaStreams"
+[2026-03-12 18:50:13.015 +01:00] [INF] Migration "20241112232041_FixMediaStreams" was successfully applied
+[2026-03-12 18:50:13.015 +01:00] [INF] Perform migration "20241112234144_FixMediaStreams2"
+[2026-03-12 18:50:13.057 +01:00] [INF] Migration "20241112234144_FixMediaStreams2" was successfully applied
+[2026-03-12 18:50:13.058 +01:00] [INF] Perform migration "20241113133548_EnforceUniqueItemValue"
+[2026-03-12 18:50:13.078 +01:00] [INF] Migration "20241113133548_EnforceUniqueItemValue" was successfully applied
+[2026-03-12 18:50:13.078 +01:00] [INF] Perform migration "20250202021306_FixedCollation"
+[2026-03-12 18:50:13.114 +01:00] [INF] Migration "20250202021306_FixedCollation" was successfully applied
+[2026-03-12 18:50:13.114 +01:00] [INF] Perform migration "20250204092455_MakeStartEndDateNullable"
+[2026-03-12 18:50:13.156 +01:00] [INF] Migration "20250204092455_MakeStartEndDateNullable" was successfully applied
+[2026-03-12 18:50:13.157 +01:00] [INF] Perform migration "20250214031148_ChannelIdGuid"
+[2026-03-12 18:50:13.177 +01:00] [INF] Migration "20250214031148_ChannelIdGuid" was successfully applied
+[2026-03-12 18:50:13.178 +01:00] [INF] Perform migration "20250326065026_AddInheritedParentalRatingSubValue"
+[2026-03-12 18:50:13.206 +01:00] [INF] Migration "20250326065026_AddInheritedParentalRatingSubValue" was successfully applied
+[2026-03-12 18:50:13.206 +01:00] [INF] Perform migration "20250327101120_AddKeyframeData"
+[2026-03-12 18:50:13.228 +01:00] [INF] Migration "20250327101120_AddKeyframeData" was successfully applied
+[2026-03-12 18:50:13.228 +01:00] [INF] Perform migration "20250327171413_AddHdr10PlusFlag"
+[2026-03-12 18:50:13.250 +01:00] [INF] Migration "20250327171413_AddHdr10PlusFlag" was successfully applied
+[2026-03-12 18:50:13.250 +01:00] [INF] Perform migration "20250331182844_FixAttachmentMigration"
+[2026-03-12 18:50:13.285 +01:00] [INF] Migration "20250331182844_FixAttachmentMigration" was successfully applied
+[2026-03-12 18:50:13.285 +01:00] [INF] Perform migration "20250401142247_FixAncestors"
+[2026-03-12 18:50:13.311 +01:00] [INF] Migration "20250401142247_FixAncestors" was successfully applied
+[2026-03-12 18:50:13.311 +01:00] [INF] Perform migration "20250405075612_FixItemValuesIndices"
+[2026-03-12 18:50:13.333 +01:00] [INF] Migration "20250405075612_FixItemValuesIndices" was successfully applied
+[2026-03-12 18:50:13.333 +01:00] [INF] Perform migration "20250609115616_DetachUserDataInsteadOfDelete"
+[2026-03-12 18:50:13.379 +01:00] [INF] Migration "20250609115616_DetachUserDataInsteadOfDelete" was successfully applied
+[2026-03-12 18:50:13.379 +01:00] [INF] Perform migration "20250622170802_BaseItemImageInfoDateModifiedNullable"
+[2026-03-12 18:50:13.416 +01:00] [INF] Migration "20250622170802_BaseItemImageInfoDateModifiedNullable" was successfully applied
+[2026-03-12 18:50:13.416 +01:00] [INF] Perform migration "20250714044826_ResetJournalMode"
+[2026-03-12 18:50:13.440 +01:00] [INF] Migration "20250714044826_ResetJournalMode" was successfully applied
+[2026-03-12 18:50:13.440 +01:00] [INF] Perform migration "20250913211637_AddProperParentChildRelationBaseItemWithCascade"
+[2026-03-12 18:50:13.483 +01:00] [INF] Migration "20250913211637_AddProperParentChildRelationBaseItemWithCascade" was successfully applied
+[2026-03-12 18:50:13.483 +01:00] [INF] Perform migration "20250925203415_ExtendPeopleMapKey"
+[2026-03-12 18:50:13.523 +01:00] [INF] Migration "20250925203415_ExtendPeopleMapKey" was successfully applied
+[2026-03-12 18:50:13.980 +01:00] [INF] Saving system configuration
+[2026-03-12 18:50:13.981 +01:00] [INF] Setting cache path: "/var/cache/jellyfin"
+[2026-03-12 18:50:13.985 +01:00] [INF] Loaded plugin: "TMDb" "10.11.6.0"
+[2026-03-12 18:50:13.986 +01:00] [INF] Loaded plugin: "Studio Images" "10.11.6.0"
+[2026-03-12 18:50:13.986 +01:00] [INF] Loaded plugin: "OMDb" "10.11.6.0"
+[2026-03-12 18:50:13.997 +01:00] [INF] Loaded plugin: "MusicBrainz" "10.11.6.0"
+[2026-03-12 18:50:13.998 +01:00] [INF] Loaded plugin: "AudioDB" "10.11.6.0"
+[2026-03-12 18:50:14.042 +01:00] [INF] There are 5 migrations for stage AppInitialisation.
+[2026-03-12 18:50:14.042 +01:00] [INF] Perform migration "20250420090000_AddDefaultPluginRepository"
+[2026-03-12 18:50:14.045 +01:00] [INF] Saving system configuration
+[2026-03-12 18:50:14.046 +01:00] [INF] Setting cache path: "/var/cache/jellyfin"
+[2026-03-12 18:50:14.046 +01:00] [INF] Migration "20250420090000_AddDefaultPluginRepository" was successfully applied
+[2026-03-12 18:50:14.046 +01:00] [INF] Perform migration "20250420110000_ReaddDefaultPluginRepository"
+[2026-03-12 18:50:14.047 +01:00] [INF] Migration "20250420110000_ReaddDefaultPluginRepository" was successfully applied
+[2026-03-12 18:50:14.047 +01:00] [INF] Perform migration "20250420160000_AddDefaultCastReceivers"
+[2026-03-12 18:50:14.048 +01:00] [INF] Saving system configuration
+[2026-03-12 18:50:14.049 +01:00] [INF] Setting cache path: "/var/cache/jellyfin"
+[2026-03-12 18:50:14.049 +01:00] [INF] Migration "20250420160000_AddDefaultCastReceivers" was successfully applied
+[2026-03-12 18:50:14.049 +01:00] [INF] Perform migration "20250420170000_UpdateDefaultPluginRepository"
+[2026-03-12 18:50:14.050 +01:00] [INF] Saving system configuration
+[2026-03-12 18:50:14.051 +01:00] [INF] Setting cache path: "/var/cache/jellyfin"
+[2026-03-12 18:50:14.051 +01:00] [INF] Migration "20250420170000_UpdateDefaultPluginRepository" was successfully applied
+[2026-03-12 18:50:14.051 +01:00] [INF] Perform migration "20250420230000_MoveTrickplayFiles"
+[2026-03-12 18:50:14.256 +01:00] [INF] Checked: 5000 - Moved: 0 - Time: 00:00:00.2029382
+[2026-03-12 18:50:14.256 +01:00] [INF] Moved 0 items in 00:00:00.2037267
+[2026-03-12 18:50:14.257 +01:00] [INF] Migration "20250420230000_MoveTrickplayFiles" was successfully applied
+[2026-03-12 18:50:14.257 +01:00] [INF] Attempt to cleanup JellyfinDb backup.
+[2026-03-12 18:50:14.283 +01:00] [INF] Kestrel is listening on "0.0.0.0"
+[2026-03-12 18:50:14.299 +01:00] [WRN] No XML encryptor configured. Key {3f58a22c-7984-4b01-bbef-790653b4f7fe} may be persisted to storage in unencrypted form.
+[2026-03-12 18:50:14.723 +01:00] [WRN] The WebRootPath was not found: "/var/lib/jellyfin/wwwroot". Static files may be unavailable.
+[2026-03-12 18:50:15.138 +01:00] [INF] Running startup tasks
+[2026-03-12 18:50:15.146 +01:00] [INF] Daily trigger for "Generate Trickplay Images" set to fire at 2026-03-13 03:00:00.000 +01:00, which is 08:09:44.8532962 from now.
+[2026-03-12 18:50:15.148 +01:00] [INF] Daily trigger for "Extract Chapter Images" set to fire at 2026-03-13 02:00:00.000 +01:00, which is 07:09:44.8510371 from now.
+[2026-03-12 18:50:15.176 +01:00] [INF] Found ffmpeg version "7.1.3"
+[2026-03-12 18:50:15.214 +01:00] [INF] Available "decoders": ["libdav1d", "av1", "av1_cuvid", "av1_qsv", "h264", "h264_qsv", "h264_cuvid", "hevc", "hevc_qsv", "hevc_cuvid", "mpeg2video", "mpeg2_qsv", "mpeg2_cuvid", "mpeg4", "mpeg4_cuvid", "msmpeg4", "vc1_qsv", "vc1_cuvid", "vp8", "libvpx", "vp8_cuvid", "vp8_qsv", "vp9", "libvpx-vp9", "vp9_cuvid", "vp9_qsv", "aac", "ac3", "ac4", "dca", "flac", "mp3", "truehd"]
+[2026-03-12 18:50:15.233 +01:00] [INF] Available "encoders": ["libsvtav1", "av1_nvenc", "av1_qsv", "av1_amf", "av1_vaapi", "libx264", "h264_amf", "h264_nvenc", "h264_qsv", "h264_v4l2m2m", "h264_vaapi", "libx265", "hevc_amf", "hevc_nvenc", "hevc_qsv", "hevc_vaapi", "mjpeg_qsv", "mjpeg_vaapi", "aac", "libfdk_aac", "ac3", "alac", "dca", "flac", "libmp3lame", "libopus", "truehd", "libvorbis", "srt"]
+[2026-03-12 18:50:15.251 +01:00] [INF] Available filters: ["bwdif_cuda", "bwdif_opencl", "deinterlace_qsv", "deinterlace_vaapi", "flip_vulkan", "hwupload_cuda", "hwupload_vaapi", "libplacebo", "overlay_opencl", "overlay_qsv", "overlay_vaapi", "overlay_vulkan", "overlay_cuda", "procamp_vaapi", "scale_cuda", "scale_opencl", "scale_qsv", "scale_vaapi", "scale_vulkan", "tonemapx", "tonemap_cuda", "tonemap_opencl", "tonemap_vaapi", "transpose_cuda", "transpose_opencl", "transpose_vaapi", "transpose_vulkan", "vpp_qsv", "yadif_cuda", "yadif_opencl", "zscale", "alphasrc"]
+[2026-03-12 18:50:15.492 +01:00] [INF] Available hwaccel types: ["cuda", "vaapi", "qsv", "drm", "opencl", "vulkan"]
+[2026-03-12 18:50:17.897 +01:00] [INF] FFmpeg: "/usr/lib/jellyfin-ffmpeg/ffmpeg"
+[2026-03-12 18:50:17.898 +01:00] [INF] ServerId: "528e89e28ef745559b0db6851c43480a"
+[2026-03-12 18:50:17.898 +01:00] [INF] Core startup complete
+[2026-03-12 18:50:17.898 +01:00] [INF] Startup complete 0:00:07.0038097
+[2026-03-12 18:50:18.163 +01:00] [INF] "Clean Transcode Directory" Completed after 0 minute(s) and 0 seconds
+[2026-03-12 18:50:18.169 +01:00] [INF] "Clean up collections and playlists" Completed after 0 minute(s) and 0 seconds
+[2026-03-12 18:50:18.855 +01:00] [INF] "Update Plugins" Completed after 0 minute(s) and 0 seconds
+[2026-03-12 19:13:56.940 +01:00] [INF] Saving system configuration
+[2026-03-12 19:13:56.942 +01:00] [INF] Setting cache path: "/var/cache/jellyfin"
+[2026-03-12 19:13:57.002 +01:00] [WRN] No users, creating one with username "jellyfin"
+[2026-03-12 19:29:24.708 +01:00] [INF] Sending shutdown notifications
+[2026-03-12 19:29:24.715 +01:00] [INF] Running query planner optimizations in the database... This might take a while
+[2026-03-12 19:29:24.749 +01:00] [INF] Disposing "CoreAppHost"
+[2026-03-12 19:29:24.749 +01:00] [INF] Disposing "MusicBrainzArtistProvider"
+[2026-03-12 19:29:24.750 +01:00] [INF] Disposing "MusicBrainzAlbumProvider"
+[2026-03-12 19:29:24.750 +01:00] [INF] Disposing "PluginManager"
+[2026-03-12 19:29:25.133 +01:00] [INF] Setting cache path: "/var/cache/jellyfin"
+[2026-03-12 19:29:25.304 +01:00] [INF] Kestrel is listening on "0.0.0.0"
+[2026-03-12 19:29:25.326 +01:00] [INF] Jellyfin version: "10.11.6"
+[2026-03-12 19:29:25.329 +01:00] [INF] Environment Variables: ["[JELLYFIN_CACHE_DIR, /var/cache/jellyfin]", "[JELLYFIN_LOG_DIR, /var/log/jellyfin]", "[JELLYFIN_ADDITIONAL_OPTS, ]", "[JELLYFIN_FFMPEG_OPT, --ffmpeg=/usr/lib/jellyfin-ffmpeg/ffmpeg]", "[JELLYFIN_CONFIG_DIR, /etc/jellyfin]", "[JELLYFIN_USER, jellyfin]", "[JELLYFIN_WEB_OPT, --webdir=/usr/share/jellyfin/web]", "[JELLYFIN_ARGS, $JELLYFIN_WEB_OPT $JELLYFIN_FFMPEG_OPT $JELLYFIN_SERVICE_OPT $JELLYFIN_NOWEBAPP_OPT $JELLYFIN_ADDITIONAL_OPTS --datadir $JELLYFIN_DATA_DIR --configdir $JELLYFIN_CONFIG_DIR --logdir $JELLYFIN_LOG_DIR --cachedir $JELLYFIN_CACHE_DIR]", "[JELLYFIN_DATA_DIR, /var/lib/jellyfin]"]
+[2026-03-12 19:29:25.330 +01:00] [INF] Arguments: ["/usr/lib/jellyfin/bin/jellyfin.dll", "--webdir=/usr/share/jellyfin/web", "--ffmpeg=/usr/lib/jellyfin-ffmpeg/ffmpeg"]
+[2026-03-12 19:29:25.330 +01:00] [INF] Operating system: "Debian GNU/Linux 13 (trixie)"
+[2026-03-12 19:29:25.330 +01:00] [INF] Architecture: X64
+[2026-03-12 19:29:25.331 +01:00] [INF] 64-Bit Process: True
+[2026-03-12 19:29:25.331 +01:00] [INF] User Interactive: True
+[2026-03-12 19:29:25.331 +01:00] [INF] Processor count: 4
+[2026-03-12 19:29:25.331 +01:00] [INF] Program data path: "/var/lib/jellyfin"
+[2026-03-12 19:29:25.331 +01:00] [INF] Log directory path: "/var/log/jellyfin"
+[2026-03-12 19:29:25.331 +01:00] [INF] Config directory path: "/etc/jellyfin"
+[2026-03-12 19:29:25.331 +01:00] [INF] Cache path: "/var/cache/jellyfin"
+[2026-03-12 19:29:25.331 +01:00] [INF] Temp directory path: "/tmp/jellyfin"
+[2026-03-12 19:29:25.331 +01:00] [INF] Web resources path: "/usr/share/jellyfin/web"
+[2026-03-12 19:29:25.331 +01:00] [INF] Application directory: "/usr/lib/jellyfin/bin/"
+[2026-03-12 19:29:25.343 +01:00] [INF] Storage path `"/var/lib/jellyfin/data"` (Fixed) successfully checked with "403GiB" free which is over the minimum of "2GiB".
+[2026-03-12 19:29:25.344 +01:00] [INF] Storage path `"/var/cache/jellyfin"` (Fixed) successfully checked with "403GiB" free which is over the minimum of "2GiB".
+[2026-03-12 19:29:25.344 +01:00] [INF] Storage path `"/var/lib/jellyfin"` (Fixed) successfully checked with "403GiB" free which is over the minimum of "2GiB".
+[2026-03-12 19:29:25.347 +01:00] [INF] Setting cache path: "/var/cache/jellyfin"
+[2026-03-12 19:29:25.389 +01:00] [INF] SQLite connection string: "Data Source=/var/lib/jellyfin/data/jellyfin.db;Cache=Default;Default Timeout=30;Pooling=True"
+[2026-03-12 19:29:25.394 +01:00] [INF] SQLITE connection pragma command set to: 
+"PRAGMA locking_mode=NORMAL;
+PRAGMA journal_size_limit=134217728;
+PRAGMA synchronous=1;
+PRAGMA temp_store=2;
+"
+[2026-03-12 19:29:25.395 +01:00] [INF] The database locking mode has been set to: NoLock.
+[2026-03-12 19:29:25.421 +01:00] [INF] Initialise Migration service.
+[2026-03-12 19:29:25.421 +01:00] [INF] System initialisation detected. Seed data.
+[2026-03-12 19:29:26.358 +01:00] [INF] Migration system initialisation completed.
+[2026-03-12 19:29:26.366 +01:00] [INF] There are 0 migrations for stage PreInitialisation.
+[2026-03-12 19:29:26.371 +01:00] [INF] Setting cache path: "/var/cache/jellyfin"
+[2026-03-12 19:29:26.382 +01:00] [INF] Loading assemblies
+[2026-03-12 19:29:26.411 +01:00] [INF] Defined LAN subnets: ["127.0.0.1/8", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
+[2026-03-12 19:29:26.411 +01:00] [INF] Defined LAN exclusions: []
+[2026-03-12 19:29:26.412 +01:00] [INF] Used LAN subnets: ["127.0.0.1/8", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
+[2026-03-12 19:29:26.413 +01:00] [INF] Filtered interface addresses: ["127.0.0.1", "192.168.0.18"]
+[2026-03-12 19:29:26.413 +01:00] [INF] Bind Addresses ["0.0.0.0"]
+[2026-03-12 19:29:26.413 +01:00] [INF] Remote IP filter is "Allowlist"
+[2026-03-12 19:29:26.413 +01:00] [INF] Filtered subnets: []
+[2026-03-12 19:29:26.544 +01:00] [INF] SQLite connection string: "Data Source=/var/lib/jellyfin/data/jellyfin.db;Cache=Default;Default Timeout=30;Pooling=True"
+[2026-03-12 19:29:26.544 +01:00] [INF] SQLITE connection pragma command set to: 
+"PRAGMA locking_mode=NORMAL;
+PRAGMA journal_size_limit=134217728;
+PRAGMA synchronous=1;
+PRAGMA temp_store=2;
+"
+[2026-03-12 19:29:26.544 +01:00] [INF] The database locking mode has been set to: NoLock.
+[2026-03-12 19:29:26.548 +01:00] [INF] Prepare system for possible migrations
+[2026-03-12 19:29:26.581 +01:00] [INF] There are 0 migrations for stage CoreInitialisation.
+[2026-03-12 19:29:27.076 +01:00] [INF] Loaded plugin: "TMDb" "10.11.6.0"
+[2026-03-12 19:29:27.076 +01:00] [INF] Loaded plugin: "Studio Images" "10.11.6.0"
+[2026-03-12 19:29:27.077 +01:00] [INF] Loaded plugin: "OMDb" "10.11.6.0"
+[2026-03-12 19:29:27.087 +01:00] [INF] Loaded plugin: "MusicBrainz" "10.11.6.0"
+[2026-03-12 19:29:27.087 +01:00] [INF] Loaded plugin: "AudioDB" "10.11.6.0"
+[2026-03-12 19:29:27.122 +01:00] [INF] There are 0 migrations for stage AppInitialisation.
+[2026-03-12 19:29:27.160 +01:00] [INF] Kestrel is listening on "0.0.0.0"
+[2026-03-12 19:29:27.693 +01:00] [WRN] The WebRootPath was not found: "/var/lib/jellyfin/wwwroot". Static files may be unavailable.
+[2026-03-12 19:29:27.756 +01:00] [INF] Running startup tasks
+[2026-03-12 19:29:27.766 +01:00] [INF] Daily trigger for "Générer des images Trickplay" set to fire at 2026-03-13 03:00:00.000 +01:00, which is 07:30:32.2339602 from now.
+[2026-03-12 19:29:27.769 +01:00] [INF] Daily trigger for "Extraire les images de chapitre" set to fire at 2026-03-13 02:00:00.000 +01:00, which is 06:30:32.2310093 from now.
+[2026-03-12 19:29:27.802 +01:00] [INF] Found ffmpeg version "7.1.3"
+[2026-03-12 19:29:27.833 +01:00] [INF] Available "decoders": ["libdav1d", "av1", "av1_cuvid", "av1_qsv", "h264", "h264_qsv", "h264_cuvid", "hevc", "hevc_qsv", "hevc_cuvid", "mpeg2video", "mpeg2_qsv", "mpeg2_cuvid", "mpeg4", "mpeg4_cuvid", "msmpeg4", "vc1_qsv", "vc1_cuvid", "vp8", "libvpx", "vp8_cuvid", "vp8_qsv", "vp9", "libvpx-vp9", "vp9_cuvid", "vp9_qsv", "aac", "ac3", "ac4", "dca", "flac", "mp3", "truehd"]
+[2026-03-12 19:29:27.852 +01:00] [INF] Available "encoders": ["libsvtav1", "av1_nvenc", "av1_qsv", "av1_amf", "av1_vaapi", "libx264", "h264_amf", "h264_nvenc", "h264_qsv", "h264_v4l2m2m", "h264_vaapi", "libx265", "hevc_amf", "hevc_nvenc", "hevc_qsv", "hevc_vaapi", "mjpeg_qsv", "mjpeg_vaapi", "aac", "libfdk_aac", "ac3", "alac", "dca", "flac", "libmp3lame", "libopus", "truehd", "libvorbis", "srt"]
+[2026-03-12 19:29:27.871 +01:00] [INF] Available filters: ["bwdif_cuda", "bwdif_opencl", "deinterlace_qsv", "deinterlace_vaapi", "flip_vulkan", "hwupload_cuda", "hwupload_vaapi", "libplacebo", "overlay_opencl", "overlay_qsv", "overlay_vaapi", "overlay_vulkan", "overlay_cuda", "procamp_vaapi", "scale_cuda", "scale_opencl", "scale_qsv", "scale_vaapi", "scale_vulkan", "tonemapx", "tonemap_cuda", "tonemap_opencl", "tonemap_vaapi", "transpose_cuda", "transpose_opencl", "transpose_vaapi", "transpose_vulkan", "vpp_qsv", "yadif_cuda", "yadif_opencl", "zscale", "alphasrc"]
+[2026-03-12 19:29:28.125 +01:00] [INF] Available hwaccel types: ["cuda", "vaapi", "qsv", "drm", "opencl", "vulkan"]
+[2026-03-12 19:29:30.559 +01:00] [INF] FFmpeg: "/usr/lib/jellyfin-ffmpeg/ffmpeg"
+[2026-03-12 19:29:30.559 +01:00] [INF] ServerId: "528e89e28ef745559b0db6851c43480a"
+[2026-03-12 19:29:30.559 +01:00] [INF] Core startup complete
+[2026-03-12 19:29:30.559 +01:00] [INF] Startup complete 0:00:05.6269235
+[2026-03-12 19:29:30.791 +01:00] [INF] "Nettoyer le dossier des transcodages" Completed after 0 minute(s) and 0 seconds
+[2026-03-12 19:29:30.794 +01:00] [INF] "Nettoyer les collections et les listes de lecture" Completed after 0 minute(s) and 0 seconds
+[2026-03-12 19:29:31.464 +01:00] [INF] "Mettre à jour les extensions" Completed after 0 minute(s) and 0 seconds
+[2026-03-12 19:31:18.038 +01:00] [INF] Saving system configuration
+[2026-03-12 19:31:18.040 +01:00] [INF] Setting cache path: "/var/cache/jellyfin"
+[2026-03-12 19:31:19.796 +01:00] [INF] Defined LAN subnets: ["127.0.0.1/8", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
+[2026-03-12 19:31:19.796 +01:00] [INF] Defined LAN exclusions: []
+[2026-03-12 19:31:19.796 +01:00] [INF] Used LAN subnets: ["127.0.0.1/8", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
+[2026-03-12 19:31:19.796 +01:00] [INF] Filtered interface addresses: ["127.0.0.1", "192.168.0.18"]
+[2026-03-12 19:31:19.796 +01:00] [INF] Bind Addresses ["0.0.0.0"]
+[2026-03-12 19:31:19.797 +01:00] [INF] Remote IP filter is "Allowlist"
+[2026-03-12 19:31:19.797 +01:00] [INF] Filtered subnets: []
+[2026-03-12 19:31:20.808 +01:00] [INF] Saving system configuration
+[2026-03-12 19:31:20.809 +01:00] [INF] Setting cache path: "/var/cache/jellyfin"
+[2026-03-12 19:31:20.820 +01:00] [INF] Validating media library
+[2026-03-12 19:31:21.473 +01:00] [WRN] Library folder "/var/lib/jellyfin/data/playlists" is inaccessible or empty, skipping
+[2026-03-12 19:31:21.516 +01:00] [WRN] Library folder "/var/lib/jellyfin/data/playlists" is inaccessible or empty, skipping
+[2026-03-12 19:31:21.919 +01:00] [INF] "Analyser la médiathèque" Completed after 0 minute(s) and 1 seconds
+[2026-03-12 19:31:42.691 +01:00] [INF] Authentication request for "papaours" has succeeded.
+[2026-03-12 19:31:42.692 +01:00] [INF] Current/Max sessions for user "papaours": 0/0
+[2026-03-12 19:31:42.695 +01:00] [INF] Creating new access token for user 3a7feb29-7f2c-4748-9b55-91b3a80466bb
+[2026-03-12 19:31:42.972 +01:00] [INF] WS "127.0.0.1" request
