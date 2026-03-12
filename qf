@@ -1,30 +1,11 @@
-#!/usr/bin/env python3
-from http.server import BaseHTTPRequestHandler, HTTPServer
-import subprocess
-import os
+[Unit]
+Description=WoL HTTP server
+After=network.target
 
-# MAC de ton PC à réveiller
-MAC_ADDRESS = "00:1a:2b:3c:4d:5e"
+[Service]
+ExecStart=/usr/bin/python3 /usr/local/bin/wol-server.py
+Restart=always
+User=root
 
-class RequestHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        if self.path == "/wol":
-            # Envoi du Magic Packet sur le LAN
-            subprocess.run(["wakeonlan", MAC_ADDRESS])
-            self.send_response(200)
-            self.send_header("Content-type", "text/plain")
-            self.end_headers()
-            self.wfile.write(b"Magic Packet sent!\n")
-        else:
-            self.send_response(404)
-            self.end_headers()
-            self.wfile.write(b"Not found\n")
-
-def run():
-    port = 8080  # Port local pour le script
-    server = HTTPServer(('127.0.0.1', port), RequestHandler)
-    print(f"WoL server running on 127.0.0.1:{port}")
-    server.serve_forever()
-
-if __name__ == "__main__":
-    run()
+[Install]
+WantedBy=multi-user.target
