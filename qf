@@ -1,33 +1,37 @@
 papaours@papaours:~$ curl http://192.168.0.18:8096
-papaours@papaours:~$ curl http://192.168.0.18:8096
-papaours@papaours:~$ ss -tulpn | grep 8096
-tcp   LISTEN 0      512          0.0.0.0:8096       0.0.0.0:*                                          
-papaours@papaours:~$ cat /etc/jellyfin/network.xml
-cat: /etc/jellyfin/network.xml: Permission non accordée
-papaours@papaours:~$ sudo cat /etc/jellyfin/network.xml
-<NetworkConfiguration>
-  <EnableIPV6>false</EnableIPV6>
-  <EnableRemoteAccess>true</EnableRemoteAccess>
-  <LocalNetworkSubnets></LocalNetworkSubnets>
-  <LocalNetworkAddresses></LocalNetworkAddresses>
-  <KnownProxies></KnownProxies>
-  <EnablePublishedServerUriByRequest>false</EnablePublishedServerUriByRequest>
-  <RemoteIPFilter></RemoteIPFilter>
-  <IsRemoteIPFilterBlacklist>false</IsRemoteIPFilterBlacklist>
-</NetworkConfiguration>
+papaours@papaours:~$ curl http://127.0.0.1:8096
+papaours@papaours:~$ nslookup grizzly-stream.duckdns.org
+;; Got SERVFAIL reply from 212.224.129.90, trying next server
+;; Got SERVFAIL reply from 212.224.129.94
+Server:         212.224.129.94
+Address:        212.224.129.94#53
 
-papaours@papaours:~$ sudo ufw status
-Status: active
+** server can't find grizzly-stream.duckdns.org: SERVFAIL
 
-To                         Action      From
---                         ------      ----
-22/tcp                     ALLOW       Anywhere                  
-80/tcp                     ALLOW       Anywhere                  
-443/tcp                    ALLOW       Anywhere                  
-8096/tcp                   ALLOW       Anywhere                  
-22/tcp (v6)                ALLOW       Anywhere (v6)             
-80/tcp (v6)                ALLOW       Anywhere (v6)             
-443/tcp (v6)               ALLOW       Anywhere (v6)             
-8096/tcp (v6)              ALLOW       Anywhere (v6)             
+papaours@papaours:~$ dig grizzly-stream.duckdns.org
 
+; <<>> DiG 9.20.18-1~deb13u1-Debian <<>> grizzly-stream.duckdns.org
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: SERVFAIL, id: 19017
+;; flags: qr rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+;; QUESTION SECTION:
+;grizzly-stream.duckdns.org.    IN      A
+
+;; Query time: 8 msec
+;; SERVER: 212.224.129.90#53(212.224.129.90) (UDP)
+;; WHEN: Thu Mar 12 20:02:26 CET 2026
+;; MSG SIZE  rcvd: 55
+
+papaours@papaours:~$ curl ifcongig.me
+<html>
+<head><title>301 Moved Permanently</title></head>
+<body>
+<center><h1>301 Moved Permanently</h1></center>
+<hr><center>nginx</center>
+</body>
+</html>
 papaours@papaours:~$ 
