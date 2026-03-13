@@ -1,17 +1,9 @@
-grizzly-stream.duckdns.org {
+[Unit]
+Description=Enable Wake On LAN
 
-    # WoL script sur /wol
-    handle_path /wol* {
-        reverse_proxy 127.0.0.1:8080
-    }
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/ethtool -s enp3s0 wol g
 
-    # Jellyfin sur la racine
-    handle_path /* {
-        reverse_proxy 127.0.0.1:8096
-    }
-
-    # Optionnel : logs
-    log {
-        output file /var/log/caddy/access.log
-    }
-}
+[Install]
+WantedBy=multi-user.target
