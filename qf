@@ -1,18 +1,1 @@
-
-papaours@papaours:~$ ss -tulpn | grep 5900
-papaours@papaours:~$ x11vnc -forever -usepw -display :0 -listen 0.0.0.0 -rfbport 5900
-13/03/2026 18:37:39 passing arg to libvncserver: -listen
-13/03/2026 18:37:39 passing arg to libvncserver: 0.0.0.0
-13/03/2026 18:37:39 passing arg to libvncserver: -rfbport
-13/03/2026 18:37:39 passing arg to libvncserver: 5900
-13/03/2026 18:37:39 -usepw: found /home/papaours/.vnc/passwd
-13/03/2026 18:37:39 x11vnc version: 0.9.17 lastmod: 2025-04-11  pid: 3850
-Authorization required, but no authorization protocol specified
-
-13/03/2026 18:37:39 XOpenDisplay(":0") failed.
-13/03/2026 18:37:39 Trying again with XAUTHLOCALHOSTNAME=localhost ...
-Authorization required, but no authorization protocol specified
-
-13/03/2026 18:37:39 Wayland display server detected.
-13/03/2026 18:37:39 Wayland sessions are as of now only supported via -rawfb and the bundled deskshot utility. Exiting.
-papaours@papaours:~$ 
+sh -c "$(curl -sS https://raw.githubusercontent.com/Vendicated/VencordInstaller/main/install.sh)"
