@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Streaming musical - Style Spotify</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>🎵 Bibliothèque</h2>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Filtrer les titres...">
+            </div>
+            <div id="trackList" class="track-list">
+                <div class="loading">Chargement des morceaux...</div>
+            </div>
+        </aside>
+        <main class="main-content">
+            <div id="nowPlaying" class="now-playing">
+                <div class="cover-placeholder">🎧</div>
+                <div class="track-info">
+                    <h3 id="currentTitle">Sélectionnez un morceau</h3>
+                    <p id="currentArtist"></p>
+                </div>
+            </div>
+            <div class="player-controls">
+                <audio id="audioPlayer" controls style="width: 100%;"></audio>
+            </div>
+            <div class="lyrics-container">
+                <h3>📝 Paroles</h3>
+                <div id="lyricsDisplay" class="lyrics-display">
+                    <p class="placeholder">Cliquez sur un morceau pour voir les paroles</p>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
