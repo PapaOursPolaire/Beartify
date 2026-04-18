@@ -1,0 +1,6042 @@
+{
+  "metadata": {
+    "track": "Ma Meilleure Ennemie (from the series Arcane League of Legends)",
+    "artist": "Stromae, Pomme, Arcane",
+    "album": "Ma Meilleure Ennemie (from the series Arcane League of Legends)",
+    "trackId": "4lriIG2vNqwDWzOj2I9rtj",
+    "downloadedAt": "2026-04-18T16:53:55.646Z",
+    "syncType": "WORD",
+    "qualityScore": 75,
+    "qualityLabel": "WORD",
+    "provider": "spicylyrics",
+    "lineCount": 47,
+    "wordCount": 290,
+    "backgroundLineCount": 0,
+    "backgroundTypeCount": 0,
+    "oppositeAlignedCount": 26,
+    "songWriters": [
+      "Alexander Seaver",
+      "Claire Pommet",
+      "Luc Van Haver",
+      "Paul Van Haver"
+    ],
+    "duration": 141816
+  },
+  "lyrics": {
+    "syncType": "WORD",
+    "provider": "spicylyrics",
+    "songWriters": [
+      "Alexander Seaver",
+      "Claire Pommet",
+      "Luc Van Haver",
+      "Paul Van Haver"
+    ],
+    "duration": 141816,
+    "lines": [
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Jet'aime,jetehais,jet'aime,jetehais",
+          "startTime": 163,
+          "endTime": 2883,
+          "words": [
+            {
+              "text": "Je",
+              "startTime": 163,
+              "endTime": 506
+            },
+            {
+              "text": "t'aime,",
+              "startTime": 506,
+              "endTime": 970
+            },
+            {
+              "text": "je",
+              "startTime": 970,
+              "endTime": 1119
+            },
+            {
+              "text": "te",
+              "startTime": 1119,
+              "endTime": 1292
+            },
+            {
+              "text": "hais,",
+              "startTime": 1292,
+              "endTime": 1574
+            },
+            {
+              "text": "je",
+              "startTime": 1574,
+              "endTime": 1765
+            },
+            {
+              "text": "t'aime,",
+              "startTime": 1765,
+              "endTime": 2235
+            },
+            {
+              "text": "je",
+              "startTime": 2235,
+              "endTime": 2435
+            },
+            {
+              "text": "te",
+              "startTime": 2435,
+              "endTime": 2623
+            },
+            {
+              "text": "hais",
+              "startTime": 2623,
+              "endTime": 2883
+            }
+          ]
+        },
+        "background": null,
+        "text": "Jet'aime,jetehais,jet'aime,jetehais",
+        "startTime": 163,
+        "endTime": 2883,
+        "words": [
+          {
+            "text": "Je",
+            "startTime": 163,
+            "endTime": 506
+          },
+          {
+            "text": "t'aime,",
+            "startTime": 506,
+            "endTime": 970
+          },
+          {
+            "text": "je",
+            "startTime": 970,
+            "endTime": 1119
+          },
+          {
+            "text": "te",
+            "startTime": 1119,
+            "endTime": 1292
+          },
+          {
+            "text": "hais,",
+            "startTime": 1292,
+            "endTime": 1574
+          },
+          {
+            "text": "je",
+            "startTime": 1574,
+            "endTime": 1765
+          },
+          {
+            "text": "t'aime,",
+            "startTime": 1765,
+            "endTime": 2235
+          },
+          {
+            "text": "je",
+            "startTime": 2235,
+            "endTime": 2435
+          },
+          {
+            "text": "te",
+            "startTime": 2435,
+            "endTime": 2623
+          },
+          {
+            "text": "hais",
+            "startTime": 2623,
+            "endTime": 2883
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Jet'aime,jetehais,jet'aime,jetehais",
+          "startTime": 2883,
+          "endTime": 5605,
+          "words": [
+            {
+              "text": "Je",
+              "startTime": 2883,
+              "endTime": 3160
+            },
+            {
+              "text": "t'aime,",
+              "startTime": 3160,
+              "endTime": 3706
+            },
+            {
+              "text": "je",
+              "startTime": 3706,
+              "endTime": 3902
+            },
+            {
+              "text": "te",
+              "startTime": 3902,
+              "endTime": 4045
+            },
+            {
+              "text": "hais,",
+              "startTime": 4045,
+              "endTime": 4361
+            },
+            {
+              "text": "je",
+              "startTime": 4361,
+              "endTime": 4528
+            },
+            {
+              "text": "t'aime,",
+              "startTime": 4528,
+              "endTime": 4961
+            },
+            {
+              "text": "je",
+              "startTime": 4961,
+              "endTime": 5122
+            },
+            {
+              "text": "te",
+              "startTime": 5122,
+              "endTime": 5282
+            },
+            {
+              "text": "hais",
+              "startTime": 5282,
+              "endTime": 5605
+            }
+          ]
+        },
+        "background": null,
+        "text": "Jet'aime,jetehais,jet'aime,jetehais",
+        "startTime": 2883,
+        "endTime": 5605,
+        "words": [
+          {
+            "text": "Je",
+            "startTime": 2883,
+            "endTime": 3160
+          },
+          {
+            "text": "t'aime,",
+            "startTime": 3160,
+            "endTime": 3706
+          },
+          {
+            "text": "je",
+            "startTime": 3706,
+            "endTime": 3902
+          },
+          {
+            "text": "te",
+            "startTime": 3902,
+            "endTime": 4045
+          },
+          {
+            "text": "hais,",
+            "startTime": 4045,
+            "endTime": 4361
+          },
+          {
+            "text": "je",
+            "startTime": 4361,
+            "endTime": 4528
+          },
+          {
+            "text": "t'aime,",
+            "startTime": 4528,
+            "endTime": 4961
+          },
+          {
+            "text": "je",
+            "startTime": 4961,
+            "endTime": 5122
+          },
+          {
+            "text": "te",
+            "startTime": 5122,
+            "endTime": 5282
+          },
+          {
+            "text": "hais",
+            "startTime": 5282,
+            "endTime": 5605
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Jet'aime,jetehais,jet'aime,jetehais",
+          "startTime": 5640,
+          "endTime": 8334,
+          "words": [
+            {
+              "text": "Je",
+              "startTime": 5640,
+              "endTime": 5874
+            },
+            {
+              "text": "t'aime,",
+              "startTime": 5874,
+              "endTime": 6445
+            },
+            {
+              "text": "je",
+              "startTime": 6445,
+              "endTime": 6695
+            },
+            {
+              "text": "te",
+              "startTime": 6695,
+              "endTime": 6861
+            },
+            {
+              "text": "hais,",
+              "startTime": 6861,
+              "endTime": 7060
+            },
+            {
+              "text": "je",
+              "startTime": 7060,
+              "endTime": 7250
+            },
+            {
+              "text": "t'aime,",
+              "startTime": 7250,
+              "endTime": 7721
+            },
+            {
+              "text": "je",
+              "startTime": 7721,
+              "endTime": 7876
+            },
+            {
+              "text": "te",
+              "startTime": 7876,
+              "endTime": 8076
+            },
+            {
+              "text": "hais",
+              "startTime": 8076,
+              "endTime": 8334
+            }
+          ]
+        },
+        "background": null,
+        "text": "Jet'aime,jetehais,jet'aime,jetehais",
+        "startTime": 5640,
+        "endTime": 8334,
+        "words": [
+          {
+            "text": "Je",
+            "startTime": 5640,
+            "endTime": 5874
+          },
+          {
+            "text": "t'aime,",
+            "startTime": 5874,
+            "endTime": 6445
+          },
+          {
+            "text": "je",
+            "startTime": 6445,
+            "endTime": 6695
+          },
+          {
+            "text": "te",
+            "startTime": 6695,
+            "endTime": 6861
+          },
+          {
+            "text": "hais,",
+            "startTime": 6861,
+            "endTime": 7060
+          },
+          {
+            "text": "je",
+            "startTime": 7060,
+            "endTime": 7250
+          },
+          {
+            "text": "t'aime,",
+            "startTime": 7250,
+            "endTime": 7721
+          },
+          {
+            "text": "je",
+            "startTime": 7721,
+            "endTime": 7876
+          },
+          {
+            "text": "te",
+            "startTime": 7876,
+            "endTime": 8076
+          },
+          {
+            "text": "hais",
+            "startTime": 8076,
+            "endTime": 8334
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Jet'aime,jetehais,jet'aime,jetehais",
+          "startTime": 8403,
+          "endTime": 10939,
+          "words": [
+            {
+              "text": "Je",
+              "startTime": 8403,
+              "endTime": 8676
+            },
+            {
+              "text": "t'aime,",
+              "startTime": 8676,
+              "endTime": 9174
+            },
+            {
+              "text": "je",
+              "startTime": 9174,
+              "endTime": 9306
+            },
+            {
+              "text": "te",
+              "startTime": 9306,
+              "endTime": 9488
+            },
+            {
+              "text": "hais,",
+              "startTime": 9488,
+              "endTime": 9700
+            },
+            {
+              "text": "je",
+              "startTime": 9808,
+              "endTime": 9975
+            },
+            {
+              "text": "t'aime,",
+              "startTime": 9975,
+              "endTime": 10408
+            },
+            {
+              "text": "je",
+              "startTime": 10408,
+              "endTime": 10632
+            },
+            {
+              "text": "te",
+              "startTime": 10632,
+              "endTime": 10732
+            },
+            {
+              "text": "hais",
+              "startTime": 10732,
+              "endTime": 10939
+            }
+          ]
+        },
+        "background": null,
+        "text": "Jet'aime,jetehais,jet'aime,jetehais",
+        "startTime": 8403,
+        "endTime": 10939,
+        "words": [
+          {
+            "text": "Je",
+            "startTime": 8403,
+            "endTime": 8676
+          },
+          {
+            "text": "t'aime,",
+            "startTime": 8676,
+            "endTime": 9174
+          },
+          {
+            "text": "je",
+            "startTime": 9174,
+            "endTime": 9306
+          },
+          {
+            "text": "te",
+            "startTime": 9306,
+            "endTime": 9488
+          },
+          {
+            "text": "hais,",
+            "startTime": 9488,
+            "endTime": 9700
+          },
+          {
+            "text": "je",
+            "startTime": 9808,
+            "endTime": 9975
+          },
+          {
+            "text": "t'aime,",
+            "startTime": 9975,
+            "endTime": 10408
+          },
+          {
+            "text": "je",
+            "startTime": 10408,
+            "endTime": 10632
+          },
+          {
+            "text": "te",
+            "startTime": 10632,
+            "endTime": 10732
+          },
+          {
+            "text": "hais",
+            "startTime": 10732,
+            "endTime": 10939
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": false,
+        "lead": {
+          "text": "T'eslameilleurechosequim'estarrivée",
+          "startTime": 10723,
+          "endTime": 13093,
+          "words": [
+            {
+              "text": "T'es",
+              "startTime": 10723,
+              "endTime": 10986
+            },
+            {
+              "text": "la",
+              "startTime": 10986,
+              "endTime": 11183
+            },
+            {
+              "text": "meilleure",
+              "startTime": 11183,
+              "endTime": 11878
+            },
+            {
+              "text": "chose",
+              "startTime": 11878,
+              "endTime": 12248
+            },
+            {
+              "text": "qui",
+              "startTime": 12248,
+              "endTime": 12377
+            },
+            {
+              "text": "m'est",
+              "startTime": 12377,
+              "endTime": 12532
+            },
+            {
+              "text": "arrivée",
+              "startTime": 12532,
+              "endTime": 13093
+            }
+          ]
+        },
+        "background": null,
+        "text": "T'eslameilleurechosequim'estarrivée",
+        "startTime": 10723,
+        "endTime": 13093,
+        "words": [
+          {
+            "text": "T'es",
+            "startTime": 10723,
+            "endTime": 10986
+          },
+          {
+            "text": "la",
+            "startTime": 10986,
+            "endTime": 11183
+          },
+          {
+            "text": "meilleure",
+            "startTime": 11183,
+            "endTime": 11878
+          },
+          {
+            "text": "chose",
+            "startTime": 11878,
+            "endTime": 12248
+          },
+          {
+            "text": "qui",
+            "startTime": 12248,
+            "endTime": 12377
+          },
+          {
+            "text": "m'est",
+            "startTime": 12377,
+            "endTime": 12532
+          },
+          {
+            "text": "arrivée",
+            "startTime": 12532,
+            "endTime": 13093
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": false,
+        "lead": {
+          "text": "Maisaussilapirechosequim'estarrivée",
+          "startTime": 13408,
+          "endTime": 15800,
+          "words": [
+            {
+              "text": "Mais",
+              "startTime": 13408,
+              "endTime": 13759
+            },
+            {
+              "text": "aussi",
+              "startTime": 13759,
+              "endTime": 14141
+            },
+            {
+              "text": "la",
+              "startTime": 14141,
+              "endTime": 14360
+            },
+            {
+              "text": "pire",
+              "startTime": 14360,
+              "endTime": 14629
+            },
+            {
+              "text": "chose",
+              "startTime": 14629,
+              "endTime": 14975
+            },
+            {
+              "text": "qui",
+              "startTime": 14975,
+              "endTime": 15114
+            },
+            {
+              "text": "m'est",
+              "startTime": 15114,
+              "endTime": 15268
+            },
+            {
+              "text": "arrivée",
+              "startTime": 15268,
+              "endTime": 15800
+            }
+          ]
+        },
+        "background": null,
+        "text": "Maisaussilapirechosequim'estarrivée",
+        "startTime": 13408,
+        "endTime": 15800,
+        "words": [
+          {
+            "text": "Mais",
+            "startTime": 13408,
+            "endTime": 13759
+          },
+          {
+            "text": "aussi",
+            "startTime": 13759,
+            "endTime": 14141
+          },
+          {
+            "text": "la",
+            "startTime": 14141,
+            "endTime": 14360
+          },
+          {
+            "text": "pire",
+            "startTime": 14360,
+            "endTime": 14629
+          },
+          {
+            "text": "chose",
+            "startTime": 14629,
+            "endTime": 14975
+          },
+          {
+            "text": "qui",
+            "startTime": 14975,
+            "endTime": 15114
+          },
+          {
+            "text": "m'est",
+            "startTime": 15114,
+            "endTime": 15268
+          },
+          {
+            "text": "arrivée",
+            "startTime": 15268,
+            "endTime": 15800
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": false,
+        "lead": {
+          "text": "Cejouroùjet'airencontrée,j'auraispeut-êtrepréféré",
+          "startTime": 16123,
+          "endTime": 19181,
+          "words": [
+            {
+              "text": "Ce",
+              "startTime": 16123,
+              "endTime": 16250
+            },
+            {
+              "text": "jour",
+              "startTime": 16250,
+              "endTime": 16410
+            },
+            {
+              "text": "où",
+              "startTime": 16410,
+              "endTime": 16565
+            },
+            {
+              "text": "je",
+              "startTime": 16565,
+              "endTime": 16788
+            },
+            {
+              "text": "t'ai",
+              "startTime": 16788,
+              "endTime": 17055
+            },
+            {
+              "text": "rencontrée,",
+              "startTime": 17055,
+              "endTime": 17939
+            },
+            {
+              "text": "j'aurais",
+              "startTime": 17939,
+              "endTime": 18320
+            },
+            {
+              "text": "peut-être",
+              "startTime": 18320,
+              "endTime": 18679
+            },
+            {
+              "text": "préféré",
+              "startTime": 18679,
+              "endTime": 19181
+            }
+          ]
+        },
+        "background": null,
+        "text": "Cejouroùjet'airencontrée,j'auraispeut-êtrepréféré",
+        "startTime": 16123,
+        "endTime": 19181,
+        "words": [
+          {
+            "text": "Ce",
+            "startTime": 16123,
+            "endTime": 16250
+          },
+          {
+            "text": "jour",
+            "startTime": 16250,
+            "endTime": 16410
+          },
+          {
+            "text": "où",
+            "startTime": 16410,
+            "endTime": 16565
+          },
+          {
+            "text": "je",
+            "startTime": 16565,
+            "endTime": 16788
+          },
+          {
+            "text": "t'ai",
+            "startTime": 16788,
+            "endTime": 17055
+          },
+          {
+            "text": "rencontrée,",
+            "startTime": 17055,
+            "endTime": 17939
+          },
+          {
+            "text": "j'aurais",
+            "startTime": 17939,
+            "endTime": 18320
+          },
+          {
+            "text": "peut-être",
+            "startTime": 18320,
+            "endTime": 18679
+          },
+          {
+            "text": "préféré",
+            "startTime": 18679,
+            "endTime": 19181
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": false,
+        "lead": {
+          "text": "Quecejournesoitjamaisarrivé",
+          "startTime": 19371,
+          "endTime": 21934,
+          "words": [
+            {
+              "text": "Que",
+              "startTime": 19371,
+              "endTime": 19471
+            },
+            {
+              "text": "ce",
+              "startTime": 19471,
+              "endTime": 19658
+            },
+            {
+              "text": "jour",
+              "startTime": 19658,
+              "endTime": 20007
+            },
+            {
+              "text": "ne",
+              "startTime": 20007,
+              "endTime": 20127
+            },
+            {
+              "text": "soit",
+              "startTime": 20127,
+              "endTime": 20379
+            },
+            {
+              "text": "jamais",
+              "startTime": 20379,
+              "endTime": 20744
+            },
+            {
+              "text": "arrivé",
+              "startTime": 20744,
+              "endTime": 21301
+            }
+          ]
+        },
+        "background": null,
+        "text": "Quecejournesoitjamaisarrivé",
+        "startTime": 19371,
+        "endTime": 21934,
+        "words": [
+          {
+            "text": "Que",
+            "startTime": 19371,
+            "endTime": 19471
+          },
+          {
+            "text": "ce",
+            "startTime": 19471,
+            "endTime": 19658
+          },
+          {
+            "text": "jour",
+            "startTime": 19658,
+            "endTime": 20007
+          },
+          {
+            "text": "ne",
+            "startTime": 20007,
+            "endTime": 20127
+          },
+          {
+            "text": "soit",
+            "startTime": 20127,
+            "endTime": 20379
+          },
+          {
+            "text": "jamais",
+            "startTime": 20379,
+            "endTime": 20744
+          },
+          {
+            "text": "arrivé",
+            "startTime": 20744,
+            "endTime": 21301
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": false,
+        "lead": {
+          "text": "Lapiredesbénédictions",
+          "startTime": 22107,
+          "endTime": 23680,
+          "words": [
+            {
+              "text": "La",
+              "startTime": 22107,
+              "endTime": 22324
+            },
+            {
+              "text": "pire",
+              "startTime": 22324,
+              "endTime": 22680
+            },
+            {
+              "text": "des",
+              "startTime": 22680,
+              "endTime": 22865
+            },
+            {
+              "text": "bénédictions",
+              "startTime": 22865,
+              "endTime": 23680
+            }
+          ]
+        },
+        "background": null,
+        "text": "Lapiredesbénédictions",
+        "startTime": 22107,
+        "endTime": 23680,
+        "words": [
+          {
+            "text": "La",
+            "startTime": 22107,
+            "endTime": 22324
+          },
+          {
+            "text": "pire",
+            "startTime": 22324,
+            "endTime": 22680
+          },
+          {
+            "text": "des",
+            "startTime": 22680,
+            "endTime": 22865
+          },
+          {
+            "text": "bénédictions",
+            "startTime": 22865,
+            "endTime": 23680
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": false,
+        "lead": {
+          "text": "Laplusbelledesmalédictions",
+          "startTime": 24097,
+          "endTime": 25671,
+          "words": [
+            {
+              "text": "La",
+              "startTime": 24097,
+              "endTime": 24250
+            },
+            {
+              "text": "plus",
+              "startTime": 24250,
+              "endTime": 24421
+            },
+            {
+              "text": "belle",
+              "startTime": 24421,
+              "endTime": 24641
+            },
+            {
+              "text": "des",
+              "startTime": 24641,
+              "endTime": 24790
+            },
+            {
+              "text": "malédictions",
+              "startTime": 24790,
+              "endTime": 25671
+            }
+          ]
+        },
+        "background": null,
+        "text": "Laplusbelledesmalédictions",
+        "startTime": 24097,
+        "endTime": 25671,
+        "words": [
+          {
+            "text": "La",
+            "startTime": 24097,
+            "endTime": 24250
+          },
+          {
+            "text": "plus",
+            "startTime": 24250,
+            "endTime": 24421
+          },
+          {
+            "text": "belle",
+            "startTime": 24421,
+            "endTime": 24641
+          },
+          {
+            "text": "des",
+            "startTime": 24641,
+            "endTime": 24790
+          },
+          {
+            "text": "malédictions",
+            "startTime": 24790,
+            "endTime": 25671
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": false,
+        "lead": {
+          "text": "Detoi,j'devraism'éloigner",
+          "startTime": 26173,
+          "endTime": 27483,
+          "words": [
+            {
+              "text": "De",
+              "startTime": 26173,
+              "endTime": 26317
+            },
+            {
+              "text": "toi,",
+              "startTime": 26317,
+              "endTime": 26461
+            },
+            {
+              "text": "j'devrais",
+              "startTime": 26461,
+              "endTime": 26877
+            },
+            {
+              "text": "m'éloigner",
+              "startTime": 26877,
+              "endTime": 27483
+            }
+          ]
+        },
+        "background": null,
+        "text": "Detoi,j'devraism'éloigner",
+        "startTime": 26173,
+        "endTime": 27483,
+        "words": [
+          {
+            "text": "De",
+            "startTime": 26173,
+            "endTime": 26317
+          },
+          {
+            "text": "toi,",
+            "startTime": 26317,
+            "endTime": 26461
+          },
+          {
+            "text": "j'devrais",
+            "startTime": 26461,
+            "endTime": 26877
+          },
+          {
+            "text": "m'éloigner",
+            "startTime": 26877,
+            "endTime": 27483
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": false,
+        "lead": {
+          "text": "Maiscommeditledicton",
+          "startTime": 27705,
+          "endTime": 29135,
+          "words": [
+            {
+              "text": "Mais",
+              "startTime": 27705,
+              "endTime": 27934
+            },
+            {
+              "text": "comme",
+              "startTime": 27934,
+              "endTime": 28211
+            },
+            {
+              "text": "dit",
+              "startTime": 28211,
+              "endTime": 28402
+            },
+            {
+              "text": "le",
+              "startTime": 28402,
+              "endTime": 28592
+            },
+            {
+              "text": "dicton",
+              "startTime": 28592,
+              "endTime": 29135
+            }
+          ]
+        },
+        "background": null,
+        "text": "Maiscommeditledicton",
+        "startTime": 27705,
+        "endTime": 29135,
+        "words": [
+          {
+            "text": "Mais",
+            "startTime": 27705,
+            "endTime": 27934
+          },
+          {
+            "text": "comme",
+            "startTime": 27934,
+            "endTime": 28211
+          },
+          {
+            "text": "dit",
+            "startTime": 28211,
+            "endTime": 28402
+          },
+          {
+            "text": "le",
+            "startTime": 28402,
+            "endTime": 28592
+          },
+          {
+            "text": "dicton",
+            "startTime": 28592,
+            "endTime": 29135
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": false,
+        "lead": {
+          "text": "Plutôtqu'êtreseul,mieuxvautêtremalaccompagné",
+          "startTime": 29509,
+          "endTime": 32160,
+          "words": [
+            {
+              "text": "Plutôt",
+              "startTime": 29509,
+              "endTime": 29939
+            },
+            {
+              "text": "qu'être",
+              "startTime": 29939,
+              "endTime": 30207
+            },
+            {
+              "text": "seul,",
+              "startTime": 30207,
+              "endTime": 30504
+            },
+            {
+              "text": "mieux",
+              "startTime": 30504,
+              "endTime": 30858
+            },
+            {
+              "text": "vaut",
+              "startTime": 30858,
+              "endTime": 31036
+            },
+            {
+              "text": "être",
+              "startTime": 31036,
+              "endTime": 31341
+            },
+            {
+              "text": "mal",
+              "startTime": 31341,
+              "endTime": 31525
+            },
+            {
+              "text": "accompagné",
+              "startTime": 31525,
+              "endTime": 32160
+            }
+          ]
+        },
+        "background": null,
+        "text": "Plutôtqu'êtreseul,mieuxvautêtremalaccompagné",
+        "startTime": 29509,
+        "endTime": 32160,
+        "words": [
+          {
+            "text": "Plutôt",
+            "startTime": 29509,
+            "endTime": 29939
+          },
+          {
+            "text": "qu'être",
+            "startTime": 29939,
+            "endTime": 30207
+          },
+          {
+            "text": "seul,",
+            "startTime": 30207,
+            "endTime": 30504
+          },
+          {
+            "text": "mieux",
+            "startTime": 30504,
+            "endTime": 30858
+          },
+          {
+            "text": "vaut",
+            "startTime": 30858,
+            "endTime": 31036
+          },
+          {
+            "text": "être",
+            "startTime": 31036,
+            "endTime": 31341
+          },
+          {
+            "text": "mal",
+            "startTime": 31341,
+            "endTime": 31525
+          },
+          {
+            "text": "accompagné",
+            "startTime": 31525,
+            "endTime": 32160
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": false,
+        "lead": {
+          "text": "Tusaisc'qu'ondit",
+          "startTime": 32442,
+          "endTime": 35310,
+          "words": [
+            {
+              "text": "Tu",
+              "startTime": 32442,
+              "endTime": 32622
+            },
+            {
+              "text": "sais",
+              "startTime": 32622,
+              "endTime": 32866
+            },
+            {
+              "text": "c'qu'on",
+              "startTime": 32866,
+              "endTime": 33283
+            },
+            {
+              "text": "dit",
+              "startTime": 33283,
+              "endTime": 35310
+            }
+          ]
+        },
+        "background": null,
+        "text": "Tusaisc'qu'ondit",
+        "startTime": 32442,
+        "endTime": 35310,
+        "words": [
+          {
+            "text": "Tu",
+            "startTime": 32442,
+            "endTime": 32622
+          },
+          {
+            "text": "sais",
+            "startTime": 32622,
+            "endTime": 32866
+          },
+          {
+            "text": "c'qu'on",
+            "startTime": 32866,
+            "endTime": 33283
+          },
+          {
+            "text": "dit",
+            "startTime": 33283,
+            "endTime": 35310
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": false,
+        "lead": {
+          "text": "Soisprèsd'tesamislespluschers",
+          "startTime": 36188,
+          "endTime": 37823,
+          "words": [
+            {
+              "text": "Sois",
+              "startTime": 36188,
+              "endTime": 36436
+            },
+            {
+              "text": "près",
+              "startTime": 36436,
+              "endTime": 36563
+            },
+            {
+              "text": "d'tes",
+              "startTime": 36563,
+              "endTime": 36761
+            },
+            {
+              "text": "amis",
+              "startTime": 36761,
+              "endTime": 37097
+            },
+            {
+              "text": "les",
+              "startTime": 37097,
+              "endTime": 37262
+            },
+            {
+              "text": "plus",
+              "startTime": 37262,
+              "endTime": 37430
+            },
+            {
+              "text": "chers",
+              "startTime": 37430,
+              "endTime": 37823
+            }
+          ]
+        },
+        "background": null,
+        "text": "Soisprèsd'tesamislespluschers",
+        "startTime": 36188,
+        "endTime": 37823,
+        "words": [
+          {
+            "text": "Sois",
+            "startTime": 36188,
+            "endTime": 36436
+          },
+          {
+            "text": "près",
+            "startTime": 36436,
+            "endTime": 36563
+          },
+          {
+            "text": "d'tes",
+            "startTime": 36563,
+            "endTime": 36761
+          },
+          {
+            "text": "amis",
+            "startTime": 36761,
+            "endTime": 37097
+          },
+          {
+            "text": "les",
+            "startTime": 37097,
+            "endTime": 37262
+          },
+          {
+            "text": "plus",
+            "startTime": 37262,
+            "endTime": 37430
+          },
+          {
+            "text": "chers",
+            "startTime": 37430,
+            "endTime": 37823
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": false,
+        "lead": {
+          "text": "Maisaussi",
+          "startTime": 38036,
+          "endTime": 40716,
+          "words": [
+            {
+              "text": "Mais",
+              "startTime": 38036,
+              "endTime": 38354
+            },
+            {
+              "text": "aussi",
+              "startTime": 38354,
+              "endTime": 40716
+            }
+          ]
+        },
+        "background": null,
+        "text": "Maisaussi",
+        "startTime": 38036,
+        "endTime": 40716,
+        "words": [
+          {
+            "text": "Mais",
+            "startTime": 38036,
+            "endTime": 38354
+          },
+          {
+            "text": "aussi",
+            "startTime": 38354,
+            "endTime": 40716
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Encoreplusprèsd'tesadversaires",
+          "startTime": 41059,
+          "endTime": 43472,
+          "words": [
+            {
+              "text": "Encore",
+              "startTime": 41059,
+              "endTime": 41681
+            },
+            {
+              "text": "plus",
+              "startTime": 41681,
+              "endTime": 41876
+            },
+            {
+              "text": "près",
+              "startTime": 41876,
+              "endTime": 42019
+            },
+            {
+              "text": "d'tes",
+              "startTime": 42019,
+              "endTime": 42192
+            },
+            {
+              "text": "adversaires",
+              "startTime": 42192,
+              "endTime": 43472
+            }
+          ]
+        },
+        "background": null,
+        "text": "Encoreplusprèsd'tesadversaires",
+        "startTime": 41059,
+        "endTime": 43472,
+        "words": [
+          {
+            "text": "Encore",
+            "startTime": 41059,
+            "endTime": 41681
+          },
+          {
+            "text": "plus",
+            "startTime": 41681,
+            "endTime": 41876
+          },
+          {
+            "text": "près",
+            "startTime": 41876,
+            "endTime": 42019
+          },
+          {
+            "text": "d'tes",
+            "startTime": 42019,
+            "endTime": 42192
+          },
+          {
+            "text": "adversaires",
+            "startTime": 42192,
+            "endTime": 43472
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": false,
+        "lead": {
+          "text": "Maismameilleureennemie,c'esttoi",
+          "startTime": 43207,
+          "endTime": 45571,
+          "words": [
+            {
+              "text": "Mais",
+              "startTime": 43207,
+              "endTime": 43399
+            },
+            {
+              "text": "ma",
+              "startTime": 43399,
+              "endTime": 43578
+            },
+            {
+              "text": "meilleure",
+              "startTime": 43578,
+              "endTime": 43924
+            },
+            {
+              "text": "ennemie,",
+              "startTime": 43924,
+              "endTime": 44634
+            },
+            {
+              "text": "c'est",
+              "startTime": 44634,
+              "endTime": 44927
+            },
+            {
+              "text": "toi",
+              "startTime": 44927,
+              "endTime": 45571
+            }
+          ]
+        },
+        "background": null,
+        "text": "Maismameilleureennemie,c'esttoi",
+        "startTime": 43207,
+        "endTime": 45571,
+        "words": [
+          {
+            "text": "Mais",
+            "startTime": 43207,
+            "endTime": 43399
+          },
+          {
+            "text": "ma",
+            "startTime": 43399,
+            "endTime": 43578
+          },
+          {
+            "text": "meilleure",
+            "startTime": 43578,
+            "endTime": 43924
+          },
+          {
+            "text": "ennemie,",
+            "startTime": 43924,
+            "endTime": 44634
+          },
+          {
+            "text": "c'est",
+            "startTime": 44634,
+            "endTime": 44927
+          },
+          {
+            "text": "toi",
+            "startTime": 44927,
+            "endTime": 45571
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": false,
+        "lead": {
+          "text": "Fuis-moi",
+          "startTime": 46144,
+          "endTime": 47631,
+          "words": [
+            {
+              "text": "Fuis-moi",
+              "startTime": 46144,
+              "endTime": 47631
+            }
+          ]
+        },
+        "background": null,
+        "text": "Fuis-moi",
+        "startTime": 46144,
+        "endTime": 47631,
+        "words": [
+          {
+            "text": "Fuis-moi",
+            "startTime": 46144,
+            "endTime": 47631
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": false,
+        "lead": {
+          "text": "Lepire,c'esttoietmoi",
+          "startTime": 48050,
+          "endTime": 50361,
+          "words": [
+            {
+              "text": "Le",
+              "startTime": 48050,
+              "endTime": 48303
+            },
+            {
+              "text": "pire,",
+              "startTime": 48303,
+              "endTime": 48679
+            },
+            {
+              "text": "c'est",
+              "startTime": 48679,
+              "endTime": 48977
+            },
+            {
+              "text": "toi",
+              "startTime": 48977,
+              "endTime": 49460
+            },
+            {
+              "text": "et",
+              "startTime": 49460,
+              "endTime": 49683
+            },
+            {
+              "text": "moi",
+              "startTime": 49683,
+              "endTime": 50361
+            }
+          ]
+        },
+        "background": null,
+        "text": "Lepire,c'esttoietmoi",
+        "startTime": 48050,
+        "endTime": 50361,
+        "words": [
+          {
+            "text": "Le",
+            "startTime": 48050,
+            "endTime": 48303
+          },
+          {
+            "text": "pire,",
+            "startTime": 48303,
+            "endTime": 48679
+          },
+          {
+            "text": "c'est",
+            "startTime": 48679,
+            "endTime": 48977
+          },
+          {
+            "text": "toi",
+            "startTime": 48977,
+            "endTime": 49460
+          },
+          {
+            "text": "et",
+            "startTime": 49460,
+            "endTime": 49683
+          },
+          {
+            "text": "moi",
+            "startTime": 49683,
+            "endTime": 50361
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Maissitucherchesencoremavoix",
+          "startTime": 54074,
+          "endTime": 56580,
+          "words": [
+            {
+              "text": "Mais",
+              "startTime": 54074,
+              "endTime": 54322
+            },
+            {
+              "text": "si",
+              "startTime": 54322,
+              "endTime": 54494
+            },
+            {
+              "text": "tu",
+              "startTime": 54494,
+              "endTime": 54666
+            },
+            {
+              "text": "cherches",
+              "startTime": 54666,
+              "endTime": 54927
+            },
+            {
+              "text": "encore",
+              "startTime": 54927,
+              "endTime": 55709
+            },
+            {
+              "text": "ma",
+              "startTime": 55709,
+              "endTime": 55890
+            },
+            {
+              "text": "voix",
+              "startTime": 55890,
+              "endTime": 56580
+            }
+          ]
+        },
+        "background": null,
+        "text": "Maissitucherchesencoremavoix",
+        "startTime": 54074,
+        "endTime": 56580,
+        "words": [
+          {
+            "text": "Mais",
+            "startTime": 54074,
+            "endTime": 54322
+          },
+          {
+            "text": "si",
+            "startTime": 54322,
+            "endTime": 54494
+          },
+          {
+            "text": "tu",
+            "startTime": 54494,
+            "endTime": 54666
+          },
+          {
+            "text": "cherches",
+            "startTime": 54666,
+            "endTime": 54927
+          },
+          {
+            "text": "encore",
+            "startTime": 54927,
+            "endTime": 55709
+          },
+          {
+            "text": "ma",
+            "startTime": 55709,
+            "endTime": 55890
+          },
+          {
+            "text": "voix",
+            "startTime": 55890,
+            "endTime": 56580
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Oublie-moi",
+          "startTime": 57127,
+          "endTime": 58571,
+          "words": [
+            {
+              "text": "Oublie-moi",
+              "startTime": 57127,
+              "endTime": 58571
+            }
+          ]
+        },
+        "background": null,
+        "text": "Oublie-moi",
+        "startTime": 57127,
+        "endTime": 58571,
+        "words": [
+          {
+            "text": "Oublie-moi",
+            "startTime": 57127,
+            "endTime": 58571
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Lepire,c'esttoietmoi",
+          "startTime": 59024,
+          "endTime": 61482,
+          "words": [
+            {
+              "text": "Le",
+              "startTime": 59024,
+              "endTime": 59292
+            },
+            {
+              "text": "pire,",
+              "startTime": 59292,
+              "endTime": 59688
+            },
+            {
+              "text": "c'est",
+              "startTime": 59688,
+              "endTime": 59927
+            },
+            {
+              "text": "toi",
+              "startTime": 59927,
+              "endTime": 60448
+            },
+            {
+              "text": "et",
+              "startTime": 60448,
+              "endTime": 60663
+            },
+            {
+              "text": "moi",
+              "startTime": 60663,
+              "endTime": 61482
+            }
+          ]
+        },
+        "background": null,
+        "text": "Lepire,c'esttoietmoi",
+        "startTime": 59024,
+        "endTime": 61482,
+        "words": [
+          {
+            "text": "Le",
+            "startTime": 59024,
+            "endTime": 59292
+          },
+          {
+            "text": "pire,",
+            "startTime": 59292,
+            "endTime": 59688
+          },
+          {
+            "text": "c'est",
+            "startTime": 59688,
+            "endTime": 59927
+          },
+          {
+            "text": "toi",
+            "startTime": 59927,
+            "endTime": 60448
+          },
+          {
+            "text": "et",
+            "startTime": 60448,
+            "endTime": 60663
+          },
+          {
+            "text": "moi",
+            "startTime": 60663,
+            "endTime": 61482
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Pourquoitonprénommeblesse",
+          "startTime": 65969,
+          "endTime": 69151,
+          "words": [
+            {
+              "text": "Pourquoi",
+              "startTime": 65969,
+              "endTime": 66708
+            },
+            {
+              "text": "ton",
+              "startTime": 66708,
+              "endTime": 67140
+            },
+            {
+              "text": "prénom",
+              "startTime": 67140,
+              "endTime": 67920
+            },
+            {
+              "text": "me",
+              "startTime": 68059,
+              "endTime": 68404
+            },
+            {
+              "text": "blesse",
+              "startTime": 68404,
+              "endTime": 69151
+            }
+          ]
+        },
+        "background": null,
+        "text": "Pourquoitonprénommeblesse",
+        "startTime": 65969,
+        "endTime": 69151,
+        "words": [
+          {
+            "text": "Pourquoi",
+            "startTime": 65969,
+            "endTime": 66708
+          },
+          {
+            "text": "ton",
+            "startTime": 66708,
+            "endTime": 67140
+          },
+          {
+            "text": "prénom",
+            "startTime": 67140,
+            "endTime": 67920
+          },
+          {
+            "text": "me",
+            "startTime": 68059,
+            "endTime": 68404
+          },
+          {
+            "text": "blesse",
+            "startTime": 68404,
+            "endTime": 69151
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Quandilsecache",
+          "startTime": 70592,
+          "endTime": 72358,
+          "words": [
+            {
+              "text": "Quand",
+              "startTime": 70592,
+              "endTime": 70878
+            },
+            {
+              "text": "il",
+              "startTime": 70878,
+              "endTime": 71298
+            },
+            {
+              "text": "se",
+              "startTime": 71298,
+              "endTime": 71636
+            },
+            {
+              "text": "cache",
+              "startTime": 71636,
+              "endTime": 72358
+            }
+          ]
+        },
+        "background": null,
+        "text": "Quandilsecache",
+        "startTime": 70592,
+        "endTime": 72358,
+        "words": [
+          {
+            "text": "Quand",
+            "startTime": 70592,
+            "endTime": 70878
+          },
+          {
+            "text": "il",
+            "startTime": 70878,
+            "endTime": 71298
+          },
+          {
+            "text": "se",
+            "startTime": 71298,
+            "endTime": 71636
+          },
+          {
+            "text": "cache",
+            "startTime": 71636,
+            "endTime": 72358
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Justelàdansl'espace",
+          "startTime": 72722,
+          "endTime": 76747,
+          "words": [
+            {
+              "text": "Juste",
+              "startTime": 72722,
+              "endTime": 74129
+            },
+            {
+              "text": "là",
+              "startTime": 74129,
+              "endTime": 74683
+            },
+            {
+              "text": "dans",
+              "startTime": 74899,
+              "endTime": 75574
+            },
+            {
+              "text": "l'espace",
+              "startTime": 75574,
+              "endTime": 76747
+            }
+          ]
+        },
+        "background": null,
+        "text": "Justelàdansl'espace",
+        "startTime": 72722,
+        "endTime": 76747,
+        "words": [
+          {
+            "text": "Juste",
+            "startTime": 72722,
+            "endTime": 74129
+          },
+          {
+            "text": "là",
+            "startTime": 74129,
+            "endTime": 74683
+          },
+          {
+            "text": "dans",
+            "startTime": 74899,
+            "endTime": 75574
+          },
+          {
+            "text": "l'espace",
+            "startTime": 75574,
+            "endTime": 76747
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "C'estquelleémotionlahaine",
+          "startTime": 76923,
+          "endTime": 80054,
+          "words": [
+            {
+              "text": "C'est",
+              "startTime": 76923,
+              "endTime": 77471
+            },
+            {
+              "text": "quelle",
+              "startTime": 77471,
+              "endTime": 77738
+            },
+            {
+              "text": "émotion",
+              "startTime": 77738,
+              "endTime": 78587
+            },
+            {
+              "text": "la",
+              "startTime": 78878,
+              "endTime": 79249
+            },
+            {
+              "text": "haine",
+              "startTime": 79249,
+              "endTime": 80054
+            }
+          ]
+        },
+        "background": null,
+        "text": "C'estquelleémotionlahaine",
+        "startTime": 76923,
+        "endTime": 80054,
+        "words": [
+          {
+            "text": "C'est",
+            "startTime": 76923,
+            "endTime": 77471
+          },
+          {
+            "text": "quelle",
+            "startTime": 77471,
+            "endTime": 77738
+          },
+          {
+            "text": "émotion",
+            "startTime": 77738,
+            "endTime": 78587
+          },
+          {
+            "text": "la",
+            "startTime": 78878,
+            "endTime": 79249
+          },
+          {
+            "text": "haine",
+            "startTime": 79249,
+            "endTime": 80054
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Ouladouceur",
+          "startTime": 81469,
+          "endTime": 83154,
+          "words": [
+            {
+              "text": "Ou",
+              "startTime": 81469,
+              "endTime": 81685
+            },
+            {
+              "text": "la",
+              "startTime": 81685,
+              "endTime": 82019
+            },
+            {
+              "text": "douceur",
+              "startTime": 82019,
+              "endTime": 83154
+            }
+          ]
+        },
+        "background": null,
+        "text": "Ouladouceur",
+        "startTime": 81469,
+        "endTime": 83154,
+        "words": [
+          {
+            "text": "Ou",
+            "startTime": 81469,
+            "endTime": 81685
+          },
+          {
+            "text": "la",
+            "startTime": 81685,
+            "endTime": 82019
+          },
+          {
+            "text": "douceur",
+            "startTime": 82019,
+            "endTime": 83154
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Quandj'entendstonprénom",
+          "startTime": 83723,
+          "endTime": 87442,
+          "words": [
+            {
+              "text": "Quand",
+              "startTime": 83723,
+              "endTime": 84441
+            },
+            {
+              "text": "j'entends",
+              "startTime": 84441,
+              "endTime": 85792
+            },
+            {
+              "text": "ton",
+              "startTime": 85792,
+              "endTime": 86402
+            },
+            {
+              "text": "prénom",
+              "startTime": 86402,
+              "endTime": 87442
+            }
+          ]
+        },
+        "background": null,
+        "text": "Quandj'entendstonprénom",
+        "startTime": 83723,
+        "endTime": 87442,
+        "words": [
+          {
+            "text": "Quand",
+            "startTime": 83723,
+            "endTime": 84441
+          },
+          {
+            "text": "j'entends",
+            "startTime": 84441,
+            "endTime": 85792
+          },
+          {
+            "text": "ton",
+            "startTime": 85792,
+            "endTime": 86402
+          },
+          {
+            "text": "prénom",
+            "startTime": 86402,
+            "endTime": 87442
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Jet'avaisdit",
+          "startTime": 87784,
+          "endTime": 89483,
+          "words": [
+            {
+              "text": "Je",
+              "startTime": 87784,
+              "endTime": 88083
+            },
+            {
+              "text": "t'avais",
+              "startTime": 88083,
+              "endTime": 88827
+            },
+            {
+              "text": "dit",
+              "startTime": 88827,
+              "endTime": 89483
+            }
+          ]
+        },
+        "background": null,
+        "text": "Jet'avaisdit",
+        "startTime": 87784,
+        "endTime": 89483,
+        "words": [
+          {
+            "text": "Je",
+            "startTime": 87784,
+            "endTime": 88083
+          },
+          {
+            "text": "t'avais",
+            "startTime": 88083,
+            "endTime": 88827
+          },
+          {
+            "text": "dit",
+            "startTime": 88827,
+            "endTime": 89483
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Neregardepasenarrière",
+          "startTime": 89662,
+          "endTime": 92166,
+          "words": [
+            {
+              "text": "Ne",
+              "startTime": 89662,
+              "endTime": 89860
+            },
+            {
+              "text": "regarde",
+              "startTime": 89860,
+              "endTime": 90486
+            },
+            {
+              "text": "pas",
+              "startTime": 90486,
+              "endTime": 90903
+            },
+            {
+              "text": "en",
+              "startTime": 90903,
+              "endTime": 91244
+            },
+            {
+              "text": "arrière",
+              "startTime": 91244,
+              "endTime": 92166
+            }
+          ]
+        },
+        "background": null,
+        "text": "Neregardepasenarrière",
+        "startTime": 89662,
+        "endTime": 92166,
+        "words": [
+          {
+            "text": "Ne",
+            "startTime": 89662,
+            "endTime": 89860
+          },
+          {
+            "text": "regarde",
+            "startTime": 89860,
+            "endTime": 90486
+          },
+          {
+            "text": "pas",
+            "startTime": 90486,
+            "endTime": 90903
+          },
+          {
+            "text": "en",
+            "startTime": 90903,
+            "endTime": 91244
+          },
+          {
+            "text": "arrière",
+            "startTime": 91244,
+            "endTime": 92166
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Lepasséquitesuit",
+          "startTime": 92587,
+          "endTime": 95198,
+          "words": [
+            {
+              "text": "Le",
+              "startTime": 92587,
+              "endTime": 92833
+            },
+            {
+              "text": "passé",
+              "startTime": 92833,
+              "endTime": 93571
+            },
+            {
+              "text": "qui",
+              "startTime": 93571,
+              "endTime": 93986
+            },
+            {
+              "text": "te",
+              "startTime": 93986,
+              "endTime": 94188
+            },
+            {
+              "text": "suit",
+              "startTime": 94188,
+              "endTime": 95198
+            }
+          ]
+        },
+        "background": null,
+        "text": "Lepasséquitesuit",
+        "startTime": 92587,
+        "endTime": 95198,
+        "words": [
+          {
+            "text": "Le",
+            "startTime": 92587,
+            "endTime": 92833
+          },
+          {
+            "text": "passé",
+            "startTime": 92833,
+            "endTime": 93571
+          },
+          {
+            "text": "qui",
+            "startTime": 93571,
+            "endTime": 93986
+          },
+          {
+            "text": "te",
+            "startTime": 93986,
+            "endTime": 94188
+          },
+          {
+            "text": "suit",
+            "startTime": 94188,
+            "endTime": 95198
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Tefaitlaguerre",
+          "startTime": 95893,
+          "endTime": 97738,
+          "words": [
+            {
+              "text": "Te",
+              "startTime": 95893,
+              "endTime": 96363
+            },
+            {
+              "text": "fait",
+              "startTime": 96363,
+              "endTime": 96673
+            },
+            {
+              "text": "la",
+              "startTime": 96673,
+              "endTime": 97288
+            },
+            {
+              "text": "guerre",
+              "startTime": 97288,
+              "endTime": 97738
+            }
+          ]
+        },
+        "background": null,
+        "text": "Tefaitlaguerre",
+        "startTime": 95893,
+        "endTime": 97738,
+        "words": [
+          {
+            "text": "Te",
+            "startTime": 95893,
+            "endTime": 96363
+          },
+          {
+            "text": "fait",
+            "startTime": 96363,
+            "endTime": 96673
+          },
+          {
+            "text": "la",
+            "startTime": 96673,
+            "endTime": 97288
+          },
+          {
+            "text": "guerre",
+            "startTime": 97288,
+            "endTime": 97738
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": false,
+        "lead": {
+          "text": "Maismameilleureennemie,c'esttoi",
+          "startTime": 97738,
+          "endTime": 100124,
+          "words": [
+            {
+              "text": "Mais",
+              "startTime": 97738,
+              "endTime": 97888
+            },
+            {
+              "text": "ma",
+              "startTime": 97888,
+              "endTime": 98073
+            },
+            {
+              "text": "meilleure",
+              "startTime": 98073,
+              "endTime": 98460
+            },
+            {
+              "text": "ennemie,",
+              "startTime": 98460,
+              "endTime": 99209
+            },
+            {
+              "text": "c'est",
+              "startTime": 99209,
+              "endTime": 99483
+            },
+            {
+              "text": "toi",
+              "startTime": 99483,
+              "endTime": 100124
+            }
+          ]
+        },
+        "background": null,
+        "text": "Maismameilleureennemie,c'esttoi",
+        "startTime": 97738,
+        "endTime": 100124,
+        "words": [
+          {
+            "text": "Mais",
+            "startTime": 97738,
+            "endTime": 97888
+          },
+          {
+            "text": "ma",
+            "startTime": 97888,
+            "endTime": 98073
+          },
+          {
+            "text": "meilleure",
+            "startTime": 98073,
+            "endTime": 98460
+          },
+          {
+            "text": "ennemie,",
+            "startTime": 98460,
+            "endTime": 99209
+          },
+          {
+            "text": "c'est",
+            "startTime": 99209,
+            "endTime": 99483
+          },
+          {
+            "text": "toi",
+            "startTime": 99483,
+            "endTime": 100124
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": false,
+        "lead": {
+          "text": "Fuis-moi",
+          "startTime": 100618,
+          "endTime": 102187,
+          "words": [
+            {
+              "text": "Fuis-moi",
+              "startTime": 100618,
+              "endTime": 102187
+            }
+          ]
+        },
+        "background": null,
+        "text": "Fuis-moi",
+        "startTime": 100618,
+        "endTime": 102187,
+        "words": [
+          {
+            "text": "Fuis-moi",
+            "startTime": 100618,
+            "endTime": 102187
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": false,
+        "lead": {
+          "text": "Lepire,c'esttoietmoi",
+          "startTime": 102633,
+          "endTime": 104857,
+          "words": [
+            {
+              "text": "Le",
+              "startTime": 102633,
+              "endTime": 102880
+            },
+            {
+              "text": "pire,",
+              "startTime": 102880,
+              "endTime": 103345
+            },
+            {
+              "text": "c'est",
+              "startTime": 103345,
+              "endTime": 103547
+            },
+            {
+              "text": "toi",
+              "startTime": 103547,
+              "endTime": 104033
+            },
+            {
+              "text": "et",
+              "startTime": 104033,
+              "endTime": 104226
+            },
+            {
+              "text": "moi",
+              "startTime": 104226,
+              "endTime": 104857
+            }
+          ]
+        },
+        "background": null,
+        "text": "Lepire,c'esttoietmoi",
+        "startTime": 102633,
+        "endTime": 104857,
+        "words": [
+          {
+            "text": "Le",
+            "startTime": 102633,
+            "endTime": 102880
+          },
+          {
+            "text": "pire,",
+            "startTime": 102880,
+            "endTime": 103345
+          },
+          {
+            "text": "c'est",
+            "startTime": 103345,
+            "endTime": 103547
+          },
+          {
+            "text": "toi",
+            "startTime": 103547,
+            "endTime": 104033
+          },
+          {
+            "text": "et",
+            "startTime": 104033,
+            "endTime": 104226
+          },
+          {
+            "text": "moi",
+            "startTime": 104226,
+            "endTime": 104857
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": false,
+        "lead": {
+          "text": "Maismameilleureennemie,c'esttoi",
+          "startTime": 108674,
+          "endTime": 110976,
+          "words": [
+            {
+              "text": "Mais",
+              "startTime": 108674,
+              "endTime": 108878
+            },
+            {
+              "text": "ma",
+              "startTime": 108878,
+              "endTime": 109062
+            },
+            {
+              "text": "meilleure",
+              "startTime": 109062,
+              "endTime": 109419
+            },
+            {
+              "text": "ennemie,",
+              "startTime": 109419,
+              "endTime": 110111
+            },
+            {
+              "text": "c'est",
+              "startTime": 110111,
+              "endTime": 110373
+            },
+            {
+              "text": "toi",
+              "startTime": 110373,
+              "endTime": 110976
+            }
+          ]
+        },
+        "background": null,
+        "text": "Maismameilleureennemie,c'esttoi",
+        "startTime": 108674,
+        "endTime": 110976,
+        "words": [
+          {
+            "text": "Mais",
+            "startTime": 108674,
+            "endTime": 108878
+          },
+          {
+            "text": "ma",
+            "startTime": 108878,
+            "endTime": 109062
+          },
+          {
+            "text": "meilleure",
+            "startTime": 109062,
+            "endTime": 109419
+          },
+          {
+            "text": "ennemie,",
+            "startTime": 109419,
+            "endTime": 110111
+          },
+          {
+            "text": "c'est",
+            "startTime": 110111,
+            "endTime": 110373
+          },
+          {
+            "text": "toi",
+            "startTime": 110373,
+            "endTime": 110976
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": false,
+        "lead": {
+          "text": "Fuis-moi",
+          "startTime": 111599,
+          "endTime": 113046,
+          "words": [
+            {
+              "text": "Fuis-moi",
+              "startTime": 111599,
+              "endTime": 113046
+            }
+          ]
+        },
+        "background": null,
+        "text": "Fuis-moi",
+        "startTime": 111599,
+        "endTime": 113046,
+        "words": [
+          {
+            "text": "Fuis-moi",
+            "startTime": 111599,
+            "endTime": 113046
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": false,
+        "lead": {
+          "text": "Lepire,c'esttoietmoi",
+          "startTime": 113517,
+          "endTime": 115749,
+          "words": [
+            {
+              "text": "Le",
+              "startTime": 113517,
+              "endTime": 113728
+            },
+            {
+              "text": "pire,",
+              "startTime": 113728,
+              "endTime": 114227
+            },
+            {
+              "text": "c'est",
+              "startTime": 114227,
+              "endTime": 114437
+            },
+            {
+              "text": "toi",
+              "startTime": 114437,
+              "endTime": 114916
+            },
+            {
+              "text": "et",
+              "startTime": 114916,
+              "endTime": 115125
+            },
+            {
+              "text": "moi",
+              "startTime": 115125,
+              "endTime": 115749
+            }
+          ]
+        },
+        "background": null,
+        "text": "Lepire,c'esttoietmoi",
+        "startTime": 113517,
+        "endTime": 115749,
+        "words": [
+          {
+            "text": "Le",
+            "startTime": 113517,
+            "endTime": 113728
+          },
+          {
+            "text": "pire,",
+            "startTime": 113728,
+            "endTime": 114227
+          },
+          {
+            "text": "c'est",
+            "startTime": 114227,
+            "endTime": 114437
+          },
+          {
+            "text": "toi",
+            "startTime": 114437,
+            "endTime": 114916
+          },
+          {
+            "text": "et",
+            "startTime": 114916,
+            "endTime": 115125
+          },
+          {
+            "text": "moi",
+            "startTime": 115125,
+            "endTime": 115749
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Jet'aime,jetehais,jet'aime,jetehais",
+          "startTime": 120188,
+          "endTime": 122846,
+          "words": [
+            {
+              "text": "Je",
+              "startTime": 120188,
+              "endTime": 120488
+            },
+            {
+              "text": "t'aime,",
+              "startTime": 120488,
+              "endTime": 120897
+            },
+            {
+              "text": "je",
+              "startTime": 120897,
+              "endTime": 121119
+            },
+            {
+              "text": "te",
+              "startTime": 121119,
+              "endTime": 121350
+            },
+            {
+              "text": "hais,",
+              "startTime": 121350,
+              "endTime": 121566
+            },
+            {
+              "text": "je",
+              "startTime": 121566,
+              "endTime": 121740
+            },
+            {
+              "text": "t'aime,",
+              "startTime": 121740,
+              "endTime": 122220
+            },
+            {
+              "text": "je",
+              "startTime": 122220,
+              "endTime": 122394
+            },
+            {
+              "text": "te",
+              "startTime": 122394,
+              "endTime": 122612
+            },
+            {
+              "text": "hais",
+              "startTime": 122612,
+              "endTime": 122846
+            }
+          ]
+        },
+        "background": null,
+        "text": "Jet'aime,jetehais,jet'aime,jetehais",
+        "startTime": 120188,
+        "endTime": 122846,
+        "words": [
+          {
+            "text": "Je",
+            "startTime": 120188,
+            "endTime": 120488
+          },
+          {
+            "text": "t'aime,",
+            "startTime": 120488,
+            "endTime": 120897
+          },
+          {
+            "text": "je",
+            "startTime": 120897,
+            "endTime": 121119
+          },
+          {
+            "text": "te",
+            "startTime": 121119,
+            "endTime": 121350
+          },
+          {
+            "text": "hais,",
+            "startTime": 121350,
+            "endTime": 121566
+          },
+          {
+            "text": "je",
+            "startTime": 121566,
+            "endTime": 121740
+          },
+          {
+            "text": "t'aime,",
+            "startTime": 121740,
+            "endTime": 122220
+          },
+          {
+            "text": "je",
+            "startTime": 122220,
+            "endTime": 122394
+          },
+          {
+            "text": "te",
+            "startTime": 122394,
+            "endTime": 122612
+          },
+          {
+            "text": "hais",
+            "startTime": 122612,
+            "endTime": 122846
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Jet'aime,jetehais,jet'aime,jetehais",
+          "startTime": 122978,
+          "endTime": 125572,
+          "words": [
+            {
+              "text": "Je",
+              "startTime": 122978,
+              "endTime": 123334
+            },
+            {
+              "text": "t'aime,",
+              "startTime": 123334,
+              "endTime": 123679
+            },
+            {
+              "text": "je",
+              "startTime": 123679,
+              "endTime": 123899
+            },
+            {
+              "text": "te",
+              "startTime": 123899,
+              "endTime": 124118
+            },
+            {
+              "text": "hais,",
+              "startTime": 124118,
+              "endTime": 124320
+            },
+            {
+              "text": "je",
+              "startTime": 124320,
+              "endTime": 124545
+            },
+            {
+              "text": "t'aime,",
+              "startTime": 124545,
+              "endTime": 124950
+            },
+            {
+              "text": "je",
+              "startTime": 124950,
+              "endTime": 125188
+            },
+            {
+              "text": "te",
+              "startTime": 125188,
+              "endTime": 125331
+            },
+            {
+              "text": "hais",
+              "startTime": 125331,
+              "endTime": 125572
+            }
+          ]
+        },
+        "background": null,
+        "text": "Jet'aime,jetehais,jet'aime,jetehais",
+        "startTime": 122978,
+        "endTime": 125572,
+        "words": [
+          {
+            "text": "Je",
+            "startTime": 122978,
+            "endTime": 123334
+          },
+          {
+            "text": "t'aime,",
+            "startTime": 123334,
+            "endTime": 123679
+          },
+          {
+            "text": "je",
+            "startTime": 123679,
+            "endTime": 123899
+          },
+          {
+            "text": "te",
+            "startTime": 123899,
+            "endTime": 124118
+          },
+          {
+            "text": "hais,",
+            "startTime": 124118,
+            "endTime": 124320
+          },
+          {
+            "text": "je",
+            "startTime": 124320,
+            "endTime": 124545
+          },
+          {
+            "text": "t'aime,",
+            "startTime": 124545,
+            "endTime": 124950
+          },
+          {
+            "text": "je",
+            "startTime": 124950,
+            "endTime": 125188
+          },
+          {
+            "text": "te",
+            "startTime": 125188,
+            "endTime": 125331
+          },
+          {
+            "text": "hais",
+            "startTime": 125331,
+            "endTime": 125572
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Jet'aime,jetehais,jet'aime,jetehais",
+          "startTime": 125651,
+          "endTime": 128245,
+          "words": [
+            {
+              "text": "Je",
+              "startTime": 125651,
+              "endTime": 125969
+            },
+            {
+              "text": "t'aime,",
+              "startTime": 125969,
+              "endTime": 126407
+            },
+            {
+              "text": "je",
+              "startTime": 126407,
+              "endTime": 126572
+            },
+            {
+              "text": "te",
+              "startTime": 126572,
+              "endTime": 126742
+            },
+            {
+              "text": "hais,",
+              "startTime": 126742,
+              "endTime": 126993
+            },
+            {
+              "text": "je",
+              "startTime": 126993,
+              "endTime": 127218
+            },
+            {
+              "text": "t'aime,",
+              "startTime": 127218,
+              "endTime": 127678
+            },
+            {
+              "text": "je",
+              "startTime": 127678,
+              "endTime": 127861
+            },
+            {
+              "text": "te",
+              "startTime": 127861,
+              "endTime": 128024
+            },
+            {
+              "text": "hais",
+              "startTime": 128024,
+              "endTime": 128245
+            }
+          ]
+        },
+        "background": null,
+        "text": "Jet'aime,jetehais,jet'aime,jetehais",
+        "startTime": 125651,
+        "endTime": 128245,
+        "words": [
+          {
+            "text": "Je",
+            "startTime": 125651,
+            "endTime": 125969
+          },
+          {
+            "text": "t'aime,",
+            "startTime": 125969,
+            "endTime": 126407
+          },
+          {
+            "text": "je",
+            "startTime": 126407,
+            "endTime": 126572
+          },
+          {
+            "text": "te",
+            "startTime": 126572,
+            "endTime": 126742
+          },
+          {
+            "text": "hais,",
+            "startTime": 126742,
+            "endTime": 126993
+          },
+          {
+            "text": "je",
+            "startTime": 126993,
+            "endTime": 127218
+          },
+          {
+            "text": "t'aime,",
+            "startTime": 127218,
+            "endTime": 127678
+          },
+          {
+            "text": "je",
+            "startTime": 127678,
+            "endTime": 127861
+          },
+          {
+            "text": "te",
+            "startTime": 127861,
+            "endTime": 128024
+          },
+          {
+            "text": "hais",
+            "startTime": 128024,
+            "endTime": 128245
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Jet'aime,jetehais,jet'aime,jetehais",
+          "startTime": 128401,
+          "endTime": 130975,
+          "words": [
+            {
+              "text": "Je",
+              "startTime": 128401,
+              "endTime": 128757
+            },
+            {
+              "text": "t'aime,",
+              "startTime": 128757,
+              "endTime": 129102
+            },
+            {
+              "text": "je",
+              "startTime": 129102,
+              "endTime": 129322
+            },
+            {
+              "text": "te",
+              "startTime": 129322,
+              "endTime": 129541
+            },
+            {
+              "text": "hais,",
+              "startTime": 129541,
+              "endTime": 129743
+            },
+            {
+              "text": "je",
+              "startTime": 129743,
+              "endTime": 129968
+            },
+            {
+              "text": "t'aime,",
+              "startTime": 129968,
+              "endTime": 130373
+            },
+            {
+              "text": "je",
+              "startTime": 130373,
+              "endTime": 130611
+            },
+            {
+              "text": "te",
+              "startTime": 130611,
+              "endTime": 130754
+            },
+            {
+              "text": "hais",
+              "startTime": 130754,
+              "endTime": 130975
+            }
+          ]
+        },
+        "background": null,
+        "text": "Jet'aime,jetehais,jet'aime,jetehais",
+        "startTime": 128401,
+        "endTime": 130975,
+        "words": [
+          {
+            "text": "Je",
+            "startTime": 128401,
+            "endTime": 128757
+          },
+          {
+            "text": "t'aime,",
+            "startTime": 128757,
+            "endTime": 129102
+          },
+          {
+            "text": "je",
+            "startTime": 129102,
+            "endTime": 129322
+          },
+          {
+            "text": "te",
+            "startTime": 129322,
+            "endTime": 129541
+          },
+          {
+            "text": "hais,",
+            "startTime": 129541,
+            "endTime": 129743
+          },
+          {
+            "text": "je",
+            "startTime": 129743,
+            "endTime": 129968
+          },
+          {
+            "text": "t'aime,",
+            "startTime": 129968,
+            "endTime": 130373
+          },
+          {
+            "text": "je",
+            "startTime": 130373,
+            "endTime": 130611
+          },
+          {
+            "text": "te",
+            "startTime": 130611,
+            "endTime": 130754
+          },
+          {
+            "text": "hais",
+            "startTime": 130754,
+            "endTime": 130975
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Jet'aime,jetehais,jet'aime,jetehais",
+          "startTime": 131062,
+          "endTime": 133679,
+          "words": [
+            {
+              "text": "Je",
+              "startTime": 131062,
+              "endTime": 131412
+            },
+            {
+              "text": "t'aime,",
+              "startTime": 131412,
+              "endTime": 131887
+            },
+            {
+              "text": "je",
+              "startTime": 131887,
+              "endTime": 132051
+            },
+            {
+              "text": "te",
+              "startTime": 132051,
+              "endTime": 132231
+            },
+            {
+              "text": "hais,",
+              "startTime": 132231,
+              "endTime": 132427
+            },
+            {
+              "text": "je",
+              "startTime": 132427,
+              "endTime": 132629
+            },
+            {
+              "text": "t'aime,",
+              "startTime": 132629,
+              "endTime": 133132
+            },
+            {
+              "text": "je",
+              "startTime": 133132,
+              "endTime": 133292
+            },
+            {
+              "text": "te",
+              "startTime": 133292,
+              "endTime": 133464
+            },
+            {
+              "text": "hais",
+              "startTime": 133464,
+              "endTime": 133679
+            }
+          ]
+        },
+        "background": null,
+        "text": "Jet'aime,jetehais,jet'aime,jetehais",
+        "startTime": 131062,
+        "endTime": 133679,
+        "words": [
+          {
+            "text": "Je",
+            "startTime": 131062,
+            "endTime": 131412
+          },
+          {
+            "text": "t'aime,",
+            "startTime": 131412,
+            "endTime": 131887
+          },
+          {
+            "text": "je",
+            "startTime": 131887,
+            "endTime": 132051
+          },
+          {
+            "text": "te",
+            "startTime": 132051,
+            "endTime": 132231
+          },
+          {
+            "text": "hais,",
+            "startTime": 132231,
+            "endTime": 132427
+          },
+          {
+            "text": "je",
+            "startTime": 132427,
+            "endTime": 132629
+          },
+          {
+            "text": "t'aime,",
+            "startTime": 132629,
+            "endTime": 133132
+          },
+          {
+            "text": "je",
+            "startTime": 133132,
+            "endTime": 133292
+          },
+          {
+            "text": "te",
+            "startTime": 133292,
+            "endTime": 133464
+          },
+          {
+            "text": "hais",
+            "startTime": 133464,
+            "endTime": 133679
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Jet'aime,jetehais,jet'aime,jetehais",
+          "startTime": 133931,
+          "endTime": 136409,
+          "words": [
+            {
+              "text": "Je",
+              "startTime": 133931,
+              "endTime": 134287
+            },
+            {
+              "text": "t'aime,",
+              "startTime": 134287,
+              "endTime": 134632
+            },
+            {
+              "text": "je",
+              "startTime": 134632,
+              "endTime": 134832
+            },
+            {
+              "text": "te",
+              "startTime": 134832,
+              "endTime": 134984
+            },
+            {
+              "text": "hais,",
+              "startTime": 134984,
+              "endTime": 135195
+            },
+            {
+              "text": "je",
+              "startTime": 135195,
+              "endTime": 135359
+            },
+            {
+              "text": "t'aime,",
+              "startTime": 135359,
+              "endTime": 135886
+            },
+            {
+              "text": "je",
+              "startTime": 135886,
+              "endTime": 136022
+            },
+            {
+              "text": "te",
+              "startTime": 136022,
+              "endTime": 136194
+            },
+            {
+              "text": "hais",
+              "startTime": 136194,
+              "endTime": 136409
+            }
+          ]
+        },
+        "background": null,
+        "text": "Jet'aime,jetehais,jet'aime,jetehais",
+        "startTime": 133931,
+        "endTime": 136409,
+        "words": [
+          {
+            "text": "Je",
+            "startTime": 133931,
+            "endTime": 134287
+          },
+          {
+            "text": "t'aime,",
+            "startTime": 134287,
+            "endTime": 134632
+          },
+          {
+            "text": "je",
+            "startTime": 134632,
+            "endTime": 134832
+          },
+          {
+            "text": "te",
+            "startTime": 134832,
+            "endTime": 134984
+          },
+          {
+            "text": "hais,",
+            "startTime": 134984,
+            "endTime": 135195
+          },
+          {
+            "text": "je",
+            "startTime": 135195,
+            "endTime": 135359
+          },
+          {
+            "text": "t'aime,",
+            "startTime": 135359,
+            "endTime": 135886
+          },
+          {
+            "text": "je",
+            "startTime": 135886,
+            "endTime": 136022
+          },
+          {
+            "text": "te",
+            "startTime": 136022,
+            "endTime": 136194
+          },
+          {
+            "text": "hais",
+            "startTime": 136194,
+            "endTime": 136409
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Jet'aime,jetehais,jet'aime,jetehais",
+          "startTime": 136569,
+          "endTime": 139214,
+          "words": [
+            {
+              "text": "Je",
+              "startTime": 136569,
+              "endTime": 136832
+            },
+            {
+              "text": "t'aime,",
+              "startTime": 136832,
+              "endTime": 137277
+            },
+            {
+              "text": "je",
+              "startTime": 137277,
+              "endTime": 137483
+            },
+            {
+              "text": "te",
+              "startTime": 137483,
+              "endTime": 137654
+            },
+            {
+              "text": "hais,",
+              "startTime": 137654,
+              "endTime": 137956
+            },
+            {
+              "text": "je",
+              "startTime": 137956,
+              "endTime": 138154
+            },
+            {
+              "text": "t'aime,",
+              "startTime": 138154,
+              "endTime": 138535
+            },
+            {
+              "text": "je",
+              "startTime": 138535,
+              "endTime": 138759
+            },
+            {
+              "text": "te",
+              "startTime": 138759,
+              "endTime": 138938
+            },
+            {
+              "text": "hais",
+              "startTime": 138938,
+              "endTime": 139214
+            }
+          ]
+        },
+        "background": null,
+        "text": "Jet'aime,jetehais,jet'aime,jetehais",
+        "startTime": 136569,
+        "endTime": 139214,
+        "words": [
+          {
+            "text": "Je",
+            "startTime": 136569,
+            "endTime": 136832
+          },
+          {
+            "text": "t'aime,",
+            "startTime": 136832,
+            "endTime": 137277
+          },
+          {
+            "text": "je",
+            "startTime": 137277,
+            "endTime": 137483
+          },
+          {
+            "text": "te",
+            "startTime": 137483,
+            "endTime": 137654
+          },
+          {
+            "text": "hais,",
+            "startTime": 137654,
+            "endTime": 137956
+          },
+          {
+            "text": "je",
+            "startTime": 137956,
+            "endTime": 138154
+          },
+          {
+            "text": "t'aime,",
+            "startTime": 138154,
+            "endTime": 138535
+          },
+          {
+            "text": "je",
+            "startTime": 138535,
+            "endTime": 138759
+          },
+          {
+            "text": "te",
+            "startTime": 138759,
+            "endTime": 138938
+          },
+          {
+            "text": "hais",
+            "startTime": 138938,
+            "endTime": 139214
+          }
+        ]
+      },
+      {
+        "type": "Vocal",
+        "oppositeAligned": true,
+        "lead": {
+          "text": "Jet'aime,jetehais,jet'aime,jetehais",
+          "startTime": 139222,
+          "endTime": 141816,
+          "words": [
+            {
+              "text": "Je",
+              "startTime": 139222,
+              "endTime": 139578
+            },
+            {
+              "text": "t'aime,",
+              "startTime": 139578,
+              "endTime": 139969
+            },
+            {
+              "text": "je",
+              "startTime": 139969,
+              "endTime": 140189
+            },
+            {
+              "text": "te",
+              "startTime": 140189,
+              "endTime": 140382
+            },
+            {
+              "text": "hais,",
+              "startTime": 140382,
+              "endTime": 140604
+            },
+            {
+              "text": "je",
+              "startTime": 140604,
+              "endTime": 140869
+            },
+            {
+              "text": "t'aime,",
+              "startTime": 140869,
+              "endTime": 141301
+            },
+            {
+              "text": "je",
+              "startTime": 141301,
+              "endTime": 141432
+            },
+            {
+              "text": "te",
+              "startTime": 141432,
+              "endTime": 141630
+            },
+            {
+              "text": "hais",
+              "startTime": 141630,
+              "endTime": 141816
+            }
+          ]
+        },
+        "background": null,
+        "text": "Jet'aime,jetehais,jet'aime,jetehais",
+        "startTime": 139222,
+        "endTime": 141816,
+        "words": [
+          {
+            "text": "Je",
+            "startTime": 139222,
+            "endTime": 139578
+          },
+          {
+            "text": "t'aime,",
+            "startTime": 139578,
+            "endTime": 139969
+          },
+          {
+            "text": "je",
+            "startTime": 139969,
+            "endTime": 140189
+          },
+          {
+            "text": "te",
+            "startTime": 140189,
+            "endTime": 140382
+          },
+          {
+            "text": "hais,",
+            "startTime": 140382,
+            "endTime": 140604
+          },
+          {
+            "text": "je",
+            "startTime": 140604,
+            "endTime": 140869
+          },
+          {
+            "text": "t'aime,",
+            "startTime": 140869,
+            "endTime": 141301
+          },
+          {
+            "text": "je",
+            "startTime": 141301,
+            "endTime": 141432
+          },
+          {
+            "text": "te",
+            "startTime": 141432,
+            "endTime": 141630
+          },
+          {
+            "text": "hais",
+            "startTime": 141630,
+            "endTime": 141816
+          }
+        ]
+      }
+    ]
+  },
+  "rawLyrics": {
+    "Type": "Syllable",
+    "SongWriters": [
+      "Alexander Seaver",
+      "Claire Pommet",
+      "Luc Van Haver",
+      "Paul Van Haver"
+    ],
+    "StartTime": 0.163,
+    "Content": [
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Je",
+              "IsPartOfWord": false,
+              "StartTime": 0.163,
+              "EndTime": 0.506
+            },
+            {
+              "Text": "t'aime,",
+              "IsPartOfWord": false,
+              "StartTime": 0.506,
+              "EndTime": 0.97
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 0.97,
+              "EndTime": 1.119
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 1.119,
+              "EndTime": 1.292
+            },
+            {
+              "Text": "hais,",
+              "IsPartOfWord": false,
+              "StartTime": 1.292,
+              "EndTime": 1.574
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 1.574,
+              "EndTime": 1.765
+            },
+            {
+              "Text": "t'aime,",
+              "IsPartOfWord": false,
+              "StartTime": 1.765,
+              "EndTime": 2.235
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 2.235,
+              "EndTime": 2.435
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 2.435,
+              "EndTime": 2.623
+            },
+            {
+              "Text": "hais",
+              "IsPartOfWord": false,
+              "StartTime": 2.623,
+              "EndTime": 2.883
+            }
+          ],
+          "StartTime": 0.163,
+          "EndTime": 2.883
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Je",
+              "IsPartOfWord": false,
+              "StartTime": 2.883,
+              "EndTime": 3.16
+            },
+            {
+              "Text": "t'aime,",
+              "IsPartOfWord": false,
+              "StartTime": 3.16,
+              "EndTime": 3.706
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 3.706,
+              "EndTime": 3.902
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 3.902,
+              "EndTime": 4.045
+            },
+            {
+              "Text": "hais,",
+              "IsPartOfWord": false,
+              "StartTime": 4.045,
+              "EndTime": 4.361
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 4.361,
+              "EndTime": 4.528
+            },
+            {
+              "Text": "t'aime,",
+              "IsPartOfWord": false,
+              "StartTime": 4.528,
+              "EndTime": 4.961
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 4.961,
+              "EndTime": 5.122
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 5.122,
+              "EndTime": 5.282
+            },
+            {
+              "Text": "hais",
+              "IsPartOfWord": false,
+              "StartTime": 5.282,
+              "EndTime": 5.605
+            }
+          ],
+          "StartTime": 2.883,
+          "EndTime": 5.605
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Je",
+              "IsPartOfWord": false,
+              "StartTime": 5.64,
+              "EndTime": 5.874
+            },
+            {
+              "Text": "t'aime,",
+              "IsPartOfWord": false,
+              "StartTime": 5.874,
+              "EndTime": 6.445
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 6.445,
+              "EndTime": 6.695
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 6.695,
+              "EndTime": 6.861
+            },
+            {
+              "Text": "hais,",
+              "IsPartOfWord": false,
+              "StartTime": 6.861,
+              "EndTime": 7.06
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 7.06,
+              "EndTime": 7.25
+            },
+            {
+              "Text": "t'aime,",
+              "IsPartOfWord": false,
+              "StartTime": 7.25,
+              "EndTime": 7.721
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 7.721,
+              "EndTime": 7.876
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 7.876,
+              "EndTime": 8.076
+            },
+            {
+              "Text": "hais",
+              "IsPartOfWord": false,
+              "StartTime": 8.076,
+              "EndTime": 8.334
+            }
+          ],
+          "StartTime": 5.64,
+          "EndTime": 8.334
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Je",
+              "IsPartOfWord": false,
+              "StartTime": 8.403,
+              "EndTime": 8.676
+            },
+            {
+              "Text": "t'aime,",
+              "IsPartOfWord": false,
+              "StartTime": 8.676,
+              "EndTime": 9.174
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 9.174,
+              "EndTime": 9.306
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 9.306,
+              "EndTime": 9.488
+            },
+            {
+              "Text": "hais,",
+              "IsPartOfWord": false,
+              "StartTime": 9.488,
+              "EndTime": 9.7
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 9.808,
+              "EndTime": 9.975
+            },
+            {
+              "Text": "t'aime,",
+              "IsPartOfWord": false,
+              "StartTime": 9.975,
+              "EndTime": 10.408
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 10.408,
+              "EndTime": 10.632
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 10.632,
+              "EndTime": 10.732
+            },
+            {
+              "Text": "hais",
+              "IsPartOfWord": false,
+              "StartTime": 10.732,
+              "EndTime": 10.939
+            }
+          ],
+          "StartTime": 8.403,
+          "EndTime": 10.939
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": false,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "T'es",
+              "IsPartOfWord": false,
+              "StartTime": 10.723,
+              "EndTime": 10.986
+            },
+            {
+              "Text": "la",
+              "IsPartOfWord": false,
+              "StartTime": 10.986,
+              "EndTime": 11.183
+            },
+            {
+              "Text": "meilleure",
+              "IsPartOfWord": false,
+              "StartTime": 11.183,
+              "EndTime": 11.878
+            },
+            {
+              "Text": "chose",
+              "IsPartOfWord": false,
+              "StartTime": 11.878,
+              "EndTime": 12.248
+            },
+            {
+              "Text": "qui",
+              "IsPartOfWord": false,
+              "StartTime": 12.248,
+              "EndTime": 12.377
+            },
+            {
+              "Text": "m'est",
+              "IsPartOfWord": false,
+              "StartTime": 12.377,
+              "EndTime": 12.532
+            },
+            {
+              "Text": "arrivée",
+              "IsPartOfWord": false,
+              "StartTime": 12.532,
+              "EndTime": 13.093
+            }
+          ],
+          "StartTime": 10.723,
+          "EndTime": 13.093
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": false,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Mais",
+              "IsPartOfWord": false,
+              "StartTime": 13.408,
+              "EndTime": 13.759
+            },
+            {
+              "Text": "aussi",
+              "IsPartOfWord": false,
+              "StartTime": 13.759,
+              "EndTime": 14.141
+            },
+            {
+              "Text": "la",
+              "IsPartOfWord": false,
+              "StartTime": 14.141,
+              "EndTime": 14.36
+            },
+            {
+              "Text": "pire",
+              "IsPartOfWord": false,
+              "StartTime": 14.36,
+              "EndTime": 14.629
+            },
+            {
+              "Text": "chose",
+              "IsPartOfWord": false,
+              "StartTime": 14.629,
+              "EndTime": 14.975
+            },
+            {
+              "Text": "qui",
+              "IsPartOfWord": false,
+              "StartTime": 14.975,
+              "EndTime": 15.114
+            },
+            {
+              "Text": "m'est",
+              "IsPartOfWord": false,
+              "StartTime": 15.114,
+              "EndTime": 15.268
+            },
+            {
+              "Text": "arrivée",
+              "IsPartOfWord": false,
+              "StartTime": 15.268,
+              "EndTime": 15.8
+            }
+          ],
+          "StartTime": 13.408,
+          "EndTime": 15.8
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": false,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Ce",
+              "IsPartOfWord": false,
+              "StartTime": 16.123,
+              "EndTime": 16.25
+            },
+            {
+              "Text": "jour",
+              "IsPartOfWord": false,
+              "StartTime": 16.25,
+              "EndTime": 16.41
+            },
+            {
+              "Text": "où",
+              "IsPartOfWord": false,
+              "StartTime": 16.41,
+              "EndTime": 16.565
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 16.565,
+              "EndTime": 16.788
+            },
+            {
+              "Text": "t'ai",
+              "IsPartOfWord": false,
+              "StartTime": 16.788,
+              "EndTime": 17.055
+            },
+            {
+              "Text": "rencontrée,",
+              "IsPartOfWord": false,
+              "StartTime": 17.055,
+              "EndTime": 17.939
+            },
+            {
+              "Text": "j'aurais",
+              "IsPartOfWord": false,
+              "StartTime": 17.939,
+              "EndTime": 18.32
+            },
+            {
+              "Text": "peut-",
+              "IsPartOfWord": true,
+              "StartTime": 18.32,
+              "EndTime": 18.477
+            },
+            {
+              "Text": "être",
+              "IsPartOfWord": false,
+              "StartTime": 18.477,
+              "EndTime": 18.679
+            },
+            {
+              "Text": "préféré",
+              "IsPartOfWord": false,
+              "StartTime": 18.679,
+              "EndTime": 19.181
+            }
+          ],
+          "StartTime": 16.123,
+          "EndTime": 19.181
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": false,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Que",
+              "IsPartOfWord": false,
+              "StartTime": 19.371,
+              "EndTime": 19.471
+            },
+            {
+              "Text": "ce",
+              "IsPartOfWord": false,
+              "StartTime": 19.471,
+              "EndTime": 19.658
+            },
+            {
+              "Text": "jour",
+              "IsPartOfWord": false,
+              "StartTime": 19.658,
+              "EndTime": 20.007
+            },
+            {
+              "Text": "ne",
+              "IsPartOfWord": false,
+              "StartTime": 20.007,
+              "EndTime": 20.127
+            },
+            {
+              "Text": "soit",
+              "IsPartOfWord": false,
+              "StartTime": 20.127,
+              "EndTime": 20.379
+            },
+            {
+              "Text": "jamais",
+              "IsPartOfWord": false,
+              "StartTime": 20.379,
+              "EndTime": 20.744
+            },
+            {
+              "Text": "arrivé",
+              "IsPartOfWord": false,
+              "StartTime": 20.744,
+              "EndTime": 21.301
+            }
+          ],
+          "StartTime": 19.371,
+          "EndTime": 21.934
+        },
+        "Background": [
+          {
+            "Syllables": [
+              {
+                "Text": "Arrivé",
+                "IsPartOfWord": false,
+                "StartTime": 21.321,
+                "EndTime": 21.934
+              }
+            ],
+            "StartTime": 21.321,
+            "EndTime": 21.934
+          }
+        ]
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": false,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "La",
+              "IsPartOfWord": false,
+              "StartTime": 22.107,
+              "EndTime": 22.324
+            },
+            {
+              "Text": "pire",
+              "IsPartOfWord": false,
+              "StartTime": 22.324,
+              "EndTime": 22.68
+            },
+            {
+              "Text": "des",
+              "IsPartOfWord": false,
+              "StartTime": 22.68,
+              "EndTime": 22.865
+            },
+            {
+              "Text": "bénédictions",
+              "IsPartOfWord": false,
+              "StartTime": 22.865,
+              "EndTime": 23.68
+            }
+          ],
+          "StartTime": 22.107,
+          "EndTime": 23.68
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": false,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "La",
+              "IsPartOfWord": false,
+              "StartTime": 24.097,
+              "EndTime": 24.25
+            },
+            {
+              "Text": "plus",
+              "IsPartOfWord": false,
+              "StartTime": 24.25,
+              "EndTime": 24.421
+            },
+            {
+              "Text": "belle",
+              "IsPartOfWord": false,
+              "StartTime": 24.421,
+              "EndTime": 24.641
+            },
+            {
+              "Text": "des",
+              "IsPartOfWord": false,
+              "StartTime": 24.641,
+              "EndTime": 24.79
+            },
+            {
+              "Text": "malédictions",
+              "IsPartOfWord": false,
+              "StartTime": 24.79,
+              "EndTime": 25.671
+            }
+          ],
+          "StartTime": 24.097,
+          "EndTime": 25.671
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": false,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "De",
+              "IsPartOfWord": false,
+              "StartTime": 26.173,
+              "EndTime": 26.317
+            },
+            {
+              "Text": "toi,",
+              "IsPartOfWord": false,
+              "StartTime": 26.317,
+              "EndTime": 26.461
+            },
+            {
+              "Text": "j'devrais",
+              "IsPartOfWord": false,
+              "StartTime": 26.461,
+              "EndTime": 26.877
+            },
+            {
+              "Text": "m'éloigner",
+              "IsPartOfWord": false,
+              "StartTime": 26.877,
+              "EndTime": 27.483
+            }
+          ],
+          "StartTime": 26.173,
+          "EndTime": 27.483
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": false,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Mais",
+              "IsPartOfWord": false,
+              "StartTime": 27.705,
+              "EndTime": 27.934
+            },
+            {
+              "Text": "comme",
+              "IsPartOfWord": false,
+              "StartTime": 27.934,
+              "EndTime": 28.211
+            },
+            {
+              "Text": "dit",
+              "IsPartOfWord": false,
+              "StartTime": 28.211,
+              "EndTime": 28.402
+            },
+            {
+              "Text": "le",
+              "IsPartOfWord": false,
+              "StartTime": 28.402,
+              "EndTime": 28.592
+            },
+            {
+              "Text": "dicton",
+              "IsPartOfWord": false,
+              "StartTime": 28.592,
+              "EndTime": 29.135
+            }
+          ],
+          "StartTime": 27.705,
+          "EndTime": 29.135
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": false,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Plutôt",
+              "IsPartOfWord": false,
+              "StartTime": 29.509,
+              "EndTime": 29.939
+            },
+            {
+              "Text": "qu'être",
+              "IsPartOfWord": false,
+              "StartTime": 29.939,
+              "EndTime": 30.207
+            },
+            {
+              "Text": "seul,",
+              "IsPartOfWord": false,
+              "StartTime": 30.207,
+              "EndTime": 30.504
+            },
+            {
+              "Text": "mieux",
+              "IsPartOfWord": false,
+              "StartTime": 30.504,
+              "EndTime": 30.858
+            },
+            {
+              "Text": "vaut",
+              "IsPartOfWord": false,
+              "StartTime": 30.858,
+              "EndTime": 31.036
+            },
+            {
+              "Text": "être",
+              "IsPartOfWord": false,
+              "StartTime": 31.036,
+              "EndTime": 31.341
+            },
+            {
+              "Text": "mal",
+              "IsPartOfWord": false,
+              "StartTime": 31.341,
+              "EndTime": 31.525
+            },
+            {
+              "Text": "accompagné",
+              "IsPartOfWord": false,
+              "StartTime": 31.525,
+              "EndTime": 32.16
+            }
+          ],
+          "StartTime": 29.509,
+          "EndTime": 32.16
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": false,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Tu",
+              "IsPartOfWord": false,
+              "StartTime": 32.442,
+              "EndTime": 32.622
+            },
+            {
+              "Text": "sais",
+              "IsPartOfWord": false,
+              "StartTime": 32.622,
+              "EndTime": 32.866
+            },
+            {
+              "Text": "c'qu'on",
+              "IsPartOfWord": false,
+              "StartTime": 32.866,
+              "EndTime": 33.283
+            },
+            {
+              "Text": "dit",
+              "IsPartOfWord": false,
+              "StartTime": 33.283,
+              "EndTime": 35.31
+            }
+          ],
+          "StartTime": 32.442,
+          "EndTime": 35.31
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": false,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Sois",
+              "IsPartOfWord": false,
+              "StartTime": 36.188,
+              "EndTime": 36.436
+            },
+            {
+              "Text": "près",
+              "IsPartOfWord": false,
+              "StartTime": 36.436,
+              "EndTime": 36.563
+            },
+            {
+              "Text": "d'tes",
+              "IsPartOfWord": false,
+              "StartTime": 36.563,
+              "EndTime": 36.761
+            },
+            {
+              "Text": "amis",
+              "IsPartOfWord": false,
+              "StartTime": 36.761,
+              "EndTime": 37.097
+            },
+            {
+              "Text": "les",
+              "IsPartOfWord": false,
+              "StartTime": 37.097,
+              "EndTime": 37.262
+            },
+            {
+              "Text": "plus",
+              "IsPartOfWord": false,
+              "StartTime": 37.262,
+              "EndTime": 37.43
+            },
+            {
+              "Text": "chers",
+              "IsPartOfWord": false,
+              "StartTime": 37.43,
+              "EndTime": 37.823
+            }
+          ],
+          "StartTime": 36.188,
+          "EndTime": 37.823
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": false,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Mais",
+              "IsPartOfWord": false,
+              "StartTime": 38.036,
+              "EndTime": 38.354
+            },
+            {
+              "Text": "auss",
+              "IsPartOfWord": true,
+              "StartTime": 38.354,
+              "EndTime": 38.791
+            },
+            {
+              "Text": "i",
+              "IsPartOfWord": false,
+              "StartTime": 38.791,
+              "EndTime": 40.716
+            }
+          ],
+          "StartTime": 38.036,
+          "EndTime": 40.716
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Encore",
+              "IsPartOfWord": false,
+              "StartTime": 41.059,
+              "EndTime": 41.681
+            },
+            {
+              "Text": "plus",
+              "IsPartOfWord": false,
+              "StartTime": 41.681,
+              "EndTime": 41.876
+            },
+            {
+              "Text": "près",
+              "IsPartOfWord": false,
+              "StartTime": 41.876,
+              "EndTime": 42.019
+            },
+            {
+              "Text": "d'tes",
+              "IsPartOfWord": false,
+              "StartTime": 42.019,
+              "EndTime": 42.192
+            },
+            {
+              "Text": "adversaires",
+              "IsPartOfWord": false,
+              "StartTime": 42.192,
+              "EndTime": 43.472
+            }
+          ],
+          "StartTime": 41.059,
+          "EndTime": 43.472
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": false,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Mais",
+              "IsPartOfWord": false,
+              "StartTime": 43.207,
+              "EndTime": 43.399
+            },
+            {
+              "Text": "ma",
+              "IsPartOfWord": false,
+              "StartTime": 43.399,
+              "EndTime": 43.578
+            },
+            {
+              "Text": "meilleure",
+              "IsPartOfWord": false,
+              "StartTime": 43.578,
+              "EndTime": 43.924
+            },
+            {
+              "Text": "ennemie,",
+              "IsPartOfWord": false,
+              "StartTime": 43.924,
+              "EndTime": 44.634
+            },
+            {
+              "Text": "c'est",
+              "IsPartOfWord": false,
+              "StartTime": 44.634,
+              "EndTime": 44.927
+            },
+            {
+              "Text": "toi",
+              "IsPartOfWord": false,
+              "StartTime": 44.927,
+              "EndTime": 45.571
+            }
+          ],
+          "StartTime": 43.207,
+          "EndTime": 45.571
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": false,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Fuis-",
+              "IsPartOfWord": true,
+              "StartTime": 46.144,
+              "EndTime": 46.89
+            },
+            {
+              "Text": "moi",
+              "IsPartOfWord": false,
+              "StartTime": 46.89,
+              "EndTime": 47.631
+            }
+          ],
+          "StartTime": 46.144,
+          "EndTime": 47.631
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": false,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Le",
+              "IsPartOfWord": false,
+              "StartTime": 48.05,
+              "EndTime": 48.303
+            },
+            {
+              "Text": "pire,",
+              "IsPartOfWord": false,
+              "StartTime": 48.303,
+              "EndTime": 48.679
+            },
+            {
+              "Text": "c'est",
+              "IsPartOfWord": false,
+              "StartTime": 48.679,
+              "EndTime": 48.977
+            },
+            {
+              "Text": "toi",
+              "IsPartOfWord": false,
+              "StartTime": 48.977,
+              "EndTime": 49.46
+            },
+            {
+              "Text": "et",
+              "IsPartOfWord": false,
+              "StartTime": 49.46,
+              "EndTime": 49.683
+            },
+            {
+              "Text": "moi",
+              "IsPartOfWord": false,
+              "StartTime": 49.683,
+              "EndTime": 50.361
+            }
+          ],
+          "StartTime": 48.05,
+          "EndTime": 50.361
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Mais",
+              "IsPartOfWord": false,
+              "StartTime": 54.074,
+              "EndTime": 54.322
+            },
+            {
+              "Text": "si",
+              "IsPartOfWord": false,
+              "StartTime": 54.322,
+              "EndTime": 54.494
+            },
+            {
+              "Text": "tu",
+              "IsPartOfWord": false,
+              "StartTime": 54.494,
+              "EndTime": 54.666
+            },
+            {
+              "Text": "cherches",
+              "IsPartOfWord": false,
+              "StartTime": 54.666,
+              "EndTime": 54.927
+            },
+            {
+              "Text": "encore",
+              "IsPartOfWord": false,
+              "StartTime": 54.927,
+              "EndTime": 55.709
+            },
+            {
+              "Text": "ma",
+              "IsPartOfWord": false,
+              "StartTime": 55.709,
+              "EndTime": 55.89
+            },
+            {
+              "Text": "voix",
+              "IsPartOfWord": false,
+              "StartTime": 55.89,
+              "EndTime": 56.58
+            }
+          ],
+          "StartTime": 54.074,
+          "EndTime": 56.58
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Oublie-",
+              "IsPartOfWord": true,
+              "StartTime": 57.127,
+              "EndTime": 57.822
+            },
+            {
+              "Text": "moi",
+              "IsPartOfWord": false,
+              "StartTime": 57.822,
+              "EndTime": 58.571
+            }
+          ],
+          "StartTime": 57.127,
+          "EndTime": 58.571
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Le",
+              "IsPartOfWord": false,
+              "StartTime": 59.024,
+              "EndTime": 59.292
+            },
+            {
+              "Text": "pire,",
+              "IsPartOfWord": false,
+              "StartTime": 59.292,
+              "EndTime": 59.688
+            },
+            {
+              "Text": "c'est",
+              "IsPartOfWord": false,
+              "StartTime": 59.688,
+              "EndTime": 59.927
+            },
+            {
+              "Text": "toi",
+              "IsPartOfWord": false,
+              "StartTime": 59.927,
+              "EndTime": 60.448
+            },
+            {
+              "Text": "et",
+              "IsPartOfWord": false,
+              "StartTime": 60.448,
+              "EndTime": 60.663
+            },
+            {
+              "Text": "moi",
+              "IsPartOfWord": false,
+              "StartTime": 60.663,
+              "EndTime": 61.482
+            }
+          ],
+          "StartTime": 59.024,
+          "EndTime": 61.482
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Pourquoi",
+              "IsPartOfWord": false,
+              "StartTime": 65.969,
+              "EndTime": 66.708
+            },
+            {
+              "Text": "ton",
+              "IsPartOfWord": false,
+              "StartTime": 66.708,
+              "EndTime": 67.14
+            },
+            {
+              "Text": "prénom",
+              "IsPartOfWord": false,
+              "StartTime": 67.14,
+              "EndTime": 67.92
+            },
+            {
+              "Text": "me",
+              "IsPartOfWord": false,
+              "StartTime": 68.059,
+              "EndTime": 68.404
+            },
+            {
+              "Text": "blesse",
+              "IsPartOfWord": false,
+              "StartTime": 68.404,
+              "EndTime": 69.151
+            }
+          ],
+          "StartTime": 65.969,
+          "EndTime": 69.151
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Quand",
+              "IsPartOfWord": false,
+              "StartTime": 70.592,
+              "EndTime": 70.878
+            },
+            {
+              "Text": "il",
+              "IsPartOfWord": false,
+              "StartTime": 70.878,
+              "EndTime": 71.298
+            },
+            {
+              "Text": "se",
+              "IsPartOfWord": false,
+              "StartTime": 71.298,
+              "EndTime": 71.636
+            },
+            {
+              "Text": "cache",
+              "IsPartOfWord": false,
+              "StartTime": 71.636,
+              "EndTime": 72.358
+            }
+          ],
+          "StartTime": 70.592,
+          "EndTime": 72.358
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Jus",
+              "IsPartOfWord": true,
+              "StartTime": 72.722,
+              "EndTime": 73.55199999999999
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 73.55199999999999,
+              "EndTime": 74.129
+            },
+            {
+              "Text": "là",
+              "IsPartOfWord": false,
+              "StartTime": 74.129,
+              "EndTime": 74.68299999999999
+            },
+            {
+              "Text": "dans",
+              "IsPartOfWord": false,
+              "StartTime": 74.899,
+              "EndTime": 75.574
+            },
+            {
+              "Text": "l'es",
+              "IsPartOfWord": true,
+              "StartTime": 75.574,
+              "EndTime": 76.197
+            },
+            {
+              "Text": "pace",
+              "IsPartOfWord": false,
+              "StartTime": 76.197,
+              "EndTime": 76.747
+            }
+          ],
+          "StartTime": 72.722,
+          "EndTime": 76.747
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "C'est",
+              "IsPartOfWord": false,
+              "StartTime": 76.923,
+              "EndTime": 77.471
+            },
+            {
+              "Text": "quelle",
+              "IsPartOfWord": false,
+              "StartTime": 77.471,
+              "EndTime": 77.738
+            },
+            {
+              "Text": "émotion",
+              "IsPartOfWord": false,
+              "StartTime": 77.738,
+              "EndTime": 78.587
+            },
+            {
+              "Text": "la",
+              "IsPartOfWord": false,
+              "StartTime": 78.878,
+              "EndTime": 79.249
+            },
+            {
+              "Text": "haine",
+              "IsPartOfWord": false,
+              "StartTime": 79.249,
+              "EndTime": 80.054
+            }
+          ],
+          "StartTime": 76.923,
+          "EndTime": 80.054
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Ou",
+              "IsPartOfWord": false,
+              "StartTime": 81.469,
+              "EndTime": 81.685
+            },
+            {
+              "Text": "la",
+              "IsPartOfWord": false,
+              "StartTime": 81.685,
+              "EndTime": 82.019
+            },
+            {
+              "Text": "dou",
+              "IsPartOfWord": true,
+              "StartTime": 82.019,
+              "EndTime": 82.311
+            },
+            {
+              "Text": "ceur",
+              "IsPartOfWord": false,
+              "StartTime": 82.311,
+              "EndTime": 83.154
+            }
+          ],
+          "StartTime": 81.469,
+          "EndTime": 83.154
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Quand",
+              "IsPartOfWord": false,
+              "StartTime": 83.723,
+              "EndTime": 84.441
+            },
+            {
+              "Text": "j'en",
+              "IsPartOfWord": true,
+              "StartTime": 84.441,
+              "EndTime": 85.117
+            },
+            {
+              "Text": "tends",
+              "IsPartOfWord": false,
+              "StartTime": 85.117,
+              "EndTime": 85.792
+            },
+            {
+              "Text": "ton",
+              "IsPartOfWord": false,
+              "StartTime": 85.792,
+              "EndTime": 86.402
+            },
+            {
+              "Text": "pré",
+              "IsPartOfWord": true,
+              "StartTime": 86.402,
+              "EndTime": 87.167
+            },
+            {
+              "Text": "nom",
+              "IsPartOfWord": false,
+              "StartTime": 87.167,
+              "EndTime": 87.44200000000001
+            }
+          ],
+          "StartTime": 83.723,
+          "EndTime": 87.44200000000001
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Je",
+              "IsPartOfWord": false,
+              "StartTime": 87.78399999999999,
+              "EndTime": 88.083
+            },
+            {
+              "Text": "t'avais",
+              "IsPartOfWord": false,
+              "StartTime": 88.083,
+              "EndTime": 88.827
+            },
+            {
+              "Text": "dit",
+              "IsPartOfWord": false,
+              "StartTime": 88.827,
+              "EndTime": 89.483
+            }
+          ],
+          "StartTime": 87.78399999999999,
+          "EndTime": 89.483
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Ne",
+              "IsPartOfWord": false,
+              "StartTime": 89.662,
+              "EndTime": 89.86
+            },
+            {
+              "Text": "regarde",
+              "IsPartOfWord": false,
+              "StartTime": 89.86,
+              "EndTime": 90.486
+            },
+            {
+              "Text": "pas",
+              "IsPartOfWord": false,
+              "StartTime": 90.486,
+              "EndTime": 90.90299999999999
+            },
+            {
+              "Text": "en",
+              "IsPartOfWord": false,
+              "StartTime": 90.90299999999999,
+              "EndTime": 91.244
+            },
+            {
+              "Text": "arrière",
+              "IsPartOfWord": false,
+              "StartTime": 91.244,
+              "EndTime": 92.166
+            }
+          ],
+          "StartTime": 89.662,
+          "EndTime": 92.166
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Le",
+              "IsPartOfWord": false,
+              "StartTime": 92.587,
+              "EndTime": 92.833
+            },
+            {
+              "Text": "passé",
+              "IsPartOfWord": false,
+              "StartTime": 92.833,
+              "EndTime": 93.571
+            },
+            {
+              "Text": "qui",
+              "IsPartOfWord": false,
+              "StartTime": 93.571,
+              "EndTime": 93.98599999999999
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 93.98599999999999,
+              "EndTime": 94.188
+            },
+            {
+              "Text": "suit",
+              "IsPartOfWord": false,
+              "StartTime": 94.188,
+              "EndTime": 95.19800000000001
+            }
+          ],
+          "StartTime": 92.587,
+          "EndTime": 95.19800000000001
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Te",
+              "IsPartOfWord": false,
+              "StartTime": 95.893,
+              "EndTime": 96.363
+            },
+            {
+              "Text": "fait",
+              "IsPartOfWord": false,
+              "StartTime": 96.363,
+              "EndTime": 96.673
+            },
+            {
+              "Text": "la",
+              "IsPartOfWord": false,
+              "StartTime": 96.673,
+              "EndTime": 97.288
+            },
+            {
+              "Text": "guerre",
+              "IsPartOfWord": false,
+              "StartTime": 97.288,
+              "EndTime": 97.738
+            }
+          ],
+          "StartTime": 95.893,
+          "EndTime": 97.738
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": false,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Mais",
+              "IsPartOfWord": false,
+              "StartTime": 97.738,
+              "EndTime": 97.888
+            },
+            {
+              "Text": "ma",
+              "IsPartOfWord": false,
+              "StartTime": 97.888,
+              "EndTime": 98.07300000000001
+            },
+            {
+              "Text": "meilleure",
+              "IsPartOfWord": false,
+              "StartTime": 98.07300000000001,
+              "EndTime": 98.46000000000001
+            },
+            {
+              "Text": "ennemie,",
+              "IsPartOfWord": false,
+              "StartTime": 98.46000000000001,
+              "EndTime": 99.209
+            },
+            {
+              "Text": "c'est",
+              "IsPartOfWord": false,
+              "StartTime": 99.209,
+              "EndTime": 99.483
+            },
+            {
+              "Text": "toi",
+              "IsPartOfWord": false,
+              "StartTime": 99.483,
+              "EndTime": 100.124
+            }
+          ],
+          "StartTime": 97.738,
+          "EndTime": 100.124
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": false,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Fuis-",
+              "IsPartOfWord": true,
+              "StartTime": 100.618,
+              "EndTime": 101.399
+            },
+            {
+              "Text": "moi",
+              "IsPartOfWord": false,
+              "StartTime": 101.399,
+              "EndTime": 102.187
+            }
+          ],
+          "StartTime": 100.618,
+          "EndTime": 102.187
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": false,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Le",
+              "IsPartOfWord": false,
+              "StartTime": 102.63300000000001,
+              "EndTime": 102.88
+            },
+            {
+              "Text": "pire,",
+              "IsPartOfWord": false,
+              "StartTime": 102.88,
+              "EndTime": 103.345
+            },
+            {
+              "Text": "c'est",
+              "IsPartOfWord": false,
+              "StartTime": 103.345,
+              "EndTime": 103.547
+            },
+            {
+              "Text": "toi",
+              "IsPartOfWord": false,
+              "StartTime": 103.547,
+              "EndTime": 104.033
+            },
+            {
+              "Text": "et",
+              "IsPartOfWord": false,
+              "StartTime": 104.033,
+              "EndTime": 104.226
+            },
+            {
+              "Text": "moi",
+              "IsPartOfWord": false,
+              "StartTime": 104.226,
+              "EndTime": 104.857
+            }
+          ],
+          "StartTime": 102.63300000000001,
+          "EndTime": 104.857
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": false,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Mais",
+              "IsPartOfWord": false,
+              "StartTime": 108.674,
+              "EndTime": 108.878
+            },
+            {
+              "Text": "ma",
+              "IsPartOfWord": false,
+              "StartTime": 108.878,
+              "EndTime": 109.062
+            },
+            {
+              "Text": "meilleure",
+              "IsPartOfWord": false,
+              "StartTime": 109.062,
+              "EndTime": 109.419
+            },
+            {
+              "Text": "ennemie,",
+              "IsPartOfWord": false,
+              "StartTime": 109.419,
+              "EndTime": 110.11099999999999
+            },
+            {
+              "Text": "c'est",
+              "IsPartOfWord": false,
+              "StartTime": 110.11099999999999,
+              "EndTime": 110.37299999999999
+            },
+            {
+              "Text": "toi",
+              "IsPartOfWord": false,
+              "StartTime": 110.37299999999999,
+              "EndTime": 110.976
+            }
+          ],
+          "StartTime": 108.674,
+          "EndTime": 110.976
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": false,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Fuis-",
+              "IsPartOfWord": true,
+              "StartTime": 111.59899999999999,
+              "EndTime": 112.311
+            },
+            {
+              "Text": "moi",
+              "IsPartOfWord": false,
+              "StartTime": 112.311,
+              "EndTime": 113.04599999999999
+            }
+          ],
+          "StartTime": 111.59899999999999,
+          "EndTime": 113.04599999999999
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": false,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Le",
+              "IsPartOfWord": false,
+              "StartTime": 113.517,
+              "EndTime": 113.72800000000001
+            },
+            {
+              "Text": "pire,",
+              "IsPartOfWord": false,
+              "StartTime": 113.72800000000001,
+              "EndTime": 114.227
+            },
+            {
+              "Text": "c'est",
+              "IsPartOfWord": false,
+              "StartTime": 114.227,
+              "EndTime": 114.437
+            },
+            {
+              "Text": "toi",
+              "IsPartOfWord": false,
+              "StartTime": 114.437,
+              "EndTime": 114.916
+            },
+            {
+              "Text": "et",
+              "IsPartOfWord": false,
+              "StartTime": 114.916,
+              "EndTime": 115.125
+            },
+            {
+              "Text": "moi",
+              "IsPartOfWord": false,
+              "StartTime": 115.125,
+              "EndTime": 115.749
+            }
+          ],
+          "StartTime": 113.517,
+          "EndTime": 115.749
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Je",
+              "IsPartOfWord": false,
+              "StartTime": 120.188,
+              "EndTime": 120.488
+            },
+            {
+              "Text": "t'aime,",
+              "IsPartOfWord": false,
+              "StartTime": 120.488,
+              "EndTime": 120.897
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 120.897,
+              "EndTime": 121.119
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 121.119,
+              "EndTime": 121.35
+            },
+            {
+              "Text": "hais,",
+              "IsPartOfWord": false,
+              "StartTime": 121.35,
+              "EndTime": 121.566
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 121.566,
+              "EndTime": 121.74
+            },
+            {
+              "Text": "t'aime,",
+              "IsPartOfWord": false,
+              "StartTime": 121.74,
+              "EndTime": 122.22
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 122.22,
+              "EndTime": 122.394
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 122.394,
+              "EndTime": 122.612
+            },
+            {
+              "Text": "hais",
+              "IsPartOfWord": false,
+              "StartTime": 122.612,
+              "EndTime": 122.846
+            }
+          ],
+          "StartTime": 120.188,
+          "EndTime": 122.846
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Je",
+              "IsPartOfWord": false,
+              "StartTime": 122.978,
+              "EndTime": 123.334
+            },
+            {
+              "Text": "t'aime,",
+              "IsPartOfWord": false,
+              "StartTime": 123.334,
+              "EndTime": 123.679
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 123.679,
+              "EndTime": 123.899
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 123.899,
+              "EndTime": 124.118
+            },
+            {
+              "Text": "hais,",
+              "IsPartOfWord": false,
+              "StartTime": 124.118,
+              "EndTime": 124.32
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 124.32,
+              "EndTime": 124.545
+            },
+            {
+              "Text": "t'aime,",
+              "IsPartOfWord": false,
+              "StartTime": 124.545,
+              "EndTime": 124.95
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 124.95,
+              "EndTime": 125.188
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 125.188,
+              "EndTime": 125.331
+            },
+            {
+              "Text": "hais",
+              "IsPartOfWord": false,
+              "StartTime": 125.331,
+              "EndTime": 125.572
+            }
+          ],
+          "StartTime": 122.978,
+          "EndTime": 125.572
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Je",
+              "IsPartOfWord": false,
+              "StartTime": 125.651,
+              "EndTime": 125.969
+            },
+            {
+              "Text": "t'aime,",
+              "IsPartOfWord": false,
+              "StartTime": 125.969,
+              "EndTime": 126.407
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 126.407,
+              "EndTime": 126.572
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 126.572,
+              "EndTime": 126.742
+            },
+            {
+              "Text": "hais,",
+              "IsPartOfWord": false,
+              "StartTime": 126.742,
+              "EndTime": 126.993
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 126.993,
+              "EndTime": 127.218
+            },
+            {
+              "Text": "t'aime,",
+              "IsPartOfWord": false,
+              "StartTime": 127.218,
+              "EndTime": 127.678
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 127.678,
+              "EndTime": 127.861
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 127.861,
+              "EndTime": 128.024
+            },
+            {
+              "Text": "hais",
+              "IsPartOfWord": false,
+              "StartTime": 128.024,
+              "EndTime": 128.245
+            }
+          ],
+          "StartTime": 125.651,
+          "EndTime": 128.245
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Je",
+              "IsPartOfWord": false,
+              "StartTime": 128.401,
+              "EndTime": 128.757
+            },
+            {
+              "Text": "t'aime,",
+              "IsPartOfWord": false,
+              "StartTime": 128.757,
+              "EndTime": 129.102
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 129.102,
+              "EndTime": 129.322
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 129.322,
+              "EndTime": 129.541
+            },
+            {
+              "Text": "hais,",
+              "IsPartOfWord": false,
+              "StartTime": 129.541,
+              "EndTime": 129.743
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 129.743,
+              "EndTime": 129.968
+            },
+            {
+              "Text": "t'aime,",
+              "IsPartOfWord": false,
+              "StartTime": 129.968,
+              "EndTime": 130.373
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 130.373,
+              "EndTime": 130.611
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 130.611,
+              "EndTime": 130.754
+            },
+            {
+              "Text": "hais",
+              "IsPartOfWord": false,
+              "StartTime": 130.754,
+              "EndTime": 130.975
+            }
+          ],
+          "StartTime": 128.401,
+          "EndTime": 130.975
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Je",
+              "IsPartOfWord": false,
+              "StartTime": 131.062,
+              "EndTime": 131.412
+            },
+            {
+              "Text": "t'aime,",
+              "IsPartOfWord": false,
+              "StartTime": 131.412,
+              "EndTime": 131.887
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 131.887,
+              "EndTime": 132.051
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 132.051,
+              "EndTime": 132.231
+            },
+            {
+              "Text": "hais,",
+              "IsPartOfWord": false,
+              "StartTime": 132.231,
+              "EndTime": 132.427
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 132.427,
+              "EndTime": 132.629
+            },
+            {
+              "Text": "t'aime,",
+              "IsPartOfWord": false,
+              "StartTime": 132.629,
+              "EndTime": 133.132
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 133.132,
+              "EndTime": 133.292
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 133.292,
+              "EndTime": 133.464
+            },
+            {
+              "Text": "hais",
+              "IsPartOfWord": false,
+              "StartTime": 133.464,
+              "EndTime": 133.679
+            }
+          ],
+          "StartTime": 131.062,
+          "EndTime": 133.679
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Je",
+              "IsPartOfWord": false,
+              "StartTime": 133.931,
+              "EndTime": 134.287
+            },
+            {
+              "Text": "t'aime,",
+              "IsPartOfWord": false,
+              "StartTime": 134.287,
+              "EndTime": 134.632
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 134.632,
+              "EndTime": 134.832
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 134.832,
+              "EndTime": 134.984
+            },
+            {
+              "Text": "hais,",
+              "IsPartOfWord": false,
+              "StartTime": 134.984,
+              "EndTime": 135.195
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 135.195,
+              "EndTime": 135.359
+            },
+            {
+              "Text": "t'aime,",
+              "IsPartOfWord": false,
+              "StartTime": 135.359,
+              "EndTime": 135.886
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 135.886,
+              "EndTime": 136.022
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 136.022,
+              "EndTime": 136.194
+            },
+            {
+              "Text": "hais",
+              "IsPartOfWord": false,
+              "StartTime": 136.194,
+              "EndTime": 136.409
+            }
+          ],
+          "StartTime": 133.931,
+          "EndTime": 136.409
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Je",
+              "IsPartOfWord": false,
+              "StartTime": 136.569,
+              "EndTime": 136.832
+            },
+            {
+              "Text": "t'aime,",
+              "IsPartOfWord": false,
+              "StartTime": 136.832,
+              "EndTime": 137.277
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 137.277,
+              "EndTime": 137.483
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 137.483,
+              "EndTime": 137.654
+            },
+            {
+              "Text": "hais,",
+              "IsPartOfWord": false,
+              "StartTime": 137.654,
+              "EndTime": 137.956
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 137.956,
+              "EndTime": 138.154
+            },
+            {
+              "Text": "t'aime,",
+              "IsPartOfWord": false,
+              "StartTime": 138.154,
+              "EndTime": 138.535
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 138.535,
+              "EndTime": 138.75900000000001
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 138.75900000000001,
+              "EndTime": 138.938
+            },
+            {
+              "Text": "hais",
+              "IsPartOfWord": false,
+              "StartTime": 138.938,
+              "EndTime": 139.214
+            }
+          ],
+          "StartTime": 136.569,
+          "EndTime": 139.214
+        }
+      },
+      {
+        "Type": "Vocal",
+        "OppositeAligned": true,
+        "Lead": {
+          "Syllables": [
+            {
+              "Text": "Je",
+              "IsPartOfWord": false,
+              "StartTime": 139.222,
+              "EndTime": 139.578
+            },
+            {
+              "Text": "t'aime,",
+              "IsPartOfWord": false,
+              "StartTime": 139.578,
+              "EndTime": 139.969
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 139.969,
+              "EndTime": 140.189
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 140.189,
+              "EndTime": 140.382
+            },
+            {
+              "Text": "hais,",
+              "IsPartOfWord": false,
+              "StartTime": 140.382,
+              "EndTime": 140.60399999999998
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 140.60399999999998,
+              "EndTime": 140.869
+            },
+            {
+              "Text": "t'aime,",
+              "IsPartOfWord": false,
+              "StartTime": 140.869,
+              "EndTime": 141.301
+            },
+            {
+              "Text": "je",
+              "IsPartOfWord": false,
+              "StartTime": 141.301,
+              "EndTime": 141.432
+            },
+            {
+              "Text": "te",
+              "IsPartOfWord": false,
+              "StartTime": 141.432,
+              "EndTime": 141.63
+            },
+            {
+              "Text": "hais",
+              "IsPartOfWord": false,
+              "StartTime": 141.63,
+              "EndTime": 141.816
+            }
+          ],
+          "StartTime": 139.222,
+          "EndTime": 141.816
+        }
+      }
+    ],
+    "EndTime": 141.816,
+    "id": "4lriIG2vNqwDWzOj2I9rtj",
+    "source": "aml"
+  }
+}
