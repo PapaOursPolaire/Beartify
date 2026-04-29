@@ -16,7 +16,6 @@ grizzly-stream.duckdns.org {
         reverse_proxy 127.0.0.1:8096
     }
 
-    # Optionnel : logs
     log {
         output file /var/log/caddy/access.log
     }
@@ -27,9 +26,34 @@ beartify.duckdns.org {
     file_server
     encode gzip
 
-    # Headers de sécurité (optionnels)
     header {
         X-Content-Type-Options "nosniff"
         X-Frame-Options "SAMEORIGIN"
+    }
+
+    # ── Proxy Jellyfin (clé injectée côté serveur, jamais exposée au navigateur) ──
+    handle /api/jellyfin/* {
+        uri strip_prefix /api/jellyfin
+        reverse_proxy 127.0.0.1:8096 {
+            header_up X-Emby-Token "REMPLACER_PAR_NOUVELLE_CLE_JELLYFIN"
+            header_up Host grizzly-stream.duckdns.org
+        }
+    }
+
+    # ── Proxy Last.fm (clé injectée côté serveur) ────────────────────────────────
+    handle /api/lastfm/* {
+        uri strip_prefix /api/lastfm
+        rewrite * {path}?{query}&api_key=REMPLACER_PAR_NOUVELLE_CLE_LASTFM&format=json
+        reverse_proxy https://ws.audioscrobbler.com {
+            header_up Host ws.audioscrobbler.com
+        }
+    }
+
+    # ── Proxy GrizzLyrics ────────────────────────────────────────────────────────
+    handle /api/lyrics/* {
+        uri strip_prefix /api/lyrics
+        reverse_proxy 127.0.0.1:80 {
+            header_up Host grizzlyrics.duckdns.org
+        }
     }
 }
