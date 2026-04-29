@@ -1,0 +1,35 @@
+grizzlyrics.duckdns.org {
+    root * /var/www/nextcloud
+    php_fastcgi unix//run/php/php8.4-fpm.sock
+    file_server
+}
+
+grizzly-stream.duckdns.org {
+
+    # WoL script sur /wol
+    handle_path /wol* {
+        reverse_proxy 127.0.0.1:8080
+    }
+
+    # Jellyfin sur la racine
+    handle_path /* {
+        reverse_proxy 127.0.0.1:8096
+    }
+
+    # Optionnel : logs
+    log {
+        output file /var/log/caddy/access.log
+    }
+}
+
+beartify.duckdns.org {
+    root * /var/www/html/player
+    file_server
+    encode gzip
+
+    # Headers de sécurité (optionnels)
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+    }
+}
