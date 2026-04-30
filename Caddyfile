@@ -166,6 +166,14 @@ beartify.duckdns.org {
 
     encode zstd gzip
 
+    # CORS — nécessaire car le frontend (192.168.0.2:3000) est sur une origine différente
+    header Access-Control-Allow-Origin  "*"
+    header Access-Control-Allow-Methods "GET, POST, OPTIONS"
+    header Access-Control-Allow-Headers "Content-Type, Authorization"
+
+    @options method OPTIONS
+    respond @options 204
+
     handle /api/jellyfin/* {
         uri strip_prefix /api/jellyfin
         reverse_proxy 127.0.0.1:8096 {
@@ -192,7 +200,8 @@ beartify.duckdns.org {
 
     handle /api/lyrics/* {
         uri strip_prefix /api/lyrics
-        reverse_proxy 127.0.0.1:80 {
+
+        reverse_proxy https://grizzlyrics.duckdns.org {
             header_up  Host              grizzlyrics.duckdns.org
             header_up  X-Real-IP         {remote_host}
             header_up  X-Forwarded-For   {remote_host}
