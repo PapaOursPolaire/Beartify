@@ -155,8 +155,6 @@ beartify.duckdns.org {
 
 # ──────────────────────────────────────────────────────────────────────
 #  4. DEV LOCAL — :8888 (LAN uniquement, pas de TLS)
-#  Accès : http://192.168.1.X:8888  (depuis n'importe quelle machine du LAN)
-#  Sers tes fichiers locaux et pointe les /api/* vers ce bloc.
 # ──────────────────────────────────────────────────────────────────────
 :8888 {
 
@@ -166,7 +164,8 @@ beartify.duckdns.org {
 
     encode zstd gzip
 
-    # CORS — nécessaire car le frontend (192.168.0.2:3000) est sur une origine différente
+    # CORS — Caddy pose le header une seule fois.
+    # Chaque reverse_proxy supprime le header upstream pour éviter la duplication.
     header Access-Control-Allow-Origin  "*"
     header Access-Control-Allow-Methods "GET, POST, OPTIONS"
     header Access-Control-Allow-Headers "Content-Type, Authorization"
@@ -177,14 +176,15 @@ beartify.duckdns.org {
     handle /api/jellyfin/* {
         uri strip_prefix /api/jellyfin
         reverse_proxy 127.0.0.1:8096 {
-            header_up  X-Emby-Token      "aaa8a7df4b364cf7bcc76f351d768798"
-            header_up  Host              grizzly-stream.duckdns.org
-            header_up  X-Real-IP         {remote_host}
-            header_up  X-Forwarded-For   {remote_host}
-            header_up  X-Forwarded-Proto {scheme}
-            header_up  Connection        {http.request.header.Connection}
-            header_up  Upgrade           {http.request.header.Upgrade}
+            header_up   X-Emby-Token      "aaa8a7df4b364cf7bcc76f351d768798"
+            header_up   Host              grizzly-stream.duckdns.org
+            header_up   X-Real-IP         {remote_host}
+            header_up   X-Forwarded-For   {remote_host}
+            header_up   X-Forwarded-Proto {scheme}
+            header_up   Connection        {http.request.header.Connection}
+            header_up   Upgrade           {http.request.header.Upgrade}
             header_down -X-Emby-Token
+            header_down -Access-Control-Allow-Origin
         }
     }
 
@@ -192,24 +192,23 @@ beartify.duckdns.org {
         uri strip_prefix /api/lastfm
         rewrite * {path}?{query}&api_key=b25b959554ed76058ac220b7b2e0a026&format=json
         reverse_proxy https://ws.audioscrobbler.com {
-            header_up  Host              ws.audioscrobbler.com
-            header_up  X-Real-IP         {remote_host}
+            header_up   Host              ws.audioscrobbler.com
+            header_up   X-Real-IP         {remote_host}
             header_down -X-Api-Key
+            header_down -Access-Control-Allow-Origin
         }
     }
 
     handle /api/lyrics/* {
         uri strip_prefix /api/lyrics
-
         reverse_proxy https://grizzlyrics.duckdns.org {
-            header_up  Host              grizzlyrics.duckdns.org
-            header_up  X-Real-IP         {remote_host}
-            header_up  X-Forwarded-For   {remote_host}
+            header_up   Host              grizzlyrics.duckdns.org
+            header_up   X-Real-IP         {remote_host}
+            header_up   X-Forwarded-For   {remote_host}
+            header_down -Access-Control-Allow-Origin
         }
     }
 
-    # Fichiers statiques servis depuis le même dossier que la prod
-    # Tu peux changer ce chemin si tu travailles depuis un dossier différent
     root * /var/www/html/player
 
     @notFile {
