@@ -140,6 +140,20 @@ beartify.duckdns.org {
 
             # Supprimer la clé de la réponse (ne jamais la renvoyer au client)
             header_down -X-Emby-Token
+
+            # ── Intercepter les redirections Jellyfin (302/301) ─────────────
+            # Jellyfin peut rediriger le stream vers son propre domaine externe
+            # en incluant l'api_key dans l'URL (?api_key=xxx). On réécrit le
+            # Location header pour que le navigateur repasse par /api/jellyfin/*
+            # sans jamais voir la clé ni le domaine Jellyfin directement.
+            header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
+            header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
+            header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
+
+            # Supprimer l'api_key des query strings résiduels (3 formes)
+            header_down Location `\?api_key=[^&]*&` `?`
+            header_down Location `\?api_key=[^&]*$` ``
+            header_down Location `&api_key=[^&]*`   ``
         }
     }
 
