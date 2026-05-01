@@ -185,19 +185,22 @@ beartify.duckdns.org {
     }
 
     # ── PROXY GRIZZLYRICS ─────────────────────────────────────────────
+    # On se connecte directement en HTTPS (port 443) pour court-circuiter
+    # la redirection HTTP→HTTPS automatique de Nextcloud. Le transport TLS
+    # indique à Caddy de vérifier le certificat avec le nom de domaine correct
+    # même si la connexion passe par l'IP locale (127.0.0.1).
     handle /api/lyrics/* {
         uri strip_prefix /api/lyrics
 
-        reverse_proxy 127.0.0.1:80 {
+        reverse_proxy 127.0.0.1:443 {
             header_up  Host              grizzlyrics.duckdns.org
             header_up  X-Real-IP         {remote_host}
             header_up  X-Forwarded-For   {remote_host}
 
-            # Nextcloud (port 80) redirige HTTP → HTTPS vers son domaine public.
-            # On réécrit le Location pour que le navigateur reste dans /api/lyrics/*
-            # et ne contacte jamais grizzlyrics.duckdns.org directement.
-            header_down Location "https://grizzlyrics.duckdns.org" "/api/lyrics"
-            header_down Location "http://grizzlyrics.duckdns.org"  "/api/lyrics"
+            transport http {
+                tls
+                tls_server_name grizzlyrics.duckdns.org
+            }
         }
     }
 
@@ -281,16 +284,15 @@ http://192.168.0.18 {
     handle /api/lyrics/* {
         uri strip_prefix /api/lyrics
 
-        reverse_proxy 127.0.0.1:80 {
+        reverse_proxy 127.0.0.1:443 {
             header_up  Host              grizzlyrics.duckdns.org
             header_up  X-Real-IP         {remote_host}
             header_up  X-Forwarded-For   {remote_host}
 
-            # Nextcloud (port 80) redirige HTTP → HTTPS vers son domaine public.
-            # On réécrit le Location pour que le navigateur reste dans /api/lyrics/*
-            # et ne contacte jamais grizzlyrics.duckdns.org directement.
-            header_down Location "https://grizzlyrics.duckdns.org" "/api/lyrics"
-            header_down Location "http://grizzlyrics.duckdns.org"  "/api/lyrics"
+            transport http {
+                tls
+                tls_server_name grizzlyrics.duckdns.org
+            }
         }
     }
 
