@@ -192,6 +192,12 @@ beartify.duckdns.org {
             header_up  Host              grizzlyrics.duckdns.org
             header_up  X-Real-IP         {remote_host}
             header_up  X-Forwarded-For   {remote_host}
+
+            # Nextcloud (port 80) redirige HTTP → HTTPS vers son domaine public.
+            # On réécrit le Location pour que le navigateur reste dans /api/lyrics/*
+            # et ne contacte jamais grizzlyrics.duckdns.org directement.
+            header_down Location "https://grizzlyrics.duckdns.org" "/api/lyrics"
+            header_down Location "http://grizzlyrics.duckdns.org"  "/api/lyrics"
         }
     }
 
@@ -279,6 +285,12 @@ http://192.168.0.18 {
             header_up  Host              grizzlyrics.duckdns.org
             header_up  X-Real-IP         {remote_host}
             header_up  X-Forwarded-For   {remote_host}
+
+            # Nextcloud (port 80) redirige HTTP → HTTPS vers son domaine public.
+            # On réécrit le Location pour que le navigateur reste dans /api/lyrics/*
+            # et ne contacte jamais grizzlyrics.duckdns.org directement.
+            header_down Location "https://grizzlyrics.duckdns.org" "/api/lyrics"
+            header_down Location "http://grizzlyrics.duckdns.org"  "/api/lyrics"
         }
     }
 
