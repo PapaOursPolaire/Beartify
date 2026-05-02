@@ -185,10 +185,12 @@ beartify.duckdns.org {
     }
 
     # ── PROXY GRIZZLYRICS ─────────────────────────────────────────────
-    # On se connecte directement en HTTPS (port 443) pour court-circuiter
-    # la redirection HTTP→HTTPS automatique de Nextcloud. Le transport TLS
-    # indique à Caddy de vérifier le certificat avec le nom de domaine correct
-    # même si la connexion passe par l'IP locale (127.0.0.1).
+    # CAUSE DE LA FUITE : sans X-Forwarded-Proto https, Nextcloud/PHP
+    # voit la requête comme HTTP et émet un redirect 301 vers le vrai
+    # domaine — que le navigateur suit au niveau réseau avant tout
+    # intercepteur JS.
+    # Fix 1 : header_up X-Forwarded-Proto https → PHP ne redirige plus.
+    # Fix 2 : header_down Location (4 variantes) → filet de sécurité.
     handle /api/lyrics/* {
         uri strip_prefix /api/lyrics
 
@@ -196,6 +198,12 @@ beartify.duckdns.org {
             header_up  Host              grizzlyrics.duckdns.org
             header_up  X-Real-IP         {remote_host}
             header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto https
+
+            header_down Location "https://grizzlyrics.duckdns.org:443" "/api/lyrics"
+            header_down Location "https://grizzlyrics.duckdns.org"     "/api/lyrics"
+            header_down Location "http://grizzlyrics.duckdns.org:443"  "/api/lyrics"
+            header_down Location "http://grizzlyrics.duckdns.org"      "/api/lyrics"
 
             transport http {
                 tls
@@ -288,6 +296,12 @@ http://192.168.0.18 {
             header_up  Host              grizzlyrics.duckdns.org
             header_up  X-Real-IP         {remote_host}
             header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto https
+
+            header_down Location "https://grizzlyrics.duckdns.org:443" "/api/lyrics"
+            header_down Location "https://grizzlyrics.duckdns.org"     "/api/lyrics"
+            header_down Location "http://grizzlyrics.duckdns.org:443"  "/api/lyrics"
+            header_down Location "http://grizzlyrics.duckdns.org"      "/api/lyrics"
 
             transport http {
                 tls
