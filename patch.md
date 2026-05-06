@@ -9,11 +9,23 @@ https://www.gstatic.com;
 
 style-src
 'self'
-'unsafe-inline';
+'unsafe-inline'
+https://fonts.googleapis.com;
+
+font-src
+'self'
+https://fonts.gstatic.com
+data:;
 
 img-src
 'self'
 data:
+blob:
+https:;
+
+media-src
+'self'
+blob:
 https:;
 
 connect-src
@@ -22,10 +34,6 @@ https://discord.com
 https://lrclib.net
 https://firestore.googleapis.com
 https://identitytoolkit.googleapis.com
+https://securetoken.googleapis.com
 wss://grizzly-stream.duckdns.org;
-
-font-src
-'self'
-https:
-data:;
 ">
