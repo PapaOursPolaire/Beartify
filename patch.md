@@ -229,7 +229,7 @@ beartify.duckdns.org {
 # ──────────────────────────────────────────────────────────────────────
 grizzlyfin.duckdns.org {
 
-    root * /var/www/html/bearflix
+    root * /var/www/bearflix/main/
     encode zstd gzip
 
     header {
