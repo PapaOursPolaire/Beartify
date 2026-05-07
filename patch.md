@@ -360,7 +360,7 @@ http://192.168.0.18 {
 }
 
 # ──────────────────────────────────────────────────────────────────────
-#  5. BEARTIFY — accès LAN (http://192.168.0.2)
+#  6. BEARTIFY — accès LAN (http://192.168.0.2)
 #  Même règles proxy que le bloc HTTPS externe, sans TLS.
 #  Permet d'accéder au player depuis le réseau local sans exposer les clés.
 # ──────────────────────────────────────────────────────────────────────
@@ -451,7 +451,7 @@ http://192.168.0.2 {
     file_server
 
     log {
-        output file /var/log/caddy/beartify-lan-access.log
+        output file /var/log/caddy/beartify-node-server.log
         format json
     }
 }
