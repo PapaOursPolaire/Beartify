@@ -225,11 +225,146 @@ beartify.duckdns.org {
 }
 
 # ──────────────────────────────────────────────────────────────────────
-#  4. BEARTIFY — accès LAN (http://192.168.0.18)
+#  4. GRIZZLYFIN — grizzlyfin.duckdns.org (site Bearflix)
+# ──────────────────────────────────────────────────────────────────────
+grizzlyfin.duckdns.org {
+
+    root * /var/www/html/bearflix
+    encode zstd gzip
+
+    header {
+        Strict-Transport-Security "max-age=15768000; includeSubDomains; preload"
+        X-Content-Type-Options    "nosniff"
+        X-Frame-Options           "SAMEORIGIN"
+        Referrer-Policy           "strict-origin-when-cross-origin"
+        Permissions-Policy        "geolocation=(), microphone=(), camera=()"
+        -Server
+    }
+
+    # Cache statique pour les assets
+    @static {
+        path *.js *.css *.woff2 *.woff *.ttf *.png *.jpg *.jpeg *.gif *.svg *.ico *.webp *.mp4 *.webm
+    }
+    header @static Cache-Control "public, max-age=31536000, immutable"
+
+    # Fallback SPA (si application React/Vue)
+    @notFile {
+        not path *.js *.css *.png *.jpg *.jpeg *.gif *.svg *.ico *.webp *.woff* *.ttf *.mp4 *.webm
+        not path /api/*
+    }
+    rewrite @notFile /index.html
+
+    file_server
+
+    log {
+        output file /var/log/caddy/grizzlyfin-access.log
+        format json
+    }
+}
+
+# ──────────────────────────────────────────────────────────────────────
+#  5. BEARTIFY — accès LAN (http://192.168.0.18)
 #  Même règles proxy que le bloc HTTPS externe, sans TLS.
 #  Permet d'accéder au player depuis le réseau local sans exposer les clés.
 # ──────────────────────────────────────────────────────────────────────
 http://192.168.0.18 {
+
+    root * /var/www/html/player
+    encode zstd gzip
+
+    header {
+        X-Content-Type-Options    "nosniff"
+        X-Frame-Options           "SAMEORIGIN"
+        Referrer-Policy           "strict-origin-when-cross-origin"
+        -Server
+    }
+
+    @static {
+        path *.js *.css *.woff2 *.woff *.ttf *.png *.jpg *.svg *.ico *.webp
+    }
+    header @static Cache-Control "public, max-age=31536000, immutable"
+
+    # ── PROXY JELLYFIN (identique bloc prod) ─────────────────────────
+    handle /api/jellyfin/* {
+        uri strip_prefix /api/jellyfin
+
+        reverse_proxy 127.0.0.1:8096 {
+            flush_interval -1
+
+            header_up  X-Emby-Token      "aaa8a7df4b364cf7bcc76f351d768798"
+            header_up  Host              grizzly-stream.duckdns.org
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto {scheme}
+            header_up  Connection        {http.request.header.Connection}
+            header_up  Upgrade           {http.request.header.Upgrade}
+
+            header_down -X-Emby-Token
+            header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
+            header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
+            header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
+            header_down Location `\?api_key=[^&]*&` `?`
+            header_down Location `\?api_key=[^&]*$` ``
+            header_down Location `&api_key=[^&]*`   ``
+        }
+    }
+
+    # ── PROXY LAST.FM ─────────────────────────────────────────────────
+    handle /api/lastfm/* {
+        uri strip_prefix /api/lastfm
+        rewrite * {path}?{query}&api_key=b25b959554ed76058ac220b7b2e0a026&format=json
+
+        reverse_proxy https://ws.audioscrobbler.com {
+            header_up  Host              ws.audioscrobbler.com
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_down -X-Api-Key
+        }
+    }
+
+    # ── PROXY GRIZZLYRICS ─────────────────────────────────────────────
+    handle /api/lyrics/* {
+        uri strip_prefix /api/lyrics
+
+        reverse_proxy 127.0.0.1:443 {
+            header_up  Host              grizzlyrics.duckdns.org
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto https
+
+            header_down Location "https://grizzlyrics.duckdns.org:443" "/api/lyrics"
+            header_down Location "https://grizzlyrics.duckdns.org"     "/api/lyrics"
+            header_down Location "http://grizzlyrics.duckdns.org:443"  "/api/lyrics"
+            header_down Location "http://grizzlyrics.duckdns.org"      "/api/lyrics"
+
+            transport http {
+                tls
+                tls_server_name grizzlyrics.duckdns.org
+            }
+        }
+    }
+
+    # ── SPA fallback ──────────────────────────────────────────────────
+    @notFile {
+        not path *.js *.css *.png *.jpg *.svg *.ico *.woff* *.ttf *.webp *.json
+        not path /api/*
+    }
+    rewrite @notFile /index.html
+
+    file_server
+
+    log {
+        output file /var/log/caddy/beartify-lan-access.log
+        format json
+    }
+}
+
+# ──────────────────────────────────────────────────────────────────────
+#  5. BEARTIFY — accès LAN (http://192.168.0.2)
+#  Même règles proxy que le bloc HTTPS externe, sans TLS.
+#  Permet d'accéder au player depuis le réseau local sans exposer les clés.
+# ──────────────────────────────────────────────────────────────────────
+http://192.168.0.2 {
 
     root * /var/www/html/player
     encode zstd gzip
