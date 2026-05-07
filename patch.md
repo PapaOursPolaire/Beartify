@@ -225,45 +225,7 @@ beartify.duckdns.org {
 }
 
 # ──────────────────────────────────────────────────────────────────────
-#  4. GRIZZLYFIN — grizzlyfin.duckdns.org (site Bearflix)
-# ──────────────────────────────────────────────────────────────────────
-grizzlyfin.duckdns.org {
-
-    root * /var/www/html/bearflix
-    encode zstd gzip
-
-    header {
-        Strict-Transport-Security "max-age=15768000; includeSubDomains; preload"
-        X-Content-Type-Options    "nosniff"
-        X-Frame-Options           "SAMEORIGIN"
-        Referrer-Policy           "strict-origin-when-cross-origin"
-        Permissions-Policy        "geolocation=(), microphone=(), camera=()"
-        -Server
-    }
-
-    # Cache statique pour les assets
-    @static {
-        path *.js *.css *.woff2 *.woff *.ttf *.png *.jpg *.jpeg *.gif *.svg *.ico *.webp *.mp4 *.webm
-    }
-    header @static Cache-Control "public, max-age=31536000, immutable"
-
-    # Fallback SPA (si application React/Vue)
-    @notFile {
-        not path *.js *.css *.png *.jpg *.jpeg *.gif *.svg *.ico *.webp *.woff* *.ttf *.mp4 *.webm
-        not path /api/*
-    }
-    rewrite @notFile /index.html
-
-    file_server
-
-    log {
-        output file /var/log/caddy/grizzlyfin-access.log
-        format json
-    }
-}
-
-# ──────────────────────────────────────────────────────────────────────
-#  5. BEARTIFY — accès LAN (http://192.168.0.18)
+#  4. BEARTIFY — accès LAN (http://192.168.0.18)
 #  Même règles proxy que le bloc HTTPS externe, sans TLS.
 #  Permet d'accéder au player depuis le réseau local sans exposer les clés.
 # ──────────────────────────────────────────────────────────────────────
