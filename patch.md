@@ -107,12 +107,8 @@ beartify.duckdns.org {
         Referrer-Policy           "strict-origin-when-cross-origin"
         Permissions-Policy        "geolocation=(), microphone=(), camera=(), payment=()"
 
-        # CSP : ressources autorisées
-        # - 'self'              : fichiers statiques du player
-        # - grizzly-stream      : images Jellyfin (pochettes)
-        # - fonts.googleapis    : polices UI
-        # - ws:// wss://        : WebSocket Jellyfin
-        connect-src 'self' https://discord.com https://lrclib.net https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://apis.google.com https://accounts.google.com https://www.gstatic.com wss://grizzly-stream.duckdns.org https://grizzly-stream.duckdns.org;
+        # Politique CSP complète (corrigée)
+        Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://discord.com https://lrclib.net https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://apis.google.com https://accounts.google.com https://www.gstatic.com wss://grizzly-stream.duckdns.org https://grizzly-stream.duckdns.org; frame-ancestors 'none';"
 
         -Server
     }
