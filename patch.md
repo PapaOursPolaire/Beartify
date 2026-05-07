@@ -247,13 +247,6 @@ grizzlyfin.duckdns.org {
     }
     header @static Cache-Control "public, max-age=31536000, immutable"
 
-    # Fallback SPA (si application React/Vue)
-    @notFile {
-        not path *.js *.css *.png *.jpg *.jpeg *.gif *.svg *.ico *.webp *.woff* *.ttf *.mp4 *.webm
-        not path /api/*
-    }
-    rewrite @notFile /index.html
-
     file_server
 
     log {
