@@ -1,0 +1,9 @@
+window._IS_TAURI = window._IS_TAURI ?? !!(
+    window.__TAURI__ ||
+    window.__TAURI_INTERNALS__
+);
+
+window._IS_ANDROID = window._IS_ANDROID ?? (
+    window._IS_TAURI &&
+    /Android/i.test(navigator.userAgent)
+);
