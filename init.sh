@@ -51,7 +51,7 @@ sudo apt install -y \
     clang \
     cmake \
     ninja-build \
-    openjdk-17-jdk \
+    default-jdk \
     adb \
     npm \
     nodejs
