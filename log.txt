@@ -1,18 +1,113 @@
-papaours@papaours:~/Tauri$ mkdir -p "$HOME/.android/sdk"
-papaours@papaours:~/Tauri$ ./build-linux.sh --skip-deps
+papaours@papaours:~/Tauri$ ./build-linux.sh
   [INFO]  Projet  : /home/papaours/Tauri
   [INFO]  Web     : /home/papaours/Tauri/src
   [INFO]  Tauri   : /home/papaours/Tauri/src-tauri
+Ce script necessite sudo pour les paquets systeme.
 
 ================================================================
-  Verification de l environnement
+  ETAPE 1/8 - Paquets systeme Debian
 ================================================================
-  [OK]    rustc
-  [OK]    cargo
-  [OK]    node >=18
-  [OK]    npm
-  [OK]    tauri v2
-  [OK]    java >=17
-  [OK]    ANDROID_HOME
-  [ERR]   sdkmanager MANQUANT
+Lecture des listes de paquets... Fait
+Construction de l'arbre des dépendances... Fait
+Lecture des informations d'état... Fait      
+build-essential est déjà la version la plus récente (12.12).
+curl est déjà la version la plus récente (8.14.1-2+deb13u3).
+wget est déjà la version la plus récente (1.25.0-2).
+git est déjà la version la plus récente (1:2.47.3-0+deb13u1).
+file est déjà la version la plus récente (1:5.46-5).
+unzip est déjà la version la plus récente (6.0-29).
+zip est déjà la version la plus récente (3.0-15).
+xz-utils est déjà la version la plus récente (5.8.1-1).
+ca-certificates est déjà la version la plus récente (20250419).
+gnupg est déjà la version la plus récente (2.4.7-21+deb13u1).
+lsb-release est déjà la version la plus récente (12.1-1).
+pkg-config est déjà la version la plus récente (1.8.1-4).
+libssl-dev est déjà la version la plus récente (3.5.6-1~deb13u1).
+Les paquets suivants ont été installés automatiquement et ne sont plus nécessaires :
+  linux-image-6.12.74+deb13+1-amd64 linux-image-6.12.85+deb13-amd64
+Veuillez utiliser « sudo apt autoremove » pour les supprimer.
+0 mis à jour, 0 nouvellement installés, 0 à enlever et 0 non mis à jour.
+  [INFO]  Debian 13 (trixie)
+Lecture des listes de paquets... Fait
+Construction de l'arbre des dépendances... Fait
+Lecture des informations d'état... Fait      
+libwebkit2gtk-4.1-dev est déjà la version la plus récente (2.52.3-2~deb13u1).
+libjavascriptcoregtk-4.1-dev est déjà la version la plus récente (2.52.3-2~deb13u1).
+libsoup-3.0-dev est déjà la version la plus récente (3.6.5-3).
+Les paquets suivants ont été installés automatiquement et ne sont plus nécessaires :
+  linux-image-6.12.74+deb13+1-amd64 linux-image-6.12.85+deb13-amd64
+Veuillez utiliser « sudo apt autoremove » pour les supprimer.
+0 mis à jour, 0 nouvellement installés, 0 à enlever et 0 non mis à jour.
+Lecture des listes de paquets... Fait
+Construction de l'arbre des dépendances... Fait
+Lecture des informations d'état... Fait      
+Note : sélection de « libfuse2t64 » au lieu de « libfuse2 »
+libgtk-3-dev est déjà la version la plus récente (3.24.49-3).
+librsvg2-dev est déjà la version la plus récente (2.60.0+dfsg-1).
+patchelf est déjà la version la plus récente (0.18.0-1.4).
+libxdo-dev est déjà la version la plus récente (1:3.20160805.1-5.1).
+libglib2.0-dev est déjà la version la plus récente (2.84.4-3~deb13u3).
+libcairo2-dev est déjà la version la plus récente (1.18.4-1+b1).
+libpango1.0-dev est déjà la version la plus récente (1.56.3-1).
+libgdk-pixbuf-2.0-dev est déjà la version la plus récente (2.42.12+dfsg-4+deb13u1).
+libatk1.0-dev est déjà la version la plus récente (2.56.2-1+deb13u1).
+squashfs-tools est déjà la version la plus récente (1:4.6.1-1).
+fuse est déjà la version la plus récente (3.17.2-3).
+libfuse2t64 est déjà la version la plus récente (2.9.9-9).
+Les paquets suivants ont été installés automatiquement et ne sont plus nécessaires :
+  linux-image-6.12.74+deb13+1-amd64 linux-image-6.12.85+deb13-amd64
+Veuillez utiliser « sudo apt autoremove » pour les supprimer.
+0 mis à jour, 0 nouvellement installés, 0 à enlever et 0 non mis à jour.
+Lecture des listes de paquets... Fait
+Construction de l'arbre des dépendances... Fait
+Lecture des informations d'état... Fait      
+libayatana-appindicator3-dev est déjà la version la plus récente (0.5.94-1).
+Les paquets suivants ont été installés automatiquement et ne sont plus nécessaires :
+  linux-image-6.12.74+deb13+1-amd64 linux-image-6.12.85+deb13-amd64
+Veuillez utiliser « sudo apt autoremove » pour les supprimer.
+0 mis à jour, 0 nouvellement installés, 0 à enlever et 0 non mis à jour.
+  [OK]    Paquets systeme OK
+  [INFO]  Duree : 3s
+
+================================================================
+  ETAPE 2/8 - Rust + Cargo
+================================================================
+  [INFO]  Rust rustc 1.95.0 (59807616e 2026-04-14) deja installe - mise a jour...
+  stable-x86_64-unknown-linux-gnu unchanged - rustc 1.95.0 (59807616e 2026-04-14)
+
+info: checking for self-update (current version: 1.29.0)
+  [OK]    Rust  : rustc 1.95.0 (59807616e 2026-04-14)
+  [OK]    Cargo : cargo 1.95.0 (f2d3ce0bd 2026-03-21)
+  [INFO]  Duree : 0s
+
+================================================================
+  ETAPE 3/8 - Node.js 20 LTS
+================================================================
+  [OK]    Node.js v20.19.2 deja installe
+  [OK]    Node.js : v20.19.2
+  [OK]    npm : v9.2.0
+  [INFO]  Duree : 1s
+
+================================================================
+  ETAPE 4/8 - Tauri CLI v2
+================================================================
+  [OK]    Tauri CLI v2 deja present : tauri-cli 2.11.2
+  [OK]    Tauri CLI : tauri-cli 2.11.2
+  [INFO]  Duree : 0s
+
+================================================================
+  ETAPE 5/8 - OpenJDK (requis pour Android)
+================================================================
+  [OK]    JDK 21.0.11 deja installe
+  [OK]    JDK : openjdk version "21.0.11" 2026-04-21
+  [OK]    JAVA_HOME : /usr/lib/jvm/java-21-openjdk-amd64
+  [INFO]  Duree : 0s
+
+================================================================
+  ETAPE 6/8 - Android SDK
+================================================================
+  [INFO]  Telechargement Android Command Line Tools...
+/tmp/tmp.rT9RFy3KPh/ct.zip   100%[==============================================>] 146,49M  45,7MB/s    ds 3,3s    
+mv: impossible de déplacer '/tmp/tmp.rT9RFy3KPh/ex/cmdline-tools' vers '/home/papaours/.android/sdk/cmdline-tools/latest': Aucun fichier ou dossier de ce nom
+mv: impossible de déplacer '/tmp/tmp.rT9RFy3KPh/ex' vers '/home/papaours/.android/sdk/cmdline-tools/latest': Aucun fichier ou dossier de ce nom
 papaours@papaours:~/Tauri$ 
