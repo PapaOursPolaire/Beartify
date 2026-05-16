@@ -1,7 +1,12 @@
-papaours@papaours:~/Tauri/src-tauri/target/release/bundle/appimage$ chmod +x Beartify.AppImage
-papaours@papaours:~/Tauri/src-tauri/target/release/bundle/appimage$ ./Beartify.AppImage
+# 1. On s'assure que les variables Android sont bien chargées
+export ANDROID_HOME="$HOME/.android/sdk"
+export NDK_HOME="$ANDROID_HOME/ndk/26.3.11579264"
 
-thread 'main' (3631501) panicked at src/lib.rs:34:10:
-Erreur au lancement de Beartify: PluginInitialization("http", "Error deserializing 'plugins.http' within your Tauri configuration: invalid type: map, expected unit")
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-papaours@papaours:~/Tauri/src-tauri/target/release/bundle/appimage$ 
+# 2. On supprime le dossier Android corrompu/obsolète
+rm -rf src-tauri/gen/android
+
+# 3. On demande à Tauri de recréer proprement le projet Android
+npx tauri android init
+
+# 4. On lance la compilation finale de l'APK
+npx tauri android build
