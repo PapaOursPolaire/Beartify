@@ -1,133 +1,988 @@
-{
-  "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Beartify",
-  "version": "1.0.0",
-  "identifier": "org.beartify.player",
-  "build": {
-    "frontendDist": "../src",
-    "beforeDevCommand": "",
-    "beforeBuildCommand": ""
-  },
-  "app": {
-    "withGlobalTauri": true,
-    "windows": [
-      {
-        "label": "main",
-        "title": "Beartify",
-        "width": 1280,
-        "height": 800,
-        "minWidth": 900,
-        "minHeight": 600,
-        "resizable": true,
-        "fullscreen": false,
-        "decorations": true,
-        "transparent": false,
-        "center": true,
-        "visible": true
-      }
-    ],
-    "security": {
-      "csp": {
-        "default-src": [
-          "'self'",
-          "tauri:",
-          "asset:",
-          "https:"
-        ],
-        "connect-src": [
-          "'self'",
-          "tauri:",
-          "asset:",
-          "https://firestore.googleapis.com",
-          "https://*.googleapis.com",
-          "https://*.firebaseio.com",
-          "wss://*.firebaseio.com",
-          "https://*.firebaseapp.com",
-          "https://identitytoolkit.googleapis.com",
-          "https://securetoken.googleapis.com",
-          "https://accounts.google.com",
-          "https://www.gstatic.com",
-          "https://discord.com",
-          "https://discordapp.com",
-          "https://grizzly-stream.duckdns.org",
-          "https://grizzlyrics.duckdns.org",
-          "http://localhost:*",
-          "http://127.0.0.1:*",
-          "http://192.168.*.*:*",
-          "ws://localhost:*"
-        ],
-        "img-src": [
-          "'self'",
-          "tauri:",
-          "asset:",
-          "data:",
-          "blob:",
-          "https:",
-          "http://localhost:*",
-          "http://127.0.0.1:*",
-          "http://192.168.*.*:*",
-          "https://cdn.discordapp.com",
-          "https://lh3.googleusercontent.com",
-          "https://www.gstatic.com"
-        ],
-        "media-src": [
-          "'self'",
-          "tauri:",
-          "asset:",
-          "blob:",
-          "http://localhost:*",
-          "http://127.0.0.1:*",
-          "http://192.168.*.*:*"
-        ],
-        "script-src": [
-          "'self'",
-          "'unsafe-inline'",
-          "'unsafe-eval'",
-          "https://www.gstatic.com",
-          "https://apis.google.com"
-        ],
-        "style-src": [
-          "'self'",
-          "'unsafe-inline'",
-          "https://fonts.googleapis.com"
-        ],
-        "font-src": [
-          "'self'",
-          "data:",
-          "https://fonts.gstatic.com"
-        ],
-        "frame-src": [
-          "https://accounts.google.com",
-          "https://*.firebaseapp.com"
-        ]
-      }
-    }
-  },
-  "bundle": {
-    "active": true,
-    "targets": "all",
-    "icon": [
-      "icons/32x32.png",
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
-      "icons/icon.icns",
-      "icons/icon.ico"
-    ],
-    "category": "Music",
-    "shortDescription": "Beartify Music Player",
-    "linux": {
-      "appimage": {
-        "bundleMediaFramework": true
-      }
-    },
-    "android": {
-      "minSdkVersion": 24
-    }
-  },
-  "plugins": {
-    "shell": {
-      "open": true
-    },
-    "http": {}
-  }
-}
+   Compiling regex v1.12.3
+   Compiling cssparser v0.36.0
+   Compiling brotli-decompressor v5.0.0
+   Compiling unic-ucd-ident v0.9.0
+   Compiling markup5ever v0.38.0
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling ndk-sys v0.6.0+11769913
+   Compiling jsonptr v0.6.3
+   Compiling sync_wrapper v1.0.2
+   Compiling dpi v0.1.2
+   Compiling serde_spanned v1.1.1
+   Compiling quick-xml v0.39.4
+   Compiling anyhow v1.0.102
+   Compiling derive_more v2.1.1
+   Compiling selectors v0.36.1
+   Compiling servo_arc v0.4.3
+   Compiling bit-vec v0.8.0
+   Compiling tower-layer v0.3.3
+   Compiling zeroize v1.8.2
+   Compiling toml_writer v1.1.1+spec-1.1.0
+   Compiling ipnet v2.12.0
+   Compiling same-file v1.0.6
+   Compiling rustc-hash v2.1.2
+   Compiling walkdir v2.5.0
+   Compiling hyper-util v0.1.20
+   Compiling tower v0.5.3
+   Compiling rustls-pki-types v1.14.1
+   Compiling plist v1.9.0
+   Compiling bit-set v0.8.0
+   Compiling ndk v0.9.0
+   Compiling json-patch v3.0.1
+   Compiling crossbeam-channel v0.5.15
+   Compiling digest v0.10.7
+   Compiling html5ever v0.38.0
+   Compiling urlpattern v0.3.0
+   Compiling brotli v8.0.2
+   Compiling serde-untagged v0.1.9
+   Compiling infer v0.19.0
+   Compiling serde_with v3.20.0
+   Compiling ctor v0.8.0
+   Compiling getrandom v0.2.17
+   Compiling cpufeatures v0.2.17
+   Compiling tao-macros v0.1.3
+   Compiling semver v1.0.28
+   Compiling glob v0.3.3
+   Compiling foldhash v0.2.0
+   Compiling untrusted v0.9.0
+   Compiling dunce v1.0.5
+   Compiling dom_query v0.27.0
+   Compiling tauri-runtime v2.11.1
+   Compiling wry v0.55.1
+   Compiling sha2 v0.10.9
+   Compiling tower-http v0.6.10
+   Compiling http-body-util v0.1.3
+   Compiling option-ext v0.2.0
+   Compiling rustls v0.23.40
+   Compiling tauri-runtime-wry v2.11.1
+   Compiling dirs-sys v0.5.0
+   Compiling getrandom v0.3.4
+   Compiling tauri-codegen v2.6.1
+   Compiling rustls-webpki v0.103.13
+   Compiling tao v0.35.2
+   Compiling tauri-plugin-fs v2.5.1
+   Compiling errno v0.3.14
+   Compiling subtle v2.6.1
+   Compiling mime v0.3.17
+   Compiling signal-hook v0.3.18
+   Compiling serialize-to-javascript v0.1.2
+   Compiling signal-hook-registry v1.4.8
+   Compiling tauri-macros v2.6.1
+   Compiling dirs v6.0.0
+   Compiling reqwest v0.13.3
+   Compiling psl-types v2.0.11
+   Compiling heck v0.5.0
+   Compiling publicsuffix v2.3.0
+   Compiling tokio-rustls v0.26.4
+   Compiling webpki-roots v1.0.7
+   Compiling tauri-plugin-shell v2.3.5
+   Compiling tauri-plugin-http v2.5.9
+   Compiling is-docker v0.2.0
+   Compiling encoding_rs v0.8.35
+   Compiling os_pipe v1.2.3
+   Compiling ryu v1.0.23
+   Compiling serde_urlencoded v0.7.1
+   Compiling sigchld v0.2.4
+   Compiling is-wsl v0.4.0
+   Compiling hyper-rustls v0.27.9
+   Compiling cookie_store v0.22.1
+   Compiling pathdiff v0.2.3
+   Compiling open v5.3.5
+   Compiling reqwest v0.12.28
+   Compiling shared_child v1.1.1
+   Compiling beartify v1.0.0 (/home/papaours/Tauri/src-tauri)
+   Compiling data-url v0.3.2
+warning: unused variable: `app`
+  --> src/lib.rs:15:17
+   |
+15 |         .setup(|app| {
+   |                 ^^^ help: if this is intentional, prefix it with an underscore: `_app`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `beartify` (lib) generated 1 warning (run `cargo fix --lib -p beartify` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 3m 55s
+        Info symlinking lib "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so" in jniLibs dir "/home/papaours/Tauri/src-tauri/gen/android/app/src/main/jniLibs/arm64-v8a"
+        Info "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so" requires shared lib "libandroid.so"
+        Info "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so" requires shared lib "libdl.so"
+        Info "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so" requires shared lib "liblog.so"
+        Info "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so" requires shared lib "libm.so"
+        Info "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so" requires shared lib "libc.so"
+        Info symlink at "/home/papaours/Tauri/src-tauri/gen/android/app/src/main/jniLibs/arm64-v8a/libbeartify_lib.so" points to "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so"
+Downloading https://services.gradle.org/distributions/gradle-8.14.3-bin.zip
+.............10%.............20%.............30%.............40%.............50%.............60%.............70%.............80%.............90%..............100%
+w: file:///home/papaours/Tauri/src-tauri/gen/android/buildSrc/src/main/java/org/beartify/player/kotlin/BuildTask.kt:53:17 'exec(Action<in ExecSpec!>): ExecResult' is deprecated. Deprecated in Java
+<==-----------> 20% CONFIGURING [1m 24s]
+> IDLE
+> root project > Resolve files of configuration 'classpath' > ExternalDependencyInstrumentingArtifactTransform inst
+> IDLE
+> IDLE
+^C
+papaours@papaours:~/Tauri$ npx tauri android build
+        Info Using installed NDK: /home/papaours/.android/sdk/ndk/26.3.11579264
+        Info Looking up installed tauri packages to check mismatched versions...
+   Compiling tauri v2.11.1
+   Compiling wry v0.55.1
+   Compiling tauri-plugin-fs v2.5.1
+   Compiling tauri-plugin-shell v2.3.5
+   Compiling tauri-plugin-http v2.5.9
+   Compiling beartify v1.0.0 (/home/papaours/Tauri/src-tauri)
+   Compiling tauri-runtime-wry v2.11.1
+warning: unused variable: `app`
+  --> src/lib.rs:15:17
+   |
+15 |         .setup(|app| {
+   |                 ^^^ help: if this is intentional, prefix it with an underscore: `_app`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `beartify` (lib) generated 1 warning (run `cargo fix --lib -p beartify` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 1m 07s
+        Info symlinking lib "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so" in jniLibs dir "/home/papaours/Tauri/src-tauri/gen/android/app/src/main/jniLibs/arm64-v8a"
+        Info "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so" requires shared lib "libandroid.so"
+        Info "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so" requires shared lib "libdl.so"
+        Info "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so" requires shared lib "liblog.so"
+        Info "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so" requires shared lib "libm.so"
+        Info "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so" requires shared lib "libc.so"
+        Info symlink at "/home/papaours/Tauri/src-tauri/gen/android/app/src/main/jniLibs/arm64-v8a/libbeartify_lib.so" points to "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so"
+Checking the license for package Android SDK Build-Tools 35 in /home/papaours/.android/sdk/licenses
+License for package Android SDK Build-Tools 35 accepted.
+Preparing "Install Android SDK Build-Tools 35 v.35.0.0".
+"Install Android SDK Build-Tools 35 v.35.0.0" ready.
+Installing Android SDK Build-Tools 35 in /home/papaours/.android/sdk/build-tools/35.0.0
+"Install Android SDK Build-Tools 35 v.35.0.0" complete.
+"Install Android SDK Build-Tools 35 v.35.0.0" finished.
+Checking the license for package Android SDK Platform 36 in /home/papaours/.android/sdk/licenses
+License for package Android SDK Platform 36 accepted.
+Preparing "Install Android SDK Platform 36 (revision 2)".
+"Install Android SDK Platform 36 (revision 2)" ready.
+Installing Android SDK Platform 36 in /home/papaours/.android/sdk/platforms/android-36
+"Install Android SDK Platform 36 (revision 2)" complete.
+"Install Android SDK Platform 36 (revision 2)" finished.
+[=======================================] 100% Fetch remote repository...       
+<-------------> 1% EXECUTING [25s]
+        Info Using installed NDK: /home/papaours/.android/sdk/ndk/26.3.11579264
+warning: unused variable: `app`5s]dr=127.0.0.1:53980 conn_id=0
+  --> src/lib.rs:15:17elease
+   |
+15 |         .setup(|app| {
+   |                 ^^^ help: if this is intentional, prefix it with an underscore: `_app`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `beartify` (lib) generated 1 warning (run `cargo fix --lib -p beartify` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 0.36s
+        Info symlinking lib "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so" in jniLibs dir "/home/papaours/Tauri/src-tauri/gen/android/app/src/main/jniLibs/arm64-v8a"
+        Info "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so" requires shared lib "libandroid.so"
+        Info "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so" requires shared lib "libdl.so"
+        Info "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so" requires shared lib "liblog.so"
+        Info "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so" requires shared lib "libm.so"
+        Info "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so" requires shared lib "libc.so"
+<-------------> 1% EXECUTING [26s]
+        Info Using installed NDK: /home/papaours/.android/sdk/ndk/26.3.11579264
+   Compiling serde_core v1.0.228s]dr=127.0.0.1:53992 conn_id=1
+   Compiling libc v0.2.186
+   Compiling serde v1.0.228
+   Compiling smallvec v1.15.1
+   Compiling stable_deref_trait v1.2.1
+   Compiling itoa v1.0.18ING [27s]
+   Compiling zerofrom v0.1.8 [27s]
+   Compiling cfg-if v1.0.4
+   Compiling yoke v0.8.2TING [27s]
+   Compiling memchr v2.8.0
+   Compiling litemap v0.8.2
+   Compiling zerovec v0.11.6 [27s]
+   Compiling writeable v0.6.3[27s]
+   Compiling zerotrie v0.2.4 [28s]
+   Compiling percent-encoding v2.3.2
+   Compiling tinystr v0.8.3G [28s]
+   Compiling potential_utf v0.1.5
+   Compiling utf8_iter v1.0.4[28s]
+   Compiling icu_locale_core v2.2.0
+   Compiling once_cell v1.21.4
+   Compiling icu_collections v2.2.0
+   Compiling icu_normalizer_data v2.2.0
+   Compiling icu_properties_data v2.2.0
+   Compiling log v0.4.29TING [28s]
+   Compiling pin-project-lite v0.2.17
+   Compiling futures-core v0.3.32]
+   Compiling siphasher v1.0.3[29s]
+   Compiling form_urlencoded v1.2.2
+   Compiling icu_provider v2.2.0s]
+   Compiling phf_shared v0.13.19s]
+   Compiling icu_properties v2.2.0
+   Compiling bytes v1.11.1NG [30s]
+   Compiling icu_normalizer v2.2.0
+   Compiling http v1.4.0TING [31s]
+   Compiling idna_adapter v1.2.2s]
+   Compiling idna v1.1.0se
+   Compiling mio v1.2.0UTING [31s]
+   Compiling socket2 v0.6.3G [31s]
+   Compiling zmij v1.0.21ING [32s]
+   Compiling fnv v1.0.7ase
+   Compiling equivalent v1.0.2
+   Compiling hashbrown v0.17.132s]
+   Compiling serde_json v1.0.149s]
+   Compiling tokio v1.52.3
+   Compiling indexmap v2.14.0[33s]
+   Compiling phf v0.13.1TING [33s]
+   Compiling powerfmt v0.2.0 [33s]
+   Compiling deranged v0.5.8 [33s]
+   Compiling url v2.5.8UTING [33s]
+   Compiling thiserror v1.0.6934s]
+   Compiling parking_lot_core v0.9.12
+   Compiling scopeguard v1.2.0
+   Compiling num-conv v0.2.1 [34s]
+   Compiling time-core v0.1.8[34s]
+   Compiling slab v0.4.12ING [34s]
+   Compiling new_debug_unreachable v1.0.6
+   Compiling bitflags v2.11.1[35s]
+   Compiling base64 v0.22.1G [35s]
+   Compiling time v0.3.47ING [35s]
+   Compiling jni-sys v0.3.1G [36s]
+   Compiling lock_api v0.4.14
+   Compiling jni-sys v0.4.1G [36s]
+   Compiling precomputed-hash v0.1.1
+   Compiling parking_lot v0.12.5s]
+   Compiling http-body v1.0.1[37s]
+   Compiling tracing-core v0.1.36]
+   Compiling generic-array v0.14.7
+   Compiling futures-sink v0.3.32
+   Compiling typenum v1.20.0 [38s]
+   Compiling futures-task v0.3.32]
+   Compiling httparse v1.10.1[38s]
+   Compiling futures-util v0.3.32
+   Compiling tokio-util v0.7.189s]
+   Compiling cookie v0.18.1G [39s]
+   Compiling tracing v0.1.44
+   Compiling string_cache v0.9.0s]
+   Compiling aho-corasick v1.1.4s]
+   Compiling typeid v1.0.3NG [40s]
+   Compiling web_atoms v0.2.4
+   Compiling dtoa v1.0.11ING [40s]
+   Compiling atomic-waker v1.1.2s]
+   Compiling unic-common v0.9.0
+   Compiling alloc-no-stdlib v2.0.4
+   Compiling utf-8 v0.7.6e
+   Compiling unic-char-range v0.9.0
+   Compiling regex-syntax v0.8.10
+   Compiling tower-service v0.3.3
+   Compiling try-lock v0.2.5 [40s]
+   Compiling want v0.3.1TING [40s]
+   Compiling unic-char-property v0.9.0
+   Compiling tendril v0.5.0
+   Compiling alloc-stdlib v0.2.2s]
+   Compiling unic-ucd-version v0.9.0
+   Compiling h2 v0.4.14UTING [41s]
+   Compiling regex-automata v0.4.14
+   Compiling crossbeam-utils v0.8.21
+   Compiling dtoa-short v0.3.5
+   Compiling combine v4.6.7G [47s]
+   Compiling uuid v1.23.1ING [48s]
+   Compiling futures-channel v0.3.32
+   Compiling erased-serde v0.4.10]
+   Compiling thiserror v2.0.18
+   Compiling byteorder v1.5.0
+   Compiling raw-window-handle v0.6.2
+   Compiling winnow v1.0.2NG [48s]
+   Compiling cesu8 v1.1.0ING [48s]
+   Compiling cfb v0.7.3UTING [49s]
+   Compiling toml_parser v1.1.2+spec-1.1.0
+   Compiling hyper v1.9.0ING [50s]
+   Compiling jni v0.21.1TING [51s]
+   Compiling ring v0.17.14NG [51s]
+   Compiling tauri v2.11.1NG [54s]
+   Compiling num_enum v0.7.6
+   Compiling regex v1.12.3NG [54s]
+   Compiling cssparser v0.36.0
+   Compiling markup5ever v0.38.0s]
+   Compiling unic-ucd-ident v0.9.0
+   Compiling brotli-decompressor v5.0.0
+   Compiling block-buffer v0.10.4]
+   Compiling crypto-common v0.1.7]
+   Compiling ndk-sys v0.6.0+11769913
+   Compiling jsonptr v0.6.3
+   Compiling dpi v0.1.2UTING [56s]
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling serde_spanned v1.1.1]
+   Compiling sync_wrapper v1.0.2s]
+   Compiling quick-xml v0.39.457s]
+   Compiling anyhow v1.0.102
+   Compiling derive_more v2.1.1
+   Compiling selectors v0.36.157s]
+   Compiling servo_arc v0.4.3
+   Compiling same-file v1.0.6[57s]
+   Compiling tower-layer v0.3.37s]
+   Compiling bit-vec v0.8.0G [57s]
+   Compiling ipnet v2.12.0NG [57s]
+   Compiling toml_writer v1.1.1+spec-1.1.0
+   Compiling zeroize v1.8.2G [58s]
+   Compiling rustc-hash v2.1.258s]
+   Compiling rustls-pki-types v1.14.1
+   Compiling hyper-util v0.1.209s]
+   Compiling toml v1.1.2+spec-1.1.0
+   Compiling bit-set v0.8.0
+   Compiling plist v1.9.0ING [1m]
+   Compiling tower v0.5.3ING [1m 1s]
+   Compiling walkdir v2.5.0G [1m 2s]
+   Compiling ndk v0.9.0UTING [1m 2s]
+   Compiling brotli v8.0.2NG [1m 2s]
+   Compiling json-patch v3.0.11m 3s]
+   Compiling digest v0.10.7G [1m 3s]
+   Compiling crossbeam-channel v0.5.15
+   Compiling urlpattern v0.3.01m 4s]
+   Compiling html5ever v0.38.01m 4s]
+   Compiling serde-untagged v0.1.9s]
+   Compiling infer v0.19.0NG [1m 5s]
+   Compiling serde_with v3.20.0m 6s]
+   Compiling getrandom v0.2.171m 6s]
+   Compiling ctor v0.8.0TING [1m 6s]
+   Compiling dunce v1.0.5ING [1m 6s]
+   Compiling glob v0.3.3se
+   Compiling semver v1.0.28G [1m 7s]
+   Compiling foldhash v0.2.0 [1m 7s]
+   Compiling untrusted v0.9.0[1m 8s]
+   Compiling tauri-utils v2.9.1m 8s]
+   Compiling dom_query v0.27.01m 8s]
+   Compiling wry v0.55.1TING [1m 8s]
+   Compiling tauri-runtime v2.11.1
+   Compiling sha2 v0.10.9
+   Compiling tower-http v0.6.10m 9s]
+   Compiling http-body-util v0.1.30s]
+   Compiling option-ext v0.2.01m 10s]
+   Compiling rustls v0.23.40 [1m 10s]
+   Compiling getrandom v0.3.4
+   Compiling dirs-sys v0.5.0
+   Compiling tauri-runtime-wry v2.11.1
+   Compiling rustls-webpki v0.103.13
+   Compiling tao v0.35.2TING [1m 14s]
+   Compiling errno v0.3.14NG [1m 15s]
+   Compiling mime v0.3.17ING [1m 15s]
+   Compiling subtle v2.6.1NG [1m 16s]
+   Compiling signal-hook v0.3.18 20s]
+   Compiling serialize-to-javascript v0.1.2
+   Compiling signal-hook-registry v1.4.8
+   Compiling tauri-plugin-fs v2.5.1s]
+   Compiling dirs v6.0.0TING [1m 22s]
+   Compiling reqwest v0.13.3 [1m 23s]
+   Compiling heck v0.5.0TING [1m 24s]
+   Compiling psl-types v2.0.111m 25s]
+   Compiling publicsuffix v2.3.0 25s]
+   Compiling tokio-rustls v0.26.435s]
+   Compiling webpki-roots v1.0.7
+   Compiling is-docker v0.2.0
+   Compiling os_pipe v1.2.3G [1m 36s]
+   Compiling encoding_rs v0.8.35
+   Compiling ryu v1.0.23TING [1m 36s]
+   Compiling serde_urlencoded v0.7.1]
+   Compiling sigchld v0.2.4G [1m 36s]
+   Compiling hyper-rustls v0.27.936s]
+   Compiling is-wsl v0.4.0NG [1m 36s]
+   Compiling tauri-plugin-http v2.5.9
+   Compiling tauri-plugin-shell v2.3.5
+   Compiling cookie_store v0.22.137s]
+   Compiling pathdiff v0.2.3 [1m 37s]
+   Compiling open v5.3.5TING [1m 37s]
+   Compiling reqwest v0.12.28[1m 37s]
+   Compiling shared_child v1.1.1 39s]
+   Compiling data-url v0.3.2 [1m 40s]
+   Compiling beartify v1.0.0 (/home/papaours/Tauri/src-tauri)
+warning: unused variable: `app`m 30s]
+  --> src/lib.rs:15:17ease
+   |
+15 |         .setup(|app| {
+   |                 ^^^ help: if this is intentional, prefix it with an underscore: `_app`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `beartify` (lib) generated 1 warning (run `cargo fix --lib -p beartify` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 3m 31s
+        Info symlinking lib "/home/papaours/Tauri/src-tauri/target/armv7-linux-androideabi/release/libbeartify_lib.so" in jniLibs dir "/home/papaours/Tauri/src-tauri/gen/android/app/src/main/jniLibs/armeabi-v7a"
+        Info "/home/papaours/Tauri/src-tauri/target/armv7-linux-androideabi/release/libbeartify_lib.so" requires shared lib "libandroid.so"
+        Info "/home/papaours/Tauri/src-tauri/target/armv7-linux-androideabi/release/libbeartify_lib.so" requires shared lib "libdl.so"
+        Info "/home/papaours/Tauri/src-tauri/target/armv7-linux-androideabi/release/libbeartify_lib.so" requires shared lib "liblog.so"
+        Info "/home/papaours/Tauri/src-tauri/target/armv7-linux-androideabi/release/libbeartify_lib.so" requires shared lib "libm.so"
+        Info "/home/papaours/Tauri/src-tauri/target/armv7-linux-androideabi/release/libbeartify_lib.so" requires shared lib "libc.so"
+<-------------> 2% EXECUTING [3m 59s]
+        Info Using installed NDK: /home/papaours/.android/sdk/ndk/26.3.11579264
+   Compiling serde_core v1.0.228]
+   Compiling libc v0.2.186
+   Compiling serde v1.0.228
+   Compiling stable_deref_trait v1.2.1
+   Compiling smallvec v1.15.1
+   Compiling itoa v1.0.18ING [4m]
+   Compiling zerofrom v0.1.8 [4m]
+   Compiling cfg-if v1.0.4
+   Compiling yoke v0.8.2TING [4m]
+   Compiling memchr v2.8.0
+   Compiling litemap v0.8.2G [4m]
+   Compiling zerovec v0.11.6 [4m]
+   Compiling writeable v0.6.3[4m]
+   Compiling zerotrie v0.2.4 [4m]
+   Compiling once_cell v1.21.44m 1s]
+   Compiling tinystr v0.8.3G [4m 1s]
+   Compiling potential_utf v0.1.5
+   Compiling icu_locale_core v2.2.0]
+   Compiling utf8_iter v1.0.4
+   Compiling percent-encoding v2.3.2
+   Compiling icu_collections v2.2.0]
+   Compiling icu_properties_data v2.2.0
+   Compiling icu_normalizer_data v2.2.0
+   Compiling log v0.4.29TING [4m 1s]
+   Compiling pin-project-lite v0.2.17
+   Compiling futures-core v0.3.32
+   Compiling siphasher v1.0.3[4m 1s]
+   Compiling phf_shared v0.13.1m 2s]
+   Compiling icu_provider v2.2.0
+   Compiling icu_properties v2.2.0s]
+   Compiling icu_normalizer v2.2.0s]
+   Compiling bytes v1.11.1NG [4m 2s]
+   Compiling http v1.4.0TING [4m 3s]
+   Compiling idna_adapter v1.2.2 4s]
+   Compiling form_urlencoded v1.2.2]
+   Compiling idna v1.1.0se
+   Compiling socket2 v0.6.3G [4m 4s]
+   Compiling mio v1.2.0UTING [4m 4s]
+   Compiling zmij v1.0.21ING [4m 5s]
+   Compiling fnv v1.0.7ase
+   Compiling hashbrown v0.17.1
+   Compiling equivalent v1.0.2
+   Compiling serde_json v1.0.149 5s]
+   Compiling tokio v1.52.3NG [4m 5s]
+   Compiling indexmap v2.14.0[4m 5s]
+   Compiling phf v0.13.1TING [4m 5s]
+   Compiling powerfmt v0.2.0 [4m 6s]
+   Compiling deranged v0.5.8 [4m 6s]
+   Compiling url v2.5.8UTING [4m 6s]
+   Compiling thiserror v1.0.694m 7s]
+   Compiling parking_lot_core v0.9.12
+   Compiling scopeguard v1.2.0
+   Compiling base64 v0.22.1
+   Compiling slab v0.4.12ING [4m 7s]
+   Compiling bitflags v2.11.1[4m 7s]
+   Compiling time-core v0.1.8[4m 8s]
+   Compiling new_debug_unreachable v1.0.6
+   Compiling num-conv v0.2.1 [4m 8s]
+   Compiling time v0.3.47ING [4m 8s]
+   Compiling jni-sys v0.3.1G [4m 9s]
+   Compiling lock_api v0.4.14
+   Compiling jni-sys v0.4.1G [4m 9s]
+   Compiling precomputed-hash v0.1.1]
+   Compiling parking_lot v0.12.5 10s]
+   Compiling http-body v1.0.1
+   Compiling tracing-core v0.1.3610s]
+   Compiling generic-array v0.14.71s]
+   Compiling futures-task v0.3.3211s]
+   Compiling typenum v1.20.0 [4m 11s]
+   Compiling futures-sink v0.3.3211s]
+   Compiling httparse v1.10.1
+   Compiling tokio-util v0.7.18m 11s]
+   Compiling futures-util v0.3.3212s]
+   Compiling cookie v0.18.1G [4m 13s]
+   Compiling tracing v0.1.44 [4m 13s]
+   Compiling string_cache v0.9.0 13s]
+   Compiling aho-corasick v1.1.4 13s]
+   Compiling typeid v1.0.3NG [4m 13s]
+   Compiling web_atoms v0.2.4
+   Compiling try-lock v0.2.5 [4m 14s]
+   Compiling unic-common v0.9.0m 14s]
+   Compiling alloc-no-stdlib v2.0.4
+   Compiling unic-char-range v0.9.0s]
+   Compiling dtoa v1.0.11e
+   Compiling tower-service v0.3.314s]
+   Compiling utf-8 v0.7.6e
+   Compiling atomic-waker v1.1.2 14s]
+   Compiling regex-syntax v0.8.10
+   Compiling h2 v0.4.14
+   Compiling regex-automata v0.4.14s]
+   Compiling tendril v0.5.0G [4m 18s]
+   Compiling unic-char-property v0.9.0
+   Compiling dtoa-short v0.3.54m 19s]
+   Compiling crossbeam-utils v0.8.21]
+   Compiling alloc-stdlib v0.2.2
+   Compiling unic-ucd-version v0.9.0]
+   Compiling want v0.3.1TING [4m 19s]
+   Compiling combine v4.6.7G [4m 23s]
+   Compiling uuid v1.23.1ING [4m 23s]
+   Compiling futures-channel v0.3.32]
+   Compiling thiserror v2.0.184m 24s]
+   Compiling erased-serde v0.4.1024s]
+   Compiling raw-window-handle v0.6.2
+   Compiling byteorder v1.5.0
+   Compiling cesu8 v1.1.0ING [4m 24s]
+   Compiling winnow v1.0.2
+   Compiling cfb v0.7.3
+   Compiling toml_parser v1.1.2+spec-1.1.0
+   Compiling hyper v1.9.0ING [4m 27s]
+   Compiling jni v0.21.1TING [4m 27s]
+   Compiling ring v0.17.14NG [4m 27s]
+   Compiling tauri v2.11.1NG [4m 31s]
+   Compiling num_enum v0.7.6
+   Compiling regex v1.12.3NG [4m 31s]
+   Compiling markup5ever v0.38.0 32s]
+   Compiling unic-ucd-ident v0.9.02s]
+   Compiling brotli-decompressor v5.0.0
+   Compiling cssparser v0.36.04m 33s]
+   Compiling block-buffer v0.10.434s]
+   Compiling crypto-common v0.1.734s]
+   Compiling ndk-sys v0.6.0+11769913]
+   Compiling jsonptr v0.6.3
+   Compiling dpi v0.1.2
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling serde_spanned v1.1.135s]
+   Compiling sync_wrapper v1.0.2 35s]
+   Compiling quick-xml v0.39.4
+   Compiling anyhow v1.0.102 [4m 35s]
+   Compiling derive_more v2.1.1m 35s]
+   Compiling selectors v0.36.14m 36s]
+   Compiling servo_arc v0.4.3
+   Compiling toml_writer v1.1.1+spec-1.1.0
+   Compiling tower-layer v0.3.3m 36s]
+   Compiling bit-vec v0.8.0G [4m 36s]
+   Compiling same-file v1.0.6[4m 36s]
+   Compiling zeroize v1.8.2G [4m 36s]
+   Compiling rustc-hash v2.1.2
+   Compiling ipnet v2.12.0NG [4m 36s]
+   Compiling rustls-pki-types v1.14.1
+   Compiling hyper-util v0.1.20m 38s]
+   Compiling bit-set v0.8.0G [4m 38s]
+   Compiling walkdir v2.5.0G [4m 38s]
+   Compiling tower v0.5.3ING [4m 39s]
+   Compiling toml v1.1.2+spec-1.1.0s]
+   Compiling plist v1.9.0ING [4m 40s]
+   Compiling ndk v0.9.0
+   Compiling json-patch v3.0.14m 42s]
+   Compiling digest v0.10.7G [4m 43s]
+   Compiling brotli v8.0.2NG [4m 43s]
+   Compiling crossbeam-channel v0.5.15
+   Compiling urlpattern v0.3.04m 44s]
+   Compiling html5ever v0.38.04m 44s]
+   Compiling serde-untagged v0.1.96s]
+   Compiling infer v0.19.0NG [4m 46s]
+   Compiling serde_with v3.20.0m 46s]
+   Compiling getrandom v0.2.174m 48s]
+   Compiling ctor v0.8.0TING [4m 48s]
+   Compiling cpufeatures v0.2.17 48s]
+   Compiling glob v0.3.3se
+   Compiling foldhash v0.2.0 [4m 48s]
+   Compiling untrusted v0.9.0[4m 49s]
+   Compiling semver v1.0.28G [4m 49s]
+   Compiling dunce v1.0.5e
+   Compiling tauri-runtime v2.11.1
+   Compiling wry v0.55.1
+   Compiling tauri-utils v2.9.1m 49s]
+   Compiling dom_query v0.27.04m 50s]
+   Compiling sha2 v0.10.9ING [4m 50s]
+   Compiling tower-http v0.6.10m 52s]
+   Compiling http-body-util v0.1.33s]
+   Compiling option-ext v0.2.04m 53s]
+   Compiling dirs-sys v0.5.0 [4m 53s]
+   Compiling rustls v0.23.40 [4m 54s]
+   Compiling getrandom v0.3.4
+   Compiling tauri-runtime-wry v2.11.1
+   Compiling rustls-webpki v0.103.13]
+   Compiling tao v0.35.2TING [4m 59s]
+   Compiling errno v0.3.14NG [4m 59s]
+   Compiling mime v0.3.17ING [5m]
+   Compiling subtle v2.6.1NG [5m]
+   Compiling signal-hook v0.3.18 7s]
+   Compiling serialize-to-javascript v0.1.2
+   Compiling signal-hook-registry v1.4.8
+   Compiling tauri-plugin-fs v2.5.1]
+   Compiling dirs v6.0.0TING [5m 9s]
+   Compiling reqwest v0.13.3
+   Compiling heck v0.5.0TING [5m 9s]
+   Compiling psl-types v2.0.115m 10s]
+   Compiling publicsuffix v2.3.0
+   Compiling tokio-rustls v0.26.410s]
+   Compiling webpki-roots v1.0.7 21s]
+   Compiling is-docker v0.2.0[5m 21s]
+   Compiling os_pipe v1.2.3G [5m 21s]
+   Compiling encoding_rs v0.8.35 21s]
+   Compiling ryu v1.0.23TING [5m 22s]
+   Compiling serde_urlencoded v0.7.1]
+   Compiling sigchld v0.2.4G [5m 22s]
+   Compiling is-wsl v0.4.0NG [5m 22s]
+   Compiling tauri-plugin-http v2.5.9
+   Compiling tauri-plugin-shell v2.3.5
+   Compiling hyper-rustls v0.27.9
+   Compiling cookie_store v0.22.123s]
+   Compiling pathdiff v0.2.3 [5m 23s]
+   Compiling reqwest v0.12.28[5m 23s]
+   Compiling open v5.3.5TING [5m 25s]
+   Compiling shared_child v1.1.1 25s]
+   Compiling data-url v0.3.2 [5m 26s]
+   Compiling beartify v1.0.0 (/home/papaours/Tauri/src-tauri)
+warning: unused variable: `app`m 17s]
+  --> src/lib.rs:15:17ease
+   |
+15 |         .setup(|app| {
+   |                 ^^^ help: if this is intentional, prefix it with an underscore: `_app`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `beartify` (lib) generated 1 warning (run `cargo fix --lib -p beartify` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 3m 54s
+        Info symlinking lib "/home/papaours/Tauri/src-tauri/target/i686-linux-android/release/libbeartify_lib.so" in jniLibs dir "/home/papaours/Tauri/src-tauri/gen/android/app/src/main/jniLibs/x86"
+        Info "/home/papaours/Tauri/src-tauri/target/i686-linux-android/release/libbeartify_lib.so" requires shared lib "libandroid.so"
+        Info "/home/papaours/Tauri/src-tauri/target/i686-linux-android/release/libbeartify_lib.so" requires shared lib "libdl.so"
+        Info "/home/papaours/Tauri/src-tauri/target/i686-linux-android/release/libbeartify_lib.so" requires shared lib "liblog.so"
+        Info "/home/papaours/Tauri/src-tauri/target/i686-linux-android/release/libbeartify_lib.so" requires shared lib "libm.so"
+        Info "/home/papaours/Tauri/src-tauri/target/i686-linux-android/release/libbeartify_lib.so" requires shared lib "libc.so"
+<-------------> 3% EXECUTING [7m 54s]
+        Info Using installed NDK: /home/papaours/.android/sdk/ndk/26.3.11579264
+   Compiling serde_core v1.0.228 55s]127.0.0.1:57026 conn_id=3
+   Compiling libc v0.2.186ase
+   Compiling serde v1.0.228
+   Compiling smallvec v1.15.1
+   Compiling stable_deref_trait v1.2.1
+   Compiling itoa v1.0.18ING [7m 55s]
+   Compiling zerofrom v0.1.8 [7m 55s]
+   Compiling yoke v0.8.2TING [7m 55s]
+   Compiling cfg-if v1.0.4ase
+   Compiling memchr v2.8.0
+   Compiling litemap v0.8.2
+   Compiling zerovec v0.11.6 [7m 55s]
+   Compiling writeable v0.6.3[7m 56s]
+   Compiling zerotrie v0.2.4 [7m 56s]
+   Compiling tinystr v0.8.3G [7m 56s]
+   Compiling potential_utf v0.1.556s]
+   Compiling icu_locale_core v2.2.0s]
+   Compiling utf8_iter v1.0.4
+   Compiling percent-encoding v2.3.2]
+   Compiling once_cell v1.21.47m 57s]
+   Compiling icu_collections v2.2.0s]
+   Compiling icu_properties_data v2.2.0
+   Compiling icu_normalizer_data v2.2.0
+   Compiling log v0.4.29TING [7m 57s]
+   Compiling pin-project-lite v0.2.17
+   Compiling icu_provider v2.2.0
+   Compiling icu_normalizer v2.2.07s]
+   Compiling icu_properties v2.2.08s]
+   Compiling bytes v1.11.1NG [7m 58s]
+   Compiling http v1.4.0TING [7m 59s]
+   Compiling siphasher v1.0.3[7m 59s]
+   Compiling futures-core v0.3.3259s]
+   Compiling phf_shared v0.13.1m 59s]
+   Compiling idna_adapter v1.2.2]
+   Compiling idna v1.1.0TING [8m]
+   Compiling form_urlencoded v1.2.2
+   Compiling mio v1.2.0UTING [8m]
+   Compiling socket2 v0.6.3G [8m]
+   Compiling zmij v1.0.21ING [8m 1s]
+   Compiling fnv v1.0.7elease
+   Compiling hashbrown v0.17.18m 1s]
+   Compiling equivalent v1.0.28m 2s]
+   Compiling serde_json v1.0.149 2s]
+   Compiling tokio v1.52.3ase
+   Compiling indexmap v2.14.0[8m 2s]
+   Compiling phf v0.13.1TING [8m 3s]
+   Compiling powerfmt v0.2.0 [8m 3s]
+   Compiling deranged v0.5.8 [8m 3s]
+   Compiling url v2.5.8UTING [8m 3s]
+   Compiling thiserror v1.0.698m 5s]
+   Compiling parking_lot_core v0.9.12
+   Compiling scopeguard v1.2.0
+   Compiling time-core v0.1.8[8m 5s]
+   Compiling num-conv v0.2.1 [8m 5s]
+   Compiling base64 v0.22.1G [8m 5s]
+   Compiling slab v0.4.12ING [8m 6s]
+   Compiling bitflags v2.11.1[8m 6s]
+   Compiling new_debug_unreachable v1.0.6
+   Compiling time v0.3.47ING [8m 7s]
+   Compiling jni-sys v0.3.1G [8m 8s]
+   Compiling lock_api v0.4.14[8m 8s]
+   Compiling jni-sys v0.4.1se
+   Compiling precomputed-hash v0.1.1
+   Compiling parking_lot v0.12.5 9s]
+   Compiling http-body v1.0.1
+   Compiling tracing-core v0.1.369s]
+   Compiling generic-array v0.14.70s]
+   Compiling futures-sink v0.3.32
+   Compiling futures-task v0.3.32
+   Compiling typenum v1.20.0 [8m 10s]
+   Compiling httparse v1.10.1[8m 10s]
+   Compiling futures-util v0.3.32
+   Compiling tokio-util v0.7.18m 11s]
+   Compiling cookie v0.18.1G [8m 12s]
+   Compiling tracing v0.1.44e
+   Compiling string_cache v0.9.0 12s]
+   Compiling aho-corasick v1.1.4 13s]
+   Compiling typeid v1.0.3NG [8m 13s]
+   Compiling web_atoms v0.2.4
+   Compiling utf-8 v0.7.6ING [8m 13s]
+   Compiling dtoa v1.0.11ING [8m 13s]
+   Compiling try-lock v0.2.5e
+   Compiling alloc-no-stdlib v2.0.4s]
+   Compiling atomic-waker v1.1.2
+   Compiling regex-syntax v0.8.1013s]
+   Compiling unic-common v0.9.0
+   Compiling tower-service v0.3.313s]
+   Compiling unic-char-range v0.9.0
+   Compiling unic-char-property v0.9.0
+   Compiling unic-ucd-version v0.9.0
+   Compiling alloc-stdlib v0.2.2 14s]
+   Compiling h2 v0.4.14
+   Compiling regex-automata v0.4.14s]
+   Compiling dtoa-short v0.3.58m 21s]
+   Compiling want v0.3.1TING [8m 21s]
+   Compiling crossbeam-utils v0.8.21]
+   Compiling tendril v0.5.0G [8m 23s]
+   Compiling futures-channel v0.3.32]
+   Compiling combine v4.6.7G [8m 24s]
+   Compiling uuid v1.23.1ING [8m 24s]
+   Compiling thiserror v2.0.188m 25s]
+   Compiling erased-serde v0.4.1025s]
+   Compiling cesu8 v1.1.0ease
+   Compiling raw-window-handle v0.6.2
+   Compiling byteorder v1.5.0[8m 25s]
+   Compiling winnow v1.0.2NG [8m 25s]
+   Compiling toml_parser v1.1.2+spec-1.1.0
+   Compiling cfb v0.7.3
+   Compiling ring v0.17.14NG [8m 28s]
+   Compiling hyper v1.9.0ease
+   Compiling jni v0.21.1TING [8m 29s]
+   Compiling tauri v2.11.1NG [8m 34s]
+   Compiling num_enum v0.7.6 [8m 34s]
+   Compiling markup5ever v0.38.0 34s]
+   Compiling cssparser v0.36.08m 35s]
+   Compiling regex v1.12.3NG [8m 35s]
+   Compiling brotli-decompressor v5.0.0
+   Compiling unic-ucd-ident v0.9.06s]
+   Compiling block-buffer v0.10.437s]
+   Compiling crypto-common v0.1.737s]
+   Compiling ndk-sys v0.6.0+11769913]
+   Compiling jsonptr v0.6.3se
+   Compiling sync_wrapper v1.0.2 37s]
+   Compiling dpi v0.1.2
+   Compiling serde_spanned v1.1.138s]
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling quick-xml v0.39.4
+   Compiling anyhow v1.0.102 [8m 38s]
+   Compiling derive_more v2.1.1m 38s]
+   Compiling selectors v0.36.18m 39s]
+   Compiling servo_arc v0.4.3
+   Compiling toml_writer v1.1.1+spec-1.1.0
+   Compiling same-file v1.0.6[8m 39s]
+   Compiling tower-layer v0.3.3m 39s]
+   Compiling zeroize v1.8.2G [8m 39s]
+   Compiling rustc-hash v2.1.28m 39s]
+   Compiling bit-vec v0.8.0G [8m 39s]
+   Compiling ipnet v2.12.0ase
+   Compiling bit-set v0.8.0G [8m 40s]
+   Compiling hyper-util v0.1.20m 40s]
+   Compiling rustls-pki-types v1.14.1
+   Compiling tower v0.5.3ING [8m 42s]
+   Compiling walkdir v2.5.0G [8m 43s]
+   Compiling toml v1.1.2+spec-1.1.0s]
+   Compiling plist v1.9.0ING [8m 44s]
+   Compiling ndk v0.9.0
+   Compiling json-patch v3.0.18m 45s]
+   Compiling digest v0.10.7G [8m 45s]
+   Compiling urlpattern v0.3.08m 46s]
+   Compiling brotli v8.0.2NG [8m 46s]
+   Compiling crossbeam-channel v0.5.15
+   Compiling html5ever v0.38.08m 48s]
+   Compiling serde-untagged v0.1.90s]
+   Compiling infer v0.19.0NG [8m 50s]
+   Compiling serde_with v3.20.0m 51s]
+   Compiling ctor v0.8.0TING [8m 52s]
+   Compiling getrandom v0.2.17
+   Compiling foldhash v0.2.0
+   Compiling untrusted v0.9.0[8m 52s]
+   Compiling dunce v1.0.5ING [8m 52s]
+   Compiling glob v0.3.3lease
+   Compiling semver v1.0.28
+   Compiling cpufeatures v0.2.17
+   Compiling sha2 v0.10.9ING [8m 52s]
+   Compiling tauri-utils v2.9.1m 53s]
+   Compiling tauri-runtime v2.11.1
+   Compiling wry v0.55.1TING [8m 53s]
+   Compiling dom_query v0.27.08m 53s]
+   Compiling tower-http v0.6.10m 54s]
+   Compiling http-body-util v0.1.35s]
+   Compiling option-ext v0.2.08m 55s]
+   Compiling dirs-sys v0.5.0e
+   Compiling tauri-runtime-wry v2.11.1
+   Compiling rustls v0.23.40e
+   Compiling getrandom v0.3.4
+   Compiling rustls-webpki v0.103.13
+   Compiling tao v0.35.2TING [9m]
+   Compiling errno v0.3.14NG [9m 3s]
+   Compiling mime v0.3.17ING [9m 3s]
+   Compiling subtle v2.6.1NG [9m 4s]
+   Compiling signal-hook v0.3.18 8s]
+   Compiling serialize-to-javascript v0.1.2
+   Compiling signal-hook-registry v1.4.8
+   Compiling tauri-plugin-fs v2.5.1]
+   Compiling dirs v6.0.0TING [9m 12s]
+   Compiling reqwest v0.13.3 [9m 12s]
+   Compiling heck v0.5.0TING [9m 17s]
+   Compiling psl-types v2.0.119m 18s]
+   Compiling publicsuffix v2.3.0 18s]
+   Compiling tokio-rustls v0.26.436s]
+   Compiling webpki-roots v1.0.7 37s]
+   Compiling is-docker v0.2.0
+   Compiling encoding_rs v0.8.35 37s]
+   Compiling os_pipe v1.2.3G [9m 38s]
+   Compiling ryu v1.0.23TING [9m 38s]
+   Compiling sigchld v0.2.4G [9m 38s]
+   Compiling serde_urlencoded v0.7.1]
+   Compiling is-wsl v0.4.0ase
+   Compiling tauri-plugin-http v2.5.9
+   Compiling tauri-plugin-shell v2.3.5
+   Compiling hyper-rustls v0.27.9
+   Compiling cookie_store v0.22.139s]
+   Compiling pathdiff v0.2.3 [9m 39s]
+   Compiling open v5.3.5TING [9m 40s]
+   Compiling reqwest v0.12.28[9m 40s]
+   Compiling shared_child v1.1.1 41s]
+   Compiling data-url v0.3.2 [9m 43s]
+   Compiling beartify v1.0.0 (/home/papaours/Tauri/src-tauri)
+warning: unused variable: `app`1m 45s]
+  --> src/lib.rs:15:17Release
+   |
+15 |         .setup(|app| {
+   |                 ^^^ help: if this is intentional, prefix it with an underscore: `_app`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `beartify` (lib) generated 1 warning (run `cargo fix --lib -p beartify` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 4m 20s
+        Info symlinking lib "/home/papaours/Tauri/src-tauri/target/x86_64-linux-android/release/libbeartify_lib.so" in jniLibs dir "/home/papaours/Tauri/src-tauri/gen/android/app/src/main/jniLibs/x86_64"
+        Info "/home/papaours/Tauri/src-tauri/target/x86_64-linux-android/release/libbeartify_lib.so" requires shared lib "libandroid.so"
+        Info "/home/papaours/Tauri/src-tauri/target/x86_64-linux-android/release/libbeartify_lib.so" requires shared lib "libdl.so"
+        Info "/home/papaours/Tauri/src-tauri/target/x86_64-linux-android/release/libbeartify_lib.so" requires shared lib "liblog.so"
+        Info "/home/papaours/Tauri/src-tauri/target/x86_64-linux-android/release/libbeartify_lib.so" requires shared lib "libm.so"
+        Info "/home/papaours/Tauri/src-tauri/target/x86_64-linux-android/release/libbeartify_lib.so" requires shared lib "libc.so"
+w: file:///home/papaours/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.1/mobile/android/src/main/java/app/tauri/AppPlugin.kt:35:37 'onBackPressed(): Unit' is deprecated. Deprecated in Java
+w: file:///home/papaours/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.1/mobile/android/src/main/java/app/tauri/plugin/Plugin.kt:107:5 'onDestroy(): Unit' is deprecated. use onDestroy(activity: AppCompatActivity) instead
+w: file:///home/papaours/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.1/mobile/android/src/main/java/app/tauri/plugin/Plugin.kt:112:5 'onRestart(): Unit' is deprecated. use onRestart(activity: AppCompatActivity) instead
+w: file:///home/papaours/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.1/mobile/android/src/main/java/app/tauri/plugin/PluginMethodData.kt:11:23 Parameter 'methodDecorator' is never used
+Java compiler version 21 has deprecated support for compiling with source/target version 8.
+Try one of the following options:
+    1. [Recommended] Use Java toolchain with a lower language version
+    2. Set a higher source/target version
+    3. Use a lower version of the JDK running the build (if you're not using Java toolchain)
+For more details on how to configure these settings, see https://developer.android.com/build/jdks.
+To suppress this warning, set android.javaCompile.suppressSourceTargetDeprecationWarning=true in gradle.properties.
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+3 warnings
+w: file:///home/papaours/Tauri/src-tauri/gen/android/app/src/main/java/org/beartify/player/generated/RustWebView.kt:26:18 'setter for databaseEnabled: Boolean' is deprecated. Deprecated in Java
+w: file:///home/papaours/Tauri/src-tauri/gen/android/app/src/main/java/org/beartify/player/generated/WryActivity.kt:69:46 'onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+Java compiler version 21 has deprecated support for compiling with source/target version 8.
+Try one of the following options:
+    1. [Recommended] Use Java toolchain with a lower language version
+    2. Set a higher source/target version
+    3. Use a lower version of the JDK running the build (if you're not using Java toolchain)
+For more details on how to configure these settings, see https://developer.android.com/build/jdks.
+To suppress this warning, set android.javaCompile.suppressSourceTargetDeprecationWarning=true in gradle.properties.
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+3 warnings
+Supplied consumer proguard configuration does not exist: /home/papaours/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-plugin-shell-2.3.5/android/consumer-rules.pro
+
+[Incubating] Problems report is available at: file:///home/papaours/Tauri/src-tauri/gen/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+<=======------> 57% EXECUTING [2s]
+        Info Using installed NDK: /home/papaours/.android/sdk/ndk/26.3.11579264
+warning: unused variable: `app`2s]
+  --> src/lib.rs:15:17
+   |
+15 |         .setup(|app| {
+   |                 ^^^ help: if this is intentional, prefix it with an underscore: `_app`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `beartify` (lib) generated 1 warning (run `cargo fix --lib -p beartify` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 0.44s
+        Info symlinking lib "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so" in jniLibs dir "/home/papaours/Tauri/src-tauri/gen/android/app/src/main/jniLibs/arm64-v8a"
+        Info "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so" requires shared lib "libandroid.so"
+        Info "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so" requires shared lib "libdl.so"
+        Info "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so" requires shared lib "liblog.so"
+        Info "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so" requires shared lib "libm.so"
+        Info "/home/papaours/Tauri/src-tauri/target/aarch64-linux-android/release/libbeartify_lib.so" requires shared lib "libc.so"
+<=======------> 58% EXECUTING [3s]
+        Info Using installed NDK: /home/papaours/.android/sdk/ndk/26.3.11579264
+   Compiling beartify v1.0.0 (/home/papaours/Tauri/src-tauri)
+warning: unused variable: `app`25s]
+  --> src/lib.rs:15:17
+   |
+15 |         .setup(|app| {
+   |                 ^^^ help: if this is intentional, prefix it with an underscore: `_app`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `beartify` (lib) generated 1 warning (run `cargo fix --lib -p beartify` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 58.07s
+        Info symlinking lib "/home/papaours/Tauri/src-tauri/target/armv7-linux-androideabi/release/libbeartify_lib.so" in jniLibs dir "/home/papaours/Tauri/src-tauri/gen/android/app/src/main/jniLibs/armeabi-v7a"
+        Info "/home/papaours/Tauri/src-tauri/target/armv7-linux-androideabi/release/libbeartify_lib.so" requires shared lib "libandroid.so"
+        Info "/home/papaours/Tauri/src-tauri/target/armv7-linux-androideabi/release/libbeartify_lib.so" requires shared lib "libdl.so"
+        Info "/home/papaours/Tauri/src-tauri/target/armv7-linux-androideabi/release/libbeartify_lib.so" requires shared lib "liblog.so"
+        Info "/home/papaours/Tauri/src-tauri/target/armv7-linux-androideabi/release/libbeartify_lib.so" requires shared lib "libm.so"
+        Info "/home/papaours/Tauri/src-tauri/target/armv7-linux-androideabi/release/libbeartify_lib.so" requires shared lib "libc.so"
+<=======------> 58% EXECUTING [1m 2s]
+        Info Using installed NDK: /home/papaours/.android/sdk/ndk/26.3.11579264
+   Compiling beartify v1.0.0 (/home/papaours/Tauri/src-tauri)
+warning: unused variable: `app`1m 23s]
+  --> src/lib.rs:15:17
+   |
+15 |         .setup(|app| {
+   |                 ^^^ help: if this is intentional, prefix it with an underscore: `_app`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `beartify` (lib) generated 1 warning (run `cargo fix --lib -p beartify` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 47.81s
+        Info symlinking lib "/home/papaours/Tauri/src-tauri/target/i686-linux-android/release/libbeartify_lib.so" in jniLibs dir "/home/papaours/Tauri/src-tauri/gen/android/app/src/main/jniLibs/x86"
+        Info "/home/papaours/Tauri/src-tauri/target/i686-linux-android/release/libbeartify_lib.so" requires shared lib "libandroid.so"
+        Info "/home/papaours/Tauri/src-tauri/target/i686-linux-android/release/libbeartify_lib.so" requires shared lib "libdl.so"
+        Info "/home/papaours/Tauri/src-tauri/target/i686-linux-android/release/libbeartify_lib.so" requires shared lib "liblog.so"
+        Info "/home/papaours/Tauri/src-tauri/target/i686-linux-android/release/libbeartify_lib.so" requires shared lib "libm.so"
+        Info "/home/papaours/Tauri/src-tauri/target/i686-linux-android/release/libbeartify_lib.so" requires shared lib "libc.so"
+<=======------> 59% EXECUTING [1m 51s]
+        Info Using installed NDK: /home/papaours/.android/sdk/ndk/26.3.11579264
+   Compiling beartify v1.0.0 (/home/papaours/Tauri/src-tauri)
+warning: unused variable: `app`2m 12s]
+  --> src/lib.rs:15:17
+   |
+15 |         .setup(|app| {
+   |                 ^^^ help: if this is intentional, prefix it with an underscore: `_app`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `beartify` (lib) generated 1 warning (run `cargo fix --lib -p beartify` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 48.36s
+        Info symlinking lib "/home/papaours/Tauri/src-tauri/target/x86_64-linux-android/release/libbeartify_lib.so" in jniLibs dir "/home/papaours/Tauri/src-tauri/gen/android/app/src/main/jniLibs/x86_64"
+        Info "/home/papaours/Tauri/src-tauri/target/x86_64-linux-android/release/libbeartify_lib.so" requires shared lib "libandroid.so"
+        Info "/home/papaours/Tauri/src-tauri/target/x86_64-linux-android/release/libbeartify_lib.so" requires shared lib "libdl.so"
+        Info "/home/papaours/Tauri/src-tauri/target/x86_64-linux-android/release/libbeartify_lib.so" requires shared lib "liblog.so"
+        Info "/home/papaours/Tauri/src-tauri/target/x86_64-linux-android/release/libbeartify_lib.so" requires shared lib "libm.so"
+        Info "/home/papaours/Tauri/src-tauri/target/x86_64-linux-android/release/libbeartify_lib.so" requires shared lib "libc.so"
+
+[Incubating] Problems report is available at: file:///home/papaours/Tauri/src-tauri/gen/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+    Finished 1 APK at:
+        /home/papaours/Tauri/src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk
+
+    Finished 1 AAB at:
+        /home/papaours/Tauri/src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-universal-release.aab
+
+papaours@papaours:~/Tauri$ 
