@@ -1,15 +1,7 @@
-papaours@papaours:~/Tauri$ export ANDROID_HOME="$HOME/.android/sdk"
-export NDK_HOME="$ANDROID_HOME/ndk/26.3.11579264"
-npx tauri android build
-       Error Project directory /home/papaours/Tauri/src-tauri/gen/android/app/src/main/java/org/beartify/player does not exist. Did you update the package name in `Cargo.toml` or the bundle identifier in `tauri.conf.json > identifier`? Save your changes, delete the `gen/android` folder and run `tauri android init` to recreate the Android project.
-papaours@papaours:~/Tauri$ 
+papaours@papaours:~/Tauri/src-tauri/target/release/bundle/appimage$ chmod +x Beartify.AppImage
+papaours@papaours:~/Tauri/src-tauri/target/release/bundle/appimage$ ./Beartify.AppImage
 
-
-
-
-
-
-
-
-
-
+thread 'main' (3631501) panicked at src/lib.rs:34:10:
+Erreur au lancement de Beartify: PluginInitialization("http", "Error deserializing 'plugins.http' within your Tauri configuration: invalid type: map, expected unit")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+papaours@papaours:~/Tauri/src-tauri/target/release/bundle/appimage$ 
