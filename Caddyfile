@@ -1,3 +1,3 @@
-rm -rf src-tauri/gen/android
-npx tauri android init
-npx tauri android build --apk
+./src-tauri/target/release/bundle/appimage/Beartify_1.0.0_amd64.AppImage
+
+WEBKIT_DISABLE_DMABUF_RENDERER=1 ./src-tauri/target/release/bundle/appimage/Beartify_1.0.0_amd64.AppImage
