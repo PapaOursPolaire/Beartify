@@ -1,0 +1,30 @@
+[package]
+name        = "beartify"
+version     = "1.0.0"
+description = "Beartify Music Player"
+authors     = ["you"]
+edition     = "2021"
+
+[lib]
+name       = "beartify_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri                        = { version = "2", features = ["devtools"] }
+tauri-plugin-shell           = "2"
+tauri-plugin-http            = "2"
+tauri-plugin-deep-link       = "2"
+tauri-plugin-single-instance = "2.2.0"
+tauri-plugin-oauth           = "2"
+serde      = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[features]
+custom-protocol = ["tauri/custom-protocol"]
+
+[profile.release]
+opt-level = 3
+strip     = false
