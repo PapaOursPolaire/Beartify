@@ -490,7 +490,19 @@ http://192.168.0.2 {
     }
     rewrite @notFile /index.html
 
+    # ── Vérification par date de naissance ───────────────────────────
+    handle /birthdate-check {
+        root * /var/www/html/player
+        php_fastcgi unix//run/php/php8.4-fpm.sock
+    }
+
+    # Empêcher l'accès direct au répertoire privé (fichier .docx)
+    handle /private/* {
+        respond "Forbidden" 403
+    }
+
     file_server
+    
 
     log {
         output file /var/log/caddy/beartify-node-server.log
