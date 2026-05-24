@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accès sécurisé</title>
+    <style>
+        body { font-family: system-ui, sans-serif; background: #0a0a0a; color: #eee; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: #1e1e1e; padding: 2rem; border-radius: 1rem; box-shadow: 0 0 20px rgba(0,0,0,0.5); text-align: center; max-width: 400px; }
+        input, button { padding: 0.75rem; font-size: 1rem; border-radius: 0.5rem; border: none; margin: 0.5rem; }
+        input { background: #2c2c2c; color: #fff; text-align: center; letter-spacing: 2px; }
+        button { background: #3b82f6; color: white; cursor: pointer; transition: 0.2s; }
+        button:hover { background: #2563eb; }
+        .error { color: #f87171; margin-top: 1rem; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>🔐 Accès au document</h2>
+        <p>Entrez votre date de naissance <strong>(jjmmmaa)</strong></p>
+        <form method="POST" action="/birthdate-check">
+            <input type="text" name="birthdate" placeholder="290809" maxlength="6" pattern="\d{6}" required autocomplete="off">
+            <button type="submit">Vérifier</button>
+        </form>
+        <div id="error" class="error"></div>
+    </div>
+
+    <script>
+        // Gestion simple des erreurs (si le serveur renvoie une page d'erreur)
+        const form = document.querySelector('form');
+        const errorDiv = document.getElementById('error');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const response = await fetch('/birthdate-check', {
+                method: 'POST',
+                body: formData
+            });
+            if (response.ok) {
+                // Téléchargement du fichier
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'document.docx';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                errorDiv.innerText = '';
+            } else {
+                const text = await response.text();
+                errorDiv.innerText = text || 'Date invalide.';
+            }
+        });
+    </script>
+</body>
+</html>
