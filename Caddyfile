@@ -2,6 +2,12 @@
 #  BEARTIFY — Caddyfile durci
 #  TLS automatique Let's Encrypt, clés API jamais exposées au client,
 #  headers de sécurité stricts sur les trois domaines.
+#
+#  🔐 v2 — Protection anti-téléchargement des streams audio :
+#  Le snippet (jellyfin_audio_stream) est importé AVANT le bloc
+#  /api/jellyfin/* général dans chaque site Beartify.
+#  Il retire static=true (empêche le fichier brut) et ajoute des
+#  headers Content-Disposition: inline + Cache-Control: no-store.
 # ══════════════════════════════════════════════════════════════════════
 
 # ── Options globales ───────────────────────────────────────────────────
@@ -47,6 +53,53 @@
     header @has_origin Access-Control-Expose-Headers "Content-Length, Content-Range, Accept-Ranges"
     header @has_origin Vary "Origin"
 }
+
+
+# ══════════════════════════════════════════════════════════════════════
+#  SNIPPET — Protection anti-téléchargement des streams audio Jellyfin
+#
+#  Doit être importé AVANT le bloc handle /api/jellyfin/* général.
+#  Caddy exécute le premier handle qui correspond : ce bloc intercepte
+#  les URLs /api/jellyfin/Audio/*/stream* avant le bloc générique.
+#
+#  Mesures appliquées :
+#   1. uri query -static  → supprime static=true de la query string
+#      Jellyfin reçoit /Audio/:id/stream sans le paramètre → il transcodera
+#      en temps réel au lieu de servir le fichier brut complet.
+#   2. Content-Disposition: inline → le navigateur ne propose pas "Enregistrer"
+#   3. Cache-Control: no-store    → aucun cache proxy/navigateur de l'URL
+#   4. X-Content-Type-Options     → sniffing MIME désactivé
+# ══════════════════════════════════════════════════════════════════════
+(jellyfin_audio_stream) {
+    handle /api/jellyfin/Audio/*/stream* {
+        uri strip_prefix /api/jellyfin
+        # 🔐 PROTECTION PRINCIPALE : retire static=true
+        # Sans ce paramètre Jellyfin transcodera → flux non-téléchargeable
+        uri query -static
+
+        reverse_proxy 127.0.0.1:8096 {
+            flush_interval -1
+
+            header_up  X-Emby-Token      "aaa8a7df4b364cf7bcc76f351d768798"
+            header_up  Host              grizzly-stream.duckdns.org
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto {scheme}
+            header_up  Connection        {http.request.header.Connection}
+            header_up  Upgrade           {http.request.header.Upgrade}
+
+            # Supprimer la clé de la réponse
+            header_down -X-Emby-Token
+            header_down -Access-Control-Allow-Origin
+
+            # 🔐 Headers anti-téléchargement
+            header_down Content-Disposition    "inline"
+            header_down Cache-Control          "no-store, no-cache, private, max-age=0"
+            header_down X-Content-Type-Options "nosniff"
+        }
+    }
+}
+
 
 # ──────────────────────────────────────────────────────────────────────
 #  1. NEXTCLOUD — grizzlyrics.duckdns.org
@@ -151,6 +204,11 @@ beartify.duckdns.org {
         path *.js *.css *.woff2 *.woff *.ttf *.png *.jpg *.svg *.ico *.webp *.gif
     }
     header @static Cache-Control "public, max-age=31536000, immutable"
+
+    # ── 🔐 PROTECTION AUDIO — doit précéder le bloc /api/jellyfin/* ──
+    # Ce handle intercepte uniquement les URLs de streaming audio et
+    # retire static=true avant de proxifier vers Jellyfin.
+    import jellyfin_audio_stream
 
     # ── PROXY JELLYFIN — clé API injectée par Caddy ───────────────────
     # Le client ne voit jamais la clé X-Emby-Token.
@@ -316,6 +374,9 @@ http://192.168.0.18 {
     }
     header @static Cache-Control "public, max-age=31536000, immutable"
 
+    # ── 🔐 PROTECTION AUDIO ───────────────────────────────────────────
+    import jellyfin_audio_stream
+
     # ── PROXY JELLYFIN (identique bloc prod) ─────────────────────────
     handle /api/jellyfin/* {
         uri strip_prefix /api/jellyfin
@@ -418,6 +479,9 @@ http://192.168.0.2 {
         path *.js *.css *.woff2 *.woff *.ttf *.png *.jpg *.svg *.ico *.webp
     }
     header @static Cache-Control "public, max-age=31536000, immutable"
+
+    # ── 🔐 PROTECTION AUDIO ───────────────────────────────────────────
+    import jellyfin_audio_stream
 
     # ── PROXY JELLYFIN (identique bloc prod) ─────────────────────────
     handle /api/jellyfin/* {
