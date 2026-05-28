@@ -63,19 +63,17 @@
 #  les URLs /api/jellyfin/Audio/*/stream* avant le bloc générique.
 #
 #  Mesures appliquées :
-#   1. uri query -static  → supprime static=true de la query string
-#      Jellyfin reçoit /Audio/:id/stream sans le paramètre → il transcodera
-#      en temps réel au lieu de servir le fichier brut complet.
-#   2. Content-Disposition: inline → le navigateur ne propose pas "Enregistrer"
-#   3. Cache-Control: no-store    → aucun cache proxy/navigateur de l'URL
-#   4. X-Content-Type-Options     → sniffing MIME désactivé
+#   1. Content-Disposition: inline → le navigateur ne propose pas "Enregistrer"
+#   2. Cache-Control: no-store    → aucun cache proxy/navigateur de l'URL
+#   3. X-Content-Type-Options     → sniffing MIME désactivé
+#
+#  ⚠️  static=true est conservé car requis par Jellyfin pour la lecture
+#      directe via <audio>. Retirer ce paramètre casse la lecture
+#      (Jellyfin a besoin de deviceId/container/audioCodec pour transcoder).
 # ══════════════════════════════════════════════════════════════════════
 (jellyfin_audio_stream) {
     handle /api/jellyfin/Audio/*/stream* {
         uri strip_prefix /api/jellyfin
-        # 🔐 PROTECTION PRINCIPALE : retire static=true
-        # Sans ce paramètre Jellyfin transcodera → flux non-téléchargeable
-        uri query -static
 
         reverse_proxy 127.0.0.1:8096 {
             flush_interval -1
