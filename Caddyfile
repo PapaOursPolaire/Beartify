@@ -148,7 +148,7 @@ beartify.duckdns.org {
 
     # ── Cache statique (assets compilés) ──────────────────────────────
     @static {
-        path *.js *.css *.woff2 *.woff *.ttf *.png *.jpg *.svg *.ico *.webp
+        path *.js *.css *.woff2 *.woff *.ttf *.png *.jpg *.svg *.ico *.webp *.gif
     }
     header @static Cache-Control "public, max-age=31536000, immutable"
 
@@ -248,7 +248,7 @@ beartify.duckdns.org {
     # ── SPA fallback — toutes les routes inconnues → index.html ───────
     # Permet la navigation côté client sans 404.
     @notFile {
-        not path *.js *.css *.png *.jpg *.svg *.ico *.woff* *.ttf *.webp *.json *.html
+        not path *.js *.css *.png *.jpg *.svg *.ico *.woff* *.ttf *.webp *.json *.html *.gif
         not path /api/*
     }
     rewrite @notFile /index.html
@@ -490,19 +490,7 @@ http://192.168.0.2 {
     }
     rewrite @notFile /index.html
 
-    # ── Vérification par date de naissance ───────────────────────────
-    handle /birthdate-check {
-        root * /var/www/html/player
-        php_fastcgi unix//run/php/php8.4-fpm.sock
-    }
-
-    # Empêcher l'accès direct au répertoire privé (fichier .docx)
-    handle /private/* {
-        respond "Forbidden" 403
-    }
-
     file_server
-    
 
     log {
         output file /var/log/caddy/beartify-node-server.log
