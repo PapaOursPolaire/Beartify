@@ -1,12 +1,12 @@
-# 1. On s'assure que les variables Android sont bien chargées
-export ANDROID_HOME="$HOME/.android/sdk"
-export NDK_HOME="$ANDROID_HOME/ndk/26.3.11579264"
+# 1. Installer
+mkdir -p /opt/beartify-drm && cd /opt/beartify-drm
+# copier drm.js, package.json, .env
+npm install
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+# → coller dans .env comme SESSION_SECRET=...
 
-# 2. On supprime le dossier Android corrompu/obsolète
-rm -rf src-tauri/gen/android
+# 2. Service systemd (même que précédemment, ExecStart=node drm.js)
+systemctl enable --now beartify-drm
 
-# 3. On demande à Tauri de recréer proprement le projet Android
-npx tauri android init
-
-# 4. On lance la compilation finale de l'APK
-npx tauri android build
+# 3. Caddy
+caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy
