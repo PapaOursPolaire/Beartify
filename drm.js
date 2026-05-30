@@ -100,7 +100,7 @@ async function generateHoneypotSegments() {
 
   return new Promise((resolve) => {
     // Même codec/params que les segments réels → init.mp4 compatible
-    const ff = spawn('ffmpeg', [
+    const ffArgs = [
       '-i',                  HONEYPOT_AUDIO,
       '-vn',
       '-c:a',                'flac',
@@ -113,7 +113,10 @@ async function generateHoneypotSegments() {
       '-hls_list_size',      '0',
       '-y',
       path.join(_honeypotDir, 'honey_playlist.m3u8'),
-    ], { stdio: 'ignore' });
+    ];
+    const ff = spawn('ffmpeg', ffArgs, { stdio: ['ignore', 'ignore', 'pipe'] });
+    let ffErr = '';
+    ff.stderr.on('data', d => { ffErr += d.toString(); });
 
     ff.on('close', (code) => {
       if (code === 0) {
@@ -124,6 +127,9 @@ async function generateHoneypotSegments() {
         console.log(`✅ Honeypot : ${_honeypotSegs.length} segments Rick Roll prêts`);
       } else {
         console.error('[Honeypot] ffmpeg échoué code', code);
+        // Afficher les 5 dernières lignes d'erreur ffmpeg
+        const errLines = ffErr.trim().split('\n').slice(-5).join('\n');
+        console.error('[Honeypot] stderr ffmpeg :\n' + errLines);
       }
       resolve();
     });
@@ -146,36 +152,47 @@ function startTranscode(itemId, token, tempDir) {
   const jellyUrl = `http://${JELLYFIN_HOST}:${JELLYFIN_PORT}/Audio/${itemId}/stream`
                  + `?static=true&api_key=${JELLYFIN_TOKEN}`;
 
+  // Capturer stderr pour diagnostic si ffmpeg échoue
   const ff = spawn('ffmpeg', [
     '-i',                      jellyUrl,
-    '-vn',                                    // audio seulement
-    '-c:a',                    'flac',         // LOSSLESS — pas de ré-encodage
-    '-ar',                     '44100',        // normalisation (compat. honeypot)
+    '-vn',
+    '-c:a',                    'flac',
+    '-ar',                     '44100',
     '-ac',                     '2',
-    '-hls_segment_type',       'fmp4',         // Fragmented MP4 (requis pour FLAC)
-    '-hls_fmp4_init_filename', 'init.mp4',    // segment d'initialisation
+    '-hls_segment_type',       'fmp4',
+    '-hls_fmp4_init_filename', 'init.mp4',
     '-hls_key_info_file',      path.join(tempDir, 'key.keyinfo'),
     '-hls_segment_filename',   path.join(tempDir, 'seg%03d.m4s'),
-    '-hls_time',               '4',            // segments de 4 secondes
-    '-hls_list_size',          '0',            // garder tous les segments
+    '-hls_time',               '4',
+    '-hls_list_size',          '0',
     '-hls_flags',              'independent_segments',
     '-y',
     path.join(tempDir, 'playlist.m3u8'),
-  ], { stdio: 'ignore' });
+  ], { stdio: ['ignore', 'ignore', 'pipe'] });
+
+  // Accumuler stderr ffmpeg pour le reporter en cas d'erreur
+  let _ffStderr = '';
+  ff.stderr.on('data', d => {
+    _ffStderr += d.toString();
+    // Garder seulement les 8 dernières Ko pour ne pas saturer la mémoire
+    if (_ffStderr.length > 8192) _ffStderr = _ffStderr.slice(-8192);
+  });
 
   ff.on('close', (code) => {
+    const s = sessions.get(token);
     if (code !== 0) {
-      const s = sessions.get(token);
-      if (s && !s.ready) s.ffmpegError = `ffmpeg exit ${code}`;
-      console.error(`[HLS] ffmpeg échoué pour ${itemId} (code ${code})`);
+      const lastLines = _ffStderr.trim().split('\n').slice(-8).join(' | ');
+      const errMsg = `ffmpeg exit ${code} — ${lastLines}`;
+      if (s && !s.ready) s.ffmpegError = errMsg;
+      console.error(`[HLS] ffmpeg échoué pour ${itemId} :`, errMsg);
     } else {
       console.log(`[HLS] Transcodage terminé : ${itemId}`);
     }
   });
   ff.on('error', (e) => {
     const s = sessions.get(token);
-    if (s && !s.ready) s.ffmpegError = `ffmpeg indisponible : ${e.message}`;
-    console.error('[HLS] Impossible de lancer ffmpeg :', e.message);
+    if (s && !s.ready) s.ffmpegError = `ffmpeg introuvable : ${e.message}`;
+    console.error('[HLS] ffmpeg introuvable :', e.message);
   });
 
   // ── Détection progressive ─────────────────────────────────────────
@@ -387,8 +404,11 @@ app.get('/api/hls/playlist/:id', async (req, res) => {
   }
 
   if (!s.ready) {
+    const errDetail = s.ffmpegError || 'Timeout 60s';
+    console.error(`[Playlist] Session non prête pour ${req.params.id} :`, errDetail);
     return res.status(500).json({
-      error: s.ffmpegError || 'Timeout 60s — vérifier ffmpeg',
+      error: errDetail,
+      hint: 'Vérifier : journalctl -u beartify-drm -n 50',
     });
   }
 
@@ -460,6 +480,73 @@ app.get('/api/hls/segment/:id/:seg', (req, res) => {
     res.setHeader('Cache-Control', 'no-store, private');
     fs.createReadStream(segPath).pipe(res);
   }
+});
+
+// ══════════════════════════════════════════════════════════════════════
+//  DIAGNOSTIC — /api/hls/test?item=ITEM_ID
+//  Teste ffmpeg en conditions réelles et retourne le stderr complet.
+//  Supprimer ou protéger cet endpoint en production après debug.
+// ══════════════════════════════════════════════════════════════════════
+app.get('/api/hls/test', (req, res) => {
+  const itemId = req.query.item;
+  if (!itemId || !/^[a-f0-9]{32}$/i.test(itemId)) {
+    return res.status(400).json({ error: 'Paramètre ?item=<jellyfin_id> requis' });
+  }
+
+  const jellyUrl = `http://${JELLYFIN_HOST}:${JELLYFIN_PORT}/Audio/${itemId}/stream`
+                 + `?static=true&api_key=${JELLYFIN_TOKEN}`;
+
+  const outPath = `/tmp/beartify_test_${Date.now()}`;
+  const args = [
+    '-i', jellyUrl,
+    '-vn',
+    '-c:a', 'flac',
+    '-t', '5',                     // 5 secondes seulement pour le test
+    '-hls_segment_type', 'fmp4',
+    '-hls_fmp4_init_filename', `${outPath}_init.mp4`,
+    '-hls_segment_filename',   `${outPath}_%03d.m4s`,
+    '-hls_time', '4',
+    '-hls_list_size', '0',
+    '-y', `${outPath}.m3u8`,
+  ];
+
+  const ff = spawn('ffmpeg', args, { stdio: ['ignore', 'ignore', 'pipe'] });
+  let stderr = '';
+  ff.stderr.on('data', d => { stderr += d.toString(); });
+
+  ff.on('close', (code) => {
+    // Nettoyer les fichiers de test
+    try {
+      require('fs').readdirSync('/tmp')
+        .filter(f => f.startsWith(`beartify_test_`))
+        .forEach(f => { try { require('fs').unlinkSync(`/tmp/${f}`); } catch (_) {} });
+    } catch (_) {}
+
+    const lastLines = stderr.trim().split('\n').slice(-15).join('\n');
+    res.json({
+      success:    code === 0,
+      exitCode:   code,
+      jellyfinUrl: jellyUrl.replace(JELLYFIN_TOKEN, '***'),
+      ffmpegArgs: args.map(a => a.includes(JELLYFIN_TOKEN) ? a.replace(JELLYFIN_TOKEN, '***') : a),
+      stderr_last15_lines: lastLines,
+    });
+  });
+
+  ff.on('error', (e) => {
+    res.status(500).json({
+      success: false,
+      error: e.message,
+      hint: 'ffmpeg est-il installé ? Tester : ffmpeg -version',
+    });
+  });
+
+  // Timeout 30s
+  setTimeout(() => {
+    if (!res.headersSent) {
+      ff.kill();
+      res.status(500).json({ success: false, error: 'Timeout 30s' });
+    }
+  }, 30000);
 });
 
 // ── Healthcheck ───────────────────────────────────────────────────────
