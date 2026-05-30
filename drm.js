@@ -1,138 +1,43 @@
-papaours@papaours:~$ sudo ./drm.sh --honeypot-audio /home/papaours/rickroll.mp3
-[sudo] Mot de passe de papaours : 
+Deux problèmes clairs dans le log :
 
-╔══════════════════════════════════════════════════════════╗
-║   BEARTIFY DRM v4 — HLS FLAC + AES-128 + Honeypot 1/2   ║
-╚══════════════════════════════════════════════════════════╝
+1. **Honeypot ffmpeg échoue** — probablement permissions sur `/home/papaours/rickroll.mp3` (non lisible par `www-data`)
+2. **500 playlist** — ffmpeg n'arrive pas à accéder à Jellyfin en interne
 
+Avant tout : le `drm.js` déployé est-il bien la **nouvelle version** avec la capture stderr ? Lance ce test pour avoir l'erreur exacte :
 
-▶ Vérification des permissions
-✅  Exécution en root
+```bash
+# Test 1 — ffmpeg peut-il accéder à Jellyfin ?
+curl "http://127.0.0.1:3001/api/hls/test?item=7bad677480c5183e0ee507874c9c1d4b"
+```
 
-▶ Vérification des prérequis
-⚠   ffmpeg : format fmp4 non détecté — vérifier la version (>= 4.0)
-✅  Node.js v20.19.2
-✅  npm 9.2.0
-✅  ffmpeg 7.1.4-0+deb13u1
-✅  FLAC fMP4 HLS disponible
+```bash
+# Test 2 — Jellyfin accessible en interne ?
+curl -I "http://127.0.0.1:8096/Audio/7bad677480c5183e0ee507874c9c1d4b/stream?static=true&api_key=aaa8a7df4b364cf7bcc76f351d768798"
+```
 
-▶ Création de /opt/beartify-drm
-✅  Dossier : /opt/beartify-drm
+```bash
+# Test 3 — Voir l'erreur ffmpeg en temps réel
+journalctl -u beartify-drm -n 50 --no-pager
+```
 
-▶ Déploiement de drm.js
-✅  drm.js copié depuis /home/papaours
+```bash
+# Test 4 — Corriger les permissions du Rick Roll
+sudo chmod 644 /home/papaours/rickroll.mp3
+sudo chown www-data:www-data /home/papaours/rickroll.mp3
+# Ou mieux : copier le fichier dans un dossier accessible
+sudo cp /home/papaours/rickroll.mp3 /opt/beartify-drm/rickroll.mp3
+sudo chown www-data:www-data /opt/beartify-drm/rickroll.mp3
+```
 
-▶ Écriture de package.json
-✅  package.json écrit
+Puis mettre à jour le `.env` :
+```bash
+sudo nano /opt/beartify-drm/.env
+# Modifier la ligne :
+HONEYPOT_AUDIO=/opt/beartify-drm/rickroll.mp3
+```
 
-▶ Configuration .env
-⚠   SESSION_SECRET conservé (réinstallation)
-✅  .env créé (chmod 600)
+```bash
+sudo systemctl restart beartify-drm
+```
 
-▶ Installation des dépendances npm
-✅  express + dotenv installés
-
-▶ Pré-génération des segments Rick Roll (FLAC fMP4)
-ℹ   Transcodage de /home/papaours/rickroll.mp3 en segments FLAC fMP4...
-⚠   ffmpeg a échoué — les honeypots seront générés au premier démarrage
-
-▶ Permissions
-✅  Permissions appliquées
-
-▶ Service systemd beartify-drm
-✅  Service redémarré
-
-▶ Vérification du serveur DRM
-   Attente du démarrage.
-✅  Serveur DRM actif : {"status":"ok","sessions":0,"honeypot_segs":0,"honeypot_every":"1 sur 2"}
-
-══════════════════════════════════════════════════════════
-  Déploiement terminé !                                    
-══════════════════════════════════════════════════════════
-
-  📁 Dossier      : /opt/beartify-drm
-  🔐 .env         : /opt/beartify-drm/.env  (chmod 600)
-  ⚙  Service      : beartify-drm  (auto-démarrage ON)
-  🌐 Port         : 127.0.0.1:3001
-  🎵 Audio        : FLAC lossless (fMP4 HLS)
-  🪤  Honeypot     : Rick Roll — 1 segment sur 2
-
-Commandes utiles :
-  journalctl -u beartify-drm -f
-  systemctl restart beartify-drm
-  curl http://127.0.0.1:3001/health
-
-⚠  Étape finale — Caddy + script.js :
-  scp Caddyfile.txt user@serveur:/etc/caddy/Caddyfile
-  scp script.js     user@serveur:/var/www/html/player/script.js
-  caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy
-
-papaours@papaours:~$ sudo ./drm.sh --honeypot-audio /home/papaours/rickroll.mp3
-
-╔══════════════════════════════════════════════════════════╗
-║   BEARTIFY DRM v4 — HLS FLAC + AES-128 + Honeypot 1/2   ║
-╚══════════════════════════════════════════════════════════╝
-
-
-▶ Vérification des permissions
-✅  Exécution en root
-
-▶ Vérification des prérequis
-⚠   ffmpeg : format fmp4 non détecté — vérifier la version (>= 4.0)
-✅  Node.js v20.19.2
-✅  npm 9.2.0
-✅  ffmpeg 7.1.4-0+deb13u1
-✅  FLAC fMP4 HLS disponible
-
-▶ Création de /opt/beartify-drm
-✅  Dossier : /opt/beartify-drm
-
-▶ Déploiement de drm.js
-✅  drm.js copié depuis /home/papaours
-
-▶ Écriture de package.json
-✅  package.json écrit
-
-▶ Configuration .env
-⚠   SESSION_SECRET conservé (réinstallation)
-✅  .env créé (chmod 600)
-
-▶ Installation des dépendances npm
-✅  express + dotenv installés
-
-▶ Pré-génération des segments Rick Roll (FLAC fMP4)
-ℹ   Transcodage de /home/papaours/rickroll.mp3 en segments FLAC fMP4...
-⚠   ffmpeg a échoué — les honeypots seront générés au premier démarrage
-
-▶ Permissions
-✅  Permissions appliquées
-
-▶ Service systemd beartify-drm
-✅  Service redémarré
-
-▶ Vérification du serveur DRM
-   Attente du démarrage.
-✅  Serveur DRM actif : {"status":"ok","sessions":0,"honeypot_segs":0,"honeypot_every":"1 sur 2"}
-
-══════════════════════════════════════════════════════════
-  Déploiement terminé !                                    
-══════════════════════════════════════════════════════════
-
-  📁 Dossier      : /opt/beartify-drm
-  🔐 .env         : /opt/beartify-drm/.env  (chmod 600)
-  ⚙  Service      : beartify-drm  (auto-démarrage ON)
-  🌐 Port         : 127.0.0.1:3001
-  🎵 Audio        : FLAC lossless (fMP4 HLS)
-  🪤  Honeypot     : Rick Roll — 1 segment sur 2
-
-Commandes utiles :
-  journalctl -u beartify-drm -f
-  systemctl restart beartify-drm
-  curl http://127.0.0.1:3001/health
-
-⚠  Étape finale — Caddy + script.js :
-  scp Caddyfile.txt user@serveur:/etc/caddy/Caddyfile
-  scp script.js     user@serveur:/var/www/html/player/script.js
-  caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy
-
-papaours@papaours:~$ 
+Donne-moi la sortie du **Test 1** (`/api/hls/test`) — elle contiendra le stderr ffmpeg exact et je corrige immédiatement.
