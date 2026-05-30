@@ -1,43 +1,74 @@
-Deux problèmes clairs dans le log :
-
-1. **Honeypot ffmpeg échoue** — probablement permissions sur `/home/papaours/rickroll.mp3` (non lisible par `www-data`)
-2. **500 playlist** — ffmpeg n'arrive pas à accéder à Jellyfin en interne
-
-Avant tout : le `drm.js` déployé est-il bien la **nouvelle version** avec la capture stderr ? Lance ce test pour avoir l'erreur exacte :
-
-```bash
-# Test 1 — ffmpeg peut-il accéder à Jellyfin ?
-curl "http://127.0.0.1:3001/api/hls/test?item=7bad677480c5183e0ee507874c9c1d4b"
+papaours@papaours:~$ curl "http://127.0.0.1:3001/api/hls/test?item=7bad677480c5183e0ee507874c9c1d4b"
+{"success":false,"exitCode":254,"jellyfinUrl":"http://127.0.0.1:8096/Audio/7bad677480c5183e0ee507874c9c1d4b/stream?static=true&api_key=***","ffmpegArgs":["-i","http://127.0.0.1:8096/Audio/7bad677480c5183e0ee507874c9c1d4b/stream?static=true&api_key=***","-vn","-c:a","flac","-t","5","-hls_segment_type","fmp4","-hls_fmp4_init_filename","/tmp/beartify_test_1780175722488_init.mp4","-hls_segment_filename","/tmp/beartify_test_1780175722488_%03d.m4s","-hls_time","4","-hls_list_size","0","-y","/tmp/beartify_test_1780175722488.m3u8"],"stderr_last15_lines":"      Metadata:\n        comment         : Cover (front)\n        title           : Cover\nStream mapping:\n  Stream #0:0 -> #0:0 (flac (native) -> flac (native))\nPress [q] to stop, [?] for help\n[hls @ 0x56050388b3c0] Opening '/tmp//tmp/beartify_test_1780175722488_init.mp4' for writing\n[hls @ 0x56050388b3c0] Failed to open segment '/tmp/beartify_test_1780175722488_init.mp4'\n[out#0/hls @ 0x56050388b2c0] Could not write header (incorrect codec parameters ?): No such file or directory\n[af#0:0 @ 0x56050388b700] Error sending frames to consumers: No such file or directory\n[af#0:0 @ 0x56050388b700] Task finished with error code: -2 (No such file or directory)\n[af#0:0 @ 0x56050388b700] Terminating thread with return code -2 (No such file or directory)\n[out#0/hls @ 0x56050388b2c0] Nothing was written into output file, because at least one of its streams received no packets.\nsize=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x    \nConvpapaours@papaours:~$ curl -I "http://127.0.0.1:8096/Audio/7bad677480c5183e0ee507874c9c1d4b/stream?static=true&api_key=aaa8a7df4b364cf7bcc76f351d768798"cc76f351d768798"
 ```
+HTTP/1.1 200 OK
+Content-Length: 17912116
+Content-Type: audio/flac
+Date: Sat, 30 May 2026 21:15:48 GMT
+Server: Kestrel
+Accept-Ranges: bytes
+Last-Modified: Sun, 05 Apr 2026 20:06:21 GMT
+X-Response-Time-ms: 15.9462
 
-```bash
-# Test 2 — Jellyfin accessible en interne ?
-curl -I "http://127.0.0.1:8096/Audio/7bad677480c5183e0ee507874c9c1d4b/stream?static=true&api_key=aaa8a7df4b364cf7bcc76f351d768798"
-```
-
-```bash
-# Test 3 — Voir l'erreur ffmpeg en temps réel
-journalctl -u beartify-drm -n 50 --no-pager
-```
-
-```bash
-# Test 4 — Corriger les permissions du Rick Roll
-sudo chmod 644 /home/papaours/rickroll.mp3
+> 
+> 
+> ^C
+papaours@papaours:~$ journalctl -u beartify-drm -n 50 --no-pager
+mai 30 23:10:49 papaours beartify-drm[4182925]: [af#0:0 @ 0x55acdf6ee440] Task finished with error code: -2 (No such file or directory)
+mai 30 23:10:49 papaours beartify-drm[4182925]: [af#0:0 @ 0x55acdf6ee440] Terminating thread with return code -2 (No such file or directory)
+mai 30 23:10:49 papaours beartify-drm[4182925]: [out#0/hls @ 0x55acdf6ebe40] Nothing was written into output file, because at least one of its streams received no packets.
+mai 30 23:10:49 papaours beartify-drm[4182925]: size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x
+mai 30 23:10:49 papaours beartify-drm[4182925]: Conversion failed!
+mai 30 23:10:49 papaours beartify-drm[4182925]: ✅  Beartify DRM v4 → 127.0.0.1:3001
+mai 30 23:10:49 papaours beartify-drm[4182925]:     Audio   : FLAC lossless (fMP4 HLS)
+mai 30 23:10:49 papaours beartify-drm[4182925]:     Honeypot: 0 segments Rick Roll | 1 sur 2 (
+mai 30 23:10:58 papaours beartify-drm[4182925]: [HLS] ffmpeg échoué pour 7bad677480c5183e0ee507874c9c1d4b : ffmpeg exit 176 — [hls @ 0x5597521b1440] Encrypted fmp4 not yet supported | [out#0/hls @ 0x5597521b1340] Could not write header (incorrect codec parameters ?): Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x5597521b1700] Error sending frames to consumers: Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x5597521b1700] Task finished with error code: -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [af#0:0 @ 0x5597521b1700] Terminating thread with return code -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [out#0/hls @ 0x5597521b1340] Nothing was written into output file, because at least one of its streams received no packets. | size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x     | Conversion failed!
+mai 30 23:10:58 papaours beartify-drm[4182925]: [Playlist] Session non prête pour 7bad677480c5183e0ee507874c9c1d4b : ffmpeg exit 176 — [hls @ 0x5597521b1440] Encrypted fmp4 not yet supported | [out#0/hls @ 0x5597521b1340] Could not write header (incorrect codec parameters ?): Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x5597521b1700] Error sending frames to consumers: Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x5597521b1700] Task finished with error code: -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [af#0:0 @ 0x5597521b1700] Terminating thread with return code -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [out#0/hls @ 0x5597521b1340] Nothing was written into output file, because at least one of its streams received no packets. | size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x     | Conversion failed!
+mai 30 23:10:58 papaours beartify-drm[4182925]: [HLS] ffmpeg échoué pour 7bad677480c5183e0ee507874c9c1d4b : ffmpeg exit 176 — [hls @ 0x56549b726440] Encrypted fmp4 not yet supported | [out#0/hls @ 0x56549b726340] Could not write header (incorrect codec parameters ?): Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x56549b726700] Error sending frames to consumers: Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x56549b726700] Task finished with error code: -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [af#0:0 @ 0x56549b726700] Terminating thread with return code -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [out#0/hls @ 0x56549b726340] Nothing was written into output file, because at least one of its streams received no packets. | size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x     | Conversion failed!
+mai 30 23:10:59 papaours beartify-drm[4182925]: [Playlist] Session non prête pour 7bad677480c5183e0ee507874c9c1d4b : ffmpeg exit 176 — [hls @ 0x5597521b1440] Encrypted fmp4 not yet supported | [out#0/hls @ 0x5597521b1340] Could not write header (incorrect codec parameters ?): Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x5597521b1700] Error sending frames to consumers: Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x5597521b1700] Task finished with error code: -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [af#0:0 @ 0x5597521b1700] Terminating thread with return code -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [out#0/hls @ 0x5597521b1340] Nothing was written into output file, because at least one of its streams received no packets. | size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x     | Conversion failed!
+mai 30 23:11:40 papaours systemd[1]: Stopping beartify-drm.service - Beartify HLS DRM Stream Server v4 (FLAC + Honeypot)...
+mai 30 23:11:40 papaours systemd[1]: beartify-drm.service: Deactivated successfully.
+mai 30 23:11:40 papaours systemd[1]: Stopped beartify-drm.service - Beartify HLS DRM Stream Server v4 (FLAC + Honeypot).
+mai 30 23:11:40 papaours systemd[1]: Started beartify-drm.service - Beartify HLS DRM Stream Server v4 (FLAC + Honeypot).
+mai 30 23:11:40 papaours beartify-drm[4185257]: [Honeypot] Génération des segments Rick Roll FLAC fMP4...
+mai 30 23:11:41 papaours beartify-drm[4185257]: [Honeypot] ffmpeg échoué code 254
+mai 30 23:11:41 papaours beartify-drm[4185257]: [Honeypot] stderr ffmpeg :
+mai 30 23:11:41 papaours beartify-drm[4185257]: [af#0:0 @ 0x559b64ffa440] Task finished with error code: -2 (No such file or directory)
+mai 30 23:11:41 papaours beartify-drm[4185257]: [af#0:0 @ 0x559b64ffa440] Terminating thread with return code -2 (No such file or directory)
+mai 30 23:11:41 papaours beartify-drm[4185257]: [out#0/hls @ 0x559b64ff7e40] Nothing was written into output file, because at least one of its streams received no packets.
+mai 30 23:11:41 papaours beartify-drm[4185257]: size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x
+mai 30 23:11:41 papaours beartify-drm[4185257]: Conversion failed!
+mai 30 23:11:41 papaours beartify-drm[4185257]: ✅  Beartify DRM v4 → 127.0.0.1:3001
+mai 30 23:11:41 papaours beartify-drm[4185257]:     Audio   : FLAC lossless (fMP4 HLS)
+mai 30 23:11:41 papaours beartify-drm[4185257]:     Honeypot: 0 segments Rick Roll | 1 sur 2 (
+mai 30 23:12:09 papaours beartify-drm[4185257]: [HLS] ffmpeg échoué pour 7bad677480c5183e0ee507874c9c1d4b : ffmpeg exit 176 — [hls @ 0x55fe4fa17440] Encrypted fmp4 not yet supported | [out#0/hls @ 0x55fe4fa17340] Could not write header (incorrect codec parameters ?): Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x55fe4fa17700] Error sending frames to consumers: Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x55fe4fa17700] Task finished with error code: -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [af#0:0 @ 0x55fe4fa17700] Terminating thread with return code -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [out#0/hls @ 0x55fe4fa17340] Nothing was written into output file, because at least one of its streams received no packets. | size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x     | Conversion failed!
+mai 30 23:12:09 papaours beartify-drm[4185257]: [Playlist] Session non prête pour 7bad677480c5183e0ee507874c9c1d4b : ffmpeg exit 176 — [hls @ 0x55fe4fa17440] Encrypted fmp4 not yet supported | [out#0/hls @ 0x55fe4fa17340] Could not write header (incorrect codec parameters ?): Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x55fe4fa17700] Error sending frames to consumers: Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x55fe4fa17700] Task finished with error code: -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [af#0:0 @ 0x55fe4fa17700] Terminating thread with return code -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [out#0/hls @ 0x55fe4fa17340] Nothing was written into output file, because at least one of its streams received no packets. | size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x     | Conversion failed!
+mai 30 23:12:09 papaours beartify-drm[4185257]: [HLS] ffmpeg échoué pour 7bad677480c5183e0ee507874c9c1d4b : ffmpeg exit 176 — [hls @ 0x5557040f0440] Encrypted fmp4 not yet supported | [out#0/hls @ 0x5557040f0340] Could not write header (incorrect codec parameters ?): Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x5557040f0700] Error sending frames to consumers: Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x5557040f0700] Task finished with error code: -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [af#0:0 @ 0x5557040f0700] Terminating thread with return code -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [out#0/hls @ 0x5557040f0340] Nothing was written into output file, because at least one of its streams received no packets. | size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x     | Conversion failed!
+mai 30 23:12:10 papaours beartify-drm[4185257]: [Playlist] Session non prête pour 7bad677480c5183e0ee507874c9c1d4b : ffmpeg exit 176 — [hls @ 0x55fe4fa17440] Encrypted fmp4 not yet supported | [out#0/hls @ 0x55fe4fa17340] Could not write header (incorrect codec parameters ?): Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x55fe4fa17700] Error sending frames to consumers: Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x55fe4fa17700] Task finished with error code: -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [af#0:0 @ 0x55fe4fa17700] Terminating thread with return code -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [out#0/hls @ 0x55fe4fa17340] Nothing was written into output file, because at least one of its streams received no packets. | size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x     | Conversion failed!
+mai 30 23:12:35 papaours systemd[1]: Stopping beartify-drm.service - Beartify HLS DRM Stream Server v4 (FLAC + Honeypot)...
+mai 30 23:12:35 papaours systemd[1]: beartify-drm.service: Deactivated successfully.
+mai 30 23:12:35 papaours systemd[1]: Stopped beartify-drm.service - Beartify HLS DRM Stream Server v4 (FLAC + Honeypot).
+mai 30 23:12:35 papaours systemd[1]: Started beartify-drm.service - Beartify HLS DRM Stream Server v4 (FLAC + Honeypot).
+mai 30 23:12:36 papaours beartify-drm[4185731]: [Honeypot] Génération des segments Rick Roll FLAC fMP4...
+mai 30 23:12:36 papaours beartify-drm[4185731]: [Honeypot] ffmpeg échoué code 254
+mai 30 23:12:36 papaours beartify-drm[4185731]: [Honeypot] stderr ffmpeg :
+mai 30 23:12:36 papaours beartify-drm[4185731]: [af#0:0 @ 0x55a3a6d77440] Task finished with error code: -2 (No such file or directory)
+mai 30 23:12:36 papaours beartify-drm[4185731]: [af#0:0 @ 0x55a3a6d77440] Terminating thread with return code -2 (No such file or directory)
+mai 30 23:12:36 papaours beartify-drm[4185731]: [out#0/hls @ 0x55a3a6d74e40] Nothing was written into output file, because at least one of its streams received no packets.
+mai 30 23:12:36 papaours beartify-drm[4185731]: size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x
+mai 30 23:12:36 papaours beartify-drm[4185731]: Conversion failed!
+mai 30 23:12:36 papaours beartify-drm[4185731]: ✅  Beartify DRM v4 → 127.0.0.1:3001
+mai 30 23:12:36 papaours beartify-drm[4185731]:     Audio   : FLAC lossless (fMP4 HLS)
+mai 30 23:12:36 papaours beartify-drm[4185731]:     Honeypot: 0 segments Rick Roll | 1 sur 2 (
+mai 30 23:12:53 papaours beartify-drm[4185731]: [HLS] ffmpeg échoué pour 7bad677480c5183e0ee507874c9c1d4b : ffmpeg exit 176 — [hls @ 0x56073fd68440] Encrypted fmp4 not yet supported | [out#0/hls @ 0x56073fd68340] Could not write header (incorrect codec parameters ?): Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x56073fd68700] Error sending frames to consumers: Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x56073fd68700] Task finished with error code: -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [af#0:0 @ 0x56073fd68700] Terminating thread with return code -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [out#0/hls @ 0x56073fd68340] Nothing was written into output file, because at least one of its streams received no packets. | size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x     | Conversion failed!
+mai 30 23:12:53 papaours beartify-drm[4185731]: [HLS] ffmpeg échoué pour 7bad677480c5183e0ee507874c9c1d4b : ffmpeg exit 176 — [hls @ 0x55f431d97440] Encrypted fmp4 not yet supported | [out#0/hls @ 0x55f431d97340] Could not write header (incorrect codec parameters ?): Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x55f431d97700] Error sending frames to consumers: Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x55f431d97700] Task finished with error code: -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [af#0:0 @ 0x55f431d97700] Terminating thread with return code -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [out#0/hls @ 0x55f431d97340] Nothing was written into output file, because at least one of its streams received no packets. | size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x     | Conversion failed!
+mai 30 23:12:53 papaours beartify-drm[4185731]: [Playlist] Session non prête pour 7bad677480c5183e0ee507874c9c1d4b : ffmpeg exit 176 — [hls @ 0x56073fd68440] Encrypted fmp4 not yet supported | [out#0/hls @ 0x56073fd68340] Could not write header (incorrect codec parameters ?): Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x56073fd68700] Error sending frames to consumers: Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x56073fd68700] Task finished with error code: -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [af#0:0 @ 0x56073fd68700] Terminating thread with return code -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [out#0/hls @ 0x56073fd68340] Nothing was written into output file, because at least one of its streams received no packets. | size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x     | Conversion failed!
+mai 30 23:12:54 papaours beartify-drm[4185731]: [Playlist] Session non prête pour 7bad677480c5183e0ee507874c9c1d4b : ffmpeg exit 176 — [hls @ 0x56073fd68440] Encrypted fmp4 not yet supported | [out#0/hls @ 0x56073fd68340] Could not write header (incorrect codec parameters ?): Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x56073fd68700] Error sending frames to consumers: Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x56073fd68700] Task finished with error code: -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [af#0:0 @ 0x56073fd68700] Terminating thread with return code -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [out#0/hls @ 0x56073fd68340] Nothing was written into output file, because at least one of its streams received no packets. | size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x     | Conversion failed!
+papaours@papaours:~$ sudo chmod 644 /home/papaours/rickroll.mp3
 sudo chown www-data:www-data /home/papaours/rickroll.mp3
 # Ou mieux : copier le fichier dans un dossier accessible
 sudo cp /home/papaours/rickroll.mp3 /opt/beartify-drm/rickroll.mp3
 sudo chown www-data:www-data /opt/beartify-drm/rickroll.mp3
-```
-
-Puis mettre à jour le `.env` :
-```bash
-sudo nano /opt/beartify-drm/.env
-# Modifier la ligne :
-HONEYPOT_AUDIO=/opt/beartify-drm/rickroll.mp3
-```
-
-```bash
-sudo systemctl restart beartify-drm
-```
-
-Donne-moi la sortie du **Test 1** (`/api/hls/test`) — elle contiendra le stderr ffmpeg exact et je corrige immédiatement.
+papaours@papaours:~$ sudo nano /opt/beartify-drm/.env
+papaours@papaours:~$ sudo systemctl restart beartify-drm
+papaours@papaours:~$ 
