@@ -220,10 +220,28 @@ function buildHoneypotM3u8(rawM3u8, itemId, token, ivHex) {
   const out      = [];
   let realIdx    = 0;
   let honeyIdx   = 0;
-  let keyInjected = false;
+  let keyInjected  = false;
+  let typeInjected = false;
+
+  // Détecter si le transcodage est terminé (#EXT-X-ENDLIST présent)
+  const isComplete = rawM3u8.includes('#EXT-X-ENDLIST');
 
   for (let i = 0; i < lines.length; i++) {
     const t = lines[i].trim();
+
+    // Injecter #EXT-X-PLAYLIST-TYPE juste après #EXT-X-VERSION
+    // EVENT  = segments ajoutés en ordre depuis le début (transcodage en cours)
+    //          → HLS.js SAIT que le flux commence au segment 0, pas au live edge
+    // VOD    = playlist complète statique (transcodage terminé)
+    //          → HLS.js traite comme un fichier entier, seek natif
+    if (t.startsWith('#EXT-X-VERSION') && !typeInjected) {
+      out.push(lines[i]);
+      out.push(isComplete
+        ? '#EXT-X-PLAYLIST-TYPE:VOD'
+        : '#EXT-X-PLAYLIST-TYPE:EVENT');
+      typeInjected = true;
+      continue;
+    }
 
     // ── #EXT-X-MAP : init segment ─────────────────────────────────
     // Stratégie clé :
