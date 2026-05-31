@@ -151,14 +151,19 @@ function startTranscode(itemId, token, tempDir) {
   //    chiffrement AES sur les segments fMP4 ("Encrypted fmp4 not yet supported").
   //    Les .m4s sont générés en clair. drm.js les chiffre AES-128-CBC
   //    à la volée dans l'endpoint /api/hls/segment.
+  // ── Paramètres audio ──────────────────────────────────────────────
+  // -c:a flac     : réencodage FLAC→FLAC = sans perte (compression lossless)
+  // Pas de -ar    : conserve le sample rate original (44100/48000/96000…)
+  // Pas de -ac    : conserve le nombre de canaux original (mono/stéréo/5.1…)
+  // Pas de -ab    : FLAC est lossless, le bitrate n'a pas de sens
+  // ⚠️  -ar 44100 et -ac 2 ont été RETIRÉS : ils causaient un rééchantillonnage
+  //    et un downmix forcés → perte de qualité sur tout contenu hors CD 44.1kHz.
   const ff = spawn('ffmpeg', [
     '-i',                      jellyUrl,
     '-vn',
     '-c:a',                    'flac',
-    '-ar',                     '44100',
-    '-ac',                     '2',
     '-hls_segment_type',       'fmp4',
-    '-hls_fmp4_init_filename', 'init.mp4',            // nom seul → tempDir/init.mp4
+    '-hls_fmp4_init_filename', 'init.mp4',
     '-hls_segment_filename',   path.join(tempDir, 'seg%03d.m4s'),
     '-hls_time',               '4',
     '-hls_list_size',          '0',
