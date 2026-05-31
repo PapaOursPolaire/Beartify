@@ -1,74 +1,451 @@
-papaours@papaours:~$ curl "http://127.0.0.1:3001/api/hls/test?item=7bad677480c5183e0ee507874c9c1d4b"
-{"success":false,"exitCode":254,"jellyfinUrl":"http://127.0.0.1:8096/Audio/7bad677480c5183e0ee507874c9c1d4b/stream?static=true&api_key=***","ffmpegArgs":["-i","http://127.0.0.1:8096/Audio/7bad677480c5183e0ee507874c9c1d4b/stream?static=true&api_key=***","-vn","-c:a","flac","-t","5","-hls_segment_type","fmp4","-hls_fmp4_init_filename","/tmp/beartify_test_1780175722488_init.mp4","-hls_segment_filename","/tmp/beartify_test_1780175722488_%03d.m4s","-hls_time","4","-hls_list_size","0","-y","/tmp/beartify_test_1780175722488.m3u8"],"stderr_last15_lines":"      Metadata:\n        comment         : Cover (front)\n        title           : Cover\nStream mapping:\n  Stream #0:0 -> #0:0 (flac (native) -> flac (native))\nPress [q] to stop, [?] for help\n[hls @ 0x56050388b3c0] Opening '/tmp//tmp/beartify_test_1780175722488_init.mp4' for writing\n[hls @ 0x56050388b3c0] Failed to open segment '/tmp/beartify_test_1780175722488_init.mp4'\n[out#0/hls @ 0x56050388b2c0] Could not write header (incorrect codec parameters ?): No such file or directory\n[af#0:0 @ 0x56050388b700] Error sending frames to consumers: No such file or directory\n[af#0:0 @ 0x56050388b700] Task finished with error code: -2 (No such file or directory)\n[af#0:0 @ 0x56050388b700] Terminating thread with return code -2 (No such file or directory)\n[out#0/hls @ 0x56050388b2c0] Nothing was written into output file, because at least one of its streams received no packets.\nsize=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x    \nConvpapaours@papaours:~$ curl -I "http://127.0.0.1:8096/Audio/7bad677480c5183e0ee507874c9c1d4b/stream?static=true&api_key=aaa8a7df4b364cf7bcc76f351d768798"cc76f351d768798"
-```
-HTTP/1.1 200 OK
-Content-Length: 17912116
-Content-Type: audio/flac
-Date: Sat, 30 May 2026 21:15:48 GMT
-Server: Kestrel
-Accept-Ranges: bytes
-Last-Modified: Sun, 05 Apr 2026 20:06:21 GMT
-X-Response-Time-ms: 15.9462
+// ══════════════════════════════════════════════════════════════════════
+//  BEARTIFY — drm.js  v5  (HLS FLAC fMP4 + chiffrement Node.js + Honeypot 1:1)
+//  Node.js / Express — port 3001 — loopback uniquement
+//
+//  Fix v5 :
+//   ✅ Chiffrement AES-128-CBC dans Node.js (ffmpeg 7.x ne supporte pas
+//      "Encrypted fmp4" → on retire -hls_key_info_file de ffmpeg)
+//   ✅ Segments .m4s générés en clair par ffmpeg → chiffrés à la volée
+//      par drm.js au moment de les servir via /api/hls/segment
+//   ✅ Honeypot : chemin relatif pour -hls_fmp4_init_filename (fix /tmp//tmp/)
+//   ✅ #EXT-X-KEY injecté par buildHoneypotM3u8 (ffmpeg ne l'ajoute plus)
+// ══════════════════════════════════════════════════════════════════════
+'use strict';
+require('dotenv').config();
 
-> 
-> 
-> ^C
-papaours@papaours:~$ journalctl -u beartify-drm -n 50 --no-pager
-mai 30 23:10:49 papaours beartify-drm[4182925]: [af#0:0 @ 0x55acdf6ee440] Task finished with error code: -2 (No such file or directory)
-mai 30 23:10:49 papaours beartify-drm[4182925]: [af#0:0 @ 0x55acdf6ee440] Terminating thread with return code -2 (No such file or directory)
-mai 30 23:10:49 papaours beartify-drm[4182925]: [out#0/hls @ 0x55acdf6ebe40] Nothing was written into output file, because at least one of its streams received no packets.
-mai 30 23:10:49 papaours beartify-drm[4182925]: size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x
-mai 30 23:10:49 papaours beartify-drm[4182925]: Conversion failed!
-mai 30 23:10:49 papaours beartify-drm[4182925]: ✅  Beartify DRM v4 → 127.0.0.1:3001
-mai 30 23:10:49 papaours beartify-drm[4182925]:     Audio   : FLAC lossless (fMP4 HLS)
-mai 30 23:10:49 papaours beartify-drm[4182925]:     Honeypot: 0 segments Rick Roll | 1 sur 2 (
-mai 30 23:10:58 papaours beartify-drm[4182925]: [HLS] ffmpeg échoué pour 7bad677480c5183e0ee507874c9c1d4b : ffmpeg exit 176 — [hls @ 0x5597521b1440] Encrypted fmp4 not yet supported | [out#0/hls @ 0x5597521b1340] Could not write header (incorrect codec parameters ?): Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x5597521b1700] Error sending frames to consumers: Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x5597521b1700] Task finished with error code: -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [af#0:0 @ 0x5597521b1700] Terminating thread with return code -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [out#0/hls @ 0x5597521b1340] Nothing was written into output file, because at least one of its streams received no packets. | size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x     | Conversion failed!
-mai 30 23:10:58 papaours beartify-drm[4182925]: [Playlist] Session non prête pour 7bad677480c5183e0ee507874c9c1d4b : ffmpeg exit 176 — [hls @ 0x5597521b1440] Encrypted fmp4 not yet supported | [out#0/hls @ 0x5597521b1340] Could not write header (incorrect codec parameters ?): Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x5597521b1700] Error sending frames to consumers: Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x5597521b1700] Task finished with error code: -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [af#0:0 @ 0x5597521b1700] Terminating thread with return code -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [out#0/hls @ 0x5597521b1340] Nothing was written into output file, because at least one of its streams received no packets. | size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x     | Conversion failed!
-mai 30 23:10:58 papaours beartify-drm[4182925]: [HLS] ffmpeg échoué pour 7bad677480c5183e0ee507874c9c1d4b : ffmpeg exit 176 — [hls @ 0x56549b726440] Encrypted fmp4 not yet supported | [out#0/hls @ 0x56549b726340] Could not write header (incorrect codec parameters ?): Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x56549b726700] Error sending frames to consumers: Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x56549b726700] Task finished with error code: -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [af#0:0 @ 0x56549b726700] Terminating thread with return code -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [out#0/hls @ 0x56549b726340] Nothing was written into output file, because at least one of its streams received no packets. | size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x     | Conversion failed!
-mai 30 23:10:59 papaours beartify-drm[4182925]: [Playlist] Session non prête pour 7bad677480c5183e0ee507874c9c1d4b : ffmpeg exit 176 — [hls @ 0x5597521b1440] Encrypted fmp4 not yet supported | [out#0/hls @ 0x5597521b1340] Could not write header (incorrect codec parameters ?): Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x5597521b1700] Error sending frames to consumers: Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x5597521b1700] Task finished with error code: -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [af#0:0 @ 0x5597521b1700] Terminating thread with return code -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [out#0/hls @ 0x5597521b1340] Nothing was written into output file, because at least one of its streams received no packets. | size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x     | Conversion failed!
-mai 30 23:11:40 papaours systemd[1]: Stopping beartify-drm.service - Beartify HLS DRM Stream Server v4 (FLAC + Honeypot)...
-mai 30 23:11:40 papaours systemd[1]: beartify-drm.service: Deactivated successfully.
-mai 30 23:11:40 papaours systemd[1]: Stopped beartify-drm.service - Beartify HLS DRM Stream Server v4 (FLAC + Honeypot).
-mai 30 23:11:40 papaours systemd[1]: Started beartify-drm.service - Beartify HLS DRM Stream Server v4 (FLAC + Honeypot).
-mai 30 23:11:40 papaours beartify-drm[4185257]: [Honeypot] Génération des segments Rick Roll FLAC fMP4...
-mai 30 23:11:41 papaours beartify-drm[4185257]: [Honeypot] ffmpeg échoué code 254
-mai 30 23:11:41 papaours beartify-drm[4185257]: [Honeypot] stderr ffmpeg :
-mai 30 23:11:41 papaours beartify-drm[4185257]: [af#0:0 @ 0x559b64ffa440] Task finished with error code: -2 (No such file or directory)
-mai 30 23:11:41 papaours beartify-drm[4185257]: [af#0:0 @ 0x559b64ffa440] Terminating thread with return code -2 (No such file or directory)
-mai 30 23:11:41 papaours beartify-drm[4185257]: [out#0/hls @ 0x559b64ff7e40] Nothing was written into output file, because at least one of its streams received no packets.
-mai 30 23:11:41 papaours beartify-drm[4185257]: size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x
-mai 30 23:11:41 papaours beartify-drm[4185257]: Conversion failed!
-mai 30 23:11:41 papaours beartify-drm[4185257]: ✅  Beartify DRM v4 → 127.0.0.1:3001
-mai 30 23:11:41 papaours beartify-drm[4185257]:     Audio   : FLAC lossless (fMP4 HLS)
-mai 30 23:11:41 papaours beartify-drm[4185257]:     Honeypot: 0 segments Rick Roll | 1 sur 2 (
-mai 30 23:12:09 papaours beartify-drm[4185257]: [HLS] ffmpeg échoué pour 7bad677480c5183e0ee507874c9c1d4b : ffmpeg exit 176 — [hls @ 0x55fe4fa17440] Encrypted fmp4 not yet supported | [out#0/hls @ 0x55fe4fa17340] Could not write header (incorrect codec parameters ?): Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x55fe4fa17700] Error sending frames to consumers: Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x55fe4fa17700] Task finished with error code: -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [af#0:0 @ 0x55fe4fa17700] Terminating thread with return code -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [out#0/hls @ 0x55fe4fa17340] Nothing was written into output file, because at least one of its streams received no packets. | size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x     | Conversion failed!
-mai 30 23:12:09 papaours beartify-drm[4185257]: [Playlist] Session non prête pour 7bad677480c5183e0ee507874c9c1d4b : ffmpeg exit 176 — [hls @ 0x55fe4fa17440] Encrypted fmp4 not yet supported | [out#0/hls @ 0x55fe4fa17340] Could not write header (incorrect codec parameters ?): Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x55fe4fa17700] Error sending frames to consumers: Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x55fe4fa17700] Task finished with error code: -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [af#0:0 @ 0x55fe4fa17700] Terminating thread with return code -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [out#0/hls @ 0x55fe4fa17340] Nothing was written into output file, because at least one of its streams received no packets. | size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x     | Conversion failed!
-mai 30 23:12:09 papaours beartify-drm[4185257]: [HLS] ffmpeg échoué pour 7bad677480c5183e0ee507874c9c1d4b : ffmpeg exit 176 — [hls @ 0x5557040f0440] Encrypted fmp4 not yet supported | [out#0/hls @ 0x5557040f0340] Could not write header (incorrect codec parameters ?): Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x5557040f0700] Error sending frames to consumers: Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x5557040f0700] Task finished with error code: -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [af#0:0 @ 0x5557040f0700] Terminating thread with return code -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [out#0/hls @ 0x5557040f0340] Nothing was written into output file, because at least one of its streams received no packets. | size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x     | Conversion failed!
-mai 30 23:12:10 papaours beartify-drm[4185257]: [Playlist] Session non prête pour 7bad677480c5183e0ee507874c9c1d4b : ffmpeg exit 176 — [hls @ 0x55fe4fa17440] Encrypted fmp4 not yet supported | [out#0/hls @ 0x55fe4fa17340] Could not write header (incorrect codec parameters ?): Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x55fe4fa17700] Error sending frames to consumers: Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x55fe4fa17700] Task finished with error code: -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [af#0:0 @ 0x55fe4fa17700] Terminating thread with return code -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [out#0/hls @ 0x55fe4fa17340] Nothing was written into output file, because at least one of its streams received no packets. | size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x     | Conversion failed!
-mai 30 23:12:35 papaours systemd[1]: Stopping beartify-drm.service - Beartify HLS DRM Stream Server v4 (FLAC + Honeypot)...
-mai 30 23:12:35 papaours systemd[1]: beartify-drm.service: Deactivated successfully.
-mai 30 23:12:35 papaours systemd[1]: Stopped beartify-drm.service - Beartify HLS DRM Stream Server v4 (FLAC + Honeypot).
-mai 30 23:12:35 papaours systemd[1]: Started beartify-drm.service - Beartify HLS DRM Stream Server v4 (FLAC + Honeypot).
-mai 30 23:12:36 papaours beartify-drm[4185731]: [Honeypot] Génération des segments Rick Roll FLAC fMP4...
-mai 30 23:12:36 papaours beartify-drm[4185731]: [Honeypot] ffmpeg échoué code 254
-mai 30 23:12:36 papaours beartify-drm[4185731]: [Honeypot] stderr ffmpeg :
-mai 30 23:12:36 papaours beartify-drm[4185731]: [af#0:0 @ 0x55a3a6d77440] Task finished with error code: -2 (No such file or directory)
-mai 30 23:12:36 papaours beartify-drm[4185731]: [af#0:0 @ 0x55a3a6d77440] Terminating thread with return code -2 (No such file or directory)
-mai 30 23:12:36 papaours beartify-drm[4185731]: [out#0/hls @ 0x55a3a6d74e40] Nothing was written into output file, because at least one of its streams received no packets.
-mai 30 23:12:36 papaours beartify-drm[4185731]: size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x
-mai 30 23:12:36 papaours beartify-drm[4185731]: Conversion failed!
-mai 30 23:12:36 papaours beartify-drm[4185731]: ✅  Beartify DRM v4 → 127.0.0.1:3001
-mai 30 23:12:36 papaours beartify-drm[4185731]:     Audio   : FLAC lossless (fMP4 HLS)
-mai 30 23:12:36 papaours beartify-drm[4185731]:     Honeypot: 0 segments Rick Roll | 1 sur 2 (
-mai 30 23:12:53 papaours beartify-drm[4185731]: [HLS] ffmpeg échoué pour 7bad677480c5183e0ee507874c9c1d4b : ffmpeg exit 176 — [hls @ 0x56073fd68440] Encrypted fmp4 not yet supported | [out#0/hls @ 0x56073fd68340] Could not write header (incorrect codec parameters ?): Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x56073fd68700] Error sending frames to consumers: Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x56073fd68700] Task finished with error code: -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [af#0:0 @ 0x56073fd68700] Terminating thread with return code -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [out#0/hls @ 0x56073fd68340] Nothing was written into output file, because at least one of its streams received no packets. | size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x     | Conversion failed!
-mai 30 23:12:53 papaours beartify-drm[4185731]: [HLS] ffmpeg échoué pour 7bad677480c5183e0ee507874c9c1d4b : ffmpeg exit 176 — [hls @ 0x55f431d97440] Encrypted fmp4 not yet supported | [out#0/hls @ 0x55f431d97340] Could not write header (incorrect codec parameters ?): Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x55f431d97700] Error sending frames to consumers: Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x55f431d97700] Task finished with error code: -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [af#0:0 @ 0x55f431d97700] Terminating thread with return code -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [out#0/hls @ 0x55f431d97340] Nothing was written into output file, because at least one of its streams received no packets. | size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x     | Conversion failed!
-mai 30 23:12:53 papaours beartify-drm[4185731]: [Playlist] Session non prête pour 7bad677480c5183e0ee507874c9c1d4b : ffmpeg exit 176 — [hls @ 0x56073fd68440] Encrypted fmp4 not yet supported | [out#0/hls @ 0x56073fd68340] Could not write header (incorrect codec parameters ?): Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x56073fd68700] Error sending frames to consumers: Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x56073fd68700] Task finished with error code: -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [af#0:0 @ 0x56073fd68700] Terminating thread with return code -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [out#0/hls @ 0x56073fd68340] Nothing was written into output file, because at least one of its streams received no packets. | size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x     | Conversion failed!
-mai 30 23:12:54 papaours beartify-drm[4185731]: [Playlist] Session non prête pour 7bad677480c5183e0ee507874c9c1d4b : ffmpeg exit 176 — [hls @ 0x56073fd68440] Encrypted fmp4 not yet supported | [out#0/hls @ 0x56073fd68340] Could not write header (incorrect codec parameters ?): Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x56073fd68700] Error sending frames to consumers: Not yet implemented in FFmpeg, patches welcome | [af#0:0 @ 0x56073fd68700] Task finished with error code: -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [af#0:0 @ 0x56073fd68700] Terminating thread with return code -1163346256 (Not yet implemented in FFmpeg, patches welcome) | [out#0/hls @ 0x56073fd68340] Nothing was written into output file, because at least one of its streams received no packets. | size=       0KiB time=00:00:00.00 bitrate=N/A speed=   0x     | Conversion failed!
-papaours@papaours:~$ sudo chmod 644 /home/papaours/rickroll.mp3
-sudo chown www-data:www-data /home/papaours/rickroll.mp3
-# Ou mieux : copier le fichier dans un dossier accessible
-sudo cp /home/papaours/rickroll.mp3 /opt/beartify-drm/rickroll.mp3
-sudo chown www-data:www-data /opt/beartify-drm/rickroll.mp3
-papaours@papaours:~$ sudo nano /opt/beartify-drm/.env
-papaours@papaours:~$ sudo systemctl restart beartify-drm
-papaours@papaours:~$ 
+const express   = require('express');
+const http      = require('http');
+const crypto    = require('crypto');
+const path      = require('path');
+const fs        = require('fs');
+const os        = require('os');
+const { spawn } = require('child_process');
+
+const PORT           = parseInt(process.env.PORT          || '3001', 10);
+const JELLYFIN_HOST  = process.env.JELLYFIN_HOST          || '127.0.0.1';
+const JELLYFIN_PORT  = parseInt(process.env.JELLYFIN_PORT || '8096', 10);
+const JELLYFIN_TOKEN = process.env.JELLYFIN_TOKEN         || '';
+const SESSION_SECRET = process.env.SESSION_SECRET;
+const HONEYPOT_AUDIO = process.env.HONEYPOT_AUDIO         || null;
+const HONEYPOT_EVERY = parseInt(process.env.HONEYPOT_EVERY || '1', 10);
+
+if (!SESSION_SECRET) {
+  console.error('❌ SESSION_SECRET manquant dans .env — arrêt.');
+  process.exit(1);
+}
+
+const sessions    = new Map();
+let _honeypotDir  = null;
+let _honeypotSegs = [];
+
+// ── Helpers ──────────────────────────────────────────────────────────
+function clientIp(req) {
+  return (
+    req.headers['x-real-ip'] ||
+    req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+    req.socket.remoteAddress || ''
+  ).replace(/^::ffff:/, '');
+}
+
+function generateToken(itemId, ip, expiresAt) {
+  const sig = crypto.createHmac('sha256', SESSION_SECRET)
+    .update(`${itemId}|${ip}|${expiresAt}`).digest('hex');
+  return `${expiresAt}.${sig}`;
+}
+
+function validateSession(token, itemId, req) {
+  const s = sessions.get(token);
+  if (!s) return null;
+  if (Date.now() > s.expiresAt) { sessions.delete(token); return null; }
+  if (s.itemId !== itemId || s.ip !== clientIp(req)) return null;
+  return s;
+}
+
+// ── Chiffrement AES-128-CBC d'un Buffer ──────────────────────────────
+// Utilisé pour chiffrer chaque segment .m4s à la volée lors du service.
+// HLS spec : AES-128-CBC, IV = segment sequence number (big-endian 16 bytes)
+// ou IV fixe spécifié dans #EXT-X-KEY. On utilise l'IV de session (fixe).
+function encryptSegment(rawBuf, key, ivHex) {
+  const iv     = Buffer.from(ivHex, 'hex');
+  const cipher = crypto.createCipheriv('aes-128-cbc', key, iv);
+  return Buffer.concat([cipher.update(rawBuf), cipher.final()]);
+}
+
+// ── Génération des segments honeypot (FLAC fMP4, non chiffrés) ───────
+// Générés SANS chiffrement par ffmpeg — chiffrés à la demande dans /segment.
+// Fix path : -hls_fmp4_init_filename = nom seul (pas chemin absolu)
+// pour éviter le double /tmp//tmp/... que ffmpeg ajoutait.
+async function generateHoneypotSegments() {
+  if (!HONEYPOT_AUDIO) {
+    console.warn('[Honeypot] HONEYPOT_AUDIO non défini — honeypots désactivés');
+    return;
+  }
+  if (!fs.existsSync(HONEYPOT_AUDIO)) {
+    console.warn('[Honeypot] Fichier introuvable :', HONEYPOT_AUDIO);
+    return;
+  }
+
+  _honeypotDir = path.join(os.tmpdir(), 'beartify-honeypot');
+  await fs.promises.mkdir(_honeypotDir, { recursive: true });
+
+  // Réutiliser les segments existants (survie aux redémarrages)
+  const existing = fs.readdirSync(_honeypotDir)
+    .filter(f => /^honey\d+\.m4s$/.test(f))
+    .sort()
+    .map(f => path.join(_honeypotDir, f));
+  if (existing.length > 0) {
+    _honeypotSegs = existing;
+    console.log(`✅ Honeypot : ${_honeypotSegs.length} segments Rick Roll (cache)`);
+    return;
+  }
+
+  console.log('[Honeypot] Génération des segments Rick Roll FLAC fMP4...');
+  return new Promise((resolve) => {
+    // ⚠️  -hls_fmp4_init_filename → NOM SEUL (pas chemin absolu)
+    // ffmpeg préfixe avec le dossier de sortie automatiquement.
+    // Chemin absolu → /tmp//tmp/xxx_init.mp4 (double slash → erreur)
+    const ff = spawn('ffmpeg', [
+      '-i',                      HONEYPOT_AUDIO,
+      '-vn',
+      '-c:a',                    'flac',
+      '-ar',                     '44100',
+      '-ac',                     '2',
+      '-hls_segment_type',       'fmp4',
+      '-hls_fmp4_init_filename', 'honey_init.mp4',     // ← nom seul, pas absolu
+      '-hls_segment_filename',   path.join(_honeypotDir, 'honey%03d.m4s'),
+      '-hls_time',               '4',
+      '-hls_list_size',          '0',
+      '-y',
+      path.join(_honeypotDir, 'honey_playlist.m3u8'),
+    ], { stdio: ['ignore', 'ignore', 'pipe'] });
+
+    let ffErr = '';
+    ff.stderr.on('data', d => { ffErr += d.toString(); if (ffErr.length > 8192) ffErr = ffErr.slice(-8192); });
+
+    ff.on('close', (code) => {
+      if (code === 0) {
+        _honeypotSegs = fs.readdirSync(_honeypotDir)
+          .filter(f => /^honey\d+\.m4s$/.test(f))
+          .sort()
+          .map(f => path.join(_honeypotDir, f));
+        console.log(`✅ Honeypot : ${_honeypotSegs.length} segments Rick Roll prêts`);
+      } else {
+        console.error('[Honeypot] ffmpeg échoué code', code,
+          '\n' + ffErr.trim().split('\n').slice(-5).join('\n'));
+      }
+      resolve();
+    });
+    ff.on('error', (e) => { console.error('[Honeypot] ffmpeg introuvable :', e.message); resolve(); });
+  });
+}
+
+// ── Transcodage ffmpeg → HLS FLAC fMP4 (sans chiffrement ffmpeg) ─────
+function startTranscode(itemId, token, tempDir) {
+  const sess = sessions.get(token);
+  if (!sess) return;
+
+  const jellyUrl = `http://${JELLYFIN_HOST}:${JELLYFIN_PORT}/Audio/${itemId}/stream`
+                 + `?static=true&api_key=${JELLYFIN_TOKEN}`;
+
+  // ⚠️  PAS de -hls_key_info_file : ffmpeg 7.x ne supporte pas le
+  //    chiffrement AES sur les segments fMP4 ("Encrypted fmp4 not yet supported").
+  //    Les .m4s sont générés en clair. drm.js les chiffre AES-128-CBC
+  //    à la volée dans l'endpoint /api/hls/segment.
+  const ff = spawn('ffmpeg', [
+    '-i',                      jellyUrl,
+    '-vn',
+    '-c:a',                    'flac',
+    '-ar',                     '44100',
+    '-ac',                     '2',
+    '-hls_segment_type',       'fmp4',
+    '-hls_fmp4_init_filename', 'init.mp4',            // nom seul → tempDir/init.mp4
+    '-hls_segment_filename',   path.join(tempDir, 'seg%03d.m4s'),
+    '-hls_time',               '4',
+    '-hls_list_size',          '0',
+    '-hls_flags',              'independent_segments',
+    '-y',
+    path.join(tempDir, 'playlist.m3u8'),
+  ], { stdio: ['ignore', 'ignore', 'pipe'] });
+
+  let _ffStderr = '';
+  ff.stderr.on('data', d => {
+    _ffStderr += d.toString();
+    if (_ffStderr.length > 8192) _ffStderr = _ffStderr.slice(-8192);
+  });
+
+  ff.on('close', (code) => {
+    const s = sessions.get(token);
+    if (code !== 0) {
+      const lastLines = _ffStderr.trim().split('\n').slice(-8).join(' | ');
+      if (s && !s.ready) s.ffmpegError = `ffmpeg exit ${code} — ${lastLines}`;
+      console.error(`[HLS] ffmpeg échoué pour ${itemId} :`, s?.ffmpegError);
+    } else {
+      console.log(`[HLS] Transcodage terminé : ${itemId}`);
+    }
+  });
+  ff.on('error', (e) => {
+    const s = sessions.get(token);
+    if (s && !s.ready) s.ffmpegError = `ffmpeg introuvable : ${e.message}`;
+    console.error('[HLS] ffmpeg introuvable :', e.message);
+  });
+
+  // Polling : ready dès init.mp4 + 2 segments disponibles (~4-8s)
+  const watcher = setInterval(() => {
+    const s = sessions.get(token);
+    if (!s || s.ready || s.ffmpegError) { clearInterval(watcher); return; }
+    try {
+      const initOk  = fs.existsSync(path.join(tempDir, 'init.mp4'));
+      const segCount = fs.readdirSync(tempDir).filter(f => /^seg\d+\.m4s$/.test(f)).length;
+      if (initOk && segCount >= 2) {
+        s.ready = true;
+        clearInterval(watcher);
+        console.log(`[HLS] ▶ Prêt (${segCount} segments) — ${itemId}`);
+      }
+    } catch (_) {}
+  }, 300);
+
+  setTimeout(() => {
+    clearInterval(watcher);
+    const s = sessions.get(token);
+    if (s && !s.ready) s.ffmpegError = s.ffmpegError || 'Timeout 120s — ffmpeg installé ?';
+  }, 120_000);
+}
+
+// ── Construction M3U8 avec #EXT-X-KEY + honeypots ─────────────────────
+// ffmpeg génère un M3U8 sans #EXT-X-KEY (pas de chiffrement ffmpeg).
+// On injecte manuellement #EXT-X-KEY + #EXT-X-MAP + URLs sécurisées.
+// On intercale 1 honeypot Rick Roll après chaque segment réel (HONEYPOT_EVERY=1).
+function buildHoneypotM3u8(rawM3u8, itemId, token, ivHex) {
+  const lines  = rawM3u8.split('\n');
+  const out    = [];
+  let headerDone = false;
+  let realIdx    = 0;
+  let honeyIdx   = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    const t = lines[i].trim();
+
+    // Injecter #EXT-X-KEY + #EXT-X-MAP juste après #EXT-X-VERSION
+    if (t.startsWith('#EXT-X-VERSION') && !headerDone) {
+      out.push(lines[i]);
+      out.push(`#EXT-X-KEY:METHOD=AES-128,URI="/api/hls/key/${itemId}?s=${encodeURIComponent(token)}",IV=0x${ivHex}`);
+      headerDone = true;
+      continue;
+    }
+
+    // Réécrire #EXT-X-MAP → endpoint init authentifié
+    if (t.startsWith('#EXT-X-MAP')) {
+      out.push(`#EXT-X-MAP:URI="/api/hls/init/${itemId}?s=${encodeURIComponent(token)}"`);
+      continue;
+    }
+
+    // Segments réels → URL authentifiée + honeypot intercalé
+    if (t.startsWith('#EXTINF')) {
+      out.push(lines[i]);
+      i++;
+      const segFile = (lines[i] || '').trim();
+      if (segFile) {
+        const segName = path.basename(segFile.split('?')[0]);
+        out.push(`/api/hls/segment/${itemId}/${segName}?s=${encodeURIComponent(token)}`);
+      }
+      realIdx++;
+
+      // Injecter honeypot après chaque Nème segment réel
+      if (_honeypotSegs.length > 0 && realIdx % HONEYPOT_EVERY === 0) {
+        out.push('');
+        out.push('#EXT-X-BEARTIFY-HONEYPOT');  // filtré par HLS.js custom loader
+        out.push('#EXTINF:4.000,');
+        out.push(`/api/hls/segment/${itemId}/honey_${honeyIdx}.m4s?s=${encodeURIComponent(token)}`);
+        honeyIdx++;
+      }
+      continue;
+    }
+
+    out.push(lines[i]);
+  }
+
+  return out.join('\n');
+}
+
+// ── Nettoyage sessions expirées ───────────────────────────────────────
+setInterval(() => {
+  const now = Date.now();
+  for (const [tok, s] of sessions) {
+    if (s.expiresAt < now) {
+      sessions.delete(tok);
+      if (s.tempDir) try { fs.rmSync(s.tempDir, { recursive: true, force: true }); } catch (_) {}
+    }
+  }
+}, 5 * 60 * 1000);
+
+const app = express();
+
+// ── 1. Session HLS ────────────────────────────────────────────────────
+app.get('/api/hls/session/:id', async (req, res) => {
+  const itemId = req.params.id;
+  if (!itemId || !/^[a-f0-9]{32}$/i.test(itemId))
+    return res.status(400).json({ error: 'ID invalide' });
+
+  const ip        = clientIp(req);
+  const expiresAt = Date.now() + 30 * 60 * 1000;
+  const key       = crypto.randomBytes(16);  // AES-128
+  const iv        = crypto.randomBytes(16);
+  const token     = generateToken(itemId, ip, expiresAt);
+  const safeId    = token.replace(/[^a-z0-9]/gi, '').substring(0, 20);
+  const tempDir   = path.join(os.tmpdir(), `beartify-${safeId}`);
+
+  try {
+    await fs.promises.mkdir(tempDir, { recursive: true });
+
+    // Clé et IV stockés uniquement en mémoire (pas de fichiers disque)
+    sessions.set(token, {
+      itemId, key, iv: iv.toString('hex'),
+      ip, expiresAt, tempDir,
+      ready: false, ffmpegError: null,
+    });
+
+    startTranscode(itemId, token, tempDir);
+
+    res.setHeader('Cache-Control', 'no-store');
+    res.json({ sessionToken: token });
+
+  } catch (err) {
+    console.error('[Session] Erreur :', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── 2. Clé AES-128 (IP-lockée) ────────────────────────────────────────
+app.get('/api/hls/key/:id', (req, res) => {
+  const s = validateSession(req.query.s, req.params.id, req);
+  if (!s) return res.status(401).end();
+  res.setHeader('Content-Type', 'application/octet-stream');
+  res.setHeader('Cache-Control', 'no-store');
+  res.end(s.key);
+});
+
+// ── 3. Init segment fMP4 ──────────────────────────────────────────────
+app.get('/api/hls/init/:id', (req, res) => {
+  const s = validateSession(req.query.s, req.params.id, req);
+  if (!s) return res.status(401).end();
+  const initPath = path.join(s.tempDir, 'init.mp4');
+  if (!fs.existsSync(initPath)) return res.status(404).end();
+  res.setHeader('Content-Type', 'video/mp4');
+  res.setHeader('Cache-Control', 'private, max-age=1800');
+  fs.createReadStream(initPath).pipe(res);
+});
+
+// ── 4. Playlist M3U8 avec #EXT-X-KEY + honeypots ─────────────────────
+app.get('/api/hls/playlist/:id', async (req, res) => {
+  const s = validateSession(req.query.s, req.params.id, req);
+  if (!s) return res.status(401).json({ error: 'Session invalide' });
+
+  const deadline = Date.now() + 60_000;
+  while (!s.ready && !s.ffmpegError && Date.now() < deadline)
+    await new Promise(r => setTimeout(r, 300));
+
+  if (!s.ready) {
+    const errDetail = s.ffmpegError || 'Timeout 60s';
+    console.error(`[Playlist] Non prêt pour ${req.params.id} :`, errDetail);
+    return res.status(500).json({ error: errDetail, hint: 'journalctl -u beartify-drm -n 50' });
+  }
+
+  try {
+    const raw  = await fs.promises.readFile(path.join(s.tempDir, 'playlist.m3u8'), 'utf8');
+    const m3u8 = buildHoneypotM3u8(raw, req.params.id, req.query.s, s.iv);
+    res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.send(m3u8);
+  } catch (err) {
+    res.status(500).json({ error: 'Playlist indisponible' });
+  }
+});
+
+// ── 5. Segments (réels + honeypots) — chiffrés AES-128-CBC ───────────
+app.get('/api/hls/segment/:id/:seg', (req, res) => {
+  const s = validateSession(req.query.s, req.params.id, req);
+  if (!s) return res.status(401).end();
+
+  const seg = req.params.seg;
+  if (!/^(seg\d{3,6}|honey_\d+)\.m4s$/.test(seg)) return res.status(400).end();
+
+  try {
+    let rawBuf;
+    if (seg.startsWith('honey_')) {
+      // Segment honeypot Rick Roll
+      if (_honeypotSegs.length === 0) return res.status(503).end();
+      const idx = parseInt(seg.match(/\d+/)[0], 10);
+      rawBuf = fs.readFileSync(_honeypotSegs[idx % _honeypotSegs.length]);
+    } else {
+      // Segment réel FLAC (généré en clair par ffmpeg)
+      const segPath = path.join(s.tempDir, seg);
+      if (!fs.existsSync(segPath)) return res.status(404).end();
+      rawBuf = fs.readFileSync(segPath);
+    }
+
+    // Chiffrement AES-128-CBC (ce que ffmpeg aurait fait s'il le supportait)
+    // HLS.js utilise la clé de /api/hls/key et l'IV du #EXT-X-KEY pour déchiffrer.
+    const encrypted = encryptSegment(rawBuf, s.key, s.iv);
+
+    res.setHeader('Content-Type',   'video/mp4');
+    res.setHeader('Content-Length',  encrypted.length);
+    res.setHeader('Cache-Control',  'no-store, private');
+    res.end(encrypted);
+
+  } catch (err) {
+    console.error('[Segment] Erreur :', err.message);
+    if (!res.headersSent) res.status(500).end();
+  }
+});
+
+// ── 6. Endpoint diagnostic ────────────────────────────────────────────
+app.get('/api/hls/test', (req, res) => {
+  const itemId = req.query.item;
+  if (!itemId || !/^[a-f0-9]{32}$/i.test(itemId))
+    return res.status(400).json({ error: '?item=<jellyfin_id> requis' });
+
+  const jellyUrl = `http://${JELLYFIN_HOST}:${JELLYFIN_PORT}/Audio/${itemId}/stream`
+                 + `?static=true&api_key=${JELLYFIN_TOKEN}`;
+  const ts    = Date.now();
+  const tmpDir = path.join(os.tmpdir(), `btest_${ts}`);
+  fs.mkdirSync(tmpDir, { recursive: true });
+
+  const ff = spawn('ffmpeg', [
+    '-i',  jellyUrl,
+    '-vn', '-c:a', 'flac', '-t', '5',
+    '-hls_segment_type',       'fmp4',
+    '-hls_fmp4_init_filename', 'init.mp4',
+    '-hls_segment_filename',   path.join(tmpDir, 'seg%03d.m4s'),
+    '-hls_time', '4', '-hls_list_size', '0',
+    '-y', path.join(tmpDir, 'out.m3u8'),
+  ], { stdio: ['ignore', 'ignore', 'pipe'] });
+
+  let stderr = '';
+  ff.stderr.on('data', d => { stderr += d.toString(); });
+  ff.on('close', (code) => {
+    try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch (_) {}
+    res.json({
+      success: code === 0,
+      exitCode: code,
+      stderr_last15: stderr.trim().split('\n').slice(-15).join('\n'),
+    });
+  });
+  ff.on('error', (e) => res.status(500).json({ error: e.message }));
+  setTimeout(() => { if (!res.headersSent) { ff.kill(); res.status(500).json({ error: 'Timeout' }); } }, 30000);
+});
+
+// ── Healthcheck ───────────────────────────────────────────────────────
+app.get('/health', (_req, res) => res.json({
+  status: 'ok', sessions: sessions.size,
+  honeypot_segs: _honeypotSegs.length,
+  honeypot_ratio: `1 sur ${HONEYPOT_EVERY + 1}`,
+}));
+
+// ── Démarrage ─────────────────────────────────────────────────────────
+generateHoneypotSegments().then(() => {
+  app.listen(PORT, '127.0.0.1', () => {
+    console.log(`✅  Beartify DRM v5 → 127.0.0.1:${PORT}`);
+    console.log(`    Chiffrement : AES-128-CBC dans Node.js (fix ffmpeg 7.x)`);
+    console.log(`    Honeypot    : ${_honeypotSegs.length} segments | 1 sur ${HONEYPOT_EVERY + 1}`);
+  });
+});
