@@ -216,30 +216,36 @@ function startTranscode(itemId, token, tempDir) {
 // On injecte manuellement #EXT-X-KEY + #EXT-X-MAP + URLs sécurisées.
 // On intercale 1 honeypot Rick Roll après chaque segment réel (HONEYPOT_EVERY=1).
 function buildHoneypotM3u8(rawM3u8, itemId, token, ivHex) {
-  const lines  = rawM3u8.split('\n');
-  const out    = [];
-  let headerDone = false;
+  const lines    = rawM3u8.split('\n');
+  const out      = [];
   let realIdx    = 0;
   let honeyIdx   = 0;
+  let keyInjected = false;
 
   for (let i = 0; i < lines.length; i++) {
     const t = lines[i].trim();
 
-    // Injecter #EXT-X-KEY + #EXT-X-MAP juste après #EXT-X-VERSION
-    if (t.startsWith('#EXT-X-VERSION') && !headerDone) {
-      out.push(lines[i]);
-      out.push(`#EXT-X-KEY:METHOD=AES-128,URI="/api/hls/key/${itemId}?s=${encodeURIComponent(token)}",IV=0x${ivHex}`);
-      headerDone = true;
-      continue;
-    }
-
-    // Réécrire #EXT-X-MAP → endpoint init authentifié
+    // ── #EXT-X-MAP : init segment ─────────────────────────────────
+    // Stratégie clé :
+    //   AVANT  le MAP → METHOD=NONE  : HLS.js ne tente pas de déchiffrer init.mp4
+    //   APRÈS  le MAP → METHOD=AES-128 : tous les segments média sont chiffrés
+    // Sans ça, HLS.js applique AES au MAP (servi en clair) → fragDecryptError.
     if (t.startsWith('#EXT-X-MAP')) {
+      out.push('#EXT-X-KEY:METHOD=NONE');
       out.push(`#EXT-X-MAP:URI="/api/hls/init/${itemId}?s=${encodeURIComponent(token)}"`);
+      out.push(`#EXT-X-KEY:METHOD=AES-128,URI="/api/hls/key/${itemId}?s=${encodeURIComponent(token)}",IV=0x${ivHex}`);
+      keyInjected = true;
       continue;
     }
 
-    // Segments réels → URL authentifiée + honeypot intercalé
+    // Si pas de #EXT-X-MAP (segments TS sans init), injecter la clé
+    // avant le tout premier segment.
+    if (!keyInjected && t.startsWith('#EXTINF')) {
+      out.push(`#EXT-X-KEY:METHOD=AES-128,URI="/api/hls/key/${itemId}?s=${encodeURIComponent(token)}",IV=0x${ivHex}`);
+      keyInjected = true;
+    }
+
+    // ── Segments réels + honeypots ────────────────────────────────
     if (t.startsWith('#EXTINF')) {
       out.push(lines[i]);
       i++;
@@ -250,10 +256,9 @@ function buildHoneypotM3u8(rawM3u8, itemId, token, ivHex) {
       }
       realIdx++;
 
-      // Injecter honeypot après chaque Nème segment réel
       if (_honeypotSegs.length > 0 && realIdx % HONEYPOT_EVERY === 0) {
         out.push('');
-        out.push('#EXT-X-BEARTIFY-HONEYPOT');  // filtré par HLS.js custom loader
+        out.push('#EXT-X-BEARTIFY-HONEYPOT');
         out.push('#EXTINF:4.000,');
         out.push(`/api/hls/segment/${itemId}/honey_${honeyIdx}.m4s?s=${encodeURIComponent(token)}`);
         honeyIdx++;
