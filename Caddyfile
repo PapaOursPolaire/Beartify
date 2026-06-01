@@ -70,63 +70,6 @@
     }
 }
 
-
-# ══════════════════════════════════════════════════════════════════════
-#  SNIPPET — Proxy Avatar Nextcloud
-#
-#  Upload   : POST /api/avatar/upload
-#             Header X-Avatar-DocId: {docId}  (ex: user@gmail.com)
-#             Body  : fichier image (multipart ou raw blob)
-#             → PUT WebDAV vers Nextcloud/beartify-avatars/{docId}.jpg
-#
-#  Lecture  : GET /api/avatar/{docId}
-#             → GET WebDAV depuis Nextcloud
-#
-#  Les credentials Nextcloud ne sont JAMAIS exposés au client.
-#  Remplace papaours et NC_APP_PASSWORD par tes vraies valeurs.
-# ══════════════════════════════════════════════════════════════════════
-(avatar_proxy) {
-
-    # ── Upload : POST /api/avatar/upload ──────────────────────────────
-    handle /api/avatar/upload {
-        @avatar_upload method POST PUT
-        handle @avatar_upload {
-            # Réécriture vers le chemin WebDAV du fichier de l'utilisateur
-            # Le docId (email ou discord ID) est passé dans le header X-Avatar-DocId
-            rewrite * /remote.php/dav/files/papaours/beartify-avatars/{http.request.header.X-Avatar-Docid}.jpg
-
-            reverse_proxy 127.0.0.1:443 {
-                header_up  Host              grizzlyrics.duckdns.org
-                header_up  X-Forwarded-Proto https
-                header_up  Authorization     "Basic 290809"
-                header_up  Content-Type      "image/jpeg"
-                header_down -Access-Control-Allow-Origin
-                transport http {
-                    tls
-                    tls_server_name grizzlyrics.duckdns.org
-                }
-            }
-        }
-    }
-
-    # ── Lecture : GET /api/avatar/{docId} ─────────────────────────────
-    handle /api/avatar/* {
-        rewrite * /remote.php/dav/files/papaours/beartify-avatars/{http.request.uri.path.segment(3)}.jpg
-
-        reverse_proxy 127.0.0.1:443 {
-            header_up  Host              grizzlyrics.duckdns.org
-            header_up  X-Forwarded-Proto https
-            header_up  Authorization     "Basic 290809"
-            header_down -Access-Control-Allow-Origin
-            header_down Cache-Control "public, max-age=86400"
-            transport http {
-                tls
-                tls_server_name grizzlyrics.duckdns.org
-            }
-        }
-    }
-}
-
 # ──────────────────────────────────────────────────────────────────────
 #  1. NEXTCLOUD — grizzlyrics.duckdns.org
 # ──────────────────────────────────────────────────────────────────────
@@ -233,7 +176,6 @@ beartify.duckdns.org {
 
     # ── 🔐 HLS DRM — FLAC + AES-128 + Honeypot Rick Roll 1/2 ─────────
     import drm_routes
-    import avatar_proxy
 
     # ── PROXY JELLYFIN — clé API injectée par Caddy ───────────────────
     # Le client ne voit jamais la clé X-Emby-Token.
@@ -328,6 +270,31 @@ beartify.duckdns.org {
         }
     }
 
+    # ── PROXY NEXTCLOUD — upload photo de profil ─────────────────────
+    # Le client envoie des requêtes WebDAV vers /api/nextcloud/*
+    # Caddy injecte l'authentification Basic (jamais exposée au client).
+    # Les fichiers sont stockés dans : /Photos/beartify/avatars/
+    handle /api/nextcloud/* {
+        uri strip_prefix /api/nextcloud
+
+        reverse_proxy 127.0.0.1:443 {
+            header_up  Host              grizzlyrics.duckdns.org
+            header_up  Authorization     "Basic cGFwYW91cnM6MjkwODA5"
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto https
+
+            header_down -Authorization
+            header_down -WWW-Authenticate
+            header_down -Access-Control-Allow-Origin
+
+            transport http {
+                tls
+                tls_server_name grizzlyrics.duckdns.org
+            }
+        }
+    }
+
     # ── SPA fallback — toutes les routes inconnues → index.html ───────
     # Permet la navigation côté client sans 404.
     @notFile {
@@ -401,7 +368,6 @@ http://192.168.0.18 {
 
     # ── 🔐 HLS DRM ────────────────────────────────────────────────────
     import drm_routes
-    import avatar_proxy
 
     # ── PROXY JELLYFIN (identique bloc prod) ─────────────────────────
     handle /api/jellyfin/* {
@@ -467,6 +433,28 @@ http://192.168.0.18 {
         }
     }
 
+    # ── PROXY NEXTCLOUD — upload photo de profil ─────────────────────
+    handle /api/nextcloud/* {
+        uri strip_prefix /api/nextcloud
+
+        reverse_proxy 127.0.0.1:443 {
+            header_up  Host              grizzlyrics.duckdns.org
+            header_up  Authorization     "Basic cGFwYW91cnM6MjkwODA5"
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto https
+
+            header_down -Authorization
+            header_down -WWW-Authenticate
+            header_down -Access-Control-Allow-Origin
+
+            transport http {
+                tls
+                tls_server_name grizzlyrics.duckdns.org
+            }
+        }
+    }
+
     # ── SPA fallback ──────────────────────────────────────────────────
     @notFile {
         not path *.js *.css *.png *.jpg *.svg *.ico *.woff* *.ttf *.webp *.json *.html
@@ -508,7 +496,6 @@ http://192.168.0.2 {
 
     # ── 🔐 HLS DRM ────────────────────────────────────────────────────
     import drm_routes
-    import avatar_proxy
 
     # ── PROXY JELLYFIN (identique bloc prod) ─────────────────────────
     handle /api/jellyfin/* {
@@ -565,6 +552,28 @@ http://192.168.0.2 {
             header_down Location "http://grizzlyrics.duckdns.org:443"  "/api/lyrics"
             header_down Location "http://grizzlyrics.duckdns.org"      "/api/lyrics"
 
+            header_down -Access-Control-Allow-Origin
+
+            transport http {
+                tls
+                tls_server_name grizzlyrics.duckdns.org
+            }
+        }
+    }
+
+    # ── PROXY NEXTCLOUD — upload photo de profil ─────────────────────
+    handle /api/nextcloud/* {
+        uri strip_prefix /api/nextcloud
+
+        reverse_proxy 127.0.0.1:443 {
+            header_up  Host              grizzlyrics.duckdns.org
+            header_up  Authorization     "Basic cGFwYW91cnM6MjkwODA5"
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto https
+
+            header_down -Authorization
+            header_down -WWW-Authenticate
             header_down -Access-Control-Allow-Origin
 
             transport http {
