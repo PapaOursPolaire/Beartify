@@ -258,7 +258,7 @@ function startTranscode(itemId, token, tempDir) {
       if (s && !s.ready) s.ffmpegError = `ffmpeg exit ${code} — ${last}`;
       console.error(`[HLS] ffmpeg échoué pour ${itemId} :`, s?.ffmpegError);
     } else if (code === 0) {
-      console.log(`[HLS] Transcodage terminé : ${itemId}`);
+      if (s) { s.ready = true; s.ffmpegDone = true; } console.log(`[HLS] Transcodage terminé : ${itemId}`);
     }
   });
   ff.on('error', (e) => {
@@ -412,7 +412,7 @@ app.get('/api/hls/session/:id', async (req, res) => {
 
     sessions.set(token, {
       itemId, key, ip, expiresAt, tempDir,
-      ready: false, ffmpegError: null,
+      ready: false, ffmpegDone: false, ffmpegError: null,
       ffProcess: null,     // Fix 3
       honeypotTag,         // Fix 1
       segCount: 0,
@@ -468,10 +468,10 @@ app.get('/api/hls/playlist/:id', async (req, res) => {
   if (!s) return res.status(401).json({ error: 'Session invalide' });
 
   const deadline = Date.now() + 60_000;
-  while (!s.ready && !s.ffmpegError && Date.now() < deadline)
+  while (!s.ffmpegDone && !s.ffmpegError && Date.now() < deadline)
     await new Promise(r => setTimeout(r, 300));
 
-  if (!s.ready) {
+  if (!s.ffmpegDone) {
     const err = s.ffmpegError || 'Timeout 60s';
     return res.status(500).json({ error: err, hint: 'journalctl -u beartify-drm -n 50' });
   }
