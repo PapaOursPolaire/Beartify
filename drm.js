@@ -258,6 +258,10 @@ function startTranscode(itemId, token, tempDir) {
       if (s && !s.ready) s.ffmpegError = `ffmpeg exit ${code} — ${last}`;
       console.error(`[HLS] ffmpeg échoué pour ${itemId} :`, s?.ffmpegError);
     } else if (code === 0) {
+      // Marquer le transcodage comme entièrement terminé.
+      // La route playlist re-lira le M3U8 final qui contient #EXT-X-ENDLIST
+      // → PLAYLIST-TYPE:VOD → HLS.js émet 'ended' correctement.
+      if (s) s.ffmpegDone = true;
       console.log(`[HLS] Transcodage terminé : ${itemId}`);
     }
   });
@@ -416,6 +420,7 @@ app.get('/api/hls/session/:id', async (req, res) => {
       ffProcess: null,     // Fix 3
       honeypotTag,         // Fix 1
       segCount: 0,
+      ffmpegDone: false,   // true quand ffmpeg a terminé avec succès (ENDLIST présent)
     });
 
     startTranscode(itemId, token, tempDir);
@@ -477,10 +482,15 @@ app.get('/api/hls/playlist/:id', async (req, res) => {
   }
 
   try {
+    // Toujours re-lire le fichier depuis le disque : ffmpeg l'enrichit au fil
+    // du transcodage et y ajoute #EXT-X-ENDLIST à la fin. Si on ne relit pas,
+    // le M3U8 retourné manque ENDLIST → HLS.js croit à un live stream (EVENT)
+    // et ne déclenche jamais 'ended' → passage automatique impossible.
     const raw  = await fs.promises.readFile(path.join(s.tempDir, 'playlist.m3u8'), 'utf8');
     const m3u8 = buildHoneypotM3u8(raw, req.params.id, req.query.s, s);
     res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
-    res.setHeader('Cache-Control', 'no-cache');
+    // Pas de cache si le transcodage est encore en cours (ENDLIST absent)
+    res.setHeader('Cache-Control', s.ffmpegDone ? 'public, max-age=60' : 'no-cache');
     res.send(m3u8);
   } catch (err) {
     res.status(500).json({ error: 'Playlist indisponible' });
