@@ -1,10 +1,9 @@
-// spotify-lyrics-saver.js — v9 — Compatible Spicy-Lyrics v6+
+// spotify-lyrics-saver.js — v10 — Compatible Spicy-Lyrics v6+
 // Fix : support du nouveau format encodé api.spicylyrics.org/query (POST)
 //       → décodeur SpicyLyrics v6 (pool + instructions) → Content[] standard
 //       + fetch forceCurrentTrack corrigé GET→POST avec body v6
 //       + extractRawLyricsPayload retourne le payload décodé (non l'encodé brut)
-//       + saveLyrics : téléchargement multi-stratégies (showSaveFilePicker → data: URI
-//         → blob: URL → presse-papier) pour contourner le blocage Electron/Spotify
+//       + saveLyrics : téléchargement blob: URL identique à alpha.js v6 (silencieux, sans dialogue)
 
 (function () {
   'use strict';
@@ -611,64 +610,6 @@
   }
 
   /* ═══════════════════════════════════════════════════════════
-     ÉCRITURE FILESYSTEM VIA SPICETIFY
-     Tente d'écrire le fichier directement sur le disque sans
-     aucune interaction utilisateur, via les APIs Spicetify/Electron.
-     Dossier cible par ordre de priorité :
-       1. Spicetify.Platform.LocalFilesAPI   (si disponible)
-       2. window.__spicetify_write_file      (hook injecté par certains thèmes)
-       3. CosmosAsync PUT filesystem://      (Spicetify ≥ 2.x)
-     Retourne true si l'écriture a réussi, false sinon.
-  ═══════════════════════════════════════════════════════════ */
-  const LS_SAVE_DIR = 'LyricsSaver'; // sous-dossier dans ~/Music/
-
-  async function spicetifyWriteFile(filename, content) {
-    // ── Tentative 1 : CosmosAsync filesystem (Spicetify ≥ 2.x) ─────────────
-    // URI : filesystem:///<homedir>/Music/LyricsSaver/<filename>
-    try {
-      if (Spicetify?.CosmosAsync?.put) {
-        // Récupérer le homedir via la plateforme
-        const homeDir = Spicetify?.Platform?.LocalFiles?.homedir
-                     || Spicetify?.Platform?.Filesystem?.homedir
-                     || null;
-        if (homeDir) {
-          const dirPath  = `${homeDir}/Music/${LS_SAVE_DIR}`;
-          const filePath = `${dirPath}/${filename}`;
-          // Créer le dossier si nécessaire (CosmosAsync mkdir)
-          try {
-            await Spicetify.CosmosAsync.put(`filesystem://${dirPath}`, {});
-          } catch {}
-          await Spicetify.CosmosAsync.put(`filesystem://${filePath}`, content);
-          log(`✓ CosmosAsync filesystem → ${filePath}`);
-          uiAddLog(`✓ Fichier écrit : ~/Music/${LS_SAVE_DIR}/${filename}`, 'success');
-          return true;
-        }
-      }
-    } catch (e) { log('CosmosAsync filesystem échoué:', e?.message ?? e); }
-
-    // ── Tentative 2 : Spicetify.LocalFiles (certaines versions) ─────────────
-    try {
-      if (typeof Spicetify?.LocalFiles?.saveFile === 'function') {
-        await Spicetify.LocalFiles.saveFile(filename, content);
-        log('✓ Spicetify.LocalFiles.saveFile OK');
-        uiAddLog(`✓ Fichier écrit via LocalFiles : ${filename}`, 'success');
-        return true;
-      }
-    } catch (e) { log('LocalFiles.saveFile échoué:', e?.message ?? e); }
-
-    // ── Tentative 3 : hook window.__spicetify_write_file (thèmes custom) ────
-    try {
-      if (typeof window.__spicetify_write_file === 'function') {
-        await window.__spicetify_write_file(filename, content);
-        log('✓ window.__spicetify_write_file OK');
-        return true;
-      }
-    } catch (e) { log('__spicetify_write_file échoué:', e?.message ?? e); }
-
-    return false;
-  }
-
-  /* ═══════════════════════════════════════════════════════════
      SAUVEGARDE
      Le JSON de sortie préserve intégralement la structure parsée,
      y compris les champs type, oppositeAligned, lead, background.
@@ -709,61 +650,17 @@
       rawLyrics: rawData || null,
     };
 
-    const filename  = `${sanitize(trackInfo.artistName)} - ${sanitize(trackInfo.trackName)}.json`;
-    const json      = JSON.stringify(output, null, 2);
-    let   downloaded = false;
-
-    // ── Stratégie 1 : écriture filesystem via Spicetify (silencieuse, sans dialogue) ──
-    // Spicetify expose CosmosAsync qui peut écrire des fichiers via le process Electron
-    // principal, sans aucune interaction utilisateur.
-    // Dossier cible : ~/Music/LyricsSaver/ (créé automatiquement si absent).
-    if (!downloaded) {
-      try {
-        const written = await spicetifyWriteFile(filename, json);
-        if (written) {
-          downloaded = true;
-          log('✓ Fichier écrit via Spicetify filesystem');
-        }
-      } catch (e) {
-        log('spicetifyWriteFile échoué:', e);
-      }
-    }
-
-    // ── Stratégie 2 : blob: URL (comportement original pré-v8) ────────────
-    // Sur Linux/KDE, data: URI ouvre Dolphin → on évite.
-    // blob: URL déclenche le gestionnaire de téléchargement d'Electron
-    // (dossier ~/Downloads par défaut) sans dialogue.
-    if (!downloaded) {
-      try {
-        const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
-        const url  = URL.createObjectURL(blob);
-        const a    = Object.assign(document.createElement('a'), { href: url, download: filename });
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        // Délai long : Electron peut déclencher le DL tardivement (tab arrière-plan)
-        setTimeout(() => URL.revokeObjectURL(url), 60_000);
-        downloaded = true;
-        log('✓ Téléchargement via blob: URL');
-      } catch (e) {
-        log('blob: URL échoué:', e);
-      }
-    }
-
-    // ── Stratégie 3 : presse-papier (fallback ultime, sans dialogue) ───────
-    if (!downloaded) {
-      try {
-        await navigator.clipboard.writeText(json);
-        log('⚠ Aucun téléchargement possible — JSON copié dans le presse-papier');
-        uiAddLog(`⚠ ${filename} — copié dans le presse-papier (toutes les autres méthodes ont échoué)`, 'warn');
-        Spicetify?.showNotification?.(`[LyricsSaver] ⚠ JSON copié dans le presse-papier`);
-      } catch (e) {
-        log('Presse-papier échoué également:', e);
-        uiAddLog(`✗ Impossible de sauvegarder ${filename} — vérifiez la console`, 'error');
-        Spicetify?.showNotification?.(`[LyricsSaver] ✗ Échec total — vérifiez la console`);
-      }
-    }
-
+    const filename = `${sanitize(trackInfo.artistName)} - ${sanitize(trackInfo.trackName)}.json`;
+    const blob     = new Blob([JSON.stringify(output, null, 2)], { type: 'application/json' });
+    const url      = URL.createObjectURL(blob);
+    const a        = Object.assign(document.createElement('a'), { href: url, download: filename });
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    // Délai long : dans Spotify/Electron le download peut démarrer tardivement
+    // (tab en arrière-plan, Electron occupé). Si l'URL est révoquée trop tôt,
+    // le fichier n'est pas créé alors que savedScore dit déjà "sauvegardé".
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
     state.savedTrackIds.add(trackInfo.trackId);
     // Enregistrer le score de qualité pour permettre le remplacement par une meilleure version
     if (!state.savedScore) state.savedScore = {};
