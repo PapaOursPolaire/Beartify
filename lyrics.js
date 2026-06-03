@@ -1,18 +1,11 @@
-// Test : deux clics espacés de 2 secondes
-const dl = (name) => {
-  const b = new Blob([name], {type:'text/plain'});
-  const u = URL.createObjectURL(b);
-  const a = Object.assign(document.createElement('a'), {href:u, download: name+'.txt'});
+const dl2 = (name, content) => {
+  const dataUrl = 'data:text/plain;charset=utf-8,' + encodeURIComponent(content);
+  const a = Object.assign(document.createElement('a'), {href: dataUrl, download: name+'.txt'});
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  console.log('clic:', name);
+  console.log('clic data URL:', name);
 };
-dl('fichier1');
-setTimeout(() => dl('fichier2'), 2000);
-setTimeout(() => dl('fichier3'), 4000);
-
-VM133:9 clic: fichier1
-4990
-VM133:9 clic: fichier2
-VM133:9 clic: fichier3
+dl2('test1', 'contenu1');
+setTimeout(() => dl2('test2', 'contenu2'), 2000);
+setTimeout(() => dl2('test3', 'contenu3'), 4000);
