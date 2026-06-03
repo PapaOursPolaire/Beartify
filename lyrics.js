@@ -1,8 +1,10 @@
-// spotify-lyrics-saver.js — v7 — Compatible Spicy-Lyrics v6+
+// spotify-lyrics-saver.js — v8 — Compatible Spicy-Lyrics v6+
 // Fix : support du nouveau format encodé api.spicylyrics.org/query (POST)
 //       → décodeur SpicyLyrics v6 (pool + instructions) → Content[] standard
 //       + fetch forceCurrentTrack corrigé GET→POST avec body v6
 //       + extractRawLyricsPayload retourne le payload décodé (non l'encodé brut)
+//       + saveLyrics : téléchargement multi-stratégies (showSaveFilePicker → data: URI
+//         → blob: URL → presse-papier) pour contourner le blocage Electron/Spotify
 
 (function () {
   'use strict';
@@ -649,17 +651,81 @@
       rawLyrics: rawData || null,
     };
 
-    const filename = `${sanitize(trackInfo.artistName)} - ${sanitize(trackInfo.trackName)}.json`;
-    const blob     = new Blob([JSON.stringify(output, null, 2)], { type: 'text/plain;charset=utf-8' });
-    const url      = URL.createObjectURL(blob);
-    const a        = Object.assign(document.createElement('a'), { href: url, download: filename });
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    // 300ms trop court : dans Spotify/Electron le download peut démarrer après
-    // (tab en arrière-plan, Electron occupé). Si l'URL est révoquée avant que le
-    // download démarre, le fichier n'est pas créé mais savedScore dit "sauvegardé".
-    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    const filename  = `${sanitize(trackInfo.artistName)} - ${sanitize(trackInfo.trackName)}.json`;
+    const json      = JSON.stringify(output, null, 2);
+    let   downloaded = false;
+
+    // ── Stratégie 1 : showSaveFilePicker (File System Access API) ──────────
+    // Disponible dans certaines configurations Electron récentes.
+    // Présente une vraie boîte de dialogue de sauvegarde → 100 % fiable.
+    if (!downloaded && typeof window.showSaveFilePicker === 'function') {
+      try {
+        const handle   = await window.showSaveFilePicker({
+          suggestedName: filename,
+          types        : [{ description: 'JSON', accept: { 'application/json': ['.json'] } }],
+        });
+        const writable = await handle.createWritable();
+        await writable.write(json);
+        await writable.close();
+        downloaded = true;
+        log('✓ Téléchargement via showSaveFilePicker');
+      } catch (e) {
+        // Annulé par l'utilisateur (AbortError) ou non supporté → fallback silencieux
+        if (e?.name !== 'AbortError') log('showSaveFilePicker échoué:', e);
+      }
+    }
+
+    // ── Stratégie 2 : data: URI ─────────────────────────────────────────────
+    // Contrairement aux blob: URLs (liées au renderer, souvent bloquées par
+    // Electron pour les téléchargements non-trusted), les data: URIs sont
+    // auto-contenus et mieux tolérés dans le contexte sandboxé de Spotify.
+    if (!downloaded) {
+      try {
+        const dataUrl = 'data:application/json;charset=utf-8,' + encodeURIComponent(json);
+        const a       = Object.assign(document.createElement('a'), { href: dataUrl, download: filename });
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        downloaded = true;
+        log('✓ Téléchargement via data: URI');
+      } catch (e) {
+        log('data: URI échoué:', e);
+      }
+    }
+
+    // ── Stratégie 3 : blob: URL (ancienne méthode, Electron peut la bloquer) ─
+    if (!downloaded) {
+      try {
+        const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+        const url  = URL.createObjectURL(blob);
+        const a    = Object.assign(document.createElement('a'), { href: url, download: filename });
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        // Délai long car Electron peut déclencher le DL tardivement
+        setTimeout(() => URL.revokeObjectURL(url), 60_000);
+        downloaded = true;
+        log('✓ Téléchargement via blob: URL');
+      } catch (e) {
+        log('blob: URL échoué:', e);
+      }
+    }
+
+    // ── Stratégie 4 : presse-papier (fallback ultime) ──────────────────────
+    // Si aucune méthode filesystem n'a fonctionné, on copie le JSON dans le
+    // presse-papier et on avertit l'utilisateur.
+    if (!downloaded) {
+      try {
+        await navigator.clipboard.writeText(json);
+        log('⚠ Aucun téléchargement possible — JSON copié dans le presse-papier');
+        uiAddLog(`⚠ ${filename} — copié dans le presse-papier (téléchargement bloqué)`, 'warn');
+        Spicetify?.showNotification?.(`[LyricsSaver] ⚠ Téléchargement bloqué — JSON copié dans le presse-papier`);
+      } catch (e) {
+        log('Presse-papier échoué également:', e);
+        uiAddLog(`✗ Impossible de sauvegarder ${filename} — toutes les stratégies ont échoué`, 'error');
+        Spicetify?.showNotification?.(`[LyricsSaver] ✗ Échec total — vérifiez la console`);
+      }
+    }
 
     state.savedTrackIds.add(trackInfo.trackId);
     // Enregistrer le score de qualité pour permettre le remplacement par une meilleure version
