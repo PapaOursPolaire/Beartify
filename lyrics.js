@@ -9,3 +9,8 @@ const dl2 = (name, content) => {
 dl2('test1', 'contenu1');
 setTimeout(() => dl2('test2', 'contenu2'), 2000);
 setTimeout(() => dl2('test3', 'contenu3'), 4000);
+
+VM137:7 clic data URL: test1
+8488
+VM137:7 clic data URL: test2
+VM137:7 clic data URL: test3
