@@ -1,9 +1,10 @@
-// spotify-lyrics-saver.js — v10 — Compatible Spicy-Lyrics v6+
+// spotify-lyrics-saver.js — v11 — Compatible Spicy-Lyrics v6+
 // Fix : support du nouveau format encodé api.spicylyrics.org/query (POST)
 //       → décodeur SpicyLyrics v6 (pool + instructions) → Content[] standard
 //       + fetch forceCurrentTrack corrigé GET→POST avec body v6
 //       + extractRawLyricsPayload retourne le payload décodé (non l'encodé brut)
 //       + saveLyrics : téléchargement blob: URL identique à alpha.js v6 (silencieux, sans dialogue)
+//       + saveLineFallback : si syncType LINE, sauvegarde aussi "<artiste> - <titre>-line.json"
 
 (function () {
   'use strict';
@@ -610,6 +611,41 @@
   }
 
   /* ═══════════════════════════════════════════════════════════
+     SAUVEGARDE LINE FALLBACK
+     Appelé uniquement quand syncType === 'LINE' (pas de mot-par-mot disponible).
+     Récupère la réponse brute de l'endpoint Spotify color-lyrics et la sauvegarde
+     sous "<artiste> - <titre>-line.json", exactement comme lines.js exportRaw().
+     Fire-and-forget : n'affecte pas le flux principal de saveLyrics.
+  ═══════════════════════════════════════════════════════════ */
+  async function saveLineFallback(trackInfo) {
+    try {
+      const token = await getSpotifyToken();
+      if (!token) { log('saveLineFallback: token indisponible'); return; }
+
+      const url = `https://spclient.wg.spotify.com/color-lyrics/v2/track/${trackInfo.trackId}?format=json&vocalRemoval=false`;
+      const res = await state.origFetch(url, {
+        headers: { 'Authorization': `Bearer ${token}`, 'App-Platform': 'WebPlayer' },
+      });
+      if (!res.ok) { log(`saveLineFallback: HTTP ${res.status}`); return; }
+
+      const raw      = await res.json();
+      const filename = `${sanitize(trackInfo.artistName)} - ${sanitize(trackInfo.trackName)}-line.json`;
+      const blob     = new Blob([JSON.stringify(raw, null, 2)], { type: 'application/json' });
+      const blobUrl  = URL.createObjectURL(blob);
+      const a        = Object.assign(document.createElement('a'), { href: blobUrl, download: filename });
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000);
+
+      log(`✓ LINE fallback → ${filename}`);
+      uiAddLog(`✓ LINE raw → ${trackInfo.artistName} — ${trackInfo.trackName}`, 'info');
+    } catch (e) {
+      log('saveLineFallback erreur:', e);
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
      SAUVEGARDE
      Le JSON de sortie préserve intégralement la structure parsée,
      y compris les champs type, oppositeAligned, lead, background.
@@ -661,6 +697,14 @@
     // (tab en arrière-plan, Electron occupé). Si l'URL est révoquée trop tôt,
     // le fichier n'est pas créé alors que savedScore dit déjà "sauvegardé".
     setTimeout(() => URL.revokeObjectURL(url), 60_000);
+
+    // ── Fallback LINE : si la sync est phrase par phrase, on sauvegarde aussi
+    // le raw Spotify color-lyrics sous "<artiste> - <titre>-line.json".
+    // Fire-and-forget avec délai pour ne pas interférer avec le DL principal.
+    if (lyricsData.syncType === 'LINE') {
+      setTimeout(() => saveLineFallback(trackInfo), 800);
+    }
+
     state.savedTrackIds.add(trackInfo.trackId);
     // Enregistrer le score de qualité pour permettre le remplacement par une meilleure version
     if (!state.savedScore) state.savedScore = {};
