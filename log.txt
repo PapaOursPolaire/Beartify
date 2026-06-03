@@ -1,12 +1,1 @@
-# 1. Installer
-mkdir -p /opt/beartify-drm && cd /opt/beartify-drm
-# copier drm.js, package.json, .env
-npm install
-node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
-# → coller dans .env comme SESSION_SECRET=...
-
-# 2. Service systemd (même que précédemment, ExecStart=node drm.js)
-systemctl enable --now beartify-drm
-
-# 3. Caddy
-caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy
+~/.config/spicetify/Extensions/
