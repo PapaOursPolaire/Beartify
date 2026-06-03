@@ -646,7 +646,8 @@
       a.download = filename;
       w.document.body.appendChild(a);
       a.click();
-      setTimeout(() => { w.close(); URL.revokeObjectURL(url); }, 60_000);
+      // Fermer la popup dès que le téléchargement a démarré (300ms suffisent)
+      setTimeout(() => { try { w.close(); } catch {} URL.revokeObjectURL(url); }, 300);
     }
   }
 
