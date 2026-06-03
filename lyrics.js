@@ -1,4 +1,4 @@
-// spotify-lyrics-saver.js — v12 — Compatible Spicy-Lyrics v6+
+// spotify-lyrics-saver.js — v13 — Compatible Spicy-Lyrics v6+
 // Fix : support du nouveau format encodé api.spicylyrics.org/query (POST)
 //       → décodeur SpicyLyrics v6 (pool + instructions) → Content[] standard
 //       + fetch forceCurrentTrack corrigé GET→POST avec body v6
@@ -6,6 +6,7 @@
 //       + saveLyrics : téléchargement blob: URL identique à alpha.js v6 (silencieux, sans dialogue)
 //       + saveLineFallback : si syncType LINE, sauvegarde aussi "<artiste> - <titre>-line.json"
 //       + fix : savedScore de la piste entrante effacé au songchange (re-DL bloqué silencieusement)
+//       + fix : capturedTrackId passé à processPayload depuis TOUTES les sources (IDB write, SpicyLyrics setter, polling)
 
 (function () {
   'use strict';
@@ -1184,7 +1185,10 @@
       // Heuristique : données de paroles si elles ont Content[], lines[], ou structure Lead/Syllables
       if (val.Content || val.lines || val.lyrics || val.Lead || val.Syllables) {
         log('IDB write intercepté — données de paroles détectées');
-        processPayload(val);
+        // Capturer le trackId maintenant : l'écriture IDB est synchrone mais
+        // processPayload est async — la piste peut changer avant sa résolution.
+        const capturedId = getCurrentTrackInfo()?.trackId || null;
+        processPayload(val, capturedId);
       }
     }
 
@@ -1296,7 +1300,12 @@
             get() { return _val; },
             set(v) {
               _val = v;
-              if (v) { log(`SpicyLyrics.${prop} mis à jour — traitement`); processPayload(v); }
+              if (v) {
+                log(`SpicyLyrics.${prop} mis à jour — traitement`);
+                // Capturer l'ID de piste au moment du set, pas au moment de l'exécution async
+                const capturedId = getCurrentTrackInfo()?.trackId || null;
+                processPayload(v, capturedId);
+              }
             },
           });
           log(`✓ Hook sur SpicyLyrics.${prop}`);
@@ -1335,6 +1344,9 @@
       }
 
       // ── SOURCE 2 : Objet global window.SpicyLyrics ──
+      // IMPORTANT : window.SpicyLyrics.CurrentTrackLyrics peut encore contenir
+      // les paroles de la piste précédente le temps que SpicyLyrics recharge.
+      // On passe capturedTrackId → processPayload rejette si piste changée.
       const payload = getSpicyLyricsPayload();
       if (payload) {
         log('Données via window.SpicyLyrics polling');
@@ -1371,7 +1383,8 @@
       document.addEventListener(evt, e => {
         if (e.detail) {
           log(`CustomEvent ${evt} reçu`);
-          processPayload(e.detail);
+          const capturedId = getCurrentTrackInfo()?.trackId || null;
+          processPayload(e.detail, capturedId);
         }
       });
     }
