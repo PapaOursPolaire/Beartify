@@ -1,6 +1,7 @@
-const a=document.createElement('a');
-a.href='data:text/plain,test';
-a.download='test.txt';
-a.click();
-
-undefined
+console.log({
+  currentTrackId: window.SpotifyLyricsSaver?.state?.currentTrackId,
+  savedTrackIds: [...(window.SpotifyLyricsSaver?.state?.savedTrackIds ?? [])],
+  savedScore: window.SpotifyLyricsSaver?.state?.savedScore,
+  pending: Object.keys(window.SpotifyLyricsSaver?.state?.pending ?? {}),
+  totalSaved: window.SpotifyLyricsSaver?.state?.totalSaved,
+})
