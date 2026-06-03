@@ -11,3 +11,8 @@ const dl = (name) => {
 dl('fichier1');
 setTimeout(() => dl('fichier2'), 2000);
 setTimeout(() => dl('fichier3'), 4000);
+
+VM133:9 clic: fichier1
+4990
+VM133:9 clic: fichier2
+VM133:9 clic: fichier3
