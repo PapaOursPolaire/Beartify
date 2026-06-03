@@ -1,16 +1,9 @@
-const dl2 = (name, content) => {
-  const dataUrl = 'data:text/plain;charset=utf-8,' + encodeURIComponent(content);
-  const a = Object.assign(document.createElement('a'), {href: dataUrl, download: name+'.txt'});
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  console.log('clic data URL:', name);
-};
-dl2('test1', 'contenu1');
-setTimeout(() => dl2('test2', 'contenu2'), 2000);
-setTimeout(() => dl2('test3', 'contenu3'), 4000);
-
-VM137:7 clic data URL: test1
-8488
-VM137:7 clic data URL: test2
-VM137:7 clic data URL: test3
+const w = window.open('about:blank');
+const b = new Blob(['test2'], {type:'text/plain'});
+const u = URL.createObjectURL(b);
+const a = w.document.createElement('a');
+a.href = u;
+a.download = 'fichier_via_popup.txt';
+w.document.body.appendChild(a);
+a.click();
+w.close();
