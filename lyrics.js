@@ -1,10 +1,11 @@
-// spotify-lyrics-saver.js — v11 — Compatible Spicy-Lyrics v6+
+// spotify-lyrics-saver.js — v12 — Compatible Spicy-Lyrics v6+
 // Fix : support du nouveau format encodé api.spicylyrics.org/query (POST)
 //       → décodeur SpicyLyrics v6 (pool + instructions) → Content[] standard
 //       + fetch forceCurrentTrack corrigé GET→POST avec body v6
 //       + extractRawLyricsPayload retourne le payload décodé (non l'encodé brut)
 //       + saveLyrics : téléchargement blob: URL identique à alpha.js v6 (silencieux, sans dialogue)
 //       + saveLineFallback : si syncType LINE, sauvegarde aussi "<artiste> - <titre>-line.json"
+//       + fix : savedScore de la piste entrante effacé au songchange (re-DL bloqué silencieusement)
 
 (function () {
   'use strict';
@@ -1706,6 +1707,11 @@
       // savedScore est conservé : processPayload bloquera les re-téléchargements
       // inutiles si le score est déjà optimal (prevScore >= score).
       state.savedTrackIds.delete(ti.trackId);
+      // Effacer aussi le savedScore de la piste entrante : sans ça, processPayload
+      // compare prevScore >= score et retourne immédiatement sans sauvegarder,
+      // même si savedTrackIds a été débloqqué. Le téléchargement semblait réussir
+      // (log payload reçu) mais saveLyrics n'était jamais appelé.
+      if (state.savedScore) delete state.savedScore[ti.trackId];
 
       // ── Sauvegarde d'urgence des paroles en attente ──────────────────
       // Avant mon fix, les timers pendants étaient simplement annulés (clearTimeout)
@@ -1728,14 +1734,10 @@
       }
 
       delete state.trackSeenAt[ti.trackId];
-      // Ne pas effacer savedScore pour la piste en cours (permet upgrade si elle revient)
-      // Mais effacer les anciennes pistes pour libérer la mémoire
-      if (state.savedScore) {
-        const keep = new Set(state.savedTrackIds);
-        for (const k of Object.keys(state.savedScore)) {
-          if (!keep.has(k)) delete state.savedScore[k];
-        }
-      }
+      // savedScore est conservé pour toutes les pistes sauvegardées de la session
+      // afin d'éviter de re-télécharger une piste déjà sauvegardée en meilleure qualité.
+      // La piste entrante a son score effacé juste au-dessus (delete state.savedScore[ti.trackId]),
+      // ce qui permet de la re-télécharger si elle repasse.
 
       uiAddLog(`♪ ${ti.artistName} — ${ti.trackName}`, 'info');
       uiSetStatus(state.queueMode ? 'active' : 'idle');
