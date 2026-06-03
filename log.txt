@@ -1,88 +1,23 @@
-Maintenant j'ai une bonne vue d'ensemble du script. C'est un **Spicetify custom app** (extension Spotify) qui intercepte les paroles via SpicyLyrics et les sauvegarde en JSON. Laisse-moi lire la partie concernant les problèmes potentiels sur Linux.J'ai maintenant une compréhension complète du script. C'est un script Spicetify qui s'injecte dans Spotify via la console des DevTools. Voici mon analyse des problèmes potentiels sur Linux :
+Pour 
+console.log(typeof Spicetify, Spicetify?.Player, Spicetify?.showNotification) :
 
----
-
-## Diagnostic : problèmes probables sur Linux
-
-Le script en lui-même est solide, mais plusieurs points peuvent coincer spécifiquement sur Linux :
-
-### 1. Spicetify non détecté → mode dégradé
-
-Le script attend `Spicetify?.Player` et `Spicetify?.showNotification` (ligne 1855). Sur Linux, Spicetify peut être mal installé ou la version de Spotify incompatible. Si tu vois **"⚠ Spicetify timeout — activation partielle"** dans les logs, c'est le problème.
-
-**Vérifier dans la console Spotify (DevTools) :**
-```js
 console.log(typeof Spicetify, Spicetify?.Player, Spicetify?.showNotification)
-```
-Si c'est `undefined` → Spicetify ne tourne pas correctement.
+VM304:1 object {eventListeners: {…}, addEventListener: ƒ, dispatchEvent: ƒ, seek: ƒ, getProgress: ƒ, …}addEventListener: (type, callback) => {…}back: () => { 			Spicetify.Player.origin.skipToPrevious(); 		}data: {timestamp: 1780504610731, context: {…}, index: {…}, item: {…}, shuffle: true, …}decreaseVolume: () => { 			Spicetify.Platform.PlaybackAPI.lowerVolume(); 		}dispatchEvent: (event) => {…}eventListeners: {songchange: Array(4), onplaypause: Array(1), onprogress: Array(1)}formatTime: (ms) => {…}getDuration: () => Spicetify.Player.origin._state.durationgetHeart: () => {…}getMute: () => Spicetify.Player.getVolume() === 0getProgress: () => {…}getProgressPercent: () => {…}getRepeat: () => Spicetify.Player.origin._state.repeatgetShuffle: () => Spicetify.Player.origin._state.shufflegetVolume: () => Spicetify.Platform.PlaybackAPI._volumeincreaseVolume: () => { 			Spicetify.Platform.PlaybackAPI.raiseVolume(); 		}isPlaying: () => !Spicetify.Player.origin._state.isPausednext: () => { 			Spicetify.Player.origin.skipToNext(); 		}origin: (...)pause: () => { 			Spicetify.Player.origin.pause(); 		}play: () => { 			Spicetify.Player.origin.resume(); 		}playUri: async (uri, context = {}, options = {}) => {…}removeEventListener: (type, callback) => {…}seek: (p) => {…}setHeart: (b) => {…}setMute: (b) => {…}setRepeat: (r) => { 			Spicetify.Player.origin.setRepeat(r); 		}setShuffle: (b) => { 			Spicetify.Player.origin.setShuffle(b); 		}setVolume: (v) => { 			Spicetify.Platform.PlaybackAPI.setVolume(v); 		}skipBack: (amount = 15e3) => {…}skipForward: (amount = 15e3) => {…}toggleHeart: () => {…}toggleMute: () => {…}togglePlay: () => {…}toggleRepeat: () => {…}toggleShuffle: () => {…}get origin: ƒ origin()[[Prototype]]: Object (message, isError, msTimeout) => {
+				Spicetify.Snackbar.enqueueSnackbar(message, {
+					variant: isError ? "error" : "default",
+					autoHideDuration: msTimeout,
+				});
+			}
+undefined
 
----
-
-### 2. Téléchargement bloqué par le navigateur / Electron
-
-La sauvegarde utilise un `<a download>` avec une `blob:` URL (ligne 654-662). Sur Linux sous Electron (Spotify desktop), **les téléchargements silencieux via Blob URL peuvent être bloqués** selon la version d'Electron ou les paramètres de sécurité du contenu (CSP).
-
-**Test rapide dans la console :**
-```js
-const blob = new Blob(['test'], {type:'text/plain'});
-const a = Object.assign(document.createElement('a'), {href: URL.createObjectURL(blob), download:'test.txt'});
-document.body.appendChild(a); a.click(); document.body.removeChild(a);
-```
-Si aucun fichier n'est téléchargé → c'est bien ce problème.
-
-**Fix possible :** ajouter un fallback via `showSaveFilePicker` si disponible, ou forcer l'affichage dans un onglet :
-```js
-// Remplacer le bloc save (ligne 654-658) par :
-const url = URL.createObjectURL(blob);
-// Tenter download classique
-const a = Object.assign(document.createElement('a'), { href: url, download: filename });
-document.body.appendChild(a);
-a.click();
-document.body.removeChild(a);
-// Fallback : ouvrir dans un nouvel onglet si le download ne démarre pas
-setTimeout(() => window.open(url, '_blank'), 500);
-```
-
----
-
-### 3. `indexedDB.databases()` non supporté
-
-Ligne 1769 : `indexedDB.databases()` est utilisé pour lister les IDB. Cette méthode **n'est pas supportée sur Firefox** et sur certaines versions d'Electron. Le code a déjà un fallback (ligne 1773), mais le fallback peut échouer silencieusement si les noms de DB ne correspondent pas.
-
----
-
-### 4. CSP (Content Security Policy) de Spotify
-
-Spotify peut bloquer les requêtes vers `api.spicylyrics.org` via sa CSP. Sur Linux, cette CSP peut être plus stricte selon la version packagée (Snap, Flatpak, `.deb`).
-
-**Vérifier dans la console :**
-```js
 fetch('https://api.spicylyrics.org/query', {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'})
   .then(r => console.log('OK', r.status))
   .catch(e => console.error('BLOQUÉ', e))
-```
+Promise {<pending>}
+lyrics.js:919  POST https://api.spicylyrics.org/query 400 (Bad Request)
+window.fetch @ lyrics.js:919
+(anonymous) @ VM313:1
+lyrics.js:49 [LyricsSaver] fetch intercepté: https://api.spicylyrics.org/query
+VM313:2 OK 400
 
----
 
-### 5. Installation Snap ou Flatpak
-
-Si Spotify est installé via **Snap** ou **Flatpak**, le système de fichiers est sandboxé et les DevTools peuvent être inaccessibles, ou Spicetify incapable de patcher le client. Spicetify fonctionne mieux avec le **paquet `.deb` officiel** sur Linux.
-
----
-
-### Pour diagnostiquer rapidement
-
-Ouvre les DevTools Spotify (`Ctrl+Shift+I` ou `--remote-debugging-port=9222` + Chrome), puis dans la console :
-
-```js
-// 1. Vérifier Spicetify
-console.log('Spicetify:', typeof Spicetify?.Player)
-
-// 2. Vérifier les logs du script
-// (si CONFIG.debug = true, tu verras les messages [LyricsSaver] en vert)
-
-// 3. Voir l'état global
-console.log(window.SpotifyLyricsSaver?.state)
-```
-
-Dis-moi ce que tu observes et je pourrai t'aider à cibler le fix exact.
