@@ -650,94 +650,16 @@
     };
 
     const filename = `${sanitize(trackInfo.artistName)} - ${sanitize(trackInfo.trackName)}.json`;
-    const jsonStr  = JSON.stringify(output, null, 2);
-    const blob     = new Blob([jsonStr], { type: 'application/json' });
-
-    // ── Sauvegarde multi-stratégie (robuste sous Electron/Linux) ────────────
-    // Stratégie 1 : File System Access API (showSaveFilePicker)
-    //   → dialogue natif "Enregistrer sous", fonctionne dans Electron ≥ 20+
-    //     et les navigateurs modernes. Donne un vrai chemin fichier garanti.
-    // Stratégie 2 : window.open + document.write (data URI)
-    //   → ouvre un onglet/fenêtre avec le JSON affiché ; l'utilisateur peut
-    //     faire Ctrl+S pour enregistrer. Dernier recours visible.
-    // L'ancien <a download> est conservé en dernier car il échoue
-    // silencieusement sous Electron Linux sans aucun retour d'erreur.
-    let saved = false;
-
-    // Stratégie 1 — showSaveFilePicker (File System Access API)
-    if (!saved && typeof window.showSaveFilePicker === 'function') {
-      try {
-        const handle = await window.showSaveFilePicker({
-          suggestedName: filename,
-          types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }],
-        });
-        const writable = await handle.createWritable();
-        await writable.write(blob);
-        await writable.close();
-        log('✓ Sauvegarde via showSaveFilePicker');
-        saved = true;
-      } catch (e) {
-        // AbortError = l'utilisateur a annulé → on ne tente pas d'autre stratégie
-        if (e?.name === 'AbortError') {
-          uiAddLog('⚠ Sauvegarde annulée par l\'utilisateur', 'warn');
-          return;
-        }
-        log('showSaveFilePicker échoué, tentative suivante:', e?.message);
-      }
-    }
-
-    // Stratégie 2 — <a download> classique (fonctionne sur navigateur, parfois sous Electron)
-    if (!saved) {
-      try {
-        const url = URL.createObjectURL(blob);
-        const a   = Object.assign(document.createElement('a'), { href: url, download: filename });
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        // On détecte si le download a réellement démarré via visibilitychange :
-        // sous Electron Linux, le tab ne se met pas en arrière-plan → pas de signal fiable.
-        // On attend 2s puis on vérifie avec un flag ; si toujours pas sauvé → stratégie 3.
-        await new Promise(r => setTimeout(r, 2000));
-        // Heuristique : si showSaveFilePicker n'est pas dispo et qu'on est sous Electron,
-        // le <a download> a probablement échoué silencieusement.
-        const isElectron = navigator.userAgent.includes('Electron');
-        if (!isElectron) {
-          // Sur navigateur, on fait confiance au click
-          saved = true;
-          log('✓ Sauvegarde via <a download> (navigateur)');
-        } else {
-          log('<a download> tenté sous Electron — passage à la stratégie 3 pour confirmation');
-        }
-        setTimeout(() => URL.revokeObjectURL(url), 60_000);
-      } catch (e) {
-        log('<a download> échoué:', e?.message);
-      }
-    }
-
-    // Stratégie 3 — Ouvrir dans un nouvel onglet (visible, Ctrl+S pour sauver)
-    if (!saved) {
-      try {
-        // data: URI → fonctionne même sous Electron sandboxé
-        const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(jsonStr);
-        const win = window.open(dataUri, '_blank');
-        if (win) {
-          log('✓ Fallback : JSON ouvert dans un nouvel onglet (Ctrl+S pour enregistrer)');
-          uiAddLog('⚠ Fallback : JSON ouvert dans un onglet — Ctrl+S pour enregistrer', 'warn');
-          Spicetify?.showNotification?.('[LyricsSaver] Ouvre l\'onglet JSON et fais Ctrl+S');
-          saved = true;
-        }
-      } catch (e) {
-        log('window.open échoué:', e?.message);
-      }
-    }
-
-    if (!saved) {
-      uiAddLog('✗ Impossible de sauvegarder le fichier (toutes les stratégies ont échoué)', 'error');
-      log('✗ Sauvegarde échouée — JSON disponible dans la console :');
-      console.log('[LyricsSaver] JSON brut (copier-coller pour sauvegarder) :', jsonStr);
-      return; // Ne pas marquer comme sauvegardé si rien n'a fonctionné
-    }
-    // ── Fin stratégies sauvegarde ────────────────────────────────────────────
+    const blob     = new Blob([JSON.stringify(output, null, 2)], { type: 'text/plain;charset=utf-8' });
+    const url      = URL.createObjectURL(blob);
+    const a        = Object.assign(document.createElement('a'), { href: url, download: filename });
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    // 300ms trop court : dans Spotify/Electron le download peut démarrer après
+    // (tab en arrière-plan, Electron occupé). Si l'URL est révoquée avant que le
+    // download démarre, le fichier n'est pas créé mais savedScore dit "sauvegardé".
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
 
     state.savedTrackIds.add(trackInfo.trackId);
     // Enregistrer le score de qualité pour permettre le remplacement par une meilleure version
