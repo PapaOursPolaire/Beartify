@@ -1,4 +1,4 @@
-// spotify-lyrics-saver.js — v15 — Compatible Spicy-Lyrics v6+
+// spotify-lyrics-saver.js — v16 — Compatible Spicy-Lyrics v6+
 // Fix : support du nouveau format encodé api.spicylyrics.org/query (POST)
 //       → décodeur SpicyLyrics v6 (pool + instructions) → Content[] standard
 //       + fetch forceCurrentTrack corrigé GET→POST avec body v6
@@ -8,6 +8,7 @@
 //       + fix : capturedTrackId passé à processPayload depuis TOUTES les sources (IDB write, SpicyLyrics setter, polling)
 //       + fix v14 : suppression saveLineFallback — double a.click() par piste LINE cassait tous les DL suivants
 //       + fix v15 : popup about:blank par téléchargement — CEF Linux/KDE n'accepte qu'un a.click() par contexte de page
+//       + v16 : saveLineFallback — si syncType LINE ou aucune parole trouvée → fetch color-lyrics → .json + .lrc
 
 (function () {
   'use strict';
@@ -652,6 +653,61 @@
   }
 
   /* ═══════════════════════════════════════════════════════════
+     FALLBACK LINE
+     Quand aucune parole WORD n'est disponible (ou syncType LINE),
+     fetch l'endpoint Spotify color-lyrics et sauvegarde :
+       - "<artiste> - <titre>-line.json"  (payload brut)
+       - "<artiste> - <titre>.lrc"        (format LRC standard)
+  ═══════════════════════════════════════════════════════════ */
+  async function saveLineFallback(trackInfo) {
+    try {
+      const token = await getSpotifyToken();
+      if (!token) { log('saveLineFallback: token indisponible'); return; }
+
+      const url = `https://spclient.wg.spotify.com/color-lyrics/v2/track/${trackInfo.trackId}?format=json&vocalRemoval=false`;
+      const res = await state.origFetch(url, {
+        headers: { 'Authorization': `Bearer ${token}`, 'App-Platform': 'WebPlayer' },
+      });
+      if (!res.ok) { log(`saveLineFallback: HTTP ${res.status}`); return; }
+
+      const raw   = await res.json();
+      const lines = raw?.lyrics?.lines;
+      if (!lines?.length) { log('saveLineFallback: aucune ligne'); return; }
+
+      // ── JSON brut ──
+      const jsonFilename = `${sanitize(trackInfo.artistName)} - ${sanitize(trackInfo.trackName)}-line.json`;
+      triggerDownload(new Blob([JSON.stringify(raw, null, 2)], { type: 'application/json' }), jsonFilename);
+
+      // ── LRC ──
+      const header = [
+        `[ti:${trackInfo.trackName}]`,
+        `[ar:${trackInfo.artistName}]`,
+        `[al:${trackInfo.albumName}]`,
+        `[by:spotify-lyrics-saver]`,
+        `[re:spotify-color-lyrics]`,
+        '',
+      ].join('\n');
+      const body = lines
+        .map(l => {
+          const ms  = Number(l.startTimeMs ?? 0);
+          const min = String(Math.floor(ms / 60000)).padStart(2, '0');
+          const sec = String(Math.floor((ms % 60000) / 1000)).padStart(2, '0');
+          const cs  = String(Math.floor((ms % 1000) / 10)).padStart(2, '0');
+          return `[${min}:${sec}.${cs}]${(l.words || '').trim()}`;
+        })
+        .filter(l => l.slice(l.indexOf(']') + 1).trim())
+        .join('\n');
+      const lrcFilename = `${sanitize(trackInfo.artistName)} - ${sanitize(trackInfo.trackName)}.lrc`;
+      triggerDownload(new Blob([header + body], { type: 'text/plain;charset=utf-8' }), lrcFilename);
+
+      log(`✓ LINE fallback → ${jsonFilename} + ${lrcFilename}`);
+      uiAddLog(`✓ LINE fallback → ${trackInfo.artistName} — ${trackInfo.trackName} (.json + .lrc)`, 'info');
+    } catch (e) {
+      log('saveLineFallback erreur:', e);
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
      SAUVEGARDE
      Le JSON de sortie préserve intégralement la structure parsée,
      y compris les champs type, oppositeAligned, lead, background.
@@ -903,6 +959,7 @@
             if ((state.savedScore?.[id] ?? 0) >= bestScore) return;
             uiAddLog(`↓ Fallback ${qualityLabel(bestScore)} pour ${ti.trackName}`, 'info');
             await saveLyrics(ti, best, bestScore, bestRaw);
+            if (bestScore <= 20) await saveLineFallback(ti);
           }, reducedWait);
         }
       }
@@ -921,6 +978,7 @@
       if ((state.savedScore?.[id] ?? 0) >= bestScore) return;
       uiAddLog(`↓ Fallback ${qualityLabel(bestScore)} pour ${ti.trackName}`, 'info');
       await saveLyrics(ti, best, bestScore, bestRaw);
+      if (bestScore <= 20) await saveLineFallback(ti);
     }, CONFIG.spicyWaitMs);
 
     state.pending[id] = { timer, bestLyrics: lyrics, rawData, trackInfo: ti };
@@ -1316,8 +1374,9 @@
       if (state.queueMode && !state.pending[capturedTrackId]) {
         const trackSeen = state.trackSeenAt[capturedTrackId];
         if (trackSeen && Date.now() - trackSeen > CONFIG.spicyWaitMs * 2) {
-          uiAddLog(`⏭ Aucune parole disponible après ${CONFIG.spicyWaitMs * 2 / 1000}s — skip (${ti.trackName})`, 'warn');
+          uiAddLog(`⏭ Aucune parole disponible après ${CONFIG.spicyWaitMs * 2 / 1000}s — LINE fallback (${ti.trackName})`, 'warn');
           state.savedTrackIds.add(capturedTrackId);
+          await saveLineFallback(ti);
           setTimeout(() => Spicetify?.Player?.next?.(), 500);
           return;
         }
