@@ -1,4 +1,4 @@
-// spotify-lyrics-saver.js — v17 — Compatible Spicy-Lyrics v6+
+// spotify-lyrics-saver.js — v18 — Compatible Spicy-Lyrics v6+
 // Fix : support du nouveau format encodé api.spicylyrics.org/query (POST)
 //       → décodeur SpicyLyrics v6 (pool + instructions) → Content[] standard
 //       + fetch forceCurrentTrack corrigé GET→POST avec body v6
@@ -10,6 +10,7 @@
 //       + fix v15 : popup about:blank par téléchargement — CEF Linux/KDE n'accepte qu'un a.click() par contexte de page
 //       + v16 : saveLineFallback — si syncType LINE ou aucune parole trouvée → fetch color-lyrics → .json + .lrc
 //       + v17 : décodeur LINE encodé v6 — pool contient 'Line' sans 'Syllables' → 5 cols [Text,Start,End,Vocal,OA]
+//       + v18 : saveLineFallback — LRC enrichi avec tags <BG> et <OA> si isBackground/isOppositeAligned présents
 
 (function () {
   'use strict';
@@ -739,6 +740,7 @@
      fetch l'endpoint Spotify color-lyrics et sauvegarde :
        - "<artiste> - <titre>-line.json"  (payload brut)
        - "<artiste> - <titre>.lrc"        (format LRC standard)
+     Supporte Background et OppositeAligned si présents.
   ═══════════════════════════════════════════════════════════ */
   async function saveLineFallback(trackInfo) {
     try {
@@ -759,7 +761,12 @@
       const jsonFilename = `${sanitize(trackInfo.artistName)} - ${sanitize(trackInfo.trackName)}-line.json`;
       triggerDownload(new Blob([JSON.stringify(raw, null, 2)], { type: 'application/json' }), jsonFilename);
 
-      // ── LRC ──
+      // ── LRC enrichi ──
+      // Chaque ligne peut avoir : words, startTimeMs, isBackground, isOppositeAligned
+      // Convention LRC étendue :
+      //   [mm:ss.xx]<BG> texte      → ligne de type Background
+      //   [mm:ss.xx]<OA> texte      → ligne OppositeAligned
+      //   [mm:ss.xx]<BG><OA> texte  → Background + OppositeAligned
       const header = [
         `[ti:${trackInfo.trackName}]`,
         `[ar:${trackInfo.artistName}]`,
@@ -768,20 +775,28 @@
         `[re:spotify-color-lyrics]`,
         '',
       ].join('\n');
+
       const body = lines
         .map(l => {
+          const text = (l.words || '').trim();
+          if (!text || text === '♪') return null;
           const ms  = Number(l.startTimeMs ?? 0);
           const min = String(Math.floor(ms / 60000)).padStart(2, '0');
           const sec = String(Math.floor((ms % 60000) / 1000)).padStart(2, '0');
           const cs  = String(Math.floor((ms % 1000) / 10)).padStart(2, '0');
-          return `[${min}:${sec}.${cs}]${(l.words || '').trim()}`;
+          const tag = (l.isBackground     ? '<BG>' : '')
+                    + (l.isOppositeAligned ? '<OA>' : '');
+          return `[${min}:${sec}.${cs}]${tag}${text}`;
         })
-        .filter(l => l.slice(l.indexOf(']') + 1).trim())
+        .filter(Boolean)
         .join('\n');
+
       const lrcFilename = `${sanitize(trackInfo.artistName)} - ${sanitize(trackInfo.trackName)}.lrc`;
       triggerDownload(new Blob([header + body], { type: 'text/plain;charset=utf-8' }), lrcFilename);
 
-      log(`✓ LINE fallback → ${jsonFilename} + ${lrcFilename}`);
+      const bgCount = lines.filter(l => l.isBackground).length;
+      const oaCount = lines.filter(l => l.isOppositeAligned).length;
+      log(`✓ LINE fallback → ${jsonFilename} + ${lrcFilename} (bg:${bgCount} oa:${oaCount})`);
       uiAddLog(`✓ LINE fallback → ${trackInfo.artistName} — ${trackInfo.trackName} (.json + .lrc)`, 'info');
     } catch (e) {
       log('saveLineFallback erreur:', e);
