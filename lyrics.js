@@ -1,4 +1,4 @@
-// spotify-lyrics-saver.js — v16 — Compatible Spicy-Lyrics v6+
+// spotify-lyrics-saver.js — v17 — Compatible Spicy-Lyrics v6+
 // Fix : support du nouveau format encodé api.spicylyrics.org/query (POST)
 //       → décodeur SpicyLyrics v6 (pool + instructions) → Content[] standard
 //       + fetch forceCurrentTrack corrigé GET→POST avec body v6
@@ -9,6 +9,7 @@
 //       + fix v14 : suppression saveLineFallback — double a.click() par piste LINE cassait tous les DL suivants
 //       + fix v15 : popup about:blank par téléchargement — CEF Linux/KDE n'accepte qu'un a.click() par contexte de page
 //       + v16 : saveLineFallback — si syncType LINE ou aucune parole trouvée → fetch color-lyrics → .json + .lrc
+//       + v17 : décodeur LINE encodé v6 — pool contient 'Line' sans 'Syllables' → 5 cols [Text,Start,End,Vocal,OA]
 
 (function () {
   'use strict';
@@ -320,6 +321,86 @@
       const pool  = rawData[0];
       const instr = rawData[1];
       if (!Array.isArray(pool) || !Array.isArray(instr)) return null;
+
+      // ── Branche LINE encodé ──────────────────────────────────────────────────
+      // Détection : pool contient 'Line' mais pas 'Syllables'
+      // Structure : un bloc global -1 header + -5 Content + -3 nLines lignes
+      // Chaque ligne = 5 colonnes [Text, StartTime, EndTime, Vocal, OA]
+      // Sauf la dernière qui contient id+source à la place de Vocal+OA → skippée
+      if (pool.includes('Line') && !pool.includes('Syllables')) {
+        const IDX_TEXT  = pool.indexOf('Text');
+        const IDX_ID    = pool.indexOf('id');
+        const IDX_SRC   = pool.indexOf('source');
+        const IDX_SW    = pool.indexOf('SongWriters');
+        const IDX_LINE  = pool.indexOf('Line');
+
+        // Trouver -3 nLines dans les instructions
+        const m3pos = instr.indexOf(-3);
+        if (m3pos === -1) return null;
+        const nLines = instr[m3pos + 1];
+        if (typeof nLines !== 'number' || nLines <= 0) return null;
+
+        // Récupérer les métadonnées
+        let trackId = null, source = null;
+        const songWriters = [];
+        if (IDX_ID  !== -1) { const vi = pool.indexOf(pool[IDX_ID  + 1] !== undefined ? pool[IDX_ID  + 1] : null); trackId = pool[IDX_ID  + 1] ?? null; }
+        if (IDX_SRC !== -1) { source = pool[IDX_SRC + 1] ?? null; }
+        if (IDX_SW  !== -1) {
+          const contentIdx = pool.indexOf('Content');
+          const end = contentIdx !== -1 ? contentIdx : pool.length;
+          for (let k = IDX_SW + 1; k < end; k++) {
+            if (typeof pool[k] === 'string') songWriters.push(pool[k]);
+          }
+        }
+
+        // Lire le schema (valeurs positives après -3 nLines jusqu'à la première donnée non-schéma)
+        const KNOWN_SCHEMA_KEYS = new Set([
+          'Text','IsPartOfWord','StartTime','EndTime','Type','Vocal',
+          'Background','OppositeAligned','Lead','Syllables','Syllable',
+          'Content','id','source','SongWriters','SongWriter','Line',
+        ]);
+        let si = m3pos + 2;
+        while (si < instr.length && instr[si] >= 0) {
+          const v = pool[instr[si]];
+          if (KNOWN_SCHEMA_KEYS.has(v) || typeof v === 'boolean') si++;
+          else break;
+        }
+
+        // Lire les nLines lignes (5 colonnes chacune)
+        // [Text, StartTime, EndTime, Vocal, OA] — dernière ligne a id+source → skipper
+        const nCols = 5;
+        const lines = [];
+        for (let n = 0; n < nLines; n++) {
+          const base = si + n * nCols;
+          if (base + 4 >= instr.length) break;
+          const text  = pool[instr[base]];
+          const start = pool[instr[base + 1]];
+          const end   = pool[instr[base + 2]];
+          const vocal = pool[instr[base + 3]];
+          // Si vocal est l'id trackId → c'est la ligne footer, on skippe
+          if (typeof text !== 'string' || typeof start !== 'number') continue;
+          if (vocal === trackId || vocal === source) continue;
+          lines.push({
+            text     : text.replace(/\u200b/g, '').trim(),
+            startTime: Math.round(start * 1000),
+            endTime  : Math.round(end   * 1000),
+          });
+        }
+
+        if (!lines.length) return null;
+        log(`✓ Format SpicyLyrics v6 LINE encodé décodé : ${lines.length} lignes`);
+        return {
+          syncType   : 'LINE',
+          provider   : 'spicylyrics-v6-line',
+          lines,
+          SongWriters: songWriters,
+          trackId,
+          source,
+          scrapped_by  : 'PapaOursPolaire',
+          creator_link : 'https://github.com/PapaOursPolaire/',
+        };
+      }
+
       // La pool doit contenir les clés attendues au minimum
       if (!pool.includes('StartTime') || !pool.includes('Syllables')) return null;
 
