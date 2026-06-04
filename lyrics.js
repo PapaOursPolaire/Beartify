@@ -1,4 +1,4 @@
-// spotify-lyrics-saver.js — v18 — Compatible Spicy-Lyrics v6+
+// spotify-lyrics-saver.js — v20 — Compatible Spicy-Lyrics v6+
 // Fix : support du nouveau format encodé api.spicylyrics.org/query (POST)
 //       → décodeur SpicyLyrics v6 (pool + instructions) → Content[] standard
 //       + fetch forceCurrentTrack corrigé GET→POST avec body v6
@@ -11,6 +11,12 @@
 //       + v16 : saveLineFallback — si syncType LINE ou aucune parole trouvée → fetch color-lyrics → .json + .lrc
 //       + v17 : décodeur LINE encodé v6 — pool contient 'Line' sans 'Syllables' → 5 cols [Text,Start,End,Vocal,OA]
 //       + v18 : saveLineFallback — LRC enrichi avec tags <BG> et <OA> si isBackground/isOppositeAligned présents
+//       + v19 : parseLineSync préserve isBackground/isOppositeAligned — saveLineFallback accepte raw Spotify existant (pas de double fetch)
+//       + v20 : fix autoDetect — piste LINE v6 encodée retournée par extractAndDecodeV6Query était silencieusement ignorée
+//               (parseSpicyWordSync retournait null → résultat LINE non transmis) ;
+//               saveLineFallback normalisé pour accepter format SpicyLyrics v6 LINE ({ syncType:'LINE', lines:[...] })
+//               en plus du format Spotify ({ lyrics:{ lines:[...] } }) ;
+//               appels saveLineFallback dans processPayload : condition provider==='spotify' supprimée → bestRaw passé systématiquement
 
 (function () {
   'use strict';
@@ -265,12 +271,17 @@
   function parseLineSync(lines, provider = 'spotify') {
     if (!Array.isArray(lines)) return null;
     const parsed = lines
-      .map(l => ({
-        text     : (l.words || l.text || '').trim(),
-        startTime: toMs(l.startTimeMs ?? l.startTime ?? 0),
-        endTime  : toMs(l.endTimeMs   ?? l.endTime   ?? 0),
-      }))
-      .filter(l => l.text);
+      .map(l => {
+        const obj = {
+          text     : (l.words || l.text || '').trim(),
+          startTime: toMs(l.startTimeMs ?? l.startTime ?? 0),
+          endTime  : toMs(l.endTimeMs   ?? l.endTime   ?? 0),
+        };
+        if (l.isBackground)     obj.isBackground     = true;
+        if (l.isOppositeAligned) obj.isOppositeAligned = true;
+        return obj;
+      })
+      .filter(l => l.text && l.text !== '♪');
     if (!parsed.length) return null;
     return { syncType: 'LINE', provider, lines: parsed };
   }
@@ -615,11 +626,17 @@
 
     if (Array.isArray(data.queries)) {
       // ── Nouveau format SpicyLyrics v6 : result.data est un tableau encodé [pool, instr] ──
-      if (CONFIG.preferWordSync) {
-        const decoded = extractAndDecodeV6Query(data);
-        if (decoded) {
+      const decoded = extractAndDecodeV6Query(data);
+      if (decoded) {
+        // Le décodeur retourne soit { Content: [...] } (WORD) soit { syncType:'LINE', lines:[...] } (LINE).
+        // On tente WORD en priorité si preferWordSync, puis LINE comme fallback.
+        if (CONFIG.preferWordSync && decoded.Content) {
           const ws = parseSpicyWordSync(decoded);
           if (ws) return ws;
+        }
+        // Piste LINE encodée v6 : les lignes sont déjà dans decoded.lines
+        if (decoded.syncType === 'LINE' && Array.isArray(decoded.lines)) {
+          return decoded; // déjà au format { syncType:'LINE', provider, lines:[...] }
         }
       }
 
@@ -742,19 +759,47 @@
        - "<artiste> - <titre>.lrc"        (format LRC standard)
      Supporte Background et OppositeAligned si présents.
   ═══════════════════════════════════════════════════════════ */
-  async function saveLineFallback(trackInfo) {
+  async function saveLineFallback(trackInfo, preloadedRaw = null) {
     try {
-      const token = await getSpotifyToken();
-      if (!token) { log('saveLineFallback: token indisponible'); return; }
+      let raw = preloadedRaw;
 
-      const url = `https://spclient.wg.spotify.com/color-lyrics/v2/track/${trackInfo.trackId}?format=json&vocalRemoval=false`;
-      const res = await state.origFetch(url, {
-        headers: { 'Authorization': `Bearer ${token}`, 'App-Platform': 'WebPlayer' },
-      });
-      if (!res.ok) { log(`saveLineFallback: HTTP ${res.status}`); return; }
+      // ── Détection du format source ────────────────────────────────────────────
+      // Format A — SpicyLyrics v6 LINE décodé : { syncType:'LINE', lines:[{ text, startTime, endTime }] }
+      // Format B — Spotify color-lyrics        : { lyrics: { lines:[{ words, startTimeMs, ... }] } }
+      // Si preloadedRaw est déjà du format A, on l'utilise directement sans fetch.
 
-      const raw   = await res.json();
-      const lines = raw?.lyrics?.lines;
+      const isSpicyLineFormat = raw?.syncType === 'LINE' && Array.isArray(raw?.lines);
+
+      if (!raw || (!isSpicyLineFormat && !raw?.lyrics?.lines)) {
+        // Pas de données utilisables en cache → fetch Spotify color-lyrics
+        const token = await getSpotifyToken();
+        if (!token) { log('saveLineFallback: token indisponible'); return; }
+        const url = `https://spclient.wg.spotify.com/color-lyrics/v2/track/${trackInfo.trackId}?format=json&vocalRemoval=false`;
+        const res = await state.origFetch(url, {
+          headers: { 'Authorization': `Bearer ${token}`, 'App-Platform': 'WebPlayer' },
+        });
+        if (!res.ok) { log(`saveLineFallback: HTTP ${res.status}`); return; }
+        raw = await res.json();
+      }
+
+      // ── Normalisation des lignes selon le format ──────────────────────────────
+      // On ramène tout à : [{ text, startTimeMs, isBackground?, isOppositeAligned? }]
+      let lines;
+      const provider = raw?.syncType === 'LINE' ? (raw.provider || 'spicylyrics') : 'spotify';
+
+      if (raw?.syncType === 'LINE' && Array.isArray(raw?.lines)) {
+        // Format SpicyLyrics v6 LINE : { text, startTime(ms), endTime(ms), isBackground?, isOppositeAligned? }
+        lines = raw.lines.map(l => ({
+          words             : l.text || '',
+          startTimeMs       : l.startTime ?? 0,   // déjà en ms (parseLineSync applique toMs())
+          isBackground      : l.isBackground      || false,
+          isOppositeAligned : l.isOppositeAligned || false,
+        }));
+      } else {
+        // Format Spotify color-lyrics : raw.lyrics.lines
+        lines = raw?.lyrics?.lines;
+      }
+
       if (!lines?.length) { log('saveLineFallback: aucune ligne'); return; }
 
       // ── JSON brut ──
@@ -772,7 +817,7 @@
         `[ar:${trackInfo.artistName}]`,
         `[al:${trackInfo.albumName}]`,
         `[by:spotify-lyrics-saver]`,
-        `[re:spotify-color-lyrics]`,
+        `[re:${provider}]`,
         '',
       ].join('\n');
 
@@ -796,7 +841,7 @@
 
       const bgCount = lines.filter(l => l.isBackground).length;
       const oaCount = lines.filter(l => l.isOppositeAligned).length;
-      log(`✓ LINE fallback → ${jsonFilename} + ${lrcFilename} (bg:${bgCount} oa:${oaCount})`);
+      log(`✓ LINE fallback [${provider}] → ${jsonFilename} + ${lrcFilename} (bg:${bgCount} oa:${oaCount})`);
       uiAddLog(`✓ LINE fallback → ${trackInfo.artistName} — ${trackInfo.trackName} (.json + .lrc)`, 'info');
     } catch (e) {
       log('saveLineFallback erreur:', e);
@@ -1055,7 +1100,9 @@
             if ((state.savedScore?.[id] ?? 0) >= bestScore) return;
             uiAddLog(`↓ Fallback ${qualityLabel(bestScore)} pour ${ti.trackName}`, 'info');
             await saveLyrics(ti, best, bestScore, bestRaw);
-            if (bestScore <= 20) await saveLineFallback(ti);
+            // Passer bestRaw pour toute source LINE connue (Spotify ou SpicyLyrics v6).
+            // saveLineFallback normalise lui-même selon le format détecté.
+            if (bestScore <= 20) await saveLineFallback(ti, bestRaw || null);
           }, reducedWait);
         }
       }
@@ -1074,7 +1121,9 @@
       if ((state.savedScore?.[id] ?? 0) >= bestScore) return;
       uiAddLog(`↓ Fallback ${qualityLabel(bestScore)} pour ${ti.trackName}`, 'info');
       await saveLyrics(ti, best, bestScore, bestRaw);
-      if (bestScore <= 20) await saveLineFallback(ti);
+      // Passer bestRaw pour toute source LINE connue (Spotify ou SpicyLyrics v6).
+      // saveLineFallback normalise lui-même selon le format détecté.
+      if (bestScore <= 20) await saveLineFallback(ti, bestRaw || null);
     }, CONFIG.spicyWaitMs);
 
     state.pending[id] = { timer, bestLyrics: lyrics, rawData, trackInfo: ti };
