@@ -1,0 +1,437 @@
+{
+  "metadata": {
+    "track": "Ta fête",
+    "artist": "Stromae",
+    "album": "racine carrée",
+    "trackId": "7fWWbkok99Tvh8aly2Buox",
+    "downloadedAt": "2026-06-05T13:05:57.141Z",
+    "syncType": "LINE",
+    "qualityScore": 20,
+    "qualityLabel": "LINE",
+    "provider": "spicylyrics-v6-line",
+    "lineCount": 39,
+    "wordCount": 0,
+    "backgroundLineCount": 0,
+    "backgroundSectCount": 0,
+    "backgroundTypeCount": 0,
+    "oppositeAlignedCount": 0,
+    "songWriters": [],
+    "duration": null
+  },
+  "lyrics": {
+    "syncType": "LINE",
+    "provider": "spicylyrics-v6-line",
+    "lines": [
+      {
+        "text": "Il est l'heure",
+        "startTime": 7367,
+        "endTime": 8695
+      },
+      {
+        "text": "Fini l'heure de danser",
+        "startTime": 9679,
+        "endTime": 11497
+      },
+      {
+        "text": "Danse",
+        "startTime": 11575,
+        "endTime": 12505
+      },
+      {
+        "text": "T'inquiète pas, tu vas danser",
+        "startTime": 13205,
+        "endTime": 15088
+      },
+      {
+        "text": "Balance",
+        "startTime": 15128,
+        "endTime": 16103
+      },
+      {
+        "text": "Toi mais tu vas te faire balancer",
+        "startTime": 16657,
+        "endTime": 18680
+      },
+      {
+        "text": "Défonce",
+        "startTime": 18790,
+        "endTime": 19927
+      },
+      {
+        "text": "Toi mais tu vas te faire défoncer",
+        "startTime": 20415,
+        "endTime": 22564
+      },
+      {
+        "text": "Tu aimerais faire",
+        "startTime": 22674,
+        "endTime": 24718
+      },
+      {
+        "text": "Ta fête",
+        "startTime": 24728,
+        "endTime": 26176
+      },
+      {
+        "text": "Ta mère veut te la faire aussi",
+        "startTime": 26186,
+        "endTime": 28549
+      },
+      {
+        "text": "Ta fête",
+        "startTime": 28559,
+        "endTime": 29900
+      },
+      {
+        "text": "Le juge voudrait te faire",
+        "startTime": 29910,
+        "endTime": 32281
+      },
+      {
+        "text": "Ta fête",
+        "startTime": 32291,
+        "endTime": 33720
+      },
+      {
+        "text": "Tout l'monde te fera aussi",
+        "startTime": 33730,
+        "endTime": 36034
+      },
+      {
+        "text": "Ta fête",
+        "startTime": 36044,
+        "endTime": 37683
+      },
+      {
+        "text": "Tu sors trop",
+        "startTime": 52623,
+        "endTime": 53760
+      },
+      {
+        "text": "Du moins, c'est ce qu'ils disent",
+        "startTime": 54303,
+        "endTime": 56416
+      },
+      {
+        "text": "Ils parlent trop",
+        "startTime": 56426,
+        "endTime": 57585
+      },
+      {
+        "text": "C'est pourquoi tes oreilles sifflent",
+        "startTime": 58095,
+        "endTime": 60088
+      },
+      {
+        "text": "À qui la faute ?",
+        "startTime": 60098,
+        "endTime": 61464
+      },
+      {
+        "text": "C'est la faute à autrui, hein ?",
+        "startTime": 62075,
+        "endTime": 64023
+      },
+      {
+        "text": "C'est les autres",
+        "startTime": 64033,
+        "endTime": 65135
+      },
+      {
+        "text": "Toi, tu n'as qu'une seule envie",
+        "startTime": 65672,
+        "endTime": 67606
+      },
+      {
+        "text": "Tu aimerais faire",
+        "startTime": 67616,
+        "endTime": 69777
+      },
+      {
+        "text": "Ta fête",
+        "startTime": 69787,
+        "endTime": 71188
+      },
+      {
+        "text": "Ta mère veut te la faire aussi",
+        "startTime": 71198,
+        "endTime": 73491
+      },
+      {
+        "text": "Ta fête",
+        "startTime": 73501,
+        "endTime": 74903
+      },
+      {
+        "text": "Le juge voudrait te faire",
+        "startTime": 74913,
+        "endTime": 77237
+      },
+      {
+        "text": "Ta fête",
+        "startTime": 77247,
+        "endTime": 78542
+      },
+      {
+        "text": "Tout l'monde te fera aussi",
+        "startTime": 78652,
+        "endTime": 81006
+      },
+      {
+        "text": "Ta fête",
+        "startTime": 81016,
+        "endTime": 82687
+      },
+      {
+        "text": "Tu aimerais faire",
+        "startTime": 127708,
+        "endTime": 129772
+      },
+      {
+        "text": "Ta fête",
+        "startTime": 129782,
+        "endTime": 131163
+      },
+      {
+        "text": "Ta mère veut te la faire aussi",
+        "startTime": 131173,
+        "endTime": 133501
+      },
+      {
+        "text": "Ta fête",
+        "startTime": 133511,
+        "endTime": 134923
+      },
+      {
+        "text": "Le juge voudrait te faire",
+        "startTime": 134933,
+        "endTime": 137297
+      },
+      {
+        "text": "Ta fête",
+        "startTime": 137307,
+        "endTime": 138667
+      },
+      {
+        "text": "Tout l'monde te fera aussi",
+        "startTime": 138677,
+        "endTime": 141029
+      }
+    ],
+    "SongWriters": [
+      "Stromae"
+    ],
+    "trackId": "7fWWbkok99Tvh8aly2Buox",
+    "source": "aml",
+    "scrapped_by": "PapaOursPolaire",
+    "creator_link": "https://github.com/PapaOursPolaire/"
+  },
+  "rawLyrics": {
+    "syncType": "LINE",
+    "provider": "spicylyrics-v6-line",
+    "lines": [
+      {
+        "text": "Il est l'heure",
+        "startTime": 7367,
+        "endTime": 8695
+      },
+      {
+        "text": "Fini l'heure de danser",
+        "startTime": 9679,
+        "endTime": 11497
+      },
+      {
+        "text": "Danse",
+        "startTime": 11575,
+        "endTime": 12505
+      },
+      {
+        "text": "T'inquiète pas, tu vas danser",
+        "startTime": 13205,
+        "endTime": 15088
+      },
+      {
+        "text": "Balance",
+        "startTime": 15128,
+        "endTime": 16103
+      },
+      {
+        "text": "Toi mais tu vas te faire balancer",
+        "startTime": 16657,
+        "endTime": 18680
+      },
+      {
+        "text": "Défonce",
+        "startTime": 18790,
+        "endTime": 19927
+      },
+      {
+        "text": "Toi mais tu vas te faire défoncer",
+        "startTime": 20415,
+        "endTime": 22564
+      },
+      {
+        "text": "Tu aimerais faire",
+        "startTime": 22674,
+        "endTime": 24718
+      },
+      {
+        "text": "Ta fête",
+        "startTime": 24728,
+        "endTime": 26176
+      },
+      {
+        "text": "Ta mère veut te la faire aussi",
+        "startTime": 26186,
+        "endTime": 28549
+      },
+      {
+        "text": "Ta fête",
+        "startTime": 28559,
+        "endTime": 29900
+      },
+      {
+        "text": "Le juge voudrait te faire",
+        "startTime": 29910,
+        "endTime": 32281
+      },
+      {
+        "text": "Ta fête",
+        "startTime": 32291,
+        "endTime": 33720
+      },
+      {
+        "text": "Tout l'monde te fera aussi",
+        "startTime": 33730,
+        "endTime": 36034
+      },
+      {
+        "text": "Ta fête",
+        "startTime": 36044,
+        "endTime": 37683
+      },
+      {
+        "text": "Tu sors trop",
+        "startTime": 52623,
+        "endTime": 53760
+      },
+      {
+        "text": "Du moins, c'est ce qu'ils disent",
+        "startTime": 54303,
+        "endTime": 56416
+      },
+      {
+        "text": "Ils parlent trop",
+        "startTime": 56426,
+        "endTime": 57585
+      },
+      {
+        "text": "C'est pourquoi tes oreilles sifflent",
+        "startTime": 58095,
+        "endTime": 60088
+      },
+      {
+        "text": "À qui la faute ?",
+        "startTime": 60098,
+        "endTime": 61464
+      },
+      {
+        "text": "C'est la faute à autrui, hein ?",
+        "startTime": 62075,
+        "endTime": 64023
+      },
+      {
+        "text": "C'est les autres",
+        "startTime": 64033,
+        "endTime": 65135
+      },
+      {
+        "text": "Toi, tu n'as qu'une seule envie",
+        "startTime": 65672,
+        "endTime": 67606
+      },
+      {
+        "text": "Tu aimerais faire",
+        "startTime": 67616,
+        "endTime": 69777
+      },
+      {
+        "text": "Ta fête",
+        "startTime": 69787,
+        "endTime": 71188
+      },
+      {
+        "text": "Ta mère veut te la faire aussi",
+        "startTime": 71198,
+        "endTime": 73491
+      },
+      {
+        "text": "Ta fête",
+        "startTime": 73501,
+        "endTime": 74903
+      },
+      {
+        "text": "Le juge voudrait te faire",
+        "startTime": 74913,
+        "endTime": 77237
+      },
+      {
+        "text": "Ta fête",
+        "startTime": 77247,
+        "endTime": 78542
+      },
+      {
+        "text": "Tout l'monde te fera aussi",
+        "startTime": 78652,
+        "endTime": 81006
+      },
+      {
+        "text": "Ta fête",
+        "startTime": 81016,
+        "endTime": 82687
+      },
+      {
+        "text": "Tu aimerais faire",
+        "startTime": 127708,
+        "endTime": 129772
+      },
+      {
+        "text": "Ta fête",
+        "startTime": 129782,
+        "endTime": 131163
+      },
+      {
+        "text": "Ta mère veut te la faire aussi",
+        "startTime": 131173,
+        "endTime": 133501
+      },
+      {
+        "text": "Ta fête",
+        "startTime": 133511,
+        "endTime": 134923
+      },
+      {
+        "text": "Le juge voudrait te faire",
+        "startTime": 134933,
+        "endTime": 137297
+      },
+      {
+        "text": "Ta fête",
+        "startTime": 137307,
+        "endTime": 138667
+      },
+      {
+        "text": "Tout l'monde te fera aussi",
+        "startTime": 138677,
+        "endTime": 141029
+      }
+    ],
+    "SongWriters": [
+      "Stromae"
+    ],
+    "trackId": "7fWWbkok99Tvh8aly2Buox",
+    "source": "aml",
+    "scrapped_by": "PapaOursPolaire",
+    "creator_link": "https://github.com/PapaOursPolaire/"
+  }
+}
