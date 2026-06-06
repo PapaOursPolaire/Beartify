@@ -234,7 +234,7 @@ function startTranscode(itemId, token, tempDir) {
     '-hls_segment_type',       'fmp4',
     '-hls_fmp4_init_filename', 'init.mp4',
     '-hls_segment_filename',   path.join(tempDir, 'seg%03d.m4s'),
-    '-hls_time',               '4',
+    '-hls_time',               '2',        // FIX PERF: 2s au lieu de 4s → démarrage 2× plus rapide
     '-hls_list_size',          '0',
     '-hls_flags',              'independent_segments',
     '-y',
@@ -258,7 +258,7 @@ function startTranscode(itemId, token, tempDir) {
       if (s && !s.ready) s.ffmpegError = `ffmpeg exit ${code} — ${last}`;
       console.error(`[HLS] ffmpeg échoué pour ${itemId} :`, s?.ffmpegError);
     } else if (code === 0) {
-      if (s) { s.ready = true; s.ffmpegDone = true; } console.log(`[HLS] Transcodage terminé : ${itemId}`);
+      console.log(`[HLS] Transcodage terminé : ${itemId}`);
     }
   });
   ff.on('error', (e) => {
@@ -267,7 +267,7 @@ function startTranscode(itemId, token, tempDir) {
     console.error('[HLS] ffmpeg introuvable :', e.message);
   });
 
-  // Polling : ready dès init.mp4 + 2 segments disponibles
+  // Polling : ready dès init.mp4 + 1 segment disponible (segment = 2s → démarrage rapide)
   const watcher = setInterval(() => {
     const s = sessions.get(token);
     if (!s || s.ready || s.ffmpegError) { clearInterval(watcher); return; }
@@ -275,13 +275,13 @@ function startTranscode(itemId, token, tempDir) {
       const initOk   = fs.existsSync(path.join(tempDir, 'init.mp4'));
       const segFiles = fs.readdirSync(tempDir).filter(f => /^seg\d+\.m4s$/.test(f));
       s.segCount = segFiles.length;
-      if (initOk && segFiles.length >= 2) {
+      if (initOk && segFiles.length >= 1) {
         s.ready = true;
         clearInterval(watcher);
         console.log(`[HLS] ▶ Prêt (${segFiles.length} segments) — ${itemId}`);
       }
     } catch (_) {}
-  }, 300);
+  }, 150); // FIX PERF: 150ms au lieu de 300ms → réactivité 2× meilleure
 
   setTimeout(() => {
     clearInterval(watcher);
@@ -412,7 +412,7 @@ app.get('/api/hls/session/:id', async (req, res) => {
 
     sessions.set(token, {
       itemId, key, ip, expiresAt, tempDir,
-      ready: false, ffmpegDone: false, ffmpegError: null,
+      ready: false, ffmpegError: null,
       ffProcess: null,     // Fix 3
       honeypotTag,         // Fix 1
       segCount: 0,
@@ -468,10 +468,10 @@ app.get('/api/hls/playlist/:id', async (req, res) => {
   if (!s) return res.status(401).json({ error: 'Session invalide' });
 
   const deadline = Date.now() + 60_000;
-  while (!s.ffmpegDone && !s.ffmpegError && Date.now() < deadline)
-    await new Promise(r => setTimeout(r, 300));
+  while (!s.ready && !s.ffmpegError && Date.now() < deadline)
+    await new Promise(r => setTimeout(r, 100)); // FIX PERF: 100ms au lieu de 300ms
 
-  if (!s.ffmpegDone) {
+  if (!s.ready) {
     const err = s.ffmpegError || 'Timeout 60s';
     return res.status(500).json({ error: err, hint: 'journalctl -u beartify-drm -n 50' });
   }
