@@ -10,3 +10,5 @@ jun 06 19:06:18 papaours beartify-drm[2954850]: [HLS] ▶ Prêt (10 segments) �
 jun 06 19:06:19 papaours beartify-drm[2954850]: [HLS] Transcodage terminé : e7ee59cbaea49b14130e3990ef5fe862
 jun 06 19:06:19 papaours beartify-drm[2954850]: [HLS] Transcodage terminé : e7ee59cbaea49b14130e3990ef5fe862
 
+# Chercher les tempDirs créés
+ls /tmp/beartify-* 2>/dev/null && cat /tmp/beartify-*/playlist.m3u8 2>/dev/null | head -30
