@@ -234,7 +234,7 @@ function startTranscode(itemId, token, tempDir) {
     '-hls_segment_type',       'fmp4',
     '-hls_fmp4_init_filename', 'init.mp4',
     '-hls_segment_filename',   path.join(tempDir, 'seg%03d.m4s'),
-    '-hls_time',               '4',
+    '-hls_time',               '2',        // 2 s/segment → démarrage plus rapide (~4 s vs ~8 s avant)
     '-hls_list_size',          '0',
     '-hls_flags',              'independent_segments',
     '-y',
@@ -268,6 +268,7 @@ function startTranscode(itemId, token, tempDir) {
   });
 
   // Polling : ready dès init.mp4 + 2 segments disponibles
+  // Avec hls_time=2s, les segments arrivent vite → polling à 150 ms pour démarrer sans délai.
   const watcher = setInterval(() => {
     const s = sessions.get(token);
     if (!s || s.ready || s.ffmpegError) { clearInterval(watcher); return; }
@@ -281,7 +282,7 @@ function startTranscode(itemId, token, tempDir) {
         console.log(`[HLS] ▶ Prêt (${segFiles.length} segments) — ${itemId}`);
       }
     } catch (_) {}
-  }, 300);
+  }, 150);
 
   setTimeout(() => {
     clearInterval(watcher);
@@ -366,13 +367,18 @@ function buildHoneypotM3u8(rawM3u8, itemId, token, sess) {
       // ── Honeypot intercalé ──────────────────────────────────────
       if (_honeypotSegs.length > 0 && realIdx % HONEYPOT_EVERY === 0) {
         // Fix 1 : tag aléatoire par session
-        out.push('');
+        // ⚠️ Pas de ligne vide AVANT le tag — elle est mise APRÈS l'URL du segment.
+        // Le strip côté client (_stripHoneypotSegments) saute exactement 4 lignes
+        // non-vides : #tag + #EXT-X-KEY + #EXTINF + URL.
+        // Une ligne vide AVANT le tag était comptée dans le skip (t !== '' → skip--)
+        // et consommait une des 4 lignes utiles, laissant l'URL du honeypot dans le M3U8.
         out.push(`#${honeypotTag}`);
         // Fix 2 : IV du segment honeypot = son propre numéro de séquence
         const honeyIvHex = segmentIv(seqNumber).toString('hex');
         out.push(`#EXT-X-KEY:METHOD=AES-128,URI="${keyUri}",IV=0x${honeyIvHex}`);
         out.push('#EXTINF:4.000,');
         out.push(`/api/hls/segment/${itemId}/honey_${honeyIdx}.m4s?s=${encodeURIComponent(token)}&seq=${seqNumber}`);
+        out.push(''); // ligne vide séparatrice APRÈS le bloc (ne perturbe plus le strip)
         honeyIdx++;
         seqNumber++;
       }
