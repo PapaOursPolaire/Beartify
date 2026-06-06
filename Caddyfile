@@ -1,219 +1,599 @@
-papaours@papaours:~$ sudo systemctl reload caddy
-[sudo] Mot de passe de papaours : 
-Job for caddy.service failed.
-See "systemctl status caddy.service" and "journalctl -xeu caddy.service" for details.
-papaours@papaours:~$ sudo systemctl reload caddy
-Job for caddy.service failed.
-See "systemctl status caddy.service" and "journalctl -xeu caddy.service" for details.
-papaours@papaours:~$ sudo bash drm.sh --honeypot-audio /home/papaours/rickroll.mp3
+# ══════════════════════════════════════════════════════════════════════
+#  BEARTIFY — Caddyfile durci
+#  TLS automatique Let's Encrypt, clés API jamais exposées au client,
+#  headers de sécurité stricts sur les trois domaines.
+# ══════════════════════════════════════════════════════════════════════
 
-╔══════════════════════════════════════════════════════════╗
-║   BEARTIFY DRM v4 — HLS FLAC + AES-128 + Honeypot 1/2   ║
-╚══════════════════════════════════════════════════════════╝
+# ── Options globales ───────────────────────────────────────────────────
+{
+    # Email utilisé pour les certificats Let's Encrypt
+    email admin@grizzlyrics.duckdns.org
 
-
-▶ Vérification des permissions
-✅  Exécution en root
-
-▶ Vérification des prérequis
-⚠   ffmpeg : format fmp4 non détecté — vérifier la version (>= 4.0)
-✅  Node.js v20.19.2
-✅  npm 9.2.0
-✅  ffmpeg 7.1.4-0+deb13u1
-✅  FLAC fMP4 HLS disponible
-
-▶ Création de /opt/beartify-drm
-✅  Dossier : /opt/beartify-drm
-
-▶ Déploiement de drm.js
-✅  drm.js copié depuis /home/papaours
-
-▶ Écriture de package.json
-✅  package.json écrit
-
-▶ Configuration .env
-⚠   SESSION_SECRET conservé (réinstallation)
-✅  .env créé (chmod 600)
-
-▶ Installation des dépendances npm
-✅  express + dotenv installés
-
-▶ Pré-génération des segments Rick Roll (FLAC fMP4)
-ℹ   Transcodage de /home/papaours/rickroll.mp3 en segments FLAC fMP4...
-⚠   ffmpeg a échoué — les honeypots seront générés au premier démarrage
-
-▶ Permissions
-✅  Permissions appliquées
-
-▶ Service systemd beartify-drm
-✅  Service redémarré
-
-▶ Vérification du serveur DRM
-   Attente du démarrage..
-✅  Serveur DRM actif : {"status":"ok","sessions":0,"honeypot_segs":0,"honeypot_ratio":"1 sur 2"}
-
-══════════════════════════════════════════════════════════
-  Déploiement terminé !                                    
-══════════════════════════════════════════════════════════
-
-  📁 Dossier      : /opt/beartify-drm
-  🔐 .env         : /opt/beartify-drm/.env  (chmod 600)
-  ⚙  Service      : beartify-drm  (auto-démarrage ON)
-  🌐 Port         : 127.0.0.1:3001
-  🎵 Audio        : FLAC lossless (fMP4 HLS)
-  🪤  Honeypot     : Rick Roll — 1 segment sur 2
-
-Commandes utiles :
-  journalctl -u beartify-drm -f
-  systemctl restart beartify-drm
-  curl http://127.0.0.1:3001/health
-
-⚠  Étape finale — Caddy + script.js :
-  scp Caddyfile.txt user@serveur:/etc/caddy/Caddyfile
-  scp script.js     user@serveur:/var/www/html/player/script.js
-  caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy
-
-papaours@papaours:~$ sudo systemctl reload caddy
-Job for caddy.service failed.
-See "systemctl status caddy.service" and "journalctl -xeu caddy.service" for details.
-papaours@papaours:~$ sudo systemctl reload caddy
-Job for caddy.service failed.
-See "systemctl status caddy.service" and "journalctl -xeu caddy.service" for details.
-papaours@papaours:~$ sudo systemctl reload caddy
-Job for caddy.service failed.
-See "systemctl status caddy.service" and "journalctl -xeu caddy.service" for details.
-papaours@papaours:~$ 
-papaours@papaours:~$ sudo systemctl reload caddy
-Job for caddy.service failed.
-See "systemctl status caddy.service" and "journalctl -xeu caddy.service" for details.
-papaours@papaours:~$ sudo systemctl reload caddy
-Job for caddy.service failed.
-See "systemctl status caddy.service" and "journalctl -xeu caddy.service" for details.
-papaours@papaours:~$ systemctl status caddy.service
-● caddy.service - Caddy
-     Loaded: loaded (/usr/lib/systemd/system/caddy.service; enabled; preset: enabled)
-     Active: active (running) since Sat 2026-06-06 10:42:24 CEST; 8h ago
- Invocation: ef414a4d91a94f218c851cd9f2631539
-       Docs: https://caddyserver.com/docs/
-    Process: 3045988 ExecReload=/usr/bin/caddy reload --config /etc/caddy/Caddyfile --force (code=exited, status=22>
-   Main PID: 1262 (caddy)
-      Tasks: 21 (limit: 38306)
-     Memory: 187.5M (peak: 298.7M)
-        CPU: 45.838s
-     CGroup: /system.slice/caddy.service
-             └─1262 /usr/bin/caddy run --environ --config /etc/caddy/Caddyfile
-
-jun 06 19:18:07 papaours (caddy)[3045950]: caddy.service: Failed at step NAMESPACE spawning /usr/bin/caddy: No such>
-jun 06 19:18:07 papaours systemd[1]: caddy.service: Control process exited, code=exited, status=226/NAMESPACE
-jun 06 19:18:07 papaours systemd[1]: Reload failed for caddy.service - Caddy.
-jun 06 19:18:17 papaours systemd[1]: Reloading caddy.service - Caddy...
-jun 06 19:18:17 papaours (caddy)[3045988]: Failed to create destination mount point node '/run/systemd/mount-rootfs>
-jun 06 19:18:17 papaours (caddy)[3045988]: Failed to mount /tmp/systemd-private-763d7d16b5b34985a3d72e58f1bbdc82-ca>
-jun 06 19:18:17 papaours (caddy)[3045988]: caddy.service: Failed to set up mount namespacing: /tmp: No such file or>
-jun 06 19:18:17 papaours (caddy)[3045988]: caddy.service: Failed at step NAMESPACE spawning /usr/bin/caddy: No such>
-jun 06 19:18:17 papaours systemd[1]: caddy.service: Control process exited, code=exited, status=226/NAMESPACE
-jun 06 19:18:17 papaours systemd[1]: Reload failed for caddy.service - Caddy.
-
-papaours@papaours:~$ sudo rm -rf /beartify-1* /tmp/bea-17*
-papaours@papaours:~$ df -h /tmp
-Sys. de fichiers Taille Utilisé Dispo Uti% Monté sur
-tmpfs               16G    3,8M   16G   1% /tmp
-papaours@papaours:~$ sudo systemctl restart caddy
-Job for caddy.service failed because the control process exited with error code.
-See "systemctl status caddy.service" and "journalctl -xeu caddy.service" for details.
-papaours@papaours:~$ sudo bash drm.sh --honeypot-audio /home/papaours/rickroll.mp3
-
-╔══════════════════════════════════════════════════════════╗
-║   BEARTIFY DRM v4 — HLS FLAC + AES-128 + Honeypot 1/2   ║
-╚══════════════════════════════════════════════════════════╝
+    # Logs structurés centralisés
+    log {
+        output file /var/log/caddy/caddy.log
+        format json
+        level  INFO
+    }
+}
 
 
-▶ Vérification des permissions
-✅  Exécution en root
+# ══════════════════════════════════════════════════════════════════════
+#  SNIPPET — CORS pour Tauri V2
+#  Écho dynamique de l'Origin → un seul Access-Control-Allow-Origin.
+#  À importer dans tous les blocs Beartify : import cors_tauri
+# ══════════════════════════════════════════════════════════════════════
+(cors_tauri) {
+    # Répondre aux preflight OPTIONS (CORS) avant tout autre handler
+    @cors_preflight {
+        method OPTIONS
+        header Origin *
+    }
+    handle @cors_preflight {
+        header Access-Control-Allow-Origin  "{http.request.header.Origin}"
+        header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
+        header Access-Control-Allow-Headers "Content-Type, Authorization, Range, X-Requested-With, Accept, Origin"
+        header Access-Control-Max-Age       "86400"
+        header Vary "Origin"
+        respond "" 204
+    }
 
-▶ Vérification des prérequis
-⚠   ffmpeg : format fmp4 non détecté — vérifier la version (>= 4.0)
-✅  Node.js v20.19.2
-✅  npm 9.2.0
-✅  ffmpeg 7.1.4-0+deb13u1
-✅  FLAC fMP4 HLS disponible
+    # Pour toutes les requêtes normales portant un header Origin :
+    # écho dynamique → un seul Access-Control-Allow-Origin
+    @has_origin header Origin *
+    header @has_origin Access-Control-Allow-Origin  "{http.request.header.Origin}"
+    header @has_origin Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
+    header @has_origin Access-Control-Allow-Headers "Content-Type, Authorization, Range, X-Requested-With, Accept, Origin"
+    header @has_origin Access-Control-Expose-Headers "Content-Length, Content-Range, Accept-Ranges"
+    header @has_origin Vary "Origin"
+}
 
-▶ Création de /opt/beartify-drm
-✅  Dossier : /opt/beartify-drm
+# ══════════════════════════════════════════════════════════════════════
+#  SNIPPET — Routes HLS/DRM vers drm.js (:3001)
+#
+#  Intercepte /api/hls/* AVANT les blocs /api/jellyfin/*.
+#  À importer dans tous les blocs Beartify (prod + LAN).
+#
+#  /api/hls/session/:id  → session + lancement ffmpeg FLAC fMP4
+#  /api/hls/key/:id      → clé AES-128 (IP-lockée)
+#  /api/hls/init/:id     → init segment fMP4 (auth)
+#  /api/hls/playlist/:id → M3U8 avec vrais segments + Rick Roll (1/2)
+#  /api/hls/segment/:id/ → segments .m4s réels + honeypots (auth)
+# ══════════════════════════════════════════════════════════════════════
+(drm_routes) {
+    handle /api/hls/* {
+        reverse_proxy 127.0.0.1:3001 {
+            flush_interval -1
+            header_up  X-Real-IP       {remote_host}
+            header_up  X-Forwarded-For {remote_host}
+        }
+    }
+}
 
-▶ Déploiement de drm.js
-✅  drm.js copié depuis /home/papaours
+# ──────────────────────────────────────────────────────────────────────
+#  1. NEXTCLOUD — grizzlyrics.duckdns.org
+# ──────────────────────────────────────────────────────────────────────
+grizzlyrics.duckdns.org {
 
-▶ Écriture de package.json
-✅  package.json écrit
+    root * /var/www/nextcloud
+    php_fastcgi unix//run/php/php8.4-fpm.sock
+    file_server
 
-▶ Configuration .env
-⚠   SESSION_SECRET conservé (réinstallation)
-✅  .env créé (chmod 600)
+    encode zstd gzip
 
-▶ Installation des dépendances npm
-✅  express + dotenv installés
+    # Requêtes Nextcloud de longue durée (sync, upload)
+    request_body {
+        max_size 10GB
+    }
 
-▶ Pré-génération des segments Rick Roll (FLAC fMP4)
-ℹ   Transcodage de /home/papaours/rickroll.mp3 en segments FLAC fMP4...
-⚠   ffmpeg a échoué — les honeypots seront générés au premier démarrage
+    header {
+        # HSTS (6 mois, sous-domaines inclus)
+        Strict-Transport-Security "max-age=15768000; includeSubDomains; preload"
+        X-Content-Type-Options    "nosniff"
+        X-Frame-Options           "SAMEORIGIN"
+        Referrer-Policy           "strict-origin-when-cross-origin"
+        Permissions-Policy        "geolocation=(), microphone=(), camera=()"
+        # Pas de cache sur les pages d'authentification
+        -Server
+    }
 
-▶ Permissions
-✅  Permissions appliquées
+    log {
+        output file /var/log/caddy/nextcloud-access.log
+        format json
+    }
+}
 
-▶ Service systemd beartify-drm
-✅  Service redémarré
+# ──────────────────────────────────────────────────────────────────────
+#  2. JELLYFIN — grizzly-stream.duckdns.org
+# ──────────────────────────────────────────────────────────────────────
+grizzly-stream.duckdns.org {
 
-▶ Vérification du serveur DRM
-   Attente du démarrage.
-✅  Serveur DRM actif : {"status":"ok","sessions":0,"honeypot_segs":0,"honeypot_ratio":"1 sur 2"}
+    encode zstd gzip
 
-══════════════════════════════════════════════════════════
-  Déploiement terminé !                                    
-══════════════════════════════════════════════════════════
+    header {
+        Strict-Transport-Security "max-age=15768000; includeSubDomains; preload"
+        X-Content-Type-Options    "nosniff"
+        X-Frame-Options           "SAMEORIGIN"
+        Referrer-Policy           "strict-origin-when-cross-origin"
+        -Server
+    }
 
-  📁 Dossier      : /opt/beartify-drm
-  🔐 .env         : /opt/beartify-drm/.env  (chmod 600)
-  ⚙  Service      : beartify-drm  (auto-démarrage ON)
-  🌐 Port         : 127.0.0.1:3001
-  🎵 Audio        : FLAC lossless (fMP4 HLS)
-  🪤  Honeypot     : Rick Roll — 1 segment sur 2
+    # ── Wake-on-LAN ──────────────────────────────────────────────────
+    handle_path /wol* {
+        reverse_proxy 127.0.0.1:8080
+    }
 
-Commandes utiles :
-  journalctl -u beartify-drm -f
-  systemctl restart beartify-drm
-  curl http://127.0.0.1:3001/health
+    # ── Jellyfin ─────────────────────────────────────────────────────
+    handle {
+        reverse_proxy 127.0.0.1:8096 {
+            # Nécessaire pour que Jellyfin connaisse le vrai domaine
+            header_up  Host              {host}
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto {scheme}
 
-⚠  Étape finale — Caddy + script.js :
-  scp Caddyfile.txt user@serveur:/etc/caddy/Caddyfile
-  scp script.js     user@serveur:/var/www/html/player/script.js
-  caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy
+            # WebSocket pour la lecture en temps réel
+            header_up  Connection        {http.request.header.Connection}
+            header_up  Upgrade           {http.request.header.Upgrade}
+        }
+    }
 
-papaours@papaours:~$ caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy
+    log {
+        output file /var/log/caddy/jellyfin-access.log
+        format json
+    }
+}
 
-2026/06/06 17:21:38.621 INFO    using config from file  {"file": "/etc/caddy/Caddyfile"}
-2026/06/06 17:21:38.624 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/06/06 17:21:38.625 WARN    caddyfile       Unnecessary header_up X-Forwarded-Proto: the reverse proxy's default behavior is to pass headers to the upstream
-Error: adapting config using caddyfile: parsing caddyfile tokens for 'handle': parsing caddyfile tokens for 'encode': finding encoder module '': module not registered: http.encoders.identity, at /etc/caddy/Caddyfile:65 import chain ['/etc/caddy/Caddyfile:179 (import drm_routes)'], at /etc/caddy/Caddyfile:71 import chain ['/etc/caddy/Caddyfile:179 (import drm_routes)']
-papaours@papaours:~$ sudo systemctl status caddy
-× caddy.service - Caddy
-     Loaded: loaded (/usr/lib/systemd/system/caddy.service; enabled; preset: enabled)
-     Active: failed (Result: exit-code) since Sat 2026-06-06 19:20:16 CEST; 2min 27s ago
-   Duration: 8h 37min 52.476s
- Invocation: 40605f250a7c4ee7bd01acc056392a52
-       Docs: https://caddyserver.com/docs/
-   Main PID: 3053995 (code=exited, status=1/FAILURE)
-   Mem peak: 12.6M
-        CPU: 60ms
+# ──────────────────────────────────────────────────────────────────────
+#  3. BEARTIFY — beartify.duckdns.org
+# ──────────────────────────────────────────────────────────────────────
+beartify.duckdns.org {
 
-jun 06 19:20:16 papaours caddy[3053995]: MEMORY_PRESSURE_WRITE=c29tZSAyMDAwMDAgMjAwMDAwMAA=
-jun 06 19:20:16 papaours caddy[3053995]: {"level":"info","ts":1780766416.7431996,"msg":"maxprocs: Leaving GOMAXPROC>
-jun 06 19:20:16 papaours caddy[3053995]: {"level":"info","ts":1780766416.7437263,"msg":"GOMEMLIMIT is updated","GOM>
-jun 06 19:20:16 papaours caddy[3053995]: {"level":"info","ts":1780766416.7437851,"msg":"using config from file","fi>
-jun 06 19:20:16 papaours caddy[3053995]: {"level":"warn","ts":1780766416.7438273,"msg":"Unnecessary header_up X-For>
-jun 06 19:20:16 papaours caddy[3053995]: {"level":"warn","ts":1780766416.7438757,"msg":"Unnecessary header_up X-For>
-jun 06 19:20:16 papaours caddy[3053995]: Error: adapting config using caddyfile: parsing caddyfile tokens for 'hand>
-jun 06 19:20:16 papaours systemd[1]: caddy.service: Main process exited, code=exited, status=1/FAILURE
-jun 06 19:20:16 papaours systemd[1]: caddy.service: Failed with result 'exit-code'.
-jun 06 19:20:16 papaours systemd[1]: Failed to start caddy.service - Caddy.
-lines 1-20/20 (END)
+    import cors_tauri
+
+    root * /var/www/html/player
+    encode zstd gzip
+
+    # ── En-têtes de sécurité ──────────────────────────────────────────
+    header {
+        Strict-Transport-Security "max-age=15768000; includeSubDomains; preload"
+        X-Content-Type-Options    "nosniff"
+        X-Frame-Options           "SAMEORIGIN"
+        Referrer-Policy           "strict-origin-when-cross-origin"
+        Permissions-Policy        "geolocation=(), microphone=(), camera=(), payment=()"
+
+        # Politique CSP complète (corrigée)
+        Content-Security-Policy "default-src 'self' https://beartify-firebase.firebaseapp.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://discord.com https://lrclib.net https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://apis.google.com https://accounts.google.com https://www.gstatic.com wss://grizzly-stream.duckdns.org https://grizzly-stream.duckdns.org; frame-src 'self' https://beartify-firebase.firebaseapp.com https://accounts.google.com; frame-ancestors 'none';"
+
+        -Server
+    }
+
+    # ── Cache statique (assets compilés) ──────────────────────────────
+    @static {
+        path *.js *.css *.woff2 *.woff *.ttf *.png *.jpg *.svg *.ico *.webp *.gif
+    }
+    header @static Cache-Control "public, max-age=31536000, immutable"
+
+    # ── 🔐 HLS DRM — FLAC + AES-128 + Honeypot Rick Roll 1/2 ─────────
+    import drm_routes
+
+    # ── PROXY JELLYFIN — clé API injectée par Caddy ───────────────────
+    # Le client ne voit jamais la clé X-Emby-Token.
+    # Toutes les requêtes player passent par /api/jellyfin/*
+    handle /api/jellyfin/* {
+        uri strip_prefix /api/jellyfin
+
+        reverse_proxy 127.0.0.1:8096 {
+            # flush_interval -1 : désactive le buffering Caddy pour ce proxy.
+            # Sans cette directive, Caddy accumule les données de Jellyfin en
+            # mémoire avant de les transmettre au navigateur — ce qui provoque
+            # plusieurs secondes de latence avant que l'audio commence à jouer.
+            # Avec -1, chaque chunk audio est transmis dès réception → démarrage
+            # instantané, identique au comportement direct (sans proxy).
+            flush_interval -1
+
+            header_up  X-Emby-Token      "aaa8a7df4b364cf7bcc76f351d768798"
+            header_up  Host              grizzly-stream.duckdns.org
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto {scheme}
+            header_up  Connection        {http.request.header.Connection}
+            header_up  Upgrade           {http.request.header.Upgrade}
+
+            # Supprimer la clé de la réponse (ne jamais la renvoyer au client)
+            header_down -X-Emby-Token
+            header_down -Access-Control-Allow-Origin
+
+            # ── Intercepter les redirections Jellyfin (302/301) ─────────────
+            # Jellyfin peut rediriger le stream vers son propre domaine externe
+            # en incluant l'api_key dans l'URL (?api_key=xxx). On réécrit le
+            # Location header pour que le navigateur repasse par /api/jellyfin/*
+            # sans jamais voir la clé ni le domaine Jellyfin directement.
+            header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
+            header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
+            header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
+
+            # Supprimer l'api_key des query strings résiduels (3 formes)
+            header_down Location `\?api_key=[^&]*&` `?`
+            header_down Location `\?api_key=[^&]*$` ``
+            header_down Location `&api_key=[^&]*`   ``
+        }
+    }
+
+    # ── PROXY LAST.FM — clé API injectée par Caddy ────────────────────
+    # Le client envoie : /api/lastfm/2.0/?method=...
+    # Caddy ajoute : &api_key=...&format=json
+    handle /api/lastfm/* {
+        uri strip_prefix /api/lastfm
+
+        # Injecter api_key + format dans tous les cas
+        # (le client ne transmet PAS ces paramètres)
+        rewrite * {path}?{query}&api_key=b25b959554ed76058ac220b7b2e0a026&format=json
+
+        reverse_proxy https://ws.audioscrobbler.com {
+            header_up  Host              ws.audioscrobbler.com
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            # Supprimer la clé de la réponse (précaution)
+            header_down -X-Api-Key
+            header_down -Access-Control-Allow-Origin
+        }
+    }
+
+    # ── PROXY GRIZZLYRICS ─────────────────────────────────────────────
+    # CAUSE DE LA FUITE : sans X-Forwarded-Proto https, Nextcloud/PHP
+    # voit la requête comme HTTP et émet un redirect 301 vers le vrai
+    # domaine — que le navigateur suit au niveau réseau avant tout
+    # intercepteur JS.
+    # Fix 1 : header_up X-Forwarded-Proto https → PHP ne redirige plus.
+    # Fix 2 : header_down Location (4 variantes) → filet de sécurité.
+    handle /api/lyrics/* {
+        uri strip_prefix /api/lyrics
+
+        reverse_proxy 127.0.0.1:443 {
+            header_up  Host              grizzlyrics.duckdns.org
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto https
+
+            header_down Location "https://grizzlyrics.duckdns.org:443" "/api/lyrics"
+            header_down Location "https://grizzlyrics.duckdns.org"     "/api/lyrics"
+            header_down Location "http://grizzlyrics.duckdns.org:443"  "/api/lyrics"
+            header_down Location "http://grizzlyrics.duckdns.org"      "/api/lyrics"
+
+            header_down -Access-Control-Allow-Origin
+
+            transport http {
+                tls
+                tls_server_name grizzlyrics.duckdns.org
+            }
+        }
+    }
+
+    # ── PROXY NEXTCLOUD — upload photo de profil ─────────────────────
+    # Le client envoie des requêtes WebDAV vers /api/nextcloud/*
+    # Caddy injecte l'authentification Basic (jamais exposée au client).
+    # Les fichiers sont stockés dans : /Photos/beartify/avatars/
+    handle /api/nextcloud/* {
+        uri strip_prefix /api/nextcloud
+
+        reverse_proxy 127.0.0.1:443 {
+            header_up  Host              grizzlyrics.duckdns.org
+            header_up  Authorization     "Basic cGFwYW91cnM6MjkwODA5"
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto https
+
+            header_down -Authorization
+            header_down -WWW-Authenticate
+            header_down -Access-Control-Allow-Origin
+
+            transport http {
+                tls
+                tls_server_name grizzlyrics.duckdns.org
+            }
+        }
+    }
+
+    # ── SPA fallback — toutes les routes inconnues → index.html ───────
+    # Permet la navigation côté client sans 404.
+    @notFile {
+        not path *.js *.css *.png *.jpg *.svg *.ico *.woff* *.ttf *.webp *.json *.html *.gif
+        not path /api/*
+    }
+    rewrite @notFile /index.html
+
+    file_server
+
+    log {
+        output file /var/log/caddy/beartify-access.log
+        format json
+    }
+}
+
+# ──────────────────────────────────────────────────────────────────────
+#  4. GRIZZLYFIN — grizzlyfin.duckdns.org (site Bearflix)
+# ──────────────────────────────────────────────────────────────────────
+grizzlyfin.duckdns.org {
+
+    root * /var/www/bearflix/
+    encode zstd gzip
+
+    header {
+        Strict-Transport-Security "max-age=15768000; includeSubDomains; preload"
+        X-Content-Type-Options    "nosniff"
+        X-Frame-Options           "SAMEORIGIN"
+        Referrer-Policy           "strict-origin-when-cross-origin"
+        Permissions-Policy        "geolocation=(), microphone=(), camera=()"
+        -Server
+    }
+
+    # Cache statique pour les assets
+    @static {
+        path *.js *.css *.woff2 *.woff *.ttf *.png *.jpg *.jpeg *.gif *.svg *.ico *.webp *.mp4 *.webm
+    }
+    header @static Cache-Control "public, max-age=31536000, immutable"
+
+    file_server
+
+    log {
+        output file /var/log/caddy/grizzlyfin-access.log
+        format json
+    }
+}
+
+# ──────────────────────────────────────────────────────────────────────
+#  5. BEARTIFY — accès LAN (http://192.168.0.18)
+#  Même règles proxy que le bloc HTTPS externe, sans TLS.
+#  Permet d'accéder au player depuis le réseau local sans exposer les clés.
+# ──────────────────────────────────────────────────────────────────────
+http://192.168.0.18 {
+
+    import cors_tauri
+
+    root * /var/www/html/player
+    encode zstd gzip
+
+    header {
+        X-Content-Type-Options    "nosniff"
+        X-Frame-Options           "SAMEORIGIN"
+        Referrer-Policy           "strict-origin-when-cross-origin"
+        -Server
+    }
+
+    @static {
+        path *.js *.css *.woff2 *.woff *.ttf *.png *.jpg *.svg *.ico *.webp
+    }
+    header @static Cache-Control "public, max-age=31536000, immutable"
+
+    # ── 🔐 HLS DRM ────────────────────────────────────────────────────
+    import drm_routes
+
+    # ── PROXY JELLYFIN (identique bloc prod) ─────────────────────────
+    handle /api/jellyfin/* {
+        uri strip_prefix /api/jellyfin
+
+        reverse_proxy 127.0.0.1:8096 {
+            flush_interval -1
+
+            header_up  X-Emby-Token      "aaa8a7df4b364cf7bcc76f351d768798"
+            header_up  Host              grizzly-stream.duckdns.org
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto {scheme}
+            header_up  Connection        {http.request.header.Connection}
+            header_up  Upgrade           {http.request.header.Upgrade}
+
+            header_down -Access-Control-Allow-Origin
+            header_down -X-Emby-Token
+            header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
+            header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
+            header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
+            header_down Location `\?api_key=[^&]*&` `?`
+            header_down Location `\?api_key=[^&]*$` ``
+            header_down Location `&api_key=[^&]*`   ``
+        }
+    }
+
+    # ── PROXY LAST.FM ─────────────────────────────────────────────────
+    handle /api/lastfm/* {
+        uri strip_prefix /api/lastfm
+        rewrite * {path}?{query}&api_key=b25b959554ed76058ac220b7b2e0a026&format=json
+
+        reverse_proxy https://ws.audioscrobbler.com {
+            header_up  Host              ws.audioscrobbler.com
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_down -X-Api-Key
+            header_down -Access-Control-Allow-Origin
+        }
+    }
+
+    # ── PROXY GRIZZLYRICS ─────────────────────────────────────────────
+    handle /api/lyrics/* {
+        uri strip_prefix /api/lyrics
+
+        reverse_proxy 127.0.0.1:443 {
+            header_up  Host              grizzlyrics.duckdns.org
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto https
+
+            header_down Location "https://grizzlyrics.duckdns.org:443" "/api/lyrics"
+            header_down Location "https://grizzlyrics.duckdns.org"     "/api/lyrics"
+            header_down Location "http://grizzlyrics.duckdns.org:443"  "/api/lyrics"
+            header_down Location "http://grizzlyrics.duckdns.org"      "/api/lyrics"
+
+            header_down -Access-Control-Allow-Origin
+
+            transport http {
+                tls
+                tls_server_name grizzlyrics.duckdns.org
+            }
+        }
+    }
+
+    # ── PROXY NEXTCLOUD — upload photo de profil ─────────────────────
+    handle /api/nextcloud/* {
+        uri strip_prefix /api/nextcloud
+
+        reverse_proxy 127.0.0.1:443 {
+            header_up  Host              grizzlyrics.duckdns.org
+            header_up  Authorization     "Basic cGFwYW91cnM6MjkwODA5"
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto https
+
+            header_down -Authorization
+            header_down -WWW-Authenticate
+            header_down -Access-Control-Allow-Origin
+
+            transport http {
+                tls
+                tls_server_name grizzlyrics.duckdns.org
+            }
+        }
+    }
+
+    # ── SPA fallback ──────────────────────────────────────────────────
+    @notFile {
+        not path *.js *.css *.png *.jpg *.svg *.ico *.woff* *.ttf *.webp *.json *.html
+        not path /api/*
+    }
+    rewrite @notFile /index.html
+
+    file_server
+
+    log {
+        output file /var/log/caddy/beartify-lan-access.log
+        format json
+    }
+}
+
+# ──────────────────────────────────────────────────────────────────────
+#  6. BEARTIFY — accès LAN (http://192.168.0.2)
+#  Même règles proxy que le bloc HTTPS externe, sans TLS.
+#  Permet d'accéder au player depuis le réseau local sans exposer les clés.
+# ──────────────────────────────────────────────────────────────────────
+http://192.168.0.2 {
+
+    import cors_tauri
+
+    root * /var/www/html/player
+    encode zstd gzip
+
+    header {
+        X-Content-Type-Options    "nosniff"
+        X-Frame-Options           "SAMEORIGIN"
+        Referrer-Policy           "strict-origin-when-cross-origin"
+        -Server
+    }
+
+    @static {
+        path *.js *.css *.woff2 *.woff *.ttf *.png *.jpg *.svg *.ico *.webp
+    }
+    header @static Cache-Control "public, max-age=31536000, immutable"
+
+    # ── 🔐 HLS DRM ────────────────────────────────────────────────────
+    import drm_routes
+
+    # ── PROXY JELLYFIN (identique bloc prod) ─────────────────────────
+    handle /api/jellyfin/* {
+        uri strip_prefix /api/jellyfin
+
+        reverse_proxy 127.0.0.1:8096 {
+            flush_interval -1
+
+            header_up  X-Emby-Token      "aaa8a7df4b364cf7bcc76f351d768798"
+            header_up  Host              grizzly-stream.duckdns.org
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto {scheme}
+            header_up  Connection        {http.request.header.Connection}
+            header_up  Upgrade           {http.request.header.Upgrade}
+
+            header_down -Access-Control-Allow-Origin
+            header_down -X-Emby-Token
+            header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
+            header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
+            header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
+            header_down Location `\?api_key=[^&]*&` `?`
+            header_down Location `\?api_key=[^&]*$` ``
+            header_down Location `&api_key=[^&]*`   ``
+        }
+    }
+
+    # ── PROXY LAST.FM ─────────────────────────────────────────────────
+    handle /api/lastfm/* {
+        uri strip_prefix /api/lastfm
+        rewrite * {path}?{query}&api_key=b25b959554ed76058ac220b7b2e0a026&format=json
+
+        reverse_proxy https://ws.audioscrobbler.com {
+            header_up  Host              ws.audioscrobbler.com
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_down -X-Api-Key
+            header_down -Access-Control-Allow-Origin
+        }
+    }
+
+    # ── PROXY GRIZZLYRICS ─────────────────────────────────────────────
+    handle /api/lyrics/* {
+        uri strip_prefix /api/lyrics
+
+        reverse_proxy 127.0.0.1:443 {
+            header_up  Host              grizzlyrics.duckdns.org
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto https
+
+            header_down Location "https://grizzlyrics.duckdns.org:443" "/api/lyrics"
+            header_down Location "https://grizzlyrics.duckdns.org"     "/api/lyrics"
+            header_down Location "http://grizzlyrics.duckdns.org:443"  "/api/lyrics"
+            header_down Location "http://grizzlyrics.duckdns.org"      "/api/lyrics"
+
+            header_down -Access-Control-Allow-Origin
+
+            transport http {
+                tls
+                tls_server_name grizzlyrics.duckdns.org
+            }
+        }
+    }
+
+    # ── PROXY NEXTCLOUD — upload photo de profil ─────────────────────
+    handle /api/nextcloud/* {
+        uri strip_prefix /api/nextcloud
+
+        reverse_proxy 127.0.0.1:443 {
+            header_up  Host              grizzlyrics.duckdns.org
+            header_up  Authorization     "Basic cGFwYW91cnM6MjkwODA5"
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto https
+
+            header_down -Authorization
+            header_down -WWW-Authenticate
+            header_down -Access-Control-Allow-Origin
+
+            transport http {
+                tls
+                tls_server_name grizzlyrics.duckdns.org
+            }
+        }
+    }
+
+    # ── SPA fallback ──────────────────────────────────────────────────
+    @notFile {
+        not path *.js *.css *.png *.jpg *.svg *.ico *.woff* *.ttf *.webp *.json *.html
+        not path /api/*
+    }
+    rewrite @notFile /index.html
+
+    file_server
+
+    log {
+        output file /var/log/caddy/beartify-node-server.log
+        format json
+    }
+}
