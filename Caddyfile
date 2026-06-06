@@ -62,6 +62,7 @@
 # ══════════════════════════════════════════════════════════════════════
 (drm_routes) {
     handle /api/hls/* {
+        encode identity   # ← désactive gzip/zstd pour HLS
         reverse_proxy 127.0.0.1:3001 {
             flush_interval -1
             header_up  X-Real-IP       {remote_host}
