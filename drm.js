@@ -234,7 +234,7 @@ function startTranscode(itemId, token, tempDir) {
     '-hls_segment_type',       'fmp4',
     '-hls_fmp4_init_filename', 'init.mp4',
     '-hls_segment_filename',   path.join(tempDir, 'seg%03d.m4s'),
-    '-hls_time',               '2',        // FIX PERF: 2s au lieu de 4s → démarrage 2× plus rapide
+    '-hls_time',               '4',
     '-hls_list_size',          '0',
     '-hls_flags',              'independent_segments',
     '-y',
@@ -267,7 +267,7 @@ function startTranscode(itemId, token, tempDir) {
     console.error('[HLS] ffmpeg introuvable :', e.message);
   });
 
-  // Polling : ready dès init.mp4 + 1 segment disponible (segment = 2s → démarrage rapide)
+  // Polling : ready dès init.mp4 + 2 segments disponibles
   const watcher = setInterval(() => {
     const s = sessions.get(token);
     if (!s || s.ready || s.ffmpegError) { clearInterval(watcher); return; }
@@ -275,13 +275,13 @@ function startTranscode(itemId, token, tempDir) {
       const initOk   = fs.existsSync(path.join(tempDir, 'init.mp4'));
       const segFiles = fs.readdirSync(tempDir).filter(f => /^seg\d+\.m4s$/.test(f));
       s.segCount = segFiles.length;
-      if (initOk && segFiles.length >= 1) {
+      if (initOk && segFiles.length >= 2) {
         s.ready = true;
         clearInterval(watcher);
         console.log(`[HLS] ▶ Prêt (${segFiles.length} segments) — ${itemId}`);
       }
     } catch (_) {}
-  }, 150); // FIX PERF: 150ms au lieu de 300ms → réactivité 2× meilleure
+  }, 300);
 
   setTimeout(() => {
     clearInterval(watcher);
@@ -469,7 +469,7 @@ app.get('/api/hls/playlist/:id', async (req, res) => {
 
   const deadline = Date.now() + 60_000;
   while (!s.ready && !s.ffmpegError && Date.now() < deadline)
-    await new Promise(r => setTimeout(r, 100)); // FIX PERF: 100ms au lieu de 300ms
+    await new Promise(r => setTimeout(r, 300));
 
   if (!s.ready) {
     const err = s.ffmpegError || 'Timeout 60s';
