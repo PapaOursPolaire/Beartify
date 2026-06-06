@@ -1,3 +1,94 @@
+papaours@papaours:~$ sudo systemctl reload caddy
+[sudo] Mot de passe de papaours : 
+Job for caddy.service failed.
+See "systemctl status caddy.service" and "journalctl -xeu caddy.service" for details.
+papaours@papaours:~$ sudo systemctl reload caddy
+Job for caddy.service failed.
+See "systemctl status caddy.service" and "journalctl -xeu caddy.service" for details.
+papaours@papaours:~$ sudo bash drm.sh --honeypot-audio /home/papaours/rickroll.mp3
+
+╔══════════════════════════════════════════════════════════╗
+║   BEARTIFY DRM v4 — HLS FLAC + AES-128 + Honeypot 1/2   ║
+╚══════════════════════════════════════════════════════════╝
+
+
+▶ Vérification des permissions
+✅  Exécution en root
+
+▶ Vérification des prérequis
+⚠   ffmpeg : format fmp4 non détecté — vérifier la version (>= 4.0)
+✅  Node.js v20.19.2
+✅  npm 9.2.0
+✅  ffmpeg 7.1.4-0+deb13u1
+✅  FLAC fMP4 HLS disponible
+
+▶ Création de /opt/beartify-drm
+✅  Dossier : /opt/beartify-drm
+
+▶ Déploiement de drm.js
+✅  drm.js copié depuis /home/papaours
+
+▶ Écriture de package.json
+✅  package.json écrit
+
+▶ Configuration .env
+⚠   SESSION_SECRET conservé (réinstallation)
+✅  .env créé (chmod 600)
+
+▶ Installation des dépendances npm
+✅  express + dotenv installés
+
+▶ Pré-génération des segments Rick Roll (FLAC fMP4)
+ℹ   Transcodage de /home/papaours/rickroll.mp3 en segments FLAC fMP4...
+⚠   ffmpeg a échoué — les honeypots seront générés au premier démarrage
+
+▶ Permissions
+✅  Permissions appliquées
+
+▶ Service systemd beartify-drm
+✅  Service redémarré
+
+▶ Vérification du serveur DRM
+   Attente du démarrage..
+✅  Serveur DRM actif : {"status":"ok","sessions":0,"honeypot_segs":0,"honeypot_ratio":"1 sur 2"}
+
+══════════════════════════════════════════════════════════
+  Déploiement terminé !                                    
+══════════════════════════════════════════════════════════
+
+  📁 Dossier      : /opt/beartify-drm
+  🔐 .env         : /opt/beartify-drm/.env  (chmod 600)
+  ⚙  Service      : beartify-drm  (auto-démarrage ON)
+  🌐 Port         : 127.0.0.1:3001
+  🎵 Audio        : FLAC lossless (fMP4 HLS)
+  🪤  Honeypot     : Rick Roll — 1 segment sur 2
+
+Commandes utiles :
+  journalctl -u beartify-drm -f
+  systemctl restart beartify-drm
+  curl http://127.0.0.1:3001/health
+
+⚠  Étape finale — Caddy + script.js :
+  scp Caddyfile.txt user@serveur:/etc/caddy/Caddyfile
+  scp script.js     user@serveur:/var/www/html/player/script.js
+  caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy
+
+papaours@papaours:~$ sudo systemctl reload caddy
+Job for caddy.service failed.
+See "systemctl status caddy.service" and "journalctl -xeu caddy.service" for details.
+papaours@papaours:~$ sudo systemctl reload caddy
+Job for caddy.service failed.
+See "systemctl status caddy.service" and "journalctl -xeu caddy.service" for details.
+papaours@papaours:~$ sudo systemctl reload caddy
+Job for caddy.service failed.
+See "systemctl status caddy.service" and "journalctl -xeu caddy.service" for details.
+papaours@papaours:~$ 
+papaours@papaours:~$ sudo systemctl reload caddy
+Job for caddy.service failed.
+See "systemctl status caddy.service" and "journalctl -xeu caddy.service" for details.
+papaours@papaours:~$ sudo systemctl reload caddy
+Job for caddy.service failed.
+See "systemctl status caddy.service" and "journalctl -xeu caddy.service" for details.
 papaours@papaours:~$ systemctl status caddy.service
 ● caddy.service - Caddy
      Loaded: loaded (/usr/lib/systemd/system/caddy.service; enabled; preset: enabled)
@@ -22,4 +113,107 @@ jun 06 19:18:17 papaours (caddy)[3045988]: caddy.service: Failed to set up mount
 jun 06 19:18:17 papaours (caddy)[3045988]: caddy.service: Failed at step NAMESPACE spawning /usr/bin/caddy: No such>
 jun 06 19:18:17 papaours systemd[1]: caddy.service: Control process exited, code=exited, status=226/NAMESPACE
 jun 06 19:18:17 papaours systemd[1]: Reload failed for caddy.service - Caddy.
-lines 1-23/23 (END)
+
+papaours@papaours:~$ sudo rm -rf /beartify-1* /tmp/bea-17*
+papaours@papaours:~$ df -h /tmp
+Sys. de fichiers Taille Utilisé Dispo Uti% Monté sur
+tmpfs               16G    3,8M   16G   1% /tmp
+papaours@papaours:~$ sudo systemctl restart caddy
+Job for caddy.service failed because the control process exited with error code.
+See "systemctl status caddy.service" and "journalctl -xeu caddy.service" for details.
+papaours@papaours:~$ sudo bash drm.sh --honeypot-audio /home/papaours/rickroll.mp3
+
+╔══════════════════════════════════════════════════════════╗
+║   BEARTIFY DRM v4 — HLS FLAC + AES-128 + Honeypot 1/2   ║
+╚══════════════════════════════════════════════════════════╝
+
+
+▶ Vérification des permissions
+✅  Exécution en root
+
+▶ Vérification des prérequis
+⚠   ffmpeg : format fmp4 non détecté — vérifier la version (>= 4.0)
+✅  Node.js v20.19.2
+✅  npm 9.2.0
+✅  ffmpeg 7.1.4-0+deb13u1
+✅  FLAC fMP4 HLS disponible
+
+▶ Création de /opt/beartify-drm
+✅  Dossier : /opt/beartify-drm
+
+▶ Déploiement de drm.js
+✅  drm.js copié depuis /home/papaours
+
+▶ Écriture de package.json
+✅  package.json écrit
+
+▶ Configuration .env
+⚠   SESSION_SECRET conservé (réinstallation)
+✅  .env créé (chmod 600)
+
+▶ Installation des dépendances npm
+✅  express + dotenv installés
+
+▶ Pré-génération des segments Rick Roll (FLAC fMP4)
+ℹ   Transcodage de /home/papaours/rickroll.mp3 en segments FLAC fMP4...
+⚠   ffmpeg a échoué — les honeypots seront générés au premier démarrage
+
+▶ Permissions
+✅  Permissions appliquées
+
+▶ Service systemd beartify-drm
+✅  Service redémarré
+
+▶ Vérification du serveur DRM
+   Attente du démarrage.
+✅  Serveur DRM actif : {"status":"ok","sessions":0,"honeypot_segs":0,"honeypot_ratio":"1 sur 2"}
+
+══════════════════════════════════════════════════════════
+  Déploiement terminé !                                    
+══════════════════════════════════════════════════════════
+
+  📁 Dossier      : /opt/beartify-drm
+  🔐 .env         : /opt/beartify-drm/.env  (chmod 600)
+  ⚙  Service      : beartify-drm  (auto-démarrage ON)
+  🌐 Port         : 127.0.0.1:3001
+  🎵 Audio        : FLAC lossless (fMP4 HLS)
+  🪤  Honeypot     : Rick Roll — 1 segment sur 2
+
+Commandes utiles :
+  journalctl -u beartify-drm -f
+  systemctl restart beartify-drm
+  curl http://127.0.0.1:3001/health
+
+⚠  Étape finale — Caddy + script.js :
+  scp Caddyfile.txt user@serveur:/etc/caddy/Caddyfile
+  scp script.js     user@serveur:/var/www/html/player/script.js
+  caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy
+
+papaours@papaours:~$ caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy
+
+2026/06/06 17:21:38.621 INFO    using config from file  {"file": "/etc/caddy/Caddyfile"}
+2026/06/06 17:21:38.624 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
+2026/06/06 17:21:38.625 WARN    caddyfile       Unnecessary header_up X-Forwarded-Proto: the reverse proxy's default behavior is to pass headers to the upstream
+Error: adapting config using caddyfile: parsing caddyfile tokens for 'handle': parsing caddyfile tokens for 'encode': finding encoder module '': module not registered: http.encoders.identity, at /etc/caddy/Caddyfile:65 import chain ['/etc/caddy/Caddyfile:179 (import drm_routes)'], at /etc/caddy/Caddyfile:71 import chain ['/etc/caddy/Caddyfile:179 (import drm_routes)']
+papaours@papaours:~$ sudo systemctl status caddy
+× caddy.service - Caddy
+     Loaded: loaded (/usr/lib/systemd/system/caddy.service; enabled; preset: enabled)
+     Active: failed (Result: exit-code) since Sat 2026-06-06 19:20:16 CEST; 2min 27s ago
+   Duration: 8h 37min 52.476s
+ Invocation: 40605f250a7c4ee7bd01acc056392a52
+       Docs: https://caddyserver.com/docs/
+   Main PID: 3053995 (code=exited, status=1/FAILURE)
+   Mem peak: 12.6M
+        CPU: 60ms
+
+jun 06 19:20:16 papaours caddy[3053995]: MEMORY_PRESSURE_WRITE=c29tZSAyMDAwMDAgMjAwMDAwMAA=
+jun 06 19:20:16 papaours caddy[3053995]: {"level":"info","ts":1780766416.7431996,"msg":"maxprocs: Leaving GOMAXPROC>
+jun 06 19:20:16 papaours caddy[3053995]: {"level":"info","ts":1780766416.7437263,"msg":"GOMEMLIMIT is updated","GOM>
+jun 06 19:20:16 papaours caddy[3053995]: {"level":"info","ts":1780766416.7437851,"msg":"using config from file","fi>
+jun 06 19:20:16 papaours caddy[3053995]: {"level":"warn","ts":1780766416.7438273,"msg":"Unnecessary header_up X-For>
+jun 06 19:20:16 papaours caddy[3053995]: {"level":"warn","ts":1780766416.7438757,"msg":"Unnecessary header_up X-For>
+jun 06 19:20:16 papaours caddy[3053995]: Error: adapting config using caddyfile: parsing caddyfile tokens for 'hand>
+jun 06 19:20:16 papaours systemd[1]: caddy.service: Main process exited, code=exited, status=1/FAILURE
+jun 06 19:20:16 papaours systemd[1]: caddy.service: Failed with result 'exit-code'.
+jun 06 19:20:16 papaours systemd[1]: Failed to start caddy.service - Caddy.
+lines 1-20/20 (END)
