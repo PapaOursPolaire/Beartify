@@ -234,7 +234,7 @@ function startTranscode(itemId, token, tempDir) {
     '-hls_segment_type',       'fmp4',
     '-hls_fmp4_init_filename', 'init.mp4',
     '-hls_segment_filename',   path.join(tempDir, 'seg%03d.m4s'),
-    '-hls_time',               '2',        // 2 s/segment → démarrage plus rapide (~4 s vs ~8 s avant)
+    '-hls_time',               '4',
     '-hls_list_size',          '0',
     '-hls_flags',              'independent_segments',
     '-y',
@@ -268,7 +268,6 @@ function startTranscode(itemId, token, tempDir) {
   });
 
   // Polling : ready dès init.mp4 + 2 segments disponibles
-  // Avec hls_time=2s, les segments arrivent vite → polling à 150 ms pour démarrer sans délai.
   const watcher = setInterval(() => {
     const s = sessions.get(token);
     if (!s || s.ready || s.ffmpegError) { clearInterval(watcher); return; }
@@ -282,7 +281,7 @@ function startTranscode(itemId, token, tempDir) {
         console.log(`[HLS] ▶ Prêt (${segFiles.length} segments) — ${itemId}`);
       }
     } catch (_) {}
-  }, 150);
+  }, 300);
 
   setTimeout(() => {
     clearInterval(watcher);
@@ -350,6 +349,8 @@ function buildHoneypotM3u8(rawM3u8, itemId, token, sess) {
     // ── Segments réels ────────────────────────────────────────────
     if (t.startsWith('#EXTINF')) {
       // Fix 2 : mettre à jour l'IV avant chaque segment réel
+      // seqNumber = numéro de séquence HLS du côté CLIENT (honeypots exclus)
+      // C'est ce numéro que HLS.js utilise pour calculer l'IV par défaut.
       const ivHex = segmentIv(seqNumber).toString('hex');
       out.push(`#EXT-X-KEY:METHOD=AES-128,URI="${keyUri}",IV=0x${ivHex}`);
 
@@ -362,25 +363,31 @@ function buildHoneypotM3u8(rawM3u8, itemId, token, sess) {
         out.push(`/api/hls/segment/${itemId}/${segName}?s=${encodeURIComponent(token)}&seq=${seqNumber}`);
       }
       realIdx++;
-      seqNumber++;
+      seqNumber++; // incrémenter UNIQUEMENT pour les segments réels
 
       // ── Honeypot intercalé ──────────────────────────────────────
       if (_honeypotSegs.length > 0 && realIdx % HONEYPOT_EVERY === 0) {
-        // Fix 1 : tag aléatoire par session
-        // ⚠️ Pas de ligne vide AVANT le tag — elle est mise APRÈS l'URL du segment.
-        // Le strip côté client (_stripHoneypotSegments) saute exactement 4 lignes
-        // non-vides : #tag + #EXT-X-KEY + #EXTINF + URL.
-        // Une ligne vide AVANT le tag était comptée dans le skip (t !== '' → skip--)
-        // et consommait une des 4 lignes utiles, laissant l'URL du honeypot dans le M3U8.
+        // Le tag honeypot utilise un compteur interne séparé (honeySeqNumber)
+        // qui N'EST PAS synchronisé avec seqNumber client.
+        // Le client filtre ces 4 lignes → ne voit jamais ce segment → son
+        // compteur de séquence n'est pas affecté → IVs restent cohérents.
+        //
+        // Structure des 4 lignes non-vides que _stripHoneypotSegments saute :
+        //   1. #TAG_HONEYPOT  (skip=4)
+        //   2. #EXT-X-KEY     (skip=3)
+        //   3. #EXTINF:4.000, (skip=2)
+        //   4. /url/honey     (skip=1)
+        // La ligne vide séparatrice est placée APRÈS l'URL (pas avant le tag)
+        // pour ne pas perturber le compteur de skip (t==='' n'est pas compté).
+        const honeySeqNum = 0xFFFF + honeyIdx; // séquence fictive hors plage réelle
+        const honeyIvHex  = segmentIv(honeySeqNum).toString('hex');
         out.push(`#${honeypotTag}`);
-        // Fix 2 : IV du segment honeypot = son propre numéro de séquence
-        const honeyIvHex = segmentIv(seqNumber).toString('hex');
         out.push(`#EXT-X-KEY:METHOD=AES-128,URI="${keyUri}",IV=0x${honeyIvHex}`);
         out.push('#EXTINF:4.000,');
-        out.push(`/api/hls/segment/${itemId}/honey_${honeyIdx}.m4s?s=${encodeURIComponent(token)}&seq=${seqNumber}`);
-        out.push(''); // ligne vide séparatrice APRÈS le bloc (ne perturbe plus le strip)
+        out.push(`/api/hls/segment/${itemId}/honey_${honeyIdx}.m4s?s=${encodeURIComponent(token)}&seq=${honeySeqNum}`);
+        out.push(''); // ligne vide séparatrice APRÈS l'URL — invisible au strip
         honeyIdx++;
-        seqNumber++;
+        // NE PAS incrémenter seqNumber ici : le client ne voit pas ce segment
       }
       continue;
     }
