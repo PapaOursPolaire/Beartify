@@ -330,9 +330,9 @@ function buildHoneypotM3u8(rawM3u8, itemId, token, sess) {
 
     // ── MAP (init segment) : METHOD=NONE → MAP → METHOD=AES-128 ──
     if (t.startsWith('#EXT-X-MAP')) {
-      out.push('#EXT-X-KEY:METHOD=NONE');
+      // Fix ordre : MAP d'abord, puis METHOD=NONE, puis AES-128
       out.push(`#EXT-X-MAP:URI="/api/hls/init/${itemId}?s=${encodeURIComponent(token)}"`);
-      // Fix 2 : IV du premier segment = numéro de séquence initial
+      out.push('#EXT-X-KEY:METHOD=NONE');
       const ivHex = segmentIv(seqNumber).toString('hex');
       out.push(`#EXT-X-KEY:METHOD=AES-128,URI="${keyUri}",IV=0x${ivHex}`);
       keyInjected = true;
