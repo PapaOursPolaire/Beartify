@@ -70,21 +70,30 @@
 }
 
 # ══════════════════════════════════════════════════════════════════════
-#  SNIPPET — Routes HLS/DRM vers drm.js (:3001)
+#  SNIPPET — Routes HLS/DRM + Marketplace vers drm.js (:3001)
 #
-#  Intercepte /api/hls/* AVANT les blocs /api/jellyfin/*.
+#  Intercepte /api/hls/* et /api/extensions/* AVANT les blocs /api/jellyfin/*.
 #  À importer dans tous les blocs Beartify (prod + LAN).
 #
-#  /api/hls/session/:id  → session + lancement ffmpeg FLAC fMP4
-#  /api/hls/key/:id      → clé AES-128 (IP-lockée)
-#  /api/hls/init/:id     → init segment fMP4 (auth)
-#  /api/hls/playlist/:id → M3U8 avec vrais segments + Rick Roll (1/2)
-#  /api/hls/segment/:id/ → segments .m4s réels + honeypots (auth)
+#  /api/hls/session/:id       → session + lancement ffmpeg FLAC fMP4
+#  /api/hls/key/:id           → clé AES-128 (IP-lockée)
+#  /api/hls/init/:id          → init segment fMP4 (auth)
+#  /api/hls/playlist/:id      → M3U8 avec vrais segments + Rick Roll (1/2)
+#  /api/hls/segment/:id/      → segments .m4s réels + honeypots (auth)
+#  /api/extensions            → liste des extensions installées (JSON)
+#  /api/extensions/:cat/:n/*  → fichiers statiques d'une extension
 # ══════════════════════════════════════════════════════════════════════
 (drm_routes) {
     handle /api/hls/* {
         reverse_proxy 127.0.0.1:3001 {
             flush_interval -1
+            header_up  X-Real-IP       {remote_host}
+            header_up  X-Forwarded-For {remote_host}
+        }
+    }
+
+    handle /api/extensions* {
+        reverse_proxy 127.0.0.1:3001 {
             header_up  X-Real-IP       {remote_host}
             header_up  X-Forwarded-For {remote_host}
         }
