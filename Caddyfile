@@ -20,32 +20,53 @@
 
 # ══════════════════════════════════════════════════════════════════════
 #  SNIPPET — CORS pour Tauri V2
-#  Écho dynamique de l'Origin → un seul Access-Control-Allow-Origin.
+#  Whitelist explicite des origines autorisées.
+#  Origines acceptées :
+#    - https://beartify.duckdns.org  (prod web)
+#    - https://tauri.localhost        (Tauri v2 desktop/Android)
+#    - tauri://localhost              (Tauri v2 variante scheme)
+#    - http://192.168.0.2             (LAN machine 1)
+#    - http://192.168.0.18            (LAN machine 2)
+#  Toute autre Origin est ignorée → pas de header CORS → navigateur bloque.
 #  À importer dans tous les blocs Beartify : import cors_tauri
 # ══════════════════════════════════════════════════════════════════════
 (cors_tauri) {
-    # Répondre aux preflight OPTIONS (CORS) avant tout autre handler
+    # ── Origines autorisées ───────────────────────────────────────────
+    @origin_ok {
+        header Origin "https://beartify.duckdns.org"
+        header Origin "https://tauri.localhost"
+        header Origin "tauri://localhost"
+        header Origin "http://192.168.0.2"
+        header Origin "http://192.168.0.18"
+    }
+
+    # ── Preflight OPTIONS — répondre uniquement aux origines autorisées
     @cors_preflight {
         method OPTIONS
         header Origin *
     }
     handle @cors_preflight {
-        header Access-Control-Allow-Origin  "{http.request.header.Origin}"
-        header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
-        header Access-Control-Allow-Headers "Content-Type, Authorization, Range, X-Requested-With, Accept, Origin"
-        header Access-Control-Max-Age       "86400"
-        header Vary "Origin"
+        @preflight_ok {
+            header Origin "https://beartify.duckdns.org"
+            header Origin "https://tauri.localhost"
+            header Origin "tauri://localhost"
+            header Origin "http://192.168.0.2"
+            header Origin "http://192.168.0.18"
+        }
+        header @preflight_ok Access-Control-Allow-Origin  "{http.request.header.Origin}"
+        header @preflight_ok Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
+        header @preflight_ok Access-Control-Allow-Headers "Content-Type, Authorization, Range, X-Requested-With, Accept, Origin"
+        header @preflight_ok Access-Control-Max-Age       "86400"
+        header @preflight_ok Vary "Origin"
         respond "" 204
     }
 
-    # Pour toutes les requêtes normales portant un header Origin :
-    # écho dynamique → un seul Access-Control-Allow-Origin
-    @has_origin header Origin *
-    header @has_origin Access-Control-Allow-Origin  "{http.request.header.Origin}"
-    header @has_origin Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
-    header @has_origin Access-Control-Allow-Headers "Content-Type, Authorization, Range, X-Requested-With, Accept, Origin"
-    header @has_origin Access-Control-Expose-Headers "Content-Length, Content-Range, Accept-Ranges"
-    header @has_origin Vary "Origin"
+    # ── Requêtes normales — injecter les headers CORS uniquement si origine autorisée
+    header @origin_ok Access-Control-Allow-Origin  "{http.request.header.Origin}"
+    header @origin_ok Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
+    header @origin_ok Access-Control-Allow-Headers "Content-Type, Authorization, Range, X-Requested-With, Accept, Origin"
+    header @origin_ok Access-Control-Expose-Headers "Content-Length, Content-Range, Accept-Ranges"
+    header @origin_ok Vary "Origin"
 }
 
 # ══════════════════════════════════════════════════════════════════════
