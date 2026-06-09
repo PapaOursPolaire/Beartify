@@ -1,4 +1,4 @@
-// spotify-lyrics-saver.js — v21 — Compatible Spicy-Lyrics v6+
+// spotify-lyrics-saver.js — v22 — Compatible Spicy-Lyrics v6+
 // Fix : support du nouveau format encodé api.spicylyrics.org/query (POST)
 //       → décodeur SpicyLyrics v6 (pool + instructions) → Content[] standard
 //       + fetch forceCurrentTrack corrigé GET→POST avec body v6
@@ -19,6 +19,9 @@
 //               appels saveLineFallback dans processPayload : condition provider==='spotify' supprimée → bestRaw passé systématiquement
 //       + v21 : suppression complète de saveLineFallback — saveLyrics télécharge déjà le .json normal pour les pistes LINE ;
 //               le polling fallback (aucune parole après timeout) appelle forceCurrentTrack() au lieu de saveLineFallback
+//       + v22 : triggerDownload refactorisé async — cascade 3 stratégies : showSaveFilePicker (dialogue natif OS,
+//               aucune restriction user gesture répété, CEF >= Chromium 86) → a.click() direct (1er DL) →
+//               window.open('about:blank') + a.click() popup (fallback v15) ; saveLyrics awaite triggerDownload.
 
 (function () {
   'use strict';
@@ -717,41 +720,86 @@
 
   /* ═══════════════════════════════════════════════════════════
      TÉLÉCHARGEMENT
-     CEF Linux (KDE) n'accepte qu'un seul a.click() par processus
-     renderer — iframe compris (même renderer). La seule approche
-     fiable pour les téléchargements suivants : window.open() avec
-     la blob: URL directement en argument. CEF Linux ouvre alors un
-     nouveau processus renderer pour la blob URL, contournant la
-     limite. L'onglet/popup se ferme de lui-même (pas de contenu
-     affiché, le navigateur le ferme automatiquement après DL).
-     Sur Windows, a.click() répété fonctionne sans restriction.
+     Stratégie en cascade, du plus fiable au moins fiable :
+
+     1. showSaveFilePicker (File System Access API) — ouvre la boîte
+        de dialogue native du système, aucune restriction de user
+        gesture répété, fonctionne identiquement sur Linux et Windows.
+        Disponible dans CEF >= Chromium 86. Inconvénient : dialogue
+        modal à chaque piste (acceptable en mode queue).
+
+     2. a.click() direct — fonctionne pour le PREMIER téléchargement
+        sur tous les builds CEF. Bloqué à partir du second sur CEF
+        Linux (builds récents Chromium 120+).
+
+     3. window.open('about:blank') + a.click() dans la popup — ancien
+        contournement CEF Linux (v15). Peut être bloqué si le popup
+        blocker est actif ou si le build CEF est trop récent.
+
+     triggerDownload est async ; saveLyrics l'awaite pour que
+     state.totalSaved++ soit incrémenté après le DL effectif.
   ═══════════════════════════════════════════════════════════ */
-  function triggerDownload(blob, filename) {
+  async function triggerDownload(blob, filename) {
+    // ── Stratégie 1 : showSaveFilePicker ─────────────────────────────────────
+    if (typeof window.showSaveFilePicker === 'function') {
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: filename,
+          types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }],
+        });
+        const writable = await handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+        log('✓ showSaveFilePicker — fichier écrit');
+        return;
+      } catch (e) {
+        // AbortError = utilisateur a annulé → silencieux
+        if (e?.name === 'AbortError') { log('showSaveFilePicker annulé'); return; }
+        // Autre erreur (SecurityError, NotAllowedError…) → fallback
+        log('showSaveFilePicker échoué, fallback a.click() :', e?.name, e?.message);
+      }
+    }
+
+    // ── Stratégie 2 : a.click() direct ───────────────────────────────────────
+    // Fonctionne sans restriction pour le premier DL sur tous les builds CEF.
+    // Bloqué à partir du second sur CEF Linux récent (Chromium 120+).
     const url = URL.createObjectURL(blob);
     if (state.totalSaved === 0) {
-      // Premier téléchargement : a.click() direct, fonctionne partout
       const a = Object.assign(document.createElement('a'), { href: url, download: filename });
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(url), 60_000);
-    } else {
-      // Téléchargements suivants sur CEF Linux : window.open(blob:URL) directement.
-      // Ouvre la blob dans un nouveau contexte renderer → le navigateur déclenche
-      // le téléchargement sans passer par un a.click() dans le renderer courant.
-      const w = window.open(url);
-      if (w) {
-        // Le navigateur gère le DL ; on révoque après un délai généreux.
-        setTimeout(() => { try { w.close(); } catch {} URL.revokeObjectURL(url); }, 30_000);
-      } else {
-        // window.open bloqué (popup blocker strict) → fallback a.click()
-        log('window.open bloqué — fallback a.click()');
+      return;
+    }
+
+    // ── Stratégie 3 : popup about:blank (contournement CEF Linux v15) ─────────
+    const w = window.open('about:blank');
+    if (w) {
+      try {
+        const a = w.document.createElement('a');
+        a.href     = url;
+        a.download = filename;
+        w.document.body.appendChild(a);
+        a.click();
+        setTimeout(() => { try { w.close(); } catch {} URL.revokeObjectURL(url); }, 300);
+      } catch (e) {
+        log('popup about:blank échouée :', e?.message);
+        try { w.close(); } catch {}
         const a = Object.assign(document.createElement('a'), { href: url, download: filename });
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         setTimeout(() => URL.revokeObjectURL(url), 60_000);
       }
+    } else {
+      // Popup bloquée → dernier recours a.click() contexte principal
+      log('window.open bloqué — dernier recours a.click()');
+      const a = Object.assign(document.createElement('a'), { href: url, download: filename });
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
     }
   }
 
@@ -798,7 +846,7 @@
 
     const filename = `${sanitize(trackInfo.artistName)} - ${sanitize(trackInfo.trackName)}.json`;
     const blob     = new Blob([JSON.stringify(output, null, 2)], { type: 'application/json' });
-    triggerDownload(blob, filename);
+    await triggerDownload(blob, filename);
 
     state.savedTrackIds.add(trackInfo.trackId);
     // Enregistrer le score de qualité pour permettre le remplacement par une meilleure version
