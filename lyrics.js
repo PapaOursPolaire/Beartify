@@ -1,4 +1,4 @@
-// spotify-lyrics-saver.js — v24 — Compatible Spicy-Lyrics v6+
+// spotify-lyrics-saver.js — v21 — Compatible Spicy-Lyrics v6+
 // Fix : support du nouveau format encodé api.spicylyrics.org/query (POST)
 //       → décodeur SpicyLyrics v6 (pool + instructions) → Content[] standard
 //       + fetch forceCurrentTrack corrigé GET→POST avec body v6
@@ -19,9 +19,6 @@
 //               appels saveLineFallback dans processPayload : condition provider==='spotify' supprimée → bestRaw passé systématiquement
 //       + v21 : suppression complète de saveLineFallback — saveLyrics télécharge déjà le .json normal pour les pistes LINE ;
 //               le polling fallback (aucune parole après timeout) appelle forceCurrentTrack() au lieu de saveLineFallback
-//       + v22 : triggerDownload refactorisé async — cascade 3 stratégies : showSaveFilePicker (dialogue natif OS,
-//               aucune restriction user gesture répété, CEF >= Chromium 86) → a.click() direct (1er DL) →
-//               window.open('about:blank') + a.click() popup (fallback v15) ; saveLyrics awaite triggerDownload.
 
 (function () {
   'use strict';
@@ -59,7 +56,6 @@
     trackSeenAt    : {},
     idbCacheGhosted    : false,  // quand true : IDB reads retournent vide → force re-fetch
     _idbReadFromOurCode: false,  // flag pour exclure nos propres lectures de readFromIDB
-    dlQueue        : [],   // { blob, filename } accumulés, vidés sur user gesture
   };
 
   /* ═══════════════════════════════════════════════════════════
@@ -721,43 +717,41 @@
 
   /* ═══════════════════════════════════════════════════════════
      TÉLÉCHARGEMENT
-     CEF Linux (KDE) : a.click() programmatique bloqué après le 1er DL.
-     a.click() depuis un vrai user gesture (onclick bouton) ne l'est pas.
-
-     Stratégie : triggerDownload() n'émet plus aucun a.click() automatique.
-     Il enfile simplement le { blob, filename } dans state.dlQueue.
-     L'UI met à jour le badge du bouton "💾 Télécharger (N)".
-     Quand l'utilisateur clique ce bouton (= vrai gesture), flushDlQueue()
-     émet un a.click() par fichier en attente — tous acceptés par CEF.
-     Sur Windows, les deux chemins fonctionnent (pas de restriction).
+     CEF Linux (KDE) n'accepte qu'un seul a.click() par contexte
+     de page. Pour les téléchargements suivants, on ouvre une
+     popup about:blank (nouveau contexte CEF) et on y déclenche
+     le clic, puis on la referme.
   ═══════════════════════════════════════════════════════════ */
   function triggerDownload(blob, filename) {
-    state.dlQueue.push({ blob, filename });
-    uiUpdateDlBadge();
-    log(`📥 En queue : ${filename} (total : ${state.dlQueue.length})`);
-  }
-
-  /** Vide la dlQueue en émettant un a.click() par fichier.
-   *  Doit être appelé depuis un vrai user gesture (onclick). */
-  function flushDlQueue() {
-    if (!state.dlQueue.length) {
-      uiAddLog('ℹ Queue vide', 'info');
-      return;
-    }
-    const items = state.dlQueue.splice(0);
-    uiUpdateDlBadge();
-    for (const { blob, filename } of items) {
-      const url = URL.createObjectURL(blob);
-      const a   = Object.assign(document.createElement('a'), { href: url, download: filename });
+    const url = URL.createObjectURL(blob);
+    if (state.totalSaved === 0) {
+      // Premier téléchargement : contexte principal, fonctionne partout
+      const a = Object.assign(document.createElement('a'), { href: url, download: filename });
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } else {
+      // Téléchargements suivants : popup pour contourner la limite CEF Linux
+      const w = window.open('about:blank');
+      if (!w) {
+        // Popup bloquée — fallback sur le contexte principal
+        const a = Object.assign(document.createElement('a'), { href: url, download: filename });
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 60_000);
+        return;
+      }
+      const a = w.document.createElement('a');
+      a.href  = url;
+      a.download = filename;
+      w.document.body.appendChild(a);
+      a.click();
+      // Fermer la popup dès que le téléchargement a démarré (300ms suffisent)
+      setTimeout(() => { try { w.close(); } catch {} URL.revokeObjectURL(url); }, 300);
     }
-    uiAddLog(`✓ ${items.length} fichier(s) téléchargé(s)`, 'success');
-    log(`✓ flushDlQueue : ${items.length} fichier(s)`);
   }
-
 
   /* ═══════════════════════════════════════════════════════════
      SAUVEGARDE
@@ -1695,8 +1689,7 @@
       <div id="lsControls">
         <button class="ls-btn ls-btn-green off" id="lsQueueBtn">▶ File auto</button>
         <button class="ls-btn ls-btn-grey"      id="lsNowBtn">⬇ Piste actuelle</button>
-        <button class="ls-btn ls-btn-grey off"  id="lsFlushBtn">💾 Télécharger</button>
-        <button class="ls-btn ls-btn-grey"      id="lsCopyLogBtn">📋 Log</button>
+        <button class="ls-btn ls-btn-grey"      id="lsCopyLogBtn">📋 Copier log</button>
       </div>
     `;
     document.body.appendChild(uiPanel);
@@ -1722,7 +1715,6 @@
     };
     document.getElementById('lsNowBtn').onclick   = forceCurrentTrack;
     document.getElementById('lsQueueBtn').onclick = toggleQueueMode;
-    document.getElementById('lsFlushBtn').onclick  = flushDlQueue;
 
     document.getElementById('lsCbWord').onchange  = e => { CONFIG.preferWordSync        = e.target.checked; };
     document.getElementById('lsCbDedup').onchange = e => { CONFIG.deduplicateByTrackId  = e.target.checked; };
@@ -1798,17 +1790,6 @@
     if (uiCountEl) uiCountEl.textContent = state.totalSaved;
     const ml = document.getElementById('lsModeLabel');
     if (ml) ml.textContent = state.queueMode ? 'File' : 'Manuel';
-    uiUpdateDlBadge();
-  }
-
-  function uiUpdateDlBadge() {
-    const btn = document.getElementById('lsFlushBtn');
-    if (!btn) return;
-    const n = state.dlQueue.length;
-    btn.textContent = n > 0 ? `💾 Télécharger (${n})` : '💾 Télécharger';
-    btn.classList.toggle('ls-btn-green', n > 0);
-    btn.classList.toggle('off',          n === 0);
-    btn.classList.toggle('ls-btn-grey',  n === 0);
   }
 
   /* ═══════════════════════════════════════════════════════════
