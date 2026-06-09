@@ -724,43 +724,37 @@
   ═══════════════════════════════════════════════════════════ */
   async function triggerDownload(blob, filename) {
     const url = URL.createObjectURL(blob);
-    const mimeType = blob.type;
 
-    // Vérification de la disponibilité de l'API File System Access
-    if (window.showSaveFilePicker) {
+    // Vérification que l'API chrome.downloads est disponible
+    if (chrome && chrome.downloads && chrome.downloads.download) {
         try {
-            // On affiche la boîte de dialogue "Enregistrer sous" de manière native.
-            // Le handle représente l'endroit où l'utilisateur choisit de sauvegarder.
-            const handle = await window.showSaveFilePicker({
-                suggestedName: filename,
-                types: [{
-                    description: 'Fichier JSON',
-                    accept: { 'application/json': ['.json'] }
-                }],
+            // On demande à l'API de télécharger le fichier
+            chrome.downloads.download({
+                url: url,
+                filename: filename, // Suggestion du nom de fichier
+                saveAs: true // On force l'affichage de la boîte de dialogue
+            }, (downloadId) => {
+                if (chrome.runtime.lastError) {
+                    console.error("Erreur chrome.downloads :", chrome.runtime.lastError);
+                    // Fallback vers la méthode classique
+                    fallbackDownload(blob, filename);
+                } else {
+                    console.log(`Téléchargement démarré avec l'ID : ${downloadId}`);
+                    URL.revokeObjectURL(url);
+                }
             });
-            
-            // On crée un flux d'écriture vers le fichier choisi.
-            const writable = await handle.createWritable();
-            // On écrit le contenu de notre blob dans le flux.
-            await writable.write(blob);
-            // On ferme le flux, ce qui sauvegarde le fichier.
-            await writable.close();
-            
-            console.log(`✅ Fichier sauvegardé automatiquement : ${filename}`);
-            // On nettoie l'URL créée pour libérer la mémoire.
-            URL.revokeObjectURL(url);
-            return; // On sort de la fonction, car le téléchargement est fait.
         } catch (err) {
-            // Si l'utilisateur annule la boîte de dialogue, on attrape l'erreur
-            if (err.name !== 'AbortError') {
-                console.error("Erreur lors de l'utilisation de showSaveFilePicker :", err);
-            }
-            // On continue vers la méthode de secours en cas d'erreur.
+            console.error("Exception avec chrome.downloads :", err);
+            fallbackDownload(blob, filename);
         }
+    } else {
+        // Si l'API n'est pas disponible, on utilise la méthode classique
+        fallbackDownload(blob, filename);
     }
+}
 
-    // --- METHODE DE SECOURS (garde-fou) ---
-    console.warn("L'API File System Access n'est pas disponible ou a échoué. Utilisation de la méthode de secours.");
+function fallbackDownload(blob, filename) {
+    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = filename;
