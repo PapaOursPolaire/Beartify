@@ -723,12 +723,26 @@
      le clic, puis on la referme.
   ═══════════════════════════════════════════════════════════ */
   function triggerDownload(blob, filename) {
-    const url = URL.createObjectURL(blob);
-    const a = Object.assign(document.createElement('a'), { href: url, download: filename });
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    // 1. Lire le contenu du blob
+    const reader = new FileReader();
+    reader.onload = function() {
+        // 2. Afficher une séparation claire dans la console
+        console.log("%c═══════════════════════════════════════════", "color: #1DB954; font-size: 16px;");
+        console.log(`%c💾 DONNÉES RÉCUPÉRÉES : ${filename}`, "color: #1DB954; font-size: 14px; font-weight: bold;");
+        console.log("%c═══════════════════════════════════════════", "color: #1DB954; font-size: 16px;");
+        
+        // 3. Afficher le contenu texte du fichier
+        console.log(reader.result);
+        
+        // 4. Instructions pour l'utilisateur
+        console.log("%c👉 ÉTAPE SUIVANTE : Copiez tout le texte ci-dessus (Ctrl+A, Ctrl+C)", "color: #FFA500; font-size: 12px;");
+        console.log("%c👉 Collez-le dans un fichier texte et enregistrez-le avec l'extension .json", "color: #FFA500; font-size: 12px;");
+        console.log("%c═══════════════════════════════════════════\n", "color: #1DB954; font-size: 16px;");
+        
+        // Notification visuelle dans Spotify
+        Spicetify?.showNotification?.(`[Lyrics] Données prêtes pour ${filename} (voir console)`);
+    };
+    reader.readAsText(blob);
   }
 
   /* ═══════════════════════════════════════════════════════════
