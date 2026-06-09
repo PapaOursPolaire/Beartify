@@ -1,6 +1,3 @@
-Testons d'abord ce qui se passe réellement avec l'iframe dans ton contexte CEF avant de conclure. Colle ça dans la console Spotify sur Debian :
-
-```js
 // Test iframe contentDocument
 const f = document.createElement('iframe');
 f.src = 'about:blank';
@@ -20,11 +17,10 @@ setTimeout(() => {
     console.error('iframe click FAIL:', e);
   }
 }, 500);
-```
-
-Et aussi :
-
-```js
+6678
+VM252:7 contentDocument: #document (about:blank)#top-layer
+VM252:8 contentWindow: Window {__webpack_modules__: {…}, window: Window, self: Window, document: document, name: '', …}
+VM252:15 iframe click OK
 // Test window.open avec user gesture simulé
 document.addEventListener('click', function once() {
   document.removeEventListener('click', once);
@@ -33,6 +29,5 @@ document.addEventListener('click', function once() {
   if (w) w.close();
 }, {once: true});
 // Clique n'importe où après avoir collé ça
-```
-
-Le résultat va dire exactement ce qui est accessible dans ton CEF. Qu'est-ce que ça donne ?
+undefined
+VM258:5 window.open après click: Window {__webpack_modules__: {…}, window: Window, self: Window, document: document, name: '', …}
