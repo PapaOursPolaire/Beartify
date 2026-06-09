@@ -1,4 +1,4 @@
-// spotify-lyrics-saver.js — v22 — Compatible Spicy-Lyrics v6+
+// spotify-lyrics-saver.js — v23 — Compatible Spicy-Lyrics v6+
 // Fix : support du nouveau format encodé api.spicylyrics.org/query (POST)
 //       → décodeur SpicyLyrics v6 (pool + instructions) → Content[] standard
 //       + fetch forceCurrentTrack corrigé GET→POST avec body v6
@@ -722,48 +722,35 @@
      TÉLÉCHARGEMENT
      Stratégie en cascade, du plus fiable au moins fiable :
 
-     1. showSaveFilePicker (File System Access API) — ouvre la boîte
-        de dialogue native du système, aucune restriction de user
-        gesture répété, fonctionne identiquement sur Linux et Windows.
-        Disponible dans CEF >= Chromium 86. Inconvénient : dialogue
-        modal à chaque piste (acceptable en mode queue).
 
-     2. a.click() direct — fonctionne pour le PREMIER téléchargement
-        sur tous les builds CEF. Bloqué à partir du second sur CEF
-        Linux (builds récents Chromium 120+).
 
-     3. window.open('about:blank') + a.click() dans la popup — ancien
-        contournement CEF Linux (v15). Peut être bloqué si le popup
-        blocker est actif ou si le build CEF est trop récent.
 
-     triggerDownload est async ; saveLyrics l'awaite pour que
-     state.totalSaved++ soit incrémenté après le DL effectif.
+
+
+
+
+
+
+
+
+
+
+
+
+
+  ═══════════════════════════════════════════════════════════ */
+  /* ═══════════════════════════════════════════════════════════
+     TÉLÉCHARGEMENT
+     CEF Linux (KDE) : a.click() répété bloqué à partir du 2e DL
+     (builds Chromium 120+). Contournement : popup about:blank avec
+     délai de fermeture suffisant (3s) pour que le download manager
+     CEF enregistre le téléchargement avant que la popup disparaisse.
+     Sur Windows, a.click() répété fonctionne sans restriction.
   ═══════════════════════════════════════════════════════════ */
   async function triggerDownload(blob, filename) {
-    // ── Stratégie 1 : showSaveFilePicker ─────────────────────────────────────
-    if (typeof window.showSaveFilePicker === 'function') {
-      try {
-        const handle = await window.showSaveFilePicker({
-          suggestedName: filename,
-          types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }],
-        });
-        const writable = await handle.createWritable();
-        await writable.write(blob);
-        await writable.close();
-        log('✓ showSaveFilePicker — fichier écrit');
-        return;
-      } catch (e) {
-        // AbortError = utilisateur a annulé → silencieux
-        if (e?.name === 'AbortError') { log('showSaveFilePicker annulé'); return; }
-        // Autre erreur (SecurityError, NotAllowedError…) → fallback
-        log('showSaveFilePicker échoué, fallback a.click() :', e?.name, e?.message);
-      }
-    }
-
-    // ── Stratégie 2 : a.click() direct ───────────────────────────────────────
-    // Fonctionne sans restriction pour le premier DL sur tous les builds CEF.
-    // Bloqué à partir du second sur CEF Linux récent (Chromium 120+).
     const url = URL.createObjectURL(blob);
+
+    // ── Premier téléchargement : a.click() direct ─────────────────────────────
     if (state.totalSaved === 0) {
       const a = Object.assign(document.createElement('a'), { href: url, download: filename });
       document.body.appendChild(a);
@@ -773,7 +760,9 @@
       return;
     }
 
-    // ── Stratégie 3 : popup about:blank (contournement CEF Linux v15) ─────────
+    // ── Téléchargements suivants : popup about:blank ───────────────────────────
+    // Délai de fermeture à 3000ms (vs 300ms en v15) pour laisser le download
+    // manager CEF enregistrer le DL avant la fermeture de la popup.
     const w = window.open('about:blank');
     if (w) {
       try {
@@ -782,10 +771,11 @@
         a.download = filename;
         w.document.body.appendChild(a);
         a.click();
-        setTimeout(() => { try { w.close(); } catch {} URL.revokeObjectURL(url); }, 300);
+        setTimeout(() => { try { w.close(); } catch {} URL.revokeObjectURL(url); }, 3000);
       } catch (e) {
         log('popup about:blank échouée :', e?.message);
         try { w.close(); } catch {}
+        // Fallback a.click() contexte principal (peut être ignoré par CEF Linux)
         const a = Object.assign(document.createElement('a'), { href: url, download: filename });
         document.body.appendChild(a);
         a.click();
@@ -793,8 +783,8 @@
         setTimeout(() => URL.revokeObjectURL(url), 60_000);
       }
     } else {
-      // Popup bloquée → dernier recours a.click() contexte principal
-      log('window.open bloqué — dernier recours a.click()');
+      // window.open bloqué → a.click() contexte principal
+      log('window.open bloqué — fallback a.click()');
       const a = Object.assign(document.createElement('a'), { href: url, download: filename });
       document.body.appendChild(a);
       a.click();
