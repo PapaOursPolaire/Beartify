@@ -87,15 +87,36 @@ step "Création de $INSTALL_DIR"
 mkdir -p "$INSTALL_DIR"
 ok "Dossier : $INSTALL_DIR"
 
-# ── 4. Copie de drm.js ────────────────────────────────────────────────
-step "Déploiement de drm.js"
-# drm.js doit être dans le même dossier que ce script
+# ── 4. Copie de drm.js + extensions.js ───────────────────────────────
+step "Déploiement de drm.js + extensions.js"
+# Les deux fichiers doivent être dans le même dossier que ce script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if [[ -f "$SCRIPT_DIR/drm.js" ]]; then
   cp "$SCRIPT_DIR/drm.js" "$INSTALL_DIR/drm.js"
   ok "drm.js copié depuis $SCRIPT_DIR"
 else
   fail "drm.js introuvable dans $SCRIPT_DIR — copier drm.js à côté de deploy-drm.sh"
+fi
+if [[ -f "$SCRIPT_DIR/extensions.js" ]]; then
+  cp "$SCRIPT_DIR/extensions.js" "$INSTALL_DIR/extensions.js"
+  ok "extensions.js copié depuis $SCRIPT_DIR"
+else
+  fail "extensions.js introuvable dans $SCRIPT_DIR — copier extensions.js à côté de deploy-drm.sh"
+fi
+
+# ── 4b. Dossier extensions/ ──────────────────────────────────────────
+step "Déploiement du dossier extensions/"
+# Créer la structure de sous-dossiers
+mkdir -p "$INSTALL_DIR/extensions/Extensions"
+mkdir -p "$INSTALL_DIR/extensions/Themes"
+mkdir -p "$INSTALL_DIR/extensions/Snippets"
+mkdir -p "$INSTALL_DIR/extensions/Integrations"
+# Copier les extensions existantes si présentes dans le dossier source
+if [[ -d "$SCRIPT_DIR/extensions" ]]; then
+  cp -r "$SCRIPT_DIR/extensions/." "$INSTALL_DIR/extensions/"
+  ok "Contenu de extensions/ copié"
+else
+  ok "Dossier extensions/ créé vide (ajouter les extensions manuellement dans $INSTALL_DIR/extensions/)"
 fi
 
 # ── 5. package.json ───────────────────────────────────────────────────
