@@ -18,3 +18,8 @@ try {
 } catch(e) {
   console.error('IDB prototype patch FAIL:', e);
 }
+
+VM108:5 IDBRequest brand check OK
+VM108:11 chrome.downloads: undefined
+VM108:17 IDB prototype patch OK
+undefined
