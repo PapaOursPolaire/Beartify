@@ -1,4 +1,4 @@
-// spotify-lyrics-saver.js — v23 — Compatible Spicy-Lyrics v6+
+// spotify-lyrics-saver.js — v24 — Compatible Spicy-Lyrics v6+
 // Fix : support du nouveau format encodé api.spicylyrics.org/query (POST)
 //       → décodeur SpicyLyrics v6 (pool + instructions) → Content[] standard
 //       + fetch forceCurrentTrack corrigé GET→POST avec body v6
@@ -59,6 +59,7 @@
     trackSeenAt    : {},
     idbCacheGhosted    : false,  // quand true : IDB reads retournent vide → force re-fetch
     _idbReadFromOurCode: false,  // flag pour exclure nos propres lectures de readFromIDB
+    dlQueue        : [],   // { blob, filename } accumulés, vidés sur user gesture
   };
 
   /* ═══════════════════════════════════════════════════════════
@@ -720,78 +721,43 @@
 
   /* ═══════════════════════════════════════════════════════════
      TÉLÉCHARGEMENT
-     Stratégie en cascade, du plus fiable au moins fiable :
+     CEF Linux (KDE) : a.click() programmatique bloqué après le 1er DL.
+     a.click() depuis un vrai user gesture (onclick bouton) ne l'est pas.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+     Stratégie : triggerDownload() n'émet plus aucun a.click() automatique.
+     Il enfile simplement le { blob, filename } dans state.dlQueue.
+     L'UI met à jour le badge du bouton "💾 Télécharger (N)".
+     Quand l'utilisateur clique ce bouton (= vrai gesture), flushDlQueue()
+     émet un a.click() par fichier en attente — tous acceptés par CEF.
+     Sur Windows, les deux chemins fonctionnent (pas de restriction).
   ═══════════════════════════════════════════════════════════ */
-  /* ═══════════════════════════════════════════════════════════
-     TÉLÉCHARGEMENT
-     CEF Linux (KDE) : a.click() répété bloqué à partir du 2e DL
-     (builds Chromium 120+). Contournement : popup about:blank avec
-     délai de fermeture suffisant (3s) pour que le download manager
-     CEF enregistre le téléchargement avant que la popup disparaisse.
-     Sur Windows, a.click() répété fonctionne sans restriction.
-  ═══════════════════════════════════════════════════════════ */
-  async function triggerDownload(blob, filename) {
-    const url = URL.createObjectURL(blob);
+  function triggerDownload(blob, filename) {
+    state.dlQueue.push({ blob, filename });
+    uiUpdateDlBadge();
+    log(`📥 En queue : ${filename} (total : ${state.dlQueue.length})`);
+  }
 
-    // ── Premier téléchargement : a.click() direct ─────────────────────────────
-    if (state.totalSaved === 0) {
-      const a = Object.assign(document.createElement('a'), { href: url, download: filename });
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  /** Vide la dlQueue en émettant un a.click() par fichier.
+   *  Doit être appelé depuis un vrai user gesture (onclick). */
+  function flushDlQueue() {
+    if (!state.dlQueue.length) {
+      uiAddLog('ℹ Queue vide', 'info');
       return;
     }
-
-    // ── Téléchargements suivants : popup about:blank ───────────────────────────
-    // Délai de fermeture à 3000ms (vs 300ms en v15) pour laisser le download
-    // manager CEF enregistrer le DL avant la fermeture de la popup.
-    const w = window.open('about:blank');
-    if (w) {
-      try {
-        const a = w.document.createElement('a');
-        a.href     = url;
-        a.download = filename;
-        w.document.body.appendChild(a);
-        a.click();
-        setTimeout(() => { try { w.close(); } catch {} URL.revokeObjectURL(url); }, 3000);
-      } catch (e) {
-        log('popup about:blank échouée :', e?.message);
-        try { w.close(); } catch {}
-        // Fallback a.click() contexte principal (peut être ignoré par CEF Linux)
-        const a = Object.assign(document.createElement('a'), { href: url, download: filename });
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(url), 60_000);
-      }
-    } else {
-      // window.open bloqué → a.click() contexte principal
-      log('window.open bloqué — fallback a.click()');
-      const a = Object.assign(document.createElement('a'), { href: url, download: filename });
+    const items = state.dlQueue.splice(0);
+    uiUpdateDlBadge();
+    for (const { blob, filename } of items) {
+      const url = URL.createObjectURL(blob);
+      const a   = Object.assign(document.createElement('a'), { href: url, download: filename });
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(url), 60_000);
     }
+    uiAddLog(`✓ ${items.length} fichier(s) téléchargé(s)`, 'success');
+    log(`✓ flushDlQueue : ${items.length} fichier(s)`);
   }
+
 
   /* ═══════════════════════════════════════════════════════════
      SAUVEGARDE
@@ -836,7 +802,7 @@
 
     const filename = `${sanitize(trackInfo.artistName)} - ${sanitize(trackInfo.trackName)}.json`;
     const blob     = new Blob([JSON.stringify(output, null, 2)], { type: 'application/json' });
-    await triggerDownload(blob, filename);
+    triggerDownload(blob, filename);
 
     state.savedTrackIds.add(trackInfo.trackId);
     // Enregistrer le score de qualité pour permettre le remplacement par une meilleure version
@@ -1729,7 +1695,8 @@
       <div id="lsControls">
         <button class="ls-btn ls-btn-green off" id="lsQueueBtn">▶ File auto</button>
         <button class="ls-btn ls-btn-grey"      id="lsNowBtn">⬇ Piste actuelle</button>
-        <button class="ls-btn ls-btn-grey"      id="lsCopyLogBtn">📋 Copier log</button>
+        <button class="ls-btn ls-btn-grey off"  id="lsFlushBtn">💾 Télécharger</button>
+        <button class="ls-btn ls-btn-grey"      id="lsCopyLogBtn">📋 Log</button>
       </div>
     `;
     document.body.appendChild(uiPanel);
@@ -1755,6 +1722,7 @@
     };
     document.getElementById('lsNowBtn').onclick   = forceCurrentTrack;
     document.getElementById('lsQueueBtn').onclick = toggleQueueMode;
+    document.getElementById('lsFlushBtn').onclick  = flushDlQueue;
 
     document.getElementById('lsCbWord').onchange  = e => { CONFIG.preferWordSync        = e.target.checked; };
     document.getElementById('lsCbDedup').onchange = e => { CONFIG.deduplicateByTrackId  = e.target.checked; };
@@ -1830,6 +1798,17 @@
     if (uiCountEl) uiCountEl.textContent = state.totalSaved;
     const ml = document.getElementById('lsModeLabel');
     if (ml) ml.textContent = state.queueMode ? 'File' : 'Manuel';
+    uiUpdateDlBadge();
+  }
+
+  function uiUpdateDlBadge() {
+    const btn = document.getElementById('lsFlushBtn');
+    if (!btn) return;
+    const n = state.dlQueue.length;
+    btn.textContent = n > 0 ? `💾 Télécharger (${n})` : '💾 Télécharger';
+    btn.classList.toggle('ls-btn-green', n > 0);
+    btn.classList.toggle('off',          n === 0);
+    btn.classList.toggle('ls-btn-grey',  n === 0);
   }
 
   /* ═══════════════════════════════════════════════════════════
