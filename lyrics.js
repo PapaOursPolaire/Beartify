@@ -1,4 +1,4 @@
-// spotify-lyrics-saver.js — v22 — Compatible Spicy-Lyrics v6+
+// spotify-lyrics-saver.js — v21 — Compatible Spicy-Lyrics v6+
 // Fix : support du nouveau format encodé api.spicylyrics.org/query (POST)
 //       → décodeur SpicyLyrics v6 (pool + instructions) → Content[] standard
 //       + fetch forceCurrentTrack corrigé GET→POST avec body v6
@@ -19,9 +19,6 @@
 //               appels saveLineFallback dans processPayload : condition provider==='spotify' supprimée → bestRaw passé systématiquement
 //       + v21 : suppression complète de saveLineFallback — saveLyrics télécharge déjà le .json normal pour les pistes LINE ;
 //               le polling fallback (aucune parole après timeout) appelle forceCurrentTrack() au lieu de saveLineFallback
-//       + v22 : triggerDownload — popup about:blank pré-ouverte au démarrage (initDlPopup) pour contourner
-//               le blocage window.open() programmatique de CEF Linux récent ; document.open/write pour
-//               recycler le contexte à chaque DL sans rouvrir la fenêtre.
 
 (function () {
   'use strict';
@@ -59,7 +56,6 @@
     trackSeenAt    : {},
     idbCacheGhosted    : false,  // quand true : IDB reads retournent vide → force re-fetch
     _idbReadFromOurCode: false,  // flag pour exclure nos propres lectures de readFromIDB
-    dlPopup        : null,   // popup about:blank pré-ouverte pour les DL suivants (CEF Linux)
   };
 
   /* ═══════════════════════════════════════════════════════════
@@ -722,86 +718,19 @@
   /* ═══════════════════════════════════════════════════════════
      TÉLÉCHARGEMENT
      CEF Linux (KDE) n'accepte qu'un seul a.click() par contexte
-     de page. Pour les téléchargements suivants, on réutilise une
-     popup about:blank ouverte une seule fois au démarrage
-     (initDlPopup), avant que CEF ne bloque window.open().
-     La popup reste ouverte en permanence ; on y réécrit le
-     document avant chaque téléchargement pour contourner la
-     restriction same-origin sur les blob: URLs.
+     de page. Pour les téléchargements suivants, on ouvre une
+     popup about:blank (nouveau contexte CEF) et on y déclenche
+     le clic, puis on la referme.
   ═══════════════════════════════════════════════════════════ */
-
-  /** Ouvre la popup de téléchargement au démarrage (contexte frais,
-   *  window.open() accepté). Appelé une seule fois depuis activateAll(). */
-  function initDlPopup() {
-    try {
-      state.dlPopup = window.open('about:blank', '_lsDlPopup',
-        'width=1,height=1,left=-100,top=-100,toolbar=no,menubar=no,status=no');
-      if (state.dlPopup) {
-        log('✓ Popup DL pré-ouverte');
-      } else {
-        log('⚠ Popup DL : window.open retourné null au démarrage');
-      }
-    } catch (e) {
-      log('⚠ initDlPopup erreur :', e);
-    }
-  }
-
   function triggerDownload(blob, filename) {
     const url = URL.createObjectURL(blob);
-
-    // Premier téléchargement ou Windows : a.click() direct dans le contexte principal
-    if (state.totalSaved === 0) {
-      const a = Object.assign(document.createElement('a'), { href: url, download: filename });
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 60_000);
-      return;
-    }
-
-    // Téléchargements suivants : réutiliser la popup pré-ouverte
-    const w = state.dlPopup;
-    if (w && !w.closed) {
-      try {
-        // Réécrire le document pour obtenir un contexte "frais" dans la même fenêtre
-        w.document.open();
-        w.document.write('<!DOCTYPE html><html><body></body></html>');
-        w.document.close();
-        const a = w.document.createElement('a');
-        a.href     = url;
-        a.download = filename;
-        w.document.body.appendChild(a);
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(url), 60_000);
-        return;
-      } catch (e) {
-        log('Popup DL write échouée :', e?.message);
-      }
-    }
-
-    // Fallback : tenter une nouvelle popup (peut être bloqué)
-    log('⚠ Popup DL fermée ou invalide — tentative window.open()');
-    const w2 = window.open('about:blank', '_lsDlPopup',
-      'width=1,height=1,left=-100,top=-100,toolbar=no,menubar=no,status=no');
-    if (w2) {
-      state.dlPopup = w2;
-      try {
-        const a = w2.document.createElement('a');
-        a.href     = url;
-        a.download = filename;
-        w2.document.body.appendChild(a);
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(url), 60_000);
-      } catch (e) { log('Fallback popup échouée :', e?.message); }
-    } else {
-      // Dernier recours : contexte principal
-      log('⚠ window.open bloqué — dernier recours a.click() contexte principal');
-      const a = Object.assign(document.createElement('a'), { href: url, download: filename });
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 60_000);
-    }
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
   }
 
   /* ═══════════════════════════════════════════════════════════
@@ -2048,7 +1977,6 @@
     state.interceptActive = true;
     uiSetStatus('active');
     uiAddLog('IDB writes + fetch + XHR + events + polling activés', 'success');
-    initDlPopup();
     Spicetify?.showNotification?.('[LyricsSaver] Extension prête ✓');
     log('✓ Toutes les méthodes d\'interception actives (IDB prioritaire)');
   }
