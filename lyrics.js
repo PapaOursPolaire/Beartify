@@ -722,28 +722,53 @@
      popup about:blank (nouveau contexte CEF) et on y déclenche
      le clic, puis on la referme.
   ═══════════════════════════════════════════════════════════ */
-  function triggerDownload(blob, filename) {
-    // 1. Lire le contenu du blob
-    const reader = new FileReader();
-    reader.onload = function() {
-        // 2. Afficher une séparation claire dans la console
-        console.log("%c═══════════════════════════════════════════", "color: #1DB954; font-size: 16px;");
-        console.log(`%c💾 DONNÉES RÉCUPÉRÉES : ${filename}`, "color: #1DB954; font-size: 14px; font-weight: bold;");
-        console.log("%c═══════════════════════════════════════════", "color: #1DB954; font-size: 16px;");
-        
-        // 3. Afficher le contenu texte du fichier
-        console.log(reader.result);
-        
-        // 4. Instructions pour l'utilisateur
-        console.log("%c👉 ÉTAPE SUIVANTE : Copiez tout le texte ci-dessus (Ctrl+A, Ctrl+C)", "color: #FFA500; font-size: 12px;");
-        console.log("%c👉 Collez-le dans un fichier texte et enregistrez-le avec l'extension .json", "color: #FFA500; font-size: 12px;");
-        console.log("%c═══════════════════════════════════════════\n", "color: #1DB954; font-size: 16px;");
-        
-        // Notification visuelle dans Spotify
-        Spicetify?.showNotification?.(`[Lyrics] Données prêtes pour ${filename} (voir console)`);
-    };
-    reader.readAsText(blob);
-  }
+  async function triggerDownload(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const mimeType = blob.type;
+
+    // Vérification de la disponibilité de l'API File System Access
+    if (window.showSaveFilePicker) {
+        try {
+            // On affiche la boîte de dialogue "Enregistrer sous" de manière native.
+            // Le handle représente l'endroit où l'utilisateur choisit de sauvegarder.
+            const handle = await window.showSaveFilePicker({
+                suggestedName: filename,
+                types: [{
+                    description: 'Fichier JSON',
+                    accept: { 'application/json': ['.json'] }
+                }],
+            });
+            
+            // On crée un flux d'écriture vers le fichier choisi.
+            const writable = await handle.createWritable();
+            // On écrit le contenu de notre blob dans le flux.
+            await writable.write(blob);
+            // On ferme le flux, ce qui sauvegarde le fichier.
+            await writable.close();
+            
+            console.log(`✅ Fichier sauvegardé automatiquement : ${filename}`);
+            // On nettoie l'URL créée pour libérer la mémoire.
+            URL.revokeObjectURL(url);
+            return; // On sort de la fonction, car le téléchargement est fait.
+        } catch (err) {
+            // Si l'utilisateur annule la boîte de dialogue, on attrape l'erreur
+            if (err.name !== 'AbortError') {
+                console.error("Erreur lors de l'utilisation de showSaveFilePicker :", err);
+            }
+            // On continue vers la méthode de secours en cas d'erreur.
+        }
+    }
+
+    // --- METHODE DE SECOURS (garde-fou) ---
+    console.warn("L'API File System Access n'est pas disponible ou a échoué. Utilisation de la méthode de secours.");
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
 
   /* ═══════════════════════════════════════════════════════════
      SAUVEGARDE
