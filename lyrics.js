@@ -718,9 +718,10 @@
   /* ═══════════════════════════════════════════════════════════
      TÉLÉCHARGEMENT
      CEF Linux (KDE) n'accepte qu'un seul a.click() par contexte
-     de page. Pour les téléchargements suivants, on ouvre une
-     popup about:blank (nouveau contexte CEF) et on y déclenche
-     le clic, puis on la referme.
+     de page. Pour les téléchargements suivants, on crée un iframe
+     caché (nouveau contexte CEF sans window.open) et on y déclenche
+     le clic via dispatchEvent(MouseEvent), plus robuste que .click()
+     synthétique sur les builds récents de Chromium/CEF.
   ═══════════════════════════════════════════════════════════ */
   function triggerDownload(blob, filename) {
     const url = URL.createObjectURL(blob);
@@ -728,28 +729,35 @@
       // Premier téléchargement : contexte principal, fonctionne partout
       const a = Object.assign(document.createElement('a'), { href: url, download: filename });
       document.body.appendChild(a);
-      a.click();
+      a.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
       document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(url), 60_000);
     } else {
-      // Téléchargements suivants : popup pour contourner la limite CEF Linux
-      const w = window.open('about:blank');
-      if (!w) {
-        // Popup bloquée — fallback sur le contexte principal
+      // Téléchargements suivants : iframe caché pour nouveau contexte CEF
+      // (window.open('about:blank') bloqué par CSP/CEF sans user gesture)
+      const iframe = document.createElement('iframe');
+      iframe.style.cssText = 'position:fixed;width:0;height:0;border:0;opacity:0;pointer-events:none';
+      document.body.appendChild(iframe);
+      try {
+        const doc = iframe.contentDocument || iframe.contentWindow?.document;
+        if (!doc) throw new Error('iframe doc inaccessible');
+        const a = doc.createElement('a');
+        a.href     = url;
+        a.download = filename;
+        doc.body.appendChild(a);
+        a.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+      } catch (err) {
+        log('iframe DL échoué, fallback contexte principal:', err);
+        // Fallback : contexte principal (peut être bloqué sur certains builds CEF)
         const a = Object.assign(document.createElement('a'), { href: url, download: filename });
         document.body.appendChild(a);
-        a.click();
+        a.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
         document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(url), 60_000);
-        return;
       }
-      const a = w.document.createElement('a');
-      a.href  = url;
-      a.download = filename;
-      w.document.body.appendChild(a);
-      a.click();
-      // Fermer la popup dès que le téléchargement a démarré (300ms suffisent)
-      setTimeout(() => { try { w.close(); } catch {} URL.revokeObjectURL(url); }, 300);
+      setTimeout(() => {
+        try { document.body.removeChild(iframe); } catch {}
+        URL.revokeObjectURL(url);
+      }, 60_000);
     }
   }
 
