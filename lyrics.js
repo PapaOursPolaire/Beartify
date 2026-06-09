@@ -1,4 +1,4 @@
-// spotify-lyrics-saver.js — v21 — Compatible Spicy-Lyrics v6+
+// spotify-lyrics-saver.js — v22 — Compatible Spicy-Lyrics v6+
 // Fix : support du nouveau format encodé api.spicylyrics.org/query (POST)
 //       → décodeur SpicyLyrics v6 (pool + instructions) → Content[] standard
 //       + fetch forceCurrentTrack corrigé GET→POST avec body v6
@@ -19,6 +19,8 @@
 //               appels saveLineFallback dans processPayload : condition provider==='spotify' supprimée → bestRaw passé systématiquement
 //       + v21 : suppression complète de saveLineFallback — saveLyrics télécharge déjà le .json normal pour les pistes LINE ;
 //               le polling fallback (aucune parole après timeout) appelle forceCurrentTrack() au lieu de saveLineFallback
+//       + v22 : triggerDownload — data: URI via FileReader au lieu de blob: URL + window.open().
+//               Contourne le blocage CEF Linux (transient activation) sur les téléchargements programmatiques répétés.
 
 (function () {
   'use strict';
@@ -717,45 +719,28 @@
 
   /* ═══════════════════════════════════════════════════════════
      TÉLÉCHARGEMENT
-     CEF Linux : window.open('about:blank') est bloqué sans
-     user gesture depuis Chromium récent. Solution : une iframe
-     jetable injectée dans le DOM — même isolation de contexte
-     qu'une popup, sans passer par le bloqueur de popups.
-     Une iframe neuve par téléchargement (pas de réutilisation)
-     pour garantir un contentDocument propre à chaque fois.
+     CEF Linux (KDE) n'accepte qu'un seul a.click() par contexte
+     de page. Pour les téléchargements suivants, on ouvre une
+     popup about:blank (nouveau contexte CEF) et on y déclenche
+     le clic, puis on la referme.
   ═══════════════════════════════════════════════════════════ */
   function triggerDownload(blob, filename) {
-    const url = URL.createObjectURL(blob);
-
-    const f = document.createElement('iframe');
-    f.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;border:none;left:-9999px;';
-    f.src = 'about:blank';
-
-    f.onload = () => {
-      try {
-        const doc = f.contentDocument || f.contentWindow?.document;
-        if (!doc) throw new Error('contentDocument inaccessible');
-        const a = doc.createElement('a');
-        a.href     = url;
-        a.download = filename;
-        doc.body.appendChild(a);
-        a.click();
-      } catch (e) {
-        log('iframe DL échoué, fallback contexte principal:', e);
-        // Fallback ultime — fonctionne au moins pour la toute première piste
-        const a = Object.assign(document.createElement('a'), { href: url, download: filename });
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      } finally {
-        setTimeout(() => {
-          URL.revokeObjectURL(url);
-          try { document.body.removeChild(f); } catch {}
-        }, 60_000);
-      }
+    // Convertir le blob en data: URI — contourne les restrictions CEF Linux sur
+    // blob: URLs et window.open() programmatique (transient activation durci
+    // dans les builds Chromium/CEF récents embarqués par Spotify).
+    // FileReader.onload est un callback asynchrone mais son exécution
+    // reste dans le contexte de la page → a.click() accepté par CEF.
+    const reader = new FileReader();
+    reader.onload = function () {
+      const a = Object.assign(document.createElement('a'), {
+        href    : reader.result,   // data:application/json;base64,…
+        download: filename,
+      });
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     };
-
-    document.body.appendChild(f);
+    reader.readAsDataURL(blob);
   }
 
   /* ═══════════════════════════════════════════════════════════
