@@ -151,12 +151,12 @@ async function _buildManifests() {
       const previewUrl  = `/api/extensions/file?url=${encodeURIComponent(rawPreview)}`;
 
       results.push({
-        id:          `${cat.dir}/${name}`,
+        id:          cfg.id || `${cat.dir}/${name}`,  // cfg.id prioritaire sur le chemin dossier
         category:    cat.dir,
         type:        cat.type,
         folderName:  name,
         source:      'github',
-        rawBase:     `${RAW_BASE}/${cat.dir}/${name}`,  // pour le téléchargement Tauri
+        rawBase:     `${RAW_BASE}/${cat.dir}/${name}`,
         name:        cfg.name        || name,
         author:      cfg.author      || '—',
         version:     cfg.version     || '0.0.1',
@@ -243,8 +243,9 @@ module.exports = function registerExtensionRoutes(app) {
         res.send(body);
       }
     } catch (err) {
-      console.warn('[extensions] /api/extensions/file error:', err.message);
-      res.status(502).json({ error: 'Fichier introuvable', detail: err.message });
+      const status = err.message.includes('404') ? 404 : 502;
+      console.warn(`[extensions] /api/extensions/file ${status}:`, err.message);
+      res.status(status).json({ error: 'Fichier introuvable', detail: err.message });
     }
   });
 
