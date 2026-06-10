@@ -1,378 +1,444 @@
-#!/usr/bin/env bash
-# ══════════════════════════════════════════════════════════════════════
-#  BEARTIFY — deploy-drm.sh  (HLS + AES-128 + Honeypot)
-#
-#  Usage :
-#   sudo bash deploy-drm.sh
-#   sudo bash deploy-drm.sh --jellyfin-token <TOKEN>
-#   sudo bash deploy-drm.sh --honeypot-audio /path/to/audio.mp3
-#   sudo bash deploy-drm.sh --reinstall
-# ══════════════════════════════════════════════════════════════════════
-set -euo pipefail
+#!/usr/bin/env python3
+"""
+music-orga-auto.py
+---------------------
+Réorganise et nettoie automatiquement une bibliothèque musicale Jellyfin.
 
-RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
-BLUE='\033[0;34m'; CYAN='\033[0;36m'; BOLD='\033[1m'; NC='\033[0m'
-ok()   { echo -e "${GREEN}✅  $*${NC}"; }
-info() { echo -e "${CYAN}ℹ️   $*${NC}"; }
-warn() { echo -e "${YELLOW}⚠️   $*${NC}"; }
-fail() { echo -e "${RED}❌  $*${NC}"; exit 1; }
-step() { echo -e "\n${BOLD}${BLUE}▶ $*${NC}"; }
+FONCTIONNALITÉS :
+  1. FUSION    – Déplace tous les fichiers audio vers Artiste/Album/ selon
+                 leur tag ALBUM embarqué (traite aussi les sous-sous-dossiers).
+  2. NETTOYAGE – Supprime les fichiers superflus détectés par leur nom :
+                 remix, live, acoustic, extended, bonus, slowed, reverb, etc.
+  3. PURGE     – Supprime les dossiers vides après le nettoyage.
+  4. CRON      – Peut tourner en arrière-plan de façon planifiée.
 
-INSTALL_DIR="/opt/beartify-drm"
-SERVICE_NAME="beartify-drm"
-SERVICE_USER="www-data"
-DRM_PORT="3001"
-JELLYFIN_HOST="127.0.0.1"
-JELLYFIN_PORT="8096"
-JELLYFIN_TOKEN="aaa8a7df4b364cf7bcc76f351d768798"
-HONEYPOT_AUDIO=""
-HONEYPOT_EVERY="3"
-REINSTALL=false
+UTILISATION :
+  # Simulation complète (rien n'est modifié) :
+  python3 music-orga-auto.py /home/papaours/Musique --dry-run
 
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    --jellyfin-token)  JELLYFIN_TOKEN="$2";  shift 2 ;;
-    --jellyfin-host)   JELLYFIN_HOST="$2";   shift 2 ;;
-    --jellyfin-port)   JELLYFIN_PORT="$2";   shift 2 ;;
-    --port)            DRM_PORT="$2";         shift 2 ;;
-    --honeypot-audio)  HONEYPOT_AUDIO="$2";  shift 2 ;;
-    --honeypot-every)  HONEYPOT_EVERY="$2";  shift 2 ;;
-    --reinstall)       REINSTALL=true;        shift   ;;
-    *) warn "Argument inconnu : $1"; shift ;;
-  esac
-done
+  # Fusion seule (sans supprimer les remixes) :
+  python3 music-orga-auto.py /home/papaours/Musique --no-delete
 
-echo -e "\n${BOLD}${CYAN}╔══════════════════════════════════════════════════════╗"
-echo -e "║   BEARTIFY DRM — HLS + AES-128 + Honeypot            ║"
-echo -e "╚══════════════════════════════════════════════════════╝${NC}\n"
+  # Exécution réelle + rapport :
+  python3 music-orga-auto.py /home/papaours/Musique --log /var/log/music-orga.log
 
-# ── 0. Root ───────────────────────────────────────────────────────────
-step "Vérification des permissions"
-[[ $EUID -eq 0 ]] || fail "Exécuter avec sudo."
-ok "Exécution en root"
+  # Installer le cron (tâche quotidienne à 03h00) :
+  python3 music-orga-auto.py /home/papaours/Musique --install-cron
 
-# ── 1. Prérequis ──────────────────────────────────────────────────────
-step "Vérification des prérequis"
-command -v node     >/dev/null 2>&1 || fail "Node.js requis : curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && apt install -y nodejs"
-command -v npm      >/dev/null 2>&1 || fail "npm requis"
-command -v ffmpeg   >/dev/null 2>&1 || fail "ffmpeg requis : apt install -y ffmpeg"
-command -v systemctl>/dev/null 2>&1 || fail "systemd requis"
+OPTIONS :
+  --dry-run         Simule tout sans toucher aux fichiers
+  --no-delete       Fusionne uniquement, ne supprime rien
+  --log FICHIER     Rapport (défaut : rapport_organisation.log)
+  --install-cron    Installe une tâche cron quotidienne (03h00)
+  --remove-cron     Supprime la tâche cron installée
+  --patterns FICH   Fichier JSON de patterns personnalisés (optionnel)
+"""
 
-NODE_MAJOR=$(node --version | sed 's/v//' | cut -d. -f1)
-[[ $NODE_MAJOR -ge 18 ]] || fail "Node.js >= 18 requis (actuel : $(node --version))"
+import os
+import sys
+import json
+import shutil
+import argparse
+import unicodedata
+import re
+import subprocess
+import logging
+from datetime import datetime
+from pathlib import Path
 
-ok "Node.js $(node --version)"
-ok "npm $(npm --version)"
-ok "ffmpeg $(ffmpeg -version 2>&1 | head -1 | cut -d' ' -f3)"
+try:
+    from mutagen import File as MutagenFile
+except ImportError:
+    print("❌  La bibliothèque 'mutagen' est requise : pip install mutagen")
+    sys.exit(1)
 
-# ── 2. Réinstallation propre ──────────────────────────────────────────
-if $REINSTALL && [[ -d "$INSTALL_DIR" ]]; then
-  step "Réinstallation propre"
-  systemctl stop    "$SERVICE_NAME" 2>/dev/null || true
-  systemctl disable "$SERVICE_NAME" 2>/dev/null || true
-  rm -rf "$INSTALL_DIR"
-  rm -f  "/etc/systemd/system/${SERVICE_NAME}.service"
-  systemctl daemon-reload
-  ok "Ancienne installation supprimée"
-fi
 
-# ── 3. Dossier d'installation ─────────────────────────────────────────
-step "Création de $INSTALL_DIR"
-mkdir -p "$INSTALL_DIR"
-ok "Dossier : $INSTALL_DIR"
+# ---------------------------------------------------------------------------
+# PATTERNS DE SUPPRESSION (insensible à la casse)
+# Appliqués sur le NOM DU FICHIER (sans extension)
+# ---------------------------------------------------------------------------
+DEFAULT_DELETE_PATTERNS: list[str] = [
+    # Remixes
+    r'\bremix\b',
+    r'\bremixed\b',
+    r'\brmx\b',
+    r'\bedit\b',           # radio edit, club edit…
+    r'\bvip mix\b',
+    r'\bvip\b',
+    r'\brework\b',
+    r'\bflip\b',
+    r'\bbootleg\b',
+    r'\bmashup\b',
 
-# ── 4. Écriture de drm.js ─────────────────────────────────────────────
-step "Écriture de drm.js"
-cat > "$INSTALL_DIR/drm.js" << 'DRMEOF'
-'use strict';
-require('dotenv').config();
-const express   = require('express');
-const http      = require('http');
-const crypto    = require('crypto');
-const path      = require('path');
-const fs        = require('fs');
-const os        = require('os');
-const { spawn } = require('child_process');
+    # Versions live / concert
+    r'\blive\b',
+    r'\bconcert\b',
+    r'\bin concert\b',
+    r'\bunplugged\b',
+    r'\bsession\b',        # BBC session, live session…
 
-const PORT           = parseInt(process.env.PORT          || '3001', 10);
-const JELLYFIN_HOST  = process.env.JELLYFIN_HOST          || '127.0.0.1';
-const JELLYFIN_PORT  = parseInt(process.env.JELLYFIN_PORT || '8096', 10);
-const JELLYFIN_TOKEN = process.env.JELLYFIN_TOKEN         || '';
-const SESSION_SECRET = process.env.SESSION_SECRET;
-const HONEYPOT_AUDIO = process.env.HONEYPOT_AUDIO         || null;
-const HONEYPOT_EVERY = parseInt(process.env.HONEYPOT_EVERY || '3', 10);
+    # Versions alternatives
+    r'\bacoustic\b',
+    r'\binstrumental\b',
+    r'\bkaraoke\b',
+    r'\ba cappella\b',
+    r'\bacapella\b',
 
-if (!SESSION_SECRET) { console.error('❌ SESSION_SECRET manquant'); process.exit(1); }
+    # Extended / short
+    r'\bextended\b',
+    r'\bclub mix\b',
+    r'\bradio mix\b',
+    r'\bradio version\b',
+    r'\bshort version\b',
 
-const sessions = new Map();
-let _fakeSegPath = null;
+    # Effets audio
+    r'\bslowed\b',
+    r'\breverb\b',
+    r'\bsped[\s\-]?up\b',
+    r'\bnightcore\b',
+    r'\blofi\b',
+    r'\blo[\s\-]fi\b',
 
-function clientIp(req) {
-  return (req.headers['x-real-ip'] || req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || '').replace(/^::ffff:/, '');
-}
-function generateToken(itemId, ip, expiresAt) {
-  const sig = crypto.createHmac('sha256', SESSION_SECRET).update(`${itemId}|${ip}|${expiresAt}`).digest('hex');
-  return `${expiresAt}.${sig}`;
-}
-function validateSession(token, itemId, req) {
-  const s = sessions.get(token);
-  if (!s) return null;
-  if (Date.now() > s.expiresAt) { sessions.delete(token); return null; }
-  if (s.itemId !== itemId || s.ip !== clientIp(req)) return null;
-  return s;
-}
+    # Bonus / interlude
+    r'\bbonus\b',
+    r'\binterlude\b',
+    r'\bskit\b',
+    r'\boutro\b',
+    r'\bintro\b',          # attention : peut être un vrai titre → voir --patterns
 
-function generateFakeSegment() {
-  return new Promise((resolve) => {
-    const outPath = path.join(os.tmpdir(), 'beartify-honeypot.ts');
-    const inputArgs = HONEYPOT_AUDIO ? ['-i', HONEYPOT_AUDIO, '-t', '4'] : ['-f', 'lavfi', '-i', 'sine=frequency=440:duration=4'];
-    const ff = spawn('ffmpeg', [...inputArgs, '-c:a', 'aac', '-b:a', '32k', '-f', 'mpegts', '-y', outPath], { stdio: 'ignore' });
-    ff.on('close', (c) => { if (c === 0) { _fakeSegPath = outPath; console.log('✅ Honeypot généré'); } resolve(); });
-    ff.on('error', () => resolve());
-  });
-}
+    # Rééditions
+    r'\br[eé]édition\b',
+    r'\breissue\b',
+    r'\bdeluxe\b',         # "Deluxe Edition" contient souvent des bonus
+    r'\banniversary\b',
+]
 
-function startTranscode(itemId, token, tempDir, bitrate) {
-  const sess = sessions.get(token);
-  if (!sess) return;
-  const jellyUrl = `http://${JELLYFIN_HOST}:${JELLYFIN_PORT}/Audio/${itemId}/stream?static=true&api_key=${JELLYFIN_TOKEN}`;
-  const args = ['-i', jellyUrl, '-vn', '-c:a', 'aac', '-b:a', bitrate ? `${Math.floor(bitrate/1000)}k` : '192k', '-hls_time', '4', '-hls_list_size', '0', '-hls_key_info_file', path.join(tempDir, 'key.keyinfo'), '-hls_segment_filename', path.join(tempDir, 'seg%03d.ts'), '-hls_flags', 'independent_segments', '-y', path.join(tempDir, 'playlist.m3u8')];
-  const ff = spawn('ffmpeg', args, { stdio: 'ignore' });
-  ff.on('close', (c) => { const s = sessions.get(token); if (s) { s.ready = c === 0; s.ffmpegError = c !== 0 ? `exit ${c}` : null; } });
-  ff.on('error', (e) => { const s = sessions.get(token); if (s) s.ffmpegError = e.message; });
-}
+AUDIO_EXTENSIONS = {'.flac', '.mp3', '.m4a', '.ogg', '.opus', '.aac', '.wav'}
+FORBIDDEN_CHARS   = r'[<>:"/\\|?*\x00-\x1f]'
+CRON_MARKER       = "# music-orga-auto"
 
-function buildHoneypotM3u8(rawM3u8, itemId, token, ivHex) {
-  const lines = rawM3u8.split('\n');
-  const out = [];
-  let segIndex = 0;
-  for (let i = 0; i < lines.length; i++) {
-    const t = lines[i].trim();
-    if (t.startsWith('#EXT-X-KEY')) {
-      out.push(`#EXT-X-KEY:METHOD=AES-128,URI="/api/hls/key/${itemId}?s=${encodeURIComponent(token)}",IV=0x${ivHex}`);
-      continue;
-    }
-    if (t.startsWith('#EXTINF')) {
-      if (segIndex > 0 && segIndex % HONEYPOT_EVERY === 0) {
-        out.push(''); out.push('#EXT-X-BEARTIFY-HONEYPOT');
-        out.push('#EXTINF:4.000,'); out.push(`/api/hls/fake/honey_${segIndex}.ts`);
-      }
-      out.push(lines[i]); i++;
-      const segFile = (lines[i] || '').trim();
-      if (segFile) out.push(`/api/hls/segment/${itemId}/${path.basename(segFile)}?s=${encodeURIComponent(token)}`);
-      segIndex++; continue;
-    }
-    out.push(lines[i]);
-  }
-  return out.join('\n');
-}
 
-setInterval(() => {
-  const now = Date.now();
-  for (const [t, s] of sessions) {
-    if (s.expiresAt < now) {
-      sessions.delete(t);
-      if (s.tempDir) try { fs.rmSync(s.tempDir, { recursive: true, force: true }); } catch (_) {}
-    }
-  }
-}, 5 * 60 * 1000);
+# ---------------------------------------------------------------------------
+# Utilitaires
+# ---------------------------------------------------------------------------
 
-const app = express();
+def setup_logging(log_path: Path) -> logging.Logger:
+    log = logging.getLogger("music-orga")
+    log.setLevel(logging.DEBUG)
+    fmt = logging.Formatter("%(asctime)s  %(levelname)-7s  %(message)s",
+                            datefmt="%Y-%m-%d %H:%M:%S")
+    # Console
+    ch = logging.StreamHandler()
+    ch.setFormatter(fmt)
+    log.addHandler(ch)
+    # Fichier (append)
+    fh = logging.FileHandler(log_path, encoding="utf-8")
+    fh.setFormatter(fmt)
+    log.addHandler(fh)
+    return log
 
-app.get('/api/hls/session/:id', async (req, res) => {
-  const itemId = req.params.id;
-  if (!itemId || !/^[a-f0-9]{32}$/i.test(itemId)) return res.status(400).json({ error: 'ID invalide' });
-  const ip = clientIp(req);
-  const bitrate = req.query.bitrate ? parseInt(req.query.bitrate, 10) : null;
-  const key = crypto.randomBytes(16);
-  const iv  = crypto.randomBytes(16);
-  const expiresAt = Date.now() + 30 * 60 * 1000;
-  const token = generateToken(itemId, ip, expiresAt);
-  const safeId = token.replace(/[^a-z0-9]/gi, '').substring(0, 20);
-  const tempDir = path.join(os.tmpdir(), `beartify-${safeId}`);
-  try {
-    await fs.promises.mkdir(tempDir, { recursive: true });
-    await fs.promises.writeFile(path.join(tempDir, 'key.bin'), key);
-    const keyUri  = `/api/hls/key/${itemId}?s=${encodeURIComponent(token)}`;
-    await fs.promises.writeFile(path.join(tempDir, 'key.keyinfo'), `${keyUri}\n${path.join(tempDir, 'key.bin')}\n${iv.toString('hex')}`);
-    sessions.set(token, { itemId, key, iv: iv.toString('hex'), ip, expiresAt, tempDir, ready: false, ffmpegError: null });
-    startTranscode(itemId, token, tempDir, bitrate);
-    res.setHeader('Cache-Control', 'no-store');
-    res.json({ sessionToken: token });
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
 
-app.get('/api/hls/key/:id', (req, res) => {
-  const s = validateSession(req.query.s, req.params.id, req);
-  if (!s) return res.status(401).end();
-  res.setHeader('Content-Type', 'application/octet-stream');
-  res.setHeader('Cache-Control', 'no-store');
-  res.end(s.key);
-});
+def sanitize_name(name: str) -> str:
+    name = unicodedata.normalize("NFC", name)
+    name = re.sub(FORBIDDEN_CHARS, "_", name)
+    name = name.strip(". ")
+    return name or "Album_Inconnu"
 
-app.get('/api/hls/playlist/:id', async (req, res) => {
-  const s = validateSession(req.query.s, req.params.id, req);
-  if (!s) return res.status(401).json({ error: 'Session invalide' });
-  const deadline = Date.now() + 90_000;
-  while (!s.ready && !s.ffmpegError && Date.now() < deadline) await new Promise(r => setTimeout(r, 500));
-  if (!s.ready) return res.status(500).json({ error: s.ffmpegError || 'Timeout — ffmpeg installé ?' });
-  try {
-    const raw = await fs.promises.readFile(path.join(s.tempDir, 'playlist.m3u8'), 'utf8');
-    res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
-    res.setHeader('Cache-Control', 'no-store');
-    res.send(buildHoneypotM3u8(raw, req.params.id, req.query.s, s.iv));
-  } catch { res.status(500).json({ error: 'Playlist indisponible' }); }
-});
 
-app.get('/api/hls/segment/:id/:seg', (req, res) => {
-  const s = validateSession(req.query.s, req.params.id, req);
-  if (!s) return res.status(401).end();
-  const seg = req.params.seg;
-  if (!/^seg\d{3,6}\.ts$/.test(seg)) return res.status(400).end();
-  const segPath = path.join(s.tempDir, seg);
-  if (!fs.existsSync(segPath)) return res.status(404).end();
-  res.setHeader('Content-Type', 'video/mp2t');
-  res.setHeader('Cache-Control', 'no-store, private');
-  fs.createReadStream(segPath).pipe(res);
-});
+def get_album_tag(filepath: Path) -> str | None:
+    try:
+        audio = MutagenFile(filepath, easy=True)
+        if audio is None or audio.tags is None:
+            return None
+        album = audio.tags.get("album") or audio.tags.get("ALBUM")
+        if isinstance(album, list):
+            album = album[0]
+        return str(album).strip() if album else None
+    except Exception:
+        return None
 
-app.get('/api/hls/fake/:seg', (_req, res) => {
-  res.setHeader('Content-Type', 'video/mp2t');
-  res.setHeader('Cache-Control', 'public, max-age=86400');
-  if (_fakeSegPath && fs.existsSync(_fakeSegPath)) fs.createReadStream(_fakeSegPath).pipe(res);
-  else res.end(crypto.randomBytes(188 * 100));
-});
 
-app.get('/health', (_req, res) => res.json({ status: 'ok', sessions: sessions.size, honeypot: !!_fakeSegPath }));
+def is_superfluous(filename: str, patterns: list[str]) -> str | None:
+    """Retourne le pattern correspondant si le fichier est superflus, sinon None."""
+    stem = Path(filename).stem.lower()
+    for pat in patterns:
+        if re.search(pat, stem, re.IGNORECASE):
+            return pat
+    return None
 
-generateFakeSegment().then(() => {
-  app.listen(PORT, '127.0.0.1', () => {
-    console.log(`✅ Beartify DRM Server → 127.0.0.1:${PORT}`);
-    console.log(`   Honeypot : ${_fakeSegPath ? 'son 440Hz' : 'bruit aléatoire'} (1/${HONEYPOT_EVERY} segments)`);
-  });
-});
-DRMEOF
-ok "drm.js écrit"
 
-# ── 5. package.json ───────────────────────────────────────────────────
-step "Écriture de package.json"
-cat > "$INSTALL_DIR/package.json" << PKGEOF
-{
-  "name": "beartify-drm",
-  "version": "3.0.0",
-  "description": "HLS + AES-128 + Honeypot DRM Server for Beartify",
-  "main": "drm.js",
-  "scripts": { "start": "node drm.js", "dev": "node --watch drm.js" },
-  "dependencies": { "express": "^4.19.2", "dotenv": "^16.4.5" }
-}
-PKGEOF
-ok "package.json écrit"
+def remove_empty_dirs(root: Path, log: logging.Logger, dry_run: bool):
+    """Supprime récursivement les dossiers vides sous root (sauf root lui-même)."""
+    removed = 0
+    # On parcourt de bas en haut
+    for dirpath in sorted(root.rglob("*"), key=lambda p: len(p.parts), reverse=True):
+        if not dirpath.is_dir() or dirpath == root:
+            continue
+        try:
+            contents = list(dirpath.iterdir())
+        except PermissionError:
+            continue
+        if not contents:
+            if dry_run:
+                log.info(f"[SIMUL] Dossier vide supprimé : {dirpath}")
+            else:
+                dirpath.rmdir()
+                log.info(f"🗑️  Dossier vide supprimé : {dirpath}")
+            removed += 1
+    return removed
 
-# ── 6. .env ───────────────────────────────────────────────────────────
-step "Configuration .env"
-ENV_FILE="$INSTALL_DIR/.env"
-if [[ -f "$ENV_FILE" ]]; then
-  OLD_SECRET=$(grep '^SESSION_SECRET=' "$ENV_FILE" | cut -d= -f2- || true)
-  if [[ -n "$OLD_SECRET" && "$OLD_SECRET" != "CHANGE_ME" ]]; then
-    SESSION_SECRET_VAL="$OLD_SECRET"; warn "SESSION_SECRET conservé"
-  else
-    SESSION_SECRET_VAL=$(node -e "console.log(require('crypto').randomBytes(64).toString('hex'))")
-    info "Nouveau SESSION_SECRET généré"
-  fi
-else
-  SESSION_SECRET_VAL=$(node -e "console.log(require('crypto').randomBytes(64).toString('hex'))")
-  info "SESSION_SECRET généré"
-fi
 
-HONEYPOT_LINE=""
-[[ -n "$HONEYPOT_AUDIO" ]] && HONEYPOT_LINE="HONEYPOT_AUDIO=${HONEYPOT_AUDIO}"
+# ---------------------------------------------------------------------------
+# Logique principale
+# ---------------------------------------------------------------------------
 
-cat > "$ENV_FILE" << ENVEOF
-# BEARTIFY DRM — généré par deploy-drm.sh — NE PAS COMMITTER
-SESSION_SECRET=${SESSION_SECRET_VAL}
-JELLYFIN_HOST=${JELLYFIN_HOST}
-JELLYFIN_PORT=${JELLYFIN_PORT}
-JELLYFIN_TOKEN=${JELLYFIN_TOKEN}
-PORT=${DRM_PORT}
-HONEYPOT_EVERY=${HONEYPOT_EVERY}
-${HONEYPOT_LINE}
-ENVEOF
+def collect_audio_files(music_root: Path) -> list[Path]:
+    """Collecte tous les fichiers audio dans tous les sous-dossiers d'artistes."""
+    files = []
+    for artist_dir in sorted(music_root.iterdir()):
+        if not artist_dir.is_dir():
+            continue
+        for item in sorted(artist_dir.rglob("*")):
+            if item.is_file() and item.suffix.lower() in AUDIO_EXTENSIONS:
+                files.append(item)
+    return files
 
-chmod 600 "$ENV_FILE"
-ok ".env créé (chmod 600)"
 
-# ── 7. npm install ────────────────────────────────────────────────────
-step "Installation des dépendances npm"
-cd "$INSTALL_DIR" && npm install --omit=dev --silent
-ok "express + dotenv installés"
+def run(music_root: Path, dry_run: bool, no_delete: bool,
+        patterns: list[str], log: logging.Logger) -> dict:
 
-# ── 8. Permissions ────────────────────────────────────────────────────
-step "Permissions"
-chown -R "$SERVICE_USER":"$SERVICE_USER" "$INSTALL_DIR" 2>/dev/null \
-  || warn "Utilisateur $SERVICE_USER introuvable (non bloquant)"
-chmod 750 "$INSTALL_DIR"
-ok "Permissions : $SERVICE_USER"
+    music_root = music_root.resolve()
+    log.info(f"{'[SIMULATION]' if dry_run else '[EXÉCUTION]'}  Racine : {music_root}")
 
-# ── 9. Service systemd ────────────────────────────────────────────────
-step "Service systemd $SERVICE_NAME"
-cat > "/etc/systemd/system/${SERVICE_NAME}.service" << SVCEOF
-[Unit]
-Description=Beartify HLS DRM Stream Server
-After=network.target jellyfin.service
-Wants=jellyfin.service
+    all_files = collect_audio_files(music_root)
+    log.info(f"Fichiers audio trouvés : {len(all_files)}")
 
-[Service]
-Type=simple
-User=${SERVICE_USER}
-WorkingDirectory=${INSTALL_DIR}
-ExecStart=$(command -v node) ${INSTALL_DIR}/drm.js
-EnvironmentFile=${INSTALL_DIR}/.env
-Restart=always
-RestartSec=5
-StandardOutput=journal
-StandardError=journal
-SyslogIdentifier=beartify-drm
-NoNewPrivileges=true
-PrivateTmp=true
-ProtectSystem=strict
-ReadWritePaths=${INSTALL_DIR} /tmp
+    stats = dict(found=len(all_files), deleted=0, merged=0,
+                 skipped_no_album=0, skipped_collision=0, errors=0,
+                 empty_dirs=0)
 
-[Install]
-WantedBy=multi-user.target
-SVCEOF
+    deleted_files   = []
+    merged_files    = []
+    no_album_files  = []
+    collision_files = []
+    error_files     = []
 
-systemctl daemon-reload
+    # ── Étape 1 : suppression des fichiers superflus ──────────────────────
+    if not no_delete:
+        log.info("── Étape 1 : détection et suppression des fichiers superflus ──")
+        for filepath in all_files[:]:          # copie pour itérer en supprimant
+            matched = is_superfluous(filepath.name, patterns)
+            if matched:
+                if dry_run:
+                    log.info(f"  [SIMUL] SUPPR  {filepath.relative_to(music_root)}"
+                             f"  (pattern: {matched})")
+                else:
+                    try:
+                        filepath.unlink()
+                        log.info(f"  🗑️  {filepath.relative_to(music_root)}")
+                    except Exception as e:
+                        log.error(f"  ❌ {filepath.name} : {e}")
+                        error_files.append((filepath, str(e)))
+                        stats["errors"] += 1
+                        continue
+                deleted_files.append(filepath)
+                stats["deleted"] += 1
+                all_files.remove(filepath)
+    else:
+        log.info("── Étape 1 : suppression désactivée (--no-delete) ──")
 
-if systemctl is-active --quiet "$SERVICE_NAME" 2>/dev/null; then
-  systemctl restart "$SERVICE_NAME"; ok "Service redémarré"
-else
-  systemctl enable "$SERVICE_NAME"; systemctl start "$SERVICE_NAME"; ok "Service activé et démarré"
-fi
+    # ── Étape 2 : fusion par tag ALBUM ────────────────────────────────────
+    log.info("── Étape 2 : fusion des fichiers par tag ALBUM ──")
+    for filepath in all_files:
+        # Fichier encore présent ?
+        if not filepath.exists():
+            continue
 
-# ── 10. Healthcheck ───────────────────────────────────────────────────
-step "Vérification du serveur"
-echo -n "   Attente"
-for i in $(seq 1 12); do
-  sleep 1; echo -n "."
-  if curl -sf "http://127.0.0.1:${DRM_PORT}/health" >/dev/null 2>&1; then
-    echo ""
-    ok "Serveur DRM actif : $(curl -s http://127.0.0.1:${DRM_PORT}/health)"
-    break
-  fi
-  [[ $i -eq 12 ]] && { echo ""; warn "Pas de réponse — vérifier : journalctl -u $SERVICE_NAME -n 30"; }
-done
+        artist_dir = filepath.parts[len(music_root.parts)]   # nom du dossier artiste
+        artist_path = music_root / artist_dir
+        album = get_album_tag(filepath)
 
-# ── Résumé ────────────────────────────────────────────────────────────
-echo -e "\n${BOLD}${GREEN}══════════════════════════════════════════════════════${NC}"
-echo -e "${BOLD}${GREEN}  Déploiement terminé !                               ${NC}"
-echo -e "${BOLD}${GREEN}══════════════════════════════════════════════════════${NC}\n"
-echo -e "  📁 Dossier     : $INSTALL_DIR"
-echo -e "  🔐 .env        : $ENV_FILE  (chmod 600)"
-echo -e "  ⚙️  Service     : $SERVICE_NAME  (auto-démarrage ON)"
-echo -e "  🌐 Port        : 127.0.0.1:$DRM_PORT"
-echo -e "  🎵 Honeypot    : 1 segment faux tous les $HONEYPOT_EVERY vrais\n"
-echo -e "${BOLD}Commandes utiles :${NC}"
-echo -e "  journalctl -u $SERVICE_NAME -f"
-echo -e "  curl http://127.0.0.1:$DRM_PORT/health\n"
-echo -e "${BOLD}${YELLOW}⚠️  Étape Caddy :${NC}"
-echo -e "  caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy\n"
+        if not album:
+            no_album_files.append(filepath)
+            stats["skipped_no_album"] += 1
+            continue
+
+        album_dir_name = sanitize_name(album)
+        dest_dir  = artist_path / album_dir_name
+        dest_file = dest_dir / filepath.name
+
+        # Déjà au bon endroit ?
+        if filepath.parent == dest_dir:
+            continue
+
+        # Collision
+        if dest_file.exists():
+            collision_files.append((filepath, dest_file))
+            stats["skipped_collision"] += 1
+            continue
+
+        if dry_run:
+            log.info(f"  [SIMUL] FUSION  {filepath.relative_to(music_root)}"
+                     f"\n               → {dest_file.relative_to(music_root)}")
+        else:
+            try:
+                dest_dir.mkdir(parents=True, exist_ok=True)
+                shutil.move(str(filepath), str(dest_file))
+                merged_files.append((filepath, dest_file))
+                stats["merged"] += 1
+                log.info(f"  ✅ {filepath.name}  →  {album_dir_name}/")
+            except Exception as e:
+                error_files.append((filepath, str(e)))
+                stats["errors"] += 1
+                log.error(f"  ❌ {filepath.name} : {e}")
+
+    # ── Étape 3 : purge des dossiers vides ────────────────────────────────
+    log.info("── Étape 3 : suppression des dossiers vides ──")
+    stats["empty_dirs"] = remove_empty_dirs(music_root, log, dry_run)
+
+    # ── Rapport final ─────────────────────────────────────────────────────
+    sep = "=" * 60
+    log.info(sep)
+    log.info("RAPPORT FINAL")
+    log.info(f"  Fichiers trouvés      : {stats['found']}")
+    log.info(f"  Supprimés (superflus) : {stats['deleted']}"
+             + (" (simulation)" if dry_run else ""))
+    log.info(f"  Fusionnés (album)     : {stats['merged']}"
+             + (" (simulation)" if dry_run else ""))
+    log.info(f"  Sans tag ALBUM        : {stats['skipped_no_album']}")
+    log.info(f"  Collisions ignorées   : {stats['skipped_collision']}")
+    log.info(f"  Dossiers vides purgés : {stats['empty_dirs']}")
+    log.info(f"  Erreurs               : {stats['errors']}")
+
+    if no_album_files:
+        log.info("  Fichiers sans tag ALBUM :")
+        for f in no_album_files:
+            log.info(f"    {f.relative_to(music_root)}")
+
+    if collision_files:
+        log.info("  Collisions (ignorées) :")
+        for src, dst in collision_files:
+            log.info(f"    {src.relative_to(music_root)}  →  {dst.relative_to(music_root)}")
+
+    log.info(sep)
+    return stats
+
+
+# ---------------------------------------------------------------------------
+# Gestion du cron
+# ---------------------------------------------------------------------------
+
+def get_cron_line(script_path: str, music_root: str, log_path: str) -> str:
+    python = sys.executable
+    # Tous les jours à 03h00
+    return (f"0 3 * * *  {python} {script_path} {music_root} "
+            f"--log {log_path}  {CRON_MARKER}")
+
+
+def install_cron(script_path: str, music_root: str, log_path: str):
+    line = get_cron_line(script_path, music_root, log_path)
+    try:
+        existing = subprocess.check_output(["crontab", "-l"],
+                                           stderr=subprocess.DEVNULL).decode()
+    except subprocess.CalledProcessError:
+        existing = ""
+
+    if CRON_MARKER in existing:
+        print("⚠️  Une tâche cron music-orga-auto est déjà installée.")
+        print("   Utilisez --remove-cron pour la supprimer d'abord.")
+        return
+
+    new_crontab = existing.rstrip("\n") + "\n" + line + "\n"
+    proc = subprocess.run(["crontab", "-"], input=new_crontab.encode(), check=True)
+    print(f"✅ Tâche cron installée (quotidien 03h00) :")
+    print(f"   {line}")
+
+
+def remove_cron():
+    try:
+        existing = subprocess.check_output(["crontab", "-l"],
+                                           stderr=subprocess.DEVNULL).decode()
+    except subprocess.CalledProcessError:
+        print("Aucun crontab existant.")
+        return
+
+    lines = [l for l in existing.splitlines() if CRON_MARKER not in l]
+    new_crontab = "\n".join(lines) + "\n"
+    subprocess.run(["crontab", "-"], input=new_crontab.encode(), check=True)
+    print("✅ Tâche cron music-orga-auto supprimée.")
+
+
+# ---------------------------------------------------------------------------
+# Entrée principale
+# ---------------------------------------------------------------------------
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Réorganise et nettoie automatiquement une bibliothèque musicale."
+    )
+    parser.add_argument("music_root", type=Path,
+                        help="Dossier racine de la musique")
+    parser.add_argument("--dry-run", action="store_true",
+                        help="Simule sans modifier les fichiers")
+    parser.add_argument("--no-delete", action="store_true",
+                        help="Fusionne uniquement, ne supprime pas les superflus")
+    parser.add_argument("--log", type=Path,
+                        default=Path("rapport_organisation.log"),
+                        help="Fichier de log (défaut : rapport_organisation.log)")
+    parser.add_argument("--patterns", type=Path, default=None,
+                        help="Fichier JSON de patterns de suppression personnalisés")
+    parser.add_argument("--install-cron", action="store_true",
+                        help="Installe une tâche cron quotidienne (03h00)")
+    parser.add_argument("--remove-cron", action="store_true",
+                        help="Supprime la tâche cron installée")
+    args = parser.parse_args()
+
+    # ── Actions cron ──────────────────────────────────────────────────────
+    if args.remove_cron:
+        remove_cron()
+        return
+
+    if args.install_cron:
+        install_cron(
+            script_path=str(Path(__file__).resolve()),
+            music_root=str(args.music_root.resolve()),
+            log_path=str(args.log.resolve()),
+        )
+        return
+
+    # ── Vérification du dossier racine ────────────────────────────────────
+    if not args.music_root.is_dir():
+        print(f"❌ Dossier introuvable : {args.music_root}")
+        sys.exit(1)
+
+    # ── Chargement des patterns ───────────────────────────────────────────
+    patterns = DEFAULT_DELETE_PATTERNS[:]
+    if args.patterns:
+        try:
+            with open(args.patterns, encoding="utf-8") as f:
+                custom = json.load(f)
+            if isinstance(custom, list):
+                patterns = custom
+                print(f"✅ Patterns personnalisés chargés : {args.patterns}")
+            else:
+                print("⚠️  Le fichier de patterns doit être une liste JSON.")
+        except Exception as e:
+            print(f"⚠️  Impossible de lire {args.patterns} : {e}")
+
+    # ── Logging ───────────────────────────────────────────────────────────
+    log = setup_logging(args.log)
+    log.info(f"{'='*60}")
+    log.info(f"music-orga-auto  –  {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+
+    # ── Exécution ─────────────────────────────────────────────────────────
+    run(
+        music_root=args.music_root,
+        dry_run=args.dry_run,
+        no_delete=args.no_delete,
+        patterns=patterns,
+        log=log,
+    )
+
+
+if __name__ == "__main__":
+    main()
