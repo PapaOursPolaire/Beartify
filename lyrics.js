@@ -724,45 +724,44 @@
   ═══════════════════════════════════════════════════════════ */
   function triggerDownload(blob, filename) {
     const url = URL.createObjectURL(blob);
-
-    try {
-      const popup = window.open('', '_blank', 'popup,width=100,height=100');
-
-      if (popup && !popup.closed) {
-        popup.document.body.innerHTML = '';
-
-        const a = popup.document.createElement('a');
-        a.href = url;
-        a.download = filename;
-
-        popup.document.body.appendChild(a);
-
-        setTimeout(() => {
-          try {
-            a.click();
-          } finally {
-            setTimeout(() => {
-              try { popup.close(); } catch {}
-            }, 1000);
-          }
-        }, 50);
-
-        setTimeout(() => URL.revokeObjectURL(url), 60000);
+    if (state.totalSaved === 0) {
+      // Premier téléchargement : contexte principal, fonctionne partout
+      const a = Object.assign(document.createElement('a'), { href: url, download: filename });
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } else {
+      // Téléchargements suivants : popup pour contourner la limite CEF Linux.
+      // Les builds CEF récents ignorent a.click() injecté depuis la page parente
+      // dans une popup about:blank. Solution : écrire une page HTML complète dans
+      // la popup avec un <a download> auto-cliqué via script inline — le download
+      // part alors du contexte de navigation propre de la popup elle-même.
+      const escaped = JSON.stringify(filename);
+      const html = `<!DOCTYPE html><html><body><script>
+        var a = document.createElement('a');
+        a.href = ${JSON.stringify(url)};
+        a.download = ${escaped};
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function(){ window.close(); }, 2000);
+      <\/script></body></html>`;
+      const w = window.open('about:blank', '_blank',
+        'width=400,height=400,left=0,top=0');
+      if (!w) {
+        // Popup bloquée — fallback sur le contexte principal
+        const a = Object.assign(document.createElement('a'), { href: url, download: filename });
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 60_000);
         return;
       }
-    } catch (e) {
-      console.error('Popup download failed:', e);
+      w.document.open();
+      w.document.write(html);
+      w.document.close();
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
     }
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-
-    setTimeout(() => URL.revokeObjectURL(url), 60000);
   }
 
   /* ═══════════════════════════════════════════════════════════
