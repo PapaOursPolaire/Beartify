@@ -725,21 +725,44 @@
   function triggerDownload(blob, filename) {
     const url = URL.createObjectURL(blob);
 
+    try {
+      const popup = window.open('', '_blank', 'popup,width=100,height=100');
+
+      if (popup && !popup.closed) {
+        popup.document.body.innerHTML = '';
+
+        const a = popup.document.createElement('a');
+        a.href = url;
+        a.download = filename;
+
+        popup.document.body.appendChild(a);
+
+        setTimeout(() => {
+          try {
+            a.click();
+          } finally {
+            setTimeout(() => {
+              try { popup.close(); } catch {}
+            }, 1000);
+          }
+        }, 50);
+
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+        return;
+      }
+    } catch (e) {
+      console.error('Popup download failed:', e);
+    }
+
     const a = document.createElement('a');
     a.href = url;
     a.download = filename;
-    a.style.display = 'none';
 
     document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
 
-    requestAnimationFrame(() => {
-      a.click();
-
-      setTimeout(() => {
-        a.remove();
-        URL.revokeObjectURL(url);
-      }, 60000);
-    });
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
   }
 
   /* ═══════════════════════════════════════════════════════════
