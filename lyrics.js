@@ -1,4 +1,4 @@
-// spotify-lyrics-saver.js — v22 — Compatible Spicy-Lyrics v6+
+// spotify-lyrics-saver.js — v21 — Compatible Spicy-Lyrics v6+
 // Fix : support du nouveau format encodé api.spicylyrics.org/query (POST)
 //       → décodeur SpicyLyrics v6 (pool + instructions) → Content[] standard
 //       + fetch forceCurrentTrack corrigé GET→POST avec body v6
@@ -732,22 +732,8 @@
       document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(url), 60_000);
     } else {
-      // Téléchargements suivants : popup pour contourner la limite CEF Linux.
-      // Les builds CEF récents ignorent a.click() injecté depuis la page parente
-      // dans une popup about:blank. Solution : écrire une page HTML complète dans
-      // la popup avec un <a download> auto-cliqué via script inline — le download
-      // part alors du contexte de navigation propre de la popup elle-même.
-      const escaped = JSON.stringify(filename);
-      const html = `<!DOCTYPE html><html><body><script>
-        var a = document.createElement('a');
-        a.href = ${JSON.stringify(url)};
-        a.download = ${escaped};
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(function(){ window.close(); }, 2000);
-      <\/script></body></html>`;
-      const w = window.open('about:blank', '_blank',
-        'width=1,height=1,left=0,top=0');
+      // Téléchargements suivants : popup pour contourner la limite CEF Linux
+      const w = window.open('about:blank');
       if (!w) {
         // Popup bloquée — fallback sur le contexte principal
         const a = Object.assign(document.createElement('a'), { href: url, download: filename });
@@ -757,10 +743,13 @@
         setTimeout(() => URL.revokeObjectURL(url), 60_000);
         return;
       }
-      w.document.open();
-      w.document.write(html);
-      w.document.close();
-      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      const a = w.document.createElement('a');
+      a.href  = url;
+      a.download = filename;
+      w.document.body.appendChild(a);
+      a.click();
+      // Fermer la popup dès que le téléchargement a démarré (300ms suffisent)
+      setTimeout(() => { try { w.close(); } catch {} URL.revokeObjectURL(url); }, 300);
     }
   }
 
