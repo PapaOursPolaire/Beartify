@@ -1,4 +1,4 @@
-// spotify-lyrics-saver.js — v21 — Compatible Spicy-Lyrics v6+
+// spotify-lyrics-saver.js — v22 — Compatible Spicy-Lyrics v6+
 // Fix : support du nouveau format encodé api.spicylyrics.org/query (POST)
 //       → décodeur SpicyLyrics v6 (pool + instructions) → Content[] standard
 //       + fetch forceCurrentTrack corrigé GET→POST avec body v6
@@ -724,33 +724,22 @@
   ═══════════════════════════════════════════════════════════ */
   function triggerDownload(blob, filename) {
     const url = URL.createObjectURL(blob);
-    if (state.totalSaved === 0) {
-      // Premier téléchargement : contexte principal, fonctionne partout
-      const a = Object.assign(document.createElement('a'), { href: url, download: filename });
-      document.body.appendChild(a);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.style.display = 'none';
+
+    document.body.appendChild(a);
+
+    requestAnimationFrame(() => {
       a.click();
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 60_000);
-    } else {
-      // Téléchargements suivants : popup pour contourner la limite CEF Linux
-      const w = window.open('about:blank');
-      if (!w) {
-        // Popup bloquée — fallback sur le contexte principal
-        const a = Object.assign(document.createElement('a'), { href: url, download: filename });
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(url), 60_000);
-        return;
-      }
-      const a = w.document.createElement('a');
-      a.href  = url;
-      a.download = filename;
-      w.document.body.appendChild(a);
-      a.click();
-      // Fermer la popup dès que le téléchargement a démarré (300ms suffisent)
-      setTimeout(() => { try { w.close(); } catch {} URL.revokeObjectURL(url); }, 300);
-    }
+
+      setTimeout(() => {
+        a.remove();
+        URL.revokeObjectURL(url);
+      }, 60000);
+    });
   }
 
   /* ═══════════════════════════════════════════════════════════
