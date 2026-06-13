@@ -19,6 +19,29 @@
 //               appels saveLineFallback dans processPayload : condition provider==='spotify' supprimée → bestRaw passé systématiquement
 //       + v21 : suppression complète de saveLineFallback — saveLyrics télécharge déjà le .json normal pour les pistes LINE ;
 //               le polling fallback (aucune parole après timeout) appelle forceCurrentTrack() au lieu de saveLineFallback
+//      + v22 : autoDetect — ajout du nouveau format LINE encodé v6 (extractAndDecodeV6Query) en plus du format Spotify direct
+// Désactiver temporairement le ghost IDB avant la session :
+//
+//Ouvrez la console navigateur (Ctrl+Shift+I), tapez :
+//
+// SpotifyLyricsSaver.disableGhost();
+/* SOLUTIONS ALTERNATIVES PERMANENTES : 
+
+function triggerDownload(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 1000);
+}
+
+*/
 
 (function () {
   'use strict';
