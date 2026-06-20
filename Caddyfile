@@ -23,29 +23,17 @@
 
 
 # ══════════════════════════════════════════════════════════════════════
-#  SNIPPET — CORS pour Tauri V2
+#  SNIPPET — CORS pour Tauri V2 (Corrigé pour http://tauri.localhost)
 # ══════════════════════════════════════════════════════════════════════
 (cors_tauri) {
-    @origin_ok {
-        header Origin "https://beartify.duckdns.org"
-        header Origin "https://tauri.localhost"
-        header Origin "tauri://localhost"
-        header Origin "http://192.168.0.2"
-        header Origin "http://192.168.0.18"
-    }
+    @origin_ok header Origin ~^(https://beartify\.duckdns\.org|https?://tauri\.localhost|tauri://localhost|http://192\.168\.0\.2|http://192\.168\.0\.18)$
 
     @cors_preflight {
         method OPTIONS
         header Origin *
     }
     handle @cors_preflight {
-        @preflight_ok {
-            header Origin "https://beartify.duckdns.org"
-            header Origin "https://tauri.localhost"
-            header Origin "tauri://localhost"
-            header Origin "http://192.168.0.2"
-            header Origin "http://192.168.0.18"
-        }
+        @preflight_ok header Origin ~^(https://beartify\.duckdns\.org|https?://tauri\.localhost|tauri://localhost|http://192\.168\.0\.2|http://192\.168\.0\.18)$
         header @preflight_ok Access-Control-Allow-Origin  "{http.request.header.Origin}"
         header @preflight_ok Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
         header @preflight_ok Access-Control-Allow-Headers "Content-Type, Authorization, Range, X-Requested-With, Accept, Origin"
@@ -523,7 +511,7 @@ http://192.168.0.2 {
             header_down -Access-Control-Allow-Origin
             header_down -X-Emby-Token
             header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
-            header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
+            header_down Location "http://grizzly-stream.duckdns.org"  "/api/jrizzly-stream.duckdns.org"
             header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
             header_down Location `\?api_key=[^&]*&` `?`
             header_down Location `\?api_key=[^&]*$` ``
