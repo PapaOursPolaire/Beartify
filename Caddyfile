@@ -1,11 +1,5 @@
 # ══════════════════════════════════════════════════════════════════════
-#  BEARTIFY — Caddyfile durci v2
-#  Modifications v2 par rapport à l'original :
-#    • CSP : ajout de cdnjs.cloudflare.com (JSZip VIP download)
-#    • Ajout snippet (lingva_proxy) → /api/translate/* → :3003
-#    • Ajout Content-Disposition:attachment sur /Audio/*/stream?Container=mp3
-#    • Importé dans les 3 blocs Beartify (prod + 2 LAN)
-#  Tout le reste est IDENTIQUE à l'original.
+#  BEARTIFY — Caddyfile durci v2 (Corrigé pour Tauri v2 multiplateforme)
 # ══════════════════════════════════════════════════════════════════════
 
 # ── Options globales ───────────────────────────────────────────────────
@@ -23,7 +17,7 @@
 
 
 # ══════════════════════════════════════════════════════════════════════
-#  SNIPPET — CORS pour Tauri V2 (Corrigé pour http://tauri.localhost)
+#  SNIPPET — CORS pour Tauri V2 (Regex AND/OR fixée pour http://tauri.localhost)
 # ══════════════════════════════════════════════════════════════════════
 (cors_tauri) {
     @origin_ok header Origin ~^(https://beartify\.duckdns\.org|https?://tauri\.localhost|tauri://localhost|http://192\.168\.0\.2|http://192\.168\.0\.18)$
@@ -72,9 +66,7 @@
 
 
 # ══════════════════════════════════════════════════════════════════════
-#  SNIPPET [NOUVEAU v2] — Lingva Translate auto-hébergé (:3003)
-#  Le front appelle /api/translate/api/v1/auto/{lang}/{text}
-#  Caddy strip /api/translate et proxifie vers localhost:3003
+#  SNIPPET — Lingva Translate auto-hébergé (:3003)
 # ══════════════════════════════════════════════════════════════════════
 (lingva_proxy) {
     handle /api/translate/* {
@@ -96,10 +88,7 @@
 
 
 # ══════════════════════════════════════════════════════════════════════
-#  SNIPPET [NOUVEAU v2] — Téléchargement VIP MP3
-#  /api/jellyfin/Audio/{id}/stream?Container=mp3 → forcé en attachment
-#  (Jellyfin stream l'audio transcoded ; sans ce header le navigateur
-#   le lirait en ligne au lieu de le télécharger)
+#  SNIPPET — Téléchargement VIP MP3
 # ══════════════════════════════════════════════════════════════════════
 (download_vip_headers) {
     @mp3_download {
@@ -184,7 +173,10 @@ grizzly-stream.duckdns.org {
 # ──────────────────────────────────────────────────────────────────────
 beartify.duckdns.org {
 
-    import cors_tauri
+    # Forcer l'application du CORS avant l'évaluation des blocs handle d'API
+    route {
+        import cors_tauri
+    }
 
     root * /var/www/html/player
     encode zstd gzip
@@ -196,8 +188,6 @@ beartify.duckdns.org {
         Referrer-Policy           "strict-origin-when-cross-origin"
         Permissions-Policy        "geolocation=(), microphone=(), camera=(), payment=()"
 
-        # [v2] cdnjs.cloudflare.com ajouté pour JSZip (téléchargement VIP)
-        # [v2] lingva.ml + instances Lingva ajoutées pour la traduction des paroles
         Content-Security-Policy "default-src 'self' https://beartify-firebase.firebaseapp.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://discord.com https://lrclib.net https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://apis.google.com https://accounts.google.com https://www.gstatic.com https://lingva.ml https://translate.plausibility.cloud https://lingva.thedaviddelta.com wss://grizzly-stream.duckdns.org https://grizzly-stream.duckdns.org; frame-src 'self' https://beartify-firebase.firebaseapp.com https://accounts.google.com; frame-ancestors 'none';"
 
         -Server
@@ -211,10 +201,10 @@ beartify.duckdns.org {
     # 🔐 HLS DRM
     import drm_routes
 
-    # [NOUVEAU v2] Lingva Translate
+    # Lingva Translate
     import lingva_proxy
 
-    # [NOUVEAU v2] Headers téléchargement VIP MP3
+    # Headers téléchargement VIP MP3
     import download_vip_headers
 
     # PROXY JELLYFIN
@@ -352,7 +342,9 @@ grizzlyfin.duckdns.org {
 # ──────────────────────────────────────────────────────────────────────
 http://192.168.0.18 {
 
-    import cors_tauri
+    route {
+        import cors_tauri
+    }
 
     root * /var/www/html/player
     encode zstd gzip
@@ -473,7 +465,9 @@ http://192.168.0.18 {
 # ──────────────────────────────────────────────────────────────────────
 http://192.168.0.2 {
 
-    import cors_tauri
+    route {
+        import cors_tauri
+    }
 
     root * /var/www/html/player
     encode zstd gzip
@@ -511,7 +505,7 @@ http://192.168.0.2 {
             header_down -Access-Control-Allow-Origin
             header_down -X-Emby-Token
             header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
-            header_down Location "http://grizzly-stream.duckdns.org"  "/api/jrizzly-stream.duckdns.org"
+            header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
             header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
             header_down Location `\?api_key=[^&]*&` `?`
             header_down Location `\?api_key=[^&]*$` ``
