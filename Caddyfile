@@ -1,5 +1,5 @@
 # ══════════════════════════════════════════════════════════════════════
-#  BEARTIFY — Caddyfile durci v2 (Corrigé pour Tauri v2 multiplateforme)
+#  BEARTIFY — Caddyfile durci v2 (Corrigé pour Dev & Double-Slash)
 # ══════════════════════════════════════════════════════════════════════
 
 # ── Options globales ───────────────────────────────────────────────────
@@ -17,7 +17,7 @@
 
 
 # ══════════════════════════════════════════════════════════════════════
-#  SNIPPET — CORS pour Tauri V2 (Inclus le support du mode Dev)
+#  SNIPPET — CORS pour Tauri V2 (Regex compatible Production & Dev Ports)
 # ══════════════════════════════════════════════════════════════════════
 (cors_tauri) {
     @origin_ok header Origin ~^(https://beartify\.duckdns\.org|https?://tauri\.localhost|tauri://localhost|http://192\.168\.0\.2|http://192\.168\.0\.18|http://127\.0\.0\.1:\d+|http://localhost:\d+)$
@@ -173,7 +173,7 @@ grizzly-stream.duckdns.org {
 # ──────────────────────────────────────────────────────────────────────
 beartify.duckdns.org {
 
-    # Forcer l'application du CORS avant l'évaluation des blocs handle d'API
+    # Application séquentielle forcée : correction slash + CORS
     route {
         uri collapse_slash
         import cors_tauri
