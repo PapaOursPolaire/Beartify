@@ -20,16 +20,17 @@
 #  SNIPPET — CORS pour Tauri V2 (Corrigé)
 # ══════════════════════════════════════════════════════════════════════
 (cors_tauri) {
-    # Utilisation d'une regex (~) pour valider si l'Origine correspond à l'une des vôtres
-    @origin_ok header Origin ~^(https://beartify\.duckdns\.org|https?://tauri\.localhost|tauri://localhost|http://192\.168\.0\.(2|18))$
+    # FIX: Utilisation de header_regexp au lieu de "header ~^"
+    @origin_ok header_regexp Origin ^(https://beartify\.duckdns\.org|https?://tauri\.localhost|tauri://localhost|http://192\.168\.0\.(2|18))$
 
     @cors_preflight {
         method OPTIONS
         header Origin *
     }
+    
     handle @cors_preflight {
-        # On applique la même vérification de sécurité pour le Preflight
-        @preflight_ok header Origin ~^(https://beartify\.duckdns\.org|https?://tauri\.localhost|tauri://localhost|http://192\.168\.0\.(2|18))$
+        # FIX: Utilisation de header_regexp ici aussi
+        @preflight_ok header_regexp Origin ^(https://beartify\.duckdns\.org|https?://tauri\.localhost|tauri://localhost|http://192\.168\.0\.(2|18))$
         
         header @preflight_ok Access-Control-Allow-Origin  "{http.request.header.Origin}"
         header @preflight_ok Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
