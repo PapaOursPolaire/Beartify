@@ -1,5 +1,5 @@
 # ══════════════════════════════════════════════════════════════════════
-#  BEARTIFY — Caddyfile durci v2.1 (Syntaxe Regex & Slash corrigée)
+#  BEARTIFY — Caddyfile durci v2.2 (Correction définitive CORS & Regexp)
 # ══════════════════════════════════════════════════════════════════════
 
 # ── Options globales ───────────────────────────────────────────────────
@@ -17,20 +17,21 @@
 
 
 # ══════════════════════════════════════════════════════════════════════
-#  SNIPPET — CORS pour Tauri V2 (Syntaxe header_regexp stricte)
+#  SNIPPET — CORS universel et robuste pour Tauri V2
 # ══════════════════════════════════════════════════════════════════════
 (cors_tauri) {
-    @origin_ok header_regexp tauri_cors Origin ^(https://beartify\.duckdns\.org|https?://tauri\.localhost|tauri://localhost|http://192\.168\.0\.2|http://192\.168\.0\.18|http://127\.0\.0\.1:\d+|http://localhost:\d+)$
+    # Matcher regex : Autorise https/http pour les domaines locaux, distants et ports de dev
+    @origin_ok header_regexp Origin `^(https?://(beartify\.duckdns\.org|tauri\.localhost|192\.168\.0\.2|192\.168\.0\.18|localhost|127\.0\.0\.1)(:\d+)?|tauri://localhost)$`
 
     @cors_preflight {
         method OPTIONS
         header Origin *
     }
     handle @cors_preflight {
-        @preflight_ok header_regexp tauri_preflight Origin ^(https://beartify\.duckdns\.org|https?://tauri\.localhost|tauri://localhost|http://192\.168\.0\.2|http://192\.168\.0\.18|http://127\.0\.0\.1:\d+|http://localhost:\d+)$
+        @preflight_ok header_regexp Origin `^(https?://(beartify\.duckdns\.org|tauri\.localhost|192\.168\.0\.2|192\.168\.0\.18|localhost|127\.0\.0\.1)(:\d+)?|tauri://localhost)$`
         header @preflight_ok Access-Control-Allow-Origin  "{http.request.header.Origin}"
         header @preflight_ok Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
-        header @preflight_ok Access-Control-Allow-Headers "Content-Type, Authorization, Range, X-Requested-With, Accept, Origin"
+        header @preflight_ok Access-Control-Allow-Headers "Content-Type, Authorization, Range, X-Requested-With, Accept, Origin, X-Emby-Token"
         header @preflight_ok Access-Control-Max-Age       "86400"
         header @preflight_ok Vary "Origin"
         respond "" 204
@@ -38,7 +39,7 @@
 
     header @origin_ok Access-Control-Allow-Origin  "{http.request.header.Origin}"
     header @origin_ok Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
-    header @origin_ok Access-Control-Allow-Headers "Content-Type, Authorization, Range, X-Requested-With, Accept, Origin"
+    header @origin_ok Access-Control-Allow-Headers "Content-Type, Authorization, Range, X-Requested-With, Accept, Origin, X-Emby-Token"
     header @origin_ok Access-Control-Expose-Headers "Content-Length, Content-Range, Accept-Ranges"
     header @origin_ok Vary "Origin"
 }
@@ -173,7 +174,7 @@ grizzly-stream.duckdns.org {
 # ──────────────────────────────────────────────────────────────────────
 beartify.duckdns.org {
 
-    # Nettoyage du double slash //api -> /api et application du CORS
+    # Forcer l'application du CORS et le nettoyage des doubles slashes en amont
     route {
         uri replace // /
         import cors_tauri
