@@ -17,21 +17,23 @@
 
 
 # ══════════════════════════════════════════════════════════════════════
-#  SNIPPET — CORS universel et robuste pour Tauri V2
+#  SNIPPET — CORS pour Tauri V2 (Corrigé)
 # ══════════════════════════════════════════════════════════════════════
 (cors_tauri) {
-    # Matcher regex : Autorise https/http pour les domaines locaux, distants et ports de dev
-    @origin_ok header_regexp Origin `^(https?://(beartify\.duckdns\.org|tauri\.localhost|192\.168\.0\.2|192\.168\.0\.18|localhost|127\.0\.0\.1)(:\d+)?|tauri://localhost)$`
+    # Utilisation d'une regex (~) pour valider si l'Origine correspond à l'une des vôtres
+    @origin_ok header Origin ~^(https://beartify\.duckdns\.org|https?://tauri\.localhost|tauri://localhost|http://192\.168\.0\.(2|18))$
 
     @cors_preflight {
         method OPTIONS
         header Origin *
     }
     handle @cors_preflight {
-        @preflight_ok header_regexp Origin `^(https?://(beartify\.duckdns\.org|tauri\.localhost|192\.168\.0\.2|192\.168\.0\.18|localhost|127\.0\.0\.1)(:\d+)?|tauri://localhost)$`
+        # On applique la même vérification de sécurité pour le Preflight
+        @preflight_ok header Origin ~^(https://beartify\.duckdns\.org|https?://tauri\.localhost|tauri://localhost|http://192\.168\.0\.(2|18))$
+        
         header @preflight_ok Access-Control-Allow-Origin  "{http.request.header.Origin}"
         header @preflight_ok Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
-        header @preflight_ok Access-Control-Allow-Headers "Content-Type, Authorization, Range, X-Requested-With, Accept, Origin, X-Emby-Token"
+        header @preflight_ok Access-Control-Allow-Headers "Content-Type, Authorization, Range, X-Requested-With, Accept, Origin"
         header @preflight_ok Access-Control-Max-Age       "86400"
         header @preflight_ok Vary "Origin"
         respond "" 204
@@ -39,11 +41,10 @@
 
     header @origin_ok Access-Control-Allow-Origin  "{http.request.header.Origin}"
     header @origin_ok Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
-    header @origin_ok Access-Control-Allow-Headers "Content-Type, Authorization, Range, X-Requested-With, Accept, Origin, X-Emby-Token"
+    header @origin_ok Access-Control-Allow-Headers "Content-Type, Authorization, Range, X-Requested-With, Accept, Origin"
     header @origin_ok Access-Control-Expose-Headers "Content-Length, Content-Range, Accept-Ranges"
     header @origin_ok Vary "Origin"
 }
-
 
 # ══════════════════════════════════════════════════════════════════════
 #  SNIPPET — Routes HLS/DRM + Marketplace → drm.js (:3001)
