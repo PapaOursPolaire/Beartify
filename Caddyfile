@@ -17,17 +17,17 @@
 
 
 # ══════════════════════════════════════════════════════════════════════
-#  SNIPPET — CORS pour Tauri V2 (Regex AND/OR fixée pour http://tauri.localhost)
+#  SNIPPET — CORS pour Tauri V2 (Inclus le support du mode Dev)
 # ══════════════════════════════════════════════════════════════════════
 (cors_tauri) {
-    @origin_ok header Origin ~^(https://beartify\.duckdns\.org|https?://tauri\.localhost|tauri://localhost|http://192\.168\.0\.2|http://192\.168\.0\.18)$
+    @origin_ok header Origin ~^(https://beartify\.duckdns\.org|https?://tauri\.localhost|tauri://localhost|http://192\.168\.0\.2|http://192\.168\.0\.18|http://127\.0\.0\.1:\d+|http://localhost:\d+)$
 
     @cors_preflight {
         method OPTIONS
         header Origin *
     }
     handle @cors_preflight {
-        @preflight_ok header Origin ~^(https://beartify\.duckdns\.org|https?://tauri\.localhost|tauri://localhost|http://192\.168\.0\.2|http://192\.168\.0\.18)$
+        @preflight_ok header Origin ~^(https://beartify\.duckdns\.org|https?://tauri\.localhost|tauri://localhost|http://192\.168\.0\.2|http://192\.168\.0\.18|http://127\.0\.0\.1:\d+|http://localhost:\d+)$
         header @preflight_ok Access-Control-Allow-Origin  "{http.request.header.Origin}"
         header @preflight_ok Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
         header @preflight_ok Access-Control-Allow-Headers "Content-Type, Authorization, Range, X-Requested-With, Accept, Origin"
@@ -175,6 +175,7 @@ beartify.duckdns.org {
 
     # Forcer l'application du CORS avant l'évaluation des blocs handle d'API
     route {
+        uri collapse_slash
         import cors_tauri
     }
 
@@ -343,6 +344,7 @@ grizzlyfin.duckdns.org {
 http://192.168.0.18 {
 
     route {
+        uri collapse_slash
         import cors_tauri
     }
 
@@ -466,6 +468,7 @@ http://192.168.0.18 {
 http://192.168.0.2 {
 
     route {
+        uri collapse_slash
         import cors_tauri
     }
 
