@@ -20,21 +20,21 @@
 #  SNIPPET — CORS pour Tauri V2 (Corrigé)
 # ══════════════════════════════════════════════════════════════════════
 (cors_tauri) {
-    # FIX: Utilisation de header_regexp au lieu de "header ~^"
-    @origin_ok header_regexp Origin ^(https://beartify\.duckdns\.org|https?://tauri\.localhost|tauri://localhost|http://192\.168\.0\.(2|18))$
+    # CORS dédié à Tauri/local et au domaine de prod
+    @origin_ok header_regexp Origin ^((https?://(?:beartify\.duckdns\.org|tauri\.localhost(?::\d+)?|192\.168\.0\.(?:2|18)(?::\d+)?))|tauri://localhost)$
 
     @cors_preflight {
         method OPTIONS
         header Origin *
     }
-    
+
     handle @cors_preflight {
-        # FIX: Utilisation de header_regexp ici aussi
-        @preflight_ok header_regexp Origin ^(https://beartify\.duckdns\.org|https?://tauri\.localhost|tauri://localhost|http://192\.168\.0\.(2|18))$
-        
+        @preflight_ok header_regexp Origin ^((https?://(?:beartify\.duckdns\.org|tauri\.localhost(?::\d+)?|192\.168\.0\.(?:2|18)(?::\d+)?))|tauri://localhost)$
+
         header @preflight_ok Access-Control-Allow-Origin  "{http.request.header.Origin}"
         header @preflight_ok Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
         header @preflight_ok Access-Control-Allow-Headers "Content-Type, Authorization, Range, X-Requested-With, Accept, Origin"
+        header @preflight_ok Access-Control-Allow-Credentials "true"
         header @preflight_ok Access-Control-Max-Age       "86400"
         header @preflight_ok Vary "Origin"
         respond "" 204
@@ -43,6 +43,7 @@
     header @origin_ok Access-Control-Allow-Origin  "{http.request.header.Origin}"
     header @origin_ok Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
     header @origin_ok Access-Control-Allow-Headers "Content-Type, Authorization, Range, X-Requested-With, Accept, Origin"
+    header @origin_ok Access-Control-Allow-Credentials "true"
     header @origin_ok Access-Control-Expose-Headers "Content-Length, Content-Range, Accept-Ranges"
     header @origin_ok Vary "Origin"
 }
@@ -176,10 +177,10 @@ grizzly-stream.duckdns.org {
 # ──────────────────────────────────────────────────────────────────────
 beartify.duckdns.org {
 
-    # Forcer l'application du CORS et le nettoyage des doubles slashes en amont
+    # Forcer le nettoyage des doubles slashes en amont
+    import cors_tauri
     route {
         uri replace // /
-        import cors_tauri
     }
 
     root * /var/www/html/player
@@ -227,6 +228,10 @@ beartify.duckdns.org {
             header_up  Upgrade           {http.request.header.Upgrade}
 
             header_down -X-Emby-Token
+            header_down Access-Control-Allow-Origin "{http.request.header.Origin}"
+            header_down Access-Control-Allow-Credentials "true"
+            header_down Access-Control-Allow-Origin "{http.request.header.Origin}"
+            header_down Access-Control-Allow-Credentials "true"
             header_down -Access-Control-Allow-Origin
             header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
             header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
@@ -346,9 +351,9 @@ grizzlyfin.duckdns.org {
 # ──────────────────────────────────────────────────────────────────────
 http://192.168.0.18 {
 
+    import cors_tauri
     route {
         uri replace // /
-        import cors_tauri
     }
 
     root * /var/www/html/player
@@ -386,6 +391,8 @@ http://192.168.0.18 {
 
             header_down -Access-Control-Allow-Origin
             header_down -X-Emby-Token
+            header_down Access-Control-Allow-Origin "{http.request.header.Origin}"
+            header_down Access-Control-Allow-Credentials "true"
             header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
             header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
             header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
@@ -470,9 +477,9 @@ http://192.168.0.18 {
 # ──────────────────────────────────────────────────────────────────────
 http://192.168.0.2 {
 
+    import cors_tauri
     route {
         uri replace // /
-        import cors_tauri
     }
 
     root * /var/www/html/player
