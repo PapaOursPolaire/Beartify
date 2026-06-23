@@ -1,1 +1,34 @@
-102116|bEXFFCKfLordNsZ2RHsO4xx1P8Zuvitx6XCwq41v7588d223
+Agis en tant qu'expert JavaScript et développeur d'applications Tauri v2. 
+
+Je possède un lecteur de musique nommé "Beartify" qui tourne sous Tauri v2 (compatible Desktop et Android APK). Je vais te fournir l'intégralité de mon fichier `script.js`. 
+
+Ton objectif est de modifier et d'enrichir ce fichier pour y intégrer parfaitement l'API standard Web `MediaSession` (`navigator.mediaSession`). Cela permettra d'avoir une notification multimédia interactive avec une barre de progression fonctionnelle (timeline) sur l'écran de verrouillage Android, ainsi que sur Windows et Linux.
+
+Voici les consignes strictes à respecter pour l'intégration :
+
+1. CRÉATION D'UNE FONCTION DE SYNCHRONISATION :
+Crée une fonction nommée `updateMediaSession()` qui s'occupe de mettre à jour le système. Elle doit :
+- Extraire les métadonnées de la piste courante via l'objet `track = tracks[currentIndex]` (gérer les cas de repli si title, artist, album ou cover_url sont vides).
+- Alimenter `navigator.mediaSession.metadata` avec le titre, l'artiste, l'album et l'artwork (pochette).
+- Mettre à jour `navigator.mediaSession.playbackState` en fonction de l'état du lecteur (`"playing"` ou `"paused"`).
+- Envoyer la position et la durée via `navigator.mediaSession.setPositionState()` en utilisant les propriétés `.duration`, `.playbackRate` et `.currentTime` de l'élément `#audioPlayer`.
+- Conserver l'appel natif Tauri existant `window.__TAURI_INTERNALS__.invoke('update_media_session', ...)` à l'intérieur de cette fonction pour que le backend Rust soit toujours notifié.
+
+2. ÉCOUTEURS D'ÉVÉNEMENTS (AUTOMATISATION) :
+Dans le bloc `DOMContentLoaded` (ou au moment de l'initialisation du lecteur `#audioPlayer`), ajoute les écouteurs d'événements nécessaires sur l'élément audio :
+- Sur `play`, `pause` et `loadedmetadata` -> Appeler la fonction complète `updateMediaSession()`.
+- Sur `timeupdate` (qui se déclenche à chaque seconde de lecture) -> Appeler uniquement `navigator.mediaSession.setPositionState(...)` avec le temps à jour, pour que la barre de progression bouge de manière fluide sur Android/PC sans surcharger l'application.
+
+3. CONTRÔLES DE LA NOTIFICATION (ACTION HANDLERS) :
+Configure les `navigator.mediaSession.setActionHandler` pour l'interactivité :
+- 'play' -> Déclenche `.play()` sur le `#audioPlayer`.
+- 'pause' -> Déclenche `.pause()` sur le `#audioPlayer`.
+- 'previoustrack' -> Simule un clic virtuel sur le bouton d'interface existant pour la piste précédente (`#prevBtn` ou sa classe correspondante) afin de préserver toute la logique interne de ta file d'attente.
+- 'nexttrack' -> Simule un clic virtuel sur le bouton de l'interface existant pour la piste suivante (`#nextBtn` ou sa classe).
+- 'seekto' -> Permet à l'utilisateur de glisser son doigt sur la barre de progression de la notification en modifiant le `.currentTime` du `#audioPlayer` avec `details.seekTime`, puis appelle `updateMediaSession()`.
+
+4. CODE INTEGRAL :
+Réécris l'INTÉGRALITÉ du fichier `script.js` sans aucune troncature, sans commentaires du type "// le reste du code reste inchangé". Je veux pouvoir copier-coller le résultat directement à la place de mon fichier actuel. Retiens bien toute la logique existante du player (les carrousels, favoris, SpicyLyrics, authentification, etc.).
+
+Voici mon fichier `script.js` actuel :
+[COLLE TOUT LE CONTENU DE TON SCRIPT.JS ICI]
