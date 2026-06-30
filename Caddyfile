@@ -192,7 +192,8 @@ beartify.duckdns.org {
         X-Frame-Options           "SAMEORIGIN"
         Referrer-Policy           "strict-origin-when-cross-origin"
         Permissions-Policy        "geolocation=(), microphone=(), camera=(), payment=()"
-
+        
+        # Directive CSP incluant cdnjs
         Content-Security-Policy "default-src 'self' https://beartify-firebase.firebaseapp.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://discord.com https://lrclib.net https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://apis.google.com https://accounts.google.com https://www.gstatic.com https://lingva.ml https://translate.plausibility.cloud https://lingva.thedaviddelta.com wss://grizzly-stream.duckdns.org https://grizzly-stream.duckdns.org; frame-src 'self' https://beartify-firebase.firebaseapp.com https://accounts.google.com; frame-ancestors 'none';"
 
         -Server
