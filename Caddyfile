@@ -193,7 +193,7 @@ beartify.duckdns.org {
         Referrer-Policy           "strict-origin-when-cross-origin"
         Permissions-Policy        "geolocation=(), microphone=(), camera=(), payment=()"
 
-        Content-Security-Policy "default-src 'self' https://beartify-firebase.firebaseapp.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://discord.com https://lrclib.net https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://apis.google.com https://accounts.google.com https://www.gstatic.com https://lingva.ml https://translate.plausibility.cloud https://lingva.thedaviddelta.com wss://grizzly-stream.duckdns.org https://grizzly-stream.duckdns.org; frame-src 'self' https://beartify-firebase.firebaseapp.com https://accounts.google.com; frame-ancestors 'none';"
+        Content-Security-Policy "default-src 'self' https://beartify-firebase.firebaseapp.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://discord.com https://lrclib.net https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://apis.google.com https://accounts.google.com https://www.gstatic.com https://lingva.ml https://translate.plausibility.cloud https://lingva.thedaviddelta.com wss://grizzly-stream.duckdns.org https://grizzly-stream.duckdns.org; frame-src 'self' https://beartify-firebase.firebaseapp.com https://accounts.google.com; frame-ancestors 'none';"
 
         -Server
     }
@@ -211,6 +211,15 @@ beartify.duckdns.org {
 
     # Headers téléchargement VIP MP3
     import download_vip_headers
+
+    # PROXY POCKETBASE (Beartify — playlists / présence / social / stats)
+    handle /api/pb/* {
+        uri strip_prefix /api/pb
+        reverse_proxy 127.0.0.1:8090 {
+            header_up  X-Real-IP       {remote_host}
+            header_up  X-Forwarded-For {remote_host}
+        }
+    }
 
     # PROXY JELLYFIN
     handle /api/jellyfin/* {
@@ -375,6 +384,15 @@ http://192.168.0.18 {
     import lingva_proxy
     import download_vip_headers
 
+    # PROXY POCKETBASE (Beartify — playlists / présence / social / stats)
+    handle /api/pb/* {
+        uri strip_prefix /api/pb
+        reverse_proxy 127.0.0.1:8090 {
+            header_up  X-Real-IP       {remote_host}
+            header_up  X-Forwarded-For {remote_host}
+        }
+    }
+
     handle /api/jellyfin/* {
         uri strip_prefix /api/jellyfin
 
@@ -500,6 +518,15 @@ http://192.168.0.2 {
     import drm_routes
     import lingva_proxy
     import download_vip_headers
+
+    # PROXY POCKETBASE (Beartify — playlists / présence / social / stats)
+    handle /api/pb/* {
+        uri strip_prefix /api/pb
+        reverse_proxy 127.0.0.1:8090 {
+            header_up  X-Real-IP       {remote_host}
+            header_up  X-Forwarded-For {remote_host}
+        }
+    }
 
     handle /api/jellyfin/* {
         uri strip_prefix /api/jellyfin
