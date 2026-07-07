@@ -109,18 +109,22 @@ ok "Binaire installé : $VERSION"
 # ─────────────────────────────────────────────────────────────────────
 cat > "$PB_DIR/pb_migrations/1_init_collections.js" << 'MIGRATION_EOF'
 migrate((app) => {
-  let users = new Collection({
-    type: "auth", name: "users",
-    listRule: "id = @request.auth.id", viewRule: "id = @request.auth.id",
-    createRule: null, updateRule: "id = @request.auth.id", deleteRule: null,
-    fields: [
-      { name: "provider", type: "select", values: ["google", "discord"], maxSelect: 1 },
-      { name: "externalId", type: "text", required: true },
-      { name: "displayName", type: "text" },
-      { name: "avatarUrl", type: "url" },
-    ],
-    indexes: ["CREATE UNIQUE INDEX idx_users_externalId ON users (externalId)"],
-  })
+  // ⚠️ PocketBase crée TOUJOURS une collection "users" par défaut dès
+  // l'installation (migration système interne). Créer une nouvelle
+  // collection du même nom provoque l'erreur "Collection name must be
+  // unique (case insensitive)". La bonne pratique consiste donc à
+  // ÉTENDRE cette collection existante avec nos champs, pas à en créer une.
+  let users = app.findCollectionByNameOrId("users")
+  users.listRule = "id = @request.auth.id"
+  users.viewRule = "id = @request.auth.id"
+  users.createRule = null
+  users.updateRule = "id = @request.auth.id"
+  users.deleteRule = null
+  users.fields.add(new SelectField({ name: "provider", values: ["google", "discord"], maxSelect: 1 }))
+  users.fields.add(new TextField({ name: "externalId", required: true }))
+  users.fields.add(new TextField({ name: "displayName" }))
+  users.fields.add(new URLField({ name: "avatarUrl" }))
+  users.indexes = [...users.indexes, "CREATE UNIQUE INDEX idx_users_externalId ON users (externalId)"]
   app.save(users)
 
   let playlists = new Collection({
@@ -241,8 +245,11 @@ migrate((app) => {
   app.save(globalStats)
 
 }, (app) => {
+  // "users" n'est PAS supprimée ici : c'est la collection système par
+  // défaut de PocketBase, on l'a seulement étendue avec nos champs.
+  // La supprimer casserait l'authentification PocketBase elle-même.
   for (const name of ["playlists","presence","follows","reports","requests",
-                       "trackStats","artistStats","albumStats","globalStats","users"]) {
+                       "trackStats","artistStats","albumStats","globalStats"]) {
     try { app.delete(app.findCollectionByNameOrId(name)) } catch {}
   }
 })
