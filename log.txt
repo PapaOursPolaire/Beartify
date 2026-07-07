@@ -1,8 +1,21 @@
-Le script (syntaxe bash vérifiée) fait tout ce qui suit sur ta Debian 13 :
-Ce qu'il installe/configure automatiquement :
+papaours@papaours:~$ sudo ./ipb.sh
+════════════════════════════════════════════════════
+ Réinstallation propre PocketBase — port 8095
+════════════════════════════════════════════════════
+→ Arrêt et nettoyage de toute installation précédente...
+Rule deleted
+Rule deleted (v6)
+  (règle pare-feu obsolète pour l'ancien port 8090 retirée)
+✅ Utilisateur système 'pocketbase' créé
+→ Téléchargement de la dernière version de PocketBase...
+  URL: https://github.com/pocketbase/pocketbase/releases/download/v0.39.5/pocketbase_0.39.5_linux_amd64.zip
+✅ Binaire installé : pocketbase version 0.39.5
+✅ Fichier de migration écrit
+✅ Hook d'authentification écrit
+→ Application explicite des migrations (avant le premier démarrage)...
+Error: failed to apply migration 1_init_collections.js: name: Collection name must be unique (case insensitive)..
+❌ La migration a échoué — voir le message ci-dessus. Le service n'a PAS été démarré.
+papaours@papaours:~$ 
 
-Téléchargement + installation du dernier PocketBase, sous un utilisateur système dédié (pas root)
-Collections créées via migration : users, playlists, presence, follows, reports, requests, trackStats, artistStats, albumStats, globalStats — avec des règles d'accès (API rules) équivalentes à ce que faisaient tes règles Firestore
-Service systemd durci (ProtectSystem, NoNewPrivileges, restart automatique)
-Port PocketBase bloqué en accès direct (ufw), uniquement joignable via Caddy en local
-Sauvegarde automatique quotidienne du fichier SQLite (cron, rétention 14 jours)
+
+
