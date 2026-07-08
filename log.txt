@@ -1,12 +1,4 @@
-papaours@papaours:~$ sudo sed -i 's|REMPLACE_MOI.apps.googleusercontent.com|712696916251-hl7b73n58mgou7ctjvtvfn8n0nmf2tb4.apps.googleusercontent.com|' /opt/pocketbase/pb_hooks/beartify_auth_bridge.pb.js
-sudo systemctl restart pocketbase-beartify
-sudo grep "FIREBASE_WEB_CLIENT_ID" /opt/pocketbase/pb_hooks/beartify_auth_bridge.pb.js
-const FIREBASE_WEB_CLIENT_ID = "712696916251-hl7b73n58mgou7ctjvtvfn8n0nmf2tb4.apps.googleusercontent.com";
-  if (claims.aud !== FIREBASE_WEB_CLIENT_ID) return e.json(401, { error: "Jeton Google émis pour un autre client" });
-papaours@papaours:~$ 
+# Comparez le temps de ces deux appels (remplacez USERID et le token)
+time curl -s "http://localhost:8096/Items?userId=USERID&Recursive=true&IncludeItemTypes=Audio&Fields=Artists,AlbumArtist,Album,AlbumId,ProductionYear,DateCreated,PremiereDate,RunTimeTicks,ImageTags,AlbumPrimaryImageTag&Limit=2000&StartIndex=0" -H "X-Emby-Token: VOTRE_TOKEN" -o /dev/null
 
-
-
-
-
-
+time curl -s "http://localhost:8096/Items?userId=USERID&Recursive=true&IncludeItemTypes=Audio&Fields=Artists,AlbumArtist,Album,AlbumId,ProductionYear,DateCreated,PremiereDate,RunTimeTicks&Limit=2000&StartIndex=0" -H "X-Emby-Token: VOTRE_TOKEN" -o /dev/null
