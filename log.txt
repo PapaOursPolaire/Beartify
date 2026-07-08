@@ -1,3 +1,12 @@
-sudo sed -i 's|REMPLACE_MOI.apps.googleusercontent.com|712696916251-hl7b73n58mgou7ctjvtvfn8n0nmf2tb4.apps.googleusercontent.com|' /opt/pocketbase/pb_hooks/beartify_auth_bridge.pb.js
+papaours@papaours:~$ sudo sed -i 's|REMPLACE_MOI.apps.googleusercontent.com|712696916251-hl7b73n58mgou7ctjvtvfn8n0nmf2tb4.apps.googleusercontent.com|' /opt/pocketbase/pb_hooks/beartify_auth_bridge.pb.js
 sudo systemctl restart pocketbase-beartify
 sudo grep "FIREBASE_WEB_CLIENT_ID" /opt/pocketbase/pb_hooks/beartify_auth_bridge.pb.js
+const FIREBASE_WEB_CLIENT_ID = "712696916251-hl7b73n58mgou7ctjvtvfn8n0nmf2tb4.apps.googleusercontent.com";
+  if (claims.aud !== FIREBASE_WEB_CLIENT_ID) return e.json(401, { error: "Jeton Google émis pour un autre client" });
+papaours@papaours:~$ 
+
+
+
+
+
+
