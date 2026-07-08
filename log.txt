@@ -1,4 +1,22 @@
-# Comparez le temps de ces deux appels (remplacez USERID et le token)
+papaours@papaours:~$ # Comparez le temps de ces deux appels (remplacez USERID et le token)
 time curl -s "http://localhost:8096/Items?userId=USERID&Recursive=true&IncludeItemTypes=Audio&Fields=Artists,AlbumArtist,Album,AlbumId,ProductionYear,DateCreated,PremiereDate,RunTimeTicks,ImageTags,AlbumPrimaryImageTag&Limit=2000&StartIndex=0" -H "X-Emby-Token: aaa8a7df4b364cf7bcc76f351d768798" -o /dev/null
 
 time curl -s "http://localhost:8096/Items?userId=USERID&Recursive=true&IncludeItemTypes=Audio&Fields=Artists,AlbumArtist,Album,AlbumId,ProductionYear,DateCreated,PremiereDate,RunTimeTicks&Limit=2000&StartIndex=0" -H "X-Emby-Token: aaa8a7df4b364cf7bcc76f351d768798" -o /dev/null
+
+real    0m0,017s
+user    0m0,005s
+sys     0m0,004s
+
+real    0m0,012s
+user    0m0,005s
+sys     0m0,005s
+papaours@papaours:~$ 
+
+
+
+
+
+
+
+
+
