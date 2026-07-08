@@ -1,31 +1,3 @@
-papaours@papaours:~$ sudo systemctl restart pocketbase-beartify
-sudo journalctl -u pocketbase-beartify -n 20 --no-pager
-jui 08 11:20:39 papaours pocketbase[304746]: 2026/07/08 11:20:39 Server started at http://127.0.0.1:8095
-jui 08 11:20:39 papaours pocketbase[304746]: ├─ REST API:  http://127.0.0.1:8095/api/
-jui 08 11:20:39 papaours pocketbase[304746]: └─ Dashboard: http://127.0.0.1:8095/_/
-jui 08 11:20:39 papaours pocketbase[304746]: (!) Launch the URL below in the browser if it hasn't been open already to create your first superuser account:
-jui 08 11:20:39 papaours pocketbase[304746]: http://127.0.0.1:8095/_/#/pbinstall/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2xsZWN0aW9uSWQiOiJwYmNfMzE0MjYzNTgyMyIsImV4cCI6MTc4MzUwNDIzOSwiaWQiOiJmZjdzbjJkOGMyaHVoaXEiLCJyZWZyZXNoYWJsZSI6ZmFsc2UsInR5cGUiOiJhdXRoIn0.2znRm1Smiog--wexoGREUV9MYXuaugHycnfO2WVL4yE
-jui 08 11:20:39 papaours pocketbase[304746]: (you can also create your first superuser by running: /opt/pocketbase/pocketbase superuser upsert EMAIL PASS)
-jui 08 11:24:25 papaours systemd[1]: Stopping pocketbase-beartify.service - PocketBase - Beartify backend...
-jui 08 11:24:25 papaours systemd[1]: pocketbase-beartify.service: Deactivated successfully.
-jui 08 11:24:25 papaours systemd[1]: Stopped pocketbase-beartify.service - PocketBase - Beartify backend.
-jui 08 11:24:36 papaours systemd[1]: Started pocketbase-beartify.service - PocketBase - Beartify backend.
-jui 08 11:24:36 papaours pocketbase[323727]: 2026/07/08 11:24:36 Server started at http://127.0.0.1:8095
-jui 08 11:24:36 papaours pocketbase[323727]: ├─ REST API:  http://127.0.0.1:8095/api/
-jui 08 11:24:36 papaours pocketbase[323727]: └─ Dashboard: http://127.0.0.1:8095/_/
-jui 08 11:24:36 papaours pocketbase[323727]: (!) Launch the URL below in the browser if it hasn't been open already to create your first superuser account:
-jui 08 11:24:36 papaours pocketbase[323727]: http://127.0.0.1:8095/_/#/pbinstall/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2xsZWN0aW9uSWQiOiJwYmNfMzE0MjYzNTgyMyIsImV4cCI6MTc4MzUwNDQ3NiwiaWQiOiJsNG5ic2Y2bjlpa3AxenUiLCJyZWZyZXNoYWJsZSI6ZmFsc2UsInR5cGUiOiJhdXRoIn0.hMe4lz4KYmPxNzFf2Tj-MtOkiNNaSMiiM08KsDauor0
-jui 08 11:24:36 papaours pocketbase[323727]: (you can also create your first superuser by running: /opt/pocketbase/pocketbase superuser upsert EMAIL PASS)
-jui 08 11:40:17 papaours systemd[1]: Stopping pocketbase-beartify.service - PocketBase - Beartify backend...
-jui 08 11:40:17 papaours systemd[1]: pocketbase-beartify.service: Deactivated successfully.
-jui 08 11:40:17 papaours systemd[1]: Stopped pocketbase-beartify.service - PocketBase - Beartify backend.
-jui 08 11:40:17 papaours systemd[1]: Started pocketbase-beartify.service - PocketBase - Beartify backend.
-papaours@papaours:~$ 
-
-
-
-
-
-
-
-
+sudo grep -n "routerAdd" /opt/pocketbase/pb_hooks/beartify_auth_bridge.pb.js
+curl -X POST http://127.0.0.1:8095/api/beartify/session/google -H "Content-Type: application/json" -d '{}'
+ls -la /opt/pocketbase/pb_hooks/
