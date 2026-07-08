@@ -1,1 +1,16 @@
-712696916251-hl7b73n58mgou7ctjvtvfn8n0nmf2tb4.apps.googleusercontent.com
+papaours@papaours:~$ sudo ss -tlpn | grep :3000
+[sudo] Mot de passe de papaours : 
+papaours@papaours:~$ grep -n "api/pb" /etc/caddy/Caddyfile
+216:    handle /api/pb/* {
+217:        uri strip_prefix /api/pb
+388:    handle /api/pb/* {
+389:        uri strip_prefix /api/pb
+523:    handle /api/pb/* {
+524:        uri strip_prefix /api/pb
+papaours@papaours:~$ sudo systemctl status caddy --no-pager | head -5
+● caddy.service - Caddy
+     Loaded: loaded (/usr/lib/systemd/system/caddy.service; enabled; preset: enabled)
+     Active: active (running) since Wed 2026-07-08 09:52:11 CEST; 5min ago
+ Invocation: 784d7987d70344bdb79aa6cc5bf10d0b
+       Docs: https://caddyserver.com/docs/
+papaours@papaours:~$ 
