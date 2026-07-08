@@ -133,15 +133,13 @@ migrate((app) => {
     viewRule: "user = @request.auth.id || (private = false)",
     createRule: "user = @request.auth.id", updateRule: "user = @request.auth.id",
     deleteRule: "user = @request.auth.id",
-    fields: [
-      { name: "user", type: "relation", required: true, maxSelect: 1, collectionId: users.id, cascadeDelete: true },
-      { name: "name", type: "text", required: true, max: 200 },
-      { name: "description", type: "text", max: 1000 },
-      { name: "tracks", type: "json" },
-      { name: "coverUrl", type: "text" },
-      { name: "private", type: "bool" },
-    ],
   })
+  playlists.fields.add(new RelationField({ name: "user", required: true, maxSelect: 1, collectionId: users.id, cascadeDelete: true }))
+  playlists.fields.add(new TextField({ name: "name", required: true, max: 200 }))
+  playlists.fields.add(new TextField({ name: "description", max: 1000 }))
+  playlists.fields.add(new JSONField({ name: "tracks" }))
+  playlists.fields.add(new TextField({ name: "coverUrl" }))
+  playlists.fields.add(new BoolField({ name: "private" }))
   app.save(playlists)
 
   let presence = new Collection({
@@ -149,15 +147,13 @@ migrate((app) => {
     listRule: "@request.auth.id != ''", viewRule: "@request.auth.id != ''",
     createRule: "user = @request.auth.id", updateRule: "user = @request.auth.id",
     deleteRule: "user = @request.auth.id",
-    fields: [
-      { name: "user", type: "relation", required: true, maxSelect: 1, collectionId: users.id, cascadeDelete: true },
-      { name: "status", type: "select", values: ["playing", "paused", "offline"], maxSelect: 1 },
-      { name: "track", type: "json" },
-      { name: "position", type: "number" },
-      { name: "updatedAt", type: "date" },
-    ],
-    indexes: ["CREATE UNIQUE INDEX idx_presence_user ON presence (user)"],
   })
+  presence.fields.add(new RelationField({ name: "user", required: true, maxSelect: 1, collectionId: users.id, cascadeDelete: true }))
+  presence.fields.add(new SelectField({ name: "status", values: ["playing", "paused", "offline"], maxSelect: 1 }))
+  presence.fields.add(new JSONField({ name: "track" }))
+  presence.fields.add(new NumberField({ name: "position" }))
+  presence.fields.add(new DateField({ name: "updatedAt" }))
+  presence.indexes = ["CREATE UNIQUE INDEX idx_presence_user ON presence (user)"]
   app.save(presence)
 
   let follows = new Collection({
@@ -166,82 +162,85 @@ migrate((app) => {
     viewRule: "follower = @request.auth.id || following = @request.auth.id",
     createRule: "follower = @request.auth.id", updateRule: null,
     deleteRule: "follower = @request.auth.id",
-    fields: [
-      { name: "follower", type: "relation", required: true, maxSelect: 1, collectionId: users.id, cascadeDelete: true },
-      { name: "following", type: "relation", required: true, maxSelect: 1, collectionId: users.id, cascadeDelete: true },
-    ],
-    indexes: ["CREATE UNIQUE INDEX idx_follows_pair ON follows (follower, following)"],
   })
+  follows.fields.add(new RelationField({ name: "follower", required: true, maxSelect: 1, collectionId: users.id, cascadeDelete: true }))
+  follows.fields.add(new RelationField({ name: "following", required: true, maxSelect: 1, collectionId: users.id, cascadeDelete: true }))
+  follows.indexes = ["CREATE UNIQUE INDEX idx_follows_pair ON follows (follower, following)"]
   app.save(follows)
 
   let reports = new Collection({
     type: "base", name: "reports",
     listRule: null, viewRule: "user = @request.auth.id",
     createRule: "@request.auth.id != ''", updateRule: null, deleteRule: null,
-    fields: [
-      { name: "user", type: "relation", maxSelect: 1, collectionId: users.id },
-      { name: "type", type: "text" }, { name: "category", type: "text" },
-      { name: "description", type: "text", max: 5000 },
-      { name: "status", type: "select", values: ["pending", "reviewed", "closed"], maxSelect: 1 },
-      { name: "meta", type: "json" },
-    ],
   })
+  reports.fields.add(new RelationField({ name: "user", maxSelect: 1, collectionId: users.id }))
+  reports.fields.add(new TextField({ name: "type" }))
+  reports.fields.add(new TextField({ name: "category" }))
+  reports.fields.add(new TextField({ name: "description", max: 5000 }))
+  reports.fields.add(new SelectField({ name: "status", values: ["pending", "reviewed", "closed"], maxSelect: 1 }))
+  reports.fields.add(new JSONField({ name: "meta" }))
   app.save(reports)
 
   let requests = new Collection({
     type: "base", name: "requests",
     listRule: "@request.auth.id != ''", viewRule: "@request.auth.id != ''",
     createRule: "@request.auth.id != ''", updateRule: "@request.auth.id != ''", deleteRule: null,
-    fields: [
-      { name: "type", type: "text", required: true }, { name: "name", type: "text", required: true },
-      { name: "artist", type: "text" }, { name: "info", type: "text" },
-      { name: "status", type: "select", values: ["pending", "added", "rejected"], maxSelect: 1 },
-      { name: "votes", type: "number" }, { name: "voters", type: "json" },
-    ],
   })
+  requests.fields.add(new TextField({ name: "type", required: true }))
+  requests.fields.add(new TextField({ name: "name", required: true }))
+  requests.fields.add(new TextField({ name: "artist" }))
+  requests.fields.add(new TextField({ name: "info" }))
+  requests.fields.add(new SelectField({ name: "status", values: ["pending", "added", "rejected"], maxSelect: 1 }))
+  requests.fields.add(new NumberField({ name: "votes" }))
+  requests.fields.add(new JSONField({ name: "voters" }))
   app.save(requests)
 
   let trackStats = new Collection({
     type: "base", name: "trackStats",
     listRule: "", viewRule: "", createRule: null, updateRule: null, deleteRule: null,
-    fields: [
-      { name: "trackKey", type: "text", required: true }, { name: "title", type: "text" },
-      { name: "artist", type: "text" }, { name: "album", type: "text" }, { name: "imageUrl", type: "text" },
-      { name: "plays", type: "number" }, { name: "playsToday", type: "number" },
-      { name: "lastPlayedAt", type: "date" }, { name: "lastDate", type: "text" },
-    ],
-    indexes: ["CREATE UNIQUE INDEX idx_trackStats_key ON trackStats (trackKey)"],
   })
+  trackStats.fields.add(new TextField({ name: "trackKey", required: true }))
+  trackStats.fields.add(new TextField({ name: "title" }))
+  trackStats.fields.add(new TextField({ name: "artist" }))
+  trackStats.fields.add(new TextField({ name: "album" }))
+  trackStats.fields.add(new TextField({ name: "imageUrl" }))
+  trackStats.fields.add(new NumberField({ name: "plays" }))
+  trackStats.fields.add(new NumberField({ name: "playsToday" }))
+  trackStats.fields.add(new DateField({ name: "lastPlayedAt" }))
+  trackStats.fields.add(new TextField({ name: "lastDate" }))
+  trackStats.indexes = ["CREATE UNIQUE INDEX idx_trackStats_key ON trackStats (trackKey)"]
   app.save(trackStats)
 
   let artistStats = new Collection({
     type: "base", name: "artistStats",
     listRule: "", viewRule: "", createRule: null, updateRule: null, deleteRule: null,
-    fields: [
-      { name: "artistKey", type: "text", required: true }, { name: "name", type: "text" },
-      { name: "plays", type: "number" }, { name: "lastPlayedAt", type: "date" },
-    ],
-    indexes: ["CREATE UNIQUE INDEX idx_artistStats_key ON artistStats (artistKey)"],
   })
+  artistStats.fields.add(new TextField({ name: "artistKey", required: true }))
+  artistStats.fields.add(new TextField({ name: "name" }))
+  artistStats.fields.add(new NumberField({ name: "plays" }))
+  artistStats.fields.add(new DateField({ name: "lastPlayedAt" }))
+  artistStats.indexes = ["CREATE UNIQUE INDEX idx_artistStats_key ON artistStats (artistKey)"]
   app.save(artistStats)
 
   let albumStats = new Collection({
     type: "base", name: "albumStats",
     listRule: "", viewRule: "", createRule: null, updateRule: null, deleteRule: null,
-    fields: [
-      { name: "albumKey", type: "text", required: true }, { name: "name", type: "text" },
-      { name: "artist", type: "text" }, { name: "plays", type: "number" }, { name: "lastPlayedAt", type: "date" },
-    ],
-    indexes: ["CREATE UNIQUE INDEX idx_albumStats_key ON albumStats (albumKey)"],
   })
+  albumStats.fields.add(new TextField({ name: "albumKey", required: true }))
+  albumStats.fields.add(new TextField({ name: "name" }))
+  albumStats.fields.add(new TextField({ name: "artist" }))
+  albumStats.fields.add(new NumberField({ name: "plays" }))
+  albumStats.fields.add(new DateField({ name: "lastPlayedAt" }))
+  albumStats.indexes = ["CREATE UNIQUE INDEX idx_albumStats_key ON albumStats (albumKey)"]
   app.save(albumStats)
 
   let globalStats = new Collection({
     type: "base", name: "globalStats",
     listRule: "", viewRule: "", createRule: null, updateRule: null, deleteRule: null,
-    fields: [ { name: "day", type: "text", required: true }, { name: "totalPlays", type: "number" } ],
-    indexes: ["CREATE UNIQUE INDEX idx_globalStats_day ON globalStats (day)"],
   })
+  globalStats.fields.add(new TextField({ name: "day", required: true }))
+  globalStats.fields.add(new NumberField({ name: "totalPlays" }))
+  globalStats.indexes = ["CREATE UNIQUE INDEX idx_globalStats_day ON globalStats (day)"]
   app.save(globalStats)
 
 }, (app) => {
