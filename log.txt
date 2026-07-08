@@ -1,3 +1,9 @@
-sudo grep -n "routerAdd" /opt/pocketbase/pb_hooks/beartify_auth_bridge.pb.js
+papaours@papaours:~$ sudo grep -n "routerAdd" /opt/pocketbase/pb_hooks/beartify_auth_bridge.pb.js
 curl -X POST http://127.0.0.1:8095/api/beartify/session/google -H "Content-Type: application/json" -d '{}'
 ls -la /opt/pocketbase/pb_hooks/
+34:routerAdd("POST", "/api/beartify/session/google", (e) => {
+47:routerAdd("POST", "/api/beartify/session/discord", (e) => {
+59:routerAdd("POST", "/api/beartify/track-play", (e) => {
+{"error":"idToken manquant"}
+ls: impossible d'accéder à '/opt/pocketbase/pb_hooks/': Permission non accordée
+papaours@papaours:~$ 
