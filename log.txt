@@ -1,1 +1,514 @@
-curl -s "http://localhost:8096/Library/VirtualFolders" -H "X-Emby-Token: aaa8a7df4b364cf7bcc76f351d768798" | python3 -m json.tool
+curl -s "http://localhost:8096/Library/VirtualFolders" -H "X-Emby-Token: aaa8a7df4b364cf7bcc76f351d768798" | python3 -m json.toolpapaours@papaours:~$ curl -s "http://localhost:8096/Library/VirtualFolders" -H "X-Emby-Token: aaa8a7df4b364cf7bcc76f351d768798" | python3 -m json.tool
+[
+    {
+        "Name": "TEST",
+        "Locations": [
+            "/mnt/papaours_f/Musique/Lushe"
+        ],
+        "CollectionType": "music",
+        "LibraryOptions": {
+            "Enabled": true,
+            "EnablePhotos": true,
+            "EnableRealtimeMonitor": true,
+            "EnableLUFSScan": true,
+            "EnableChapterImageExtraction": false,
+            "ExtractChapterImagesDuringLibraryScan": false,
+            "EnableTrickplayImageExtraction": false,
+            "ExtractTrickplayImagesDuringLibraryScan": false,
+            "PathInfos": [
+                {
+                    "Path": "/mnt/papaours_f/Musique/Lushe"
+                }
+            ],
+            "SaveLocalMetadata": false,
+            "EnableInternetProviders": false,
+            "EnableAutomaticSeriesGrouping": false,
+            "EnableEmbeddedTitles": false,
+            "EnableEmbeddedExtrasTitles": false,
+            "EnableEmbeddedEpisodeInfos": false,
+            "AutomaticRefreshIntervalDays": 0,
+            "PreferredMetadataLanguage": "",
+            "MetadataCountryCode": "",
+            "SeasonZeroDisplayName": "Specials",
+            "MetadataSavers": [],
+            "DisabledLocalMetadataReaders": [],
+            "LocalMetadataReaderOrder": [
+                "Nfo"
+            ],
+            "DisabledSubtitleFetchers": [],
+            "SubtitleFetcherOrder": [],
+            "DisabledMediaSegmentProviders": [],
+            "MediaSegmentProviderOrder": [
+                "Chapter Segments Provider",
+                "Intro Skipper"
+            ],
+            "SkipSubtitlesIfEmbeddedSubtitlesPresent": false,
+            "SkipSubtitlesIfAudioTrackMatches": false,
+            "SubtitleDownloadLanguages": [],
+            "RequirePerfectSubtitleMatch": true,
+            "SaveSubtitlesWithMedia": true,
+            "SaveLyricsWithMedia": false,
+            "SaveTrickplayWithMedia": false,
+            "DisabledLyricFetchers": [],
+            "LyricFetcherOrder": [
+                "LrcLib Lyrics"
+            ],
+            "PreferNonstandardArtistsTag": false,
+            "UseCustomTagDelimiters": false,
+            "CustomTagDelimiters": [
+                "/",
+                "|",
+                ";",
+                "\\"
+            ],
+            "DelimiterWhitelist": [],
+            "AutomaticallyAddToCollection": false,
+            "AllowEmbeddedSubtitles": "AllowAll",
+            "TypeOptions": [
+                {
+                    "Type": "MusicArtist",
+                    "MetadataFetchers": [
+                        "MusicBrainz"
+                    ],
+                    "MetadataFetcherOrder": [
+                        "TheAudioDB",
+                        "MusicBrainz"
+                    ],
+                    "ImageFetchers": [
+                        "TheAudioDB"
+                    ],
+                    "ImageFetcherOrder": [
+                        "TheAudioDB"
+                    ],
+                    "ImageOptions": []
+                },
+                {
+                    "Type": "MusicAlbum",
+                    "MetadataFetchers": [
+                        "MusicBrainz"
+                    ],
+                    "MetadataFetcherOrder": [
+                        "MusicBrainz",
+                        "TheAudioDB"
+                    ],
+                    "ImageFetchers": [
+                        "TheAudioDB",
+                        "Cover Art Archive"
+                    ],
+                    "ImageFetcherOrder": [
+                        "TheAudioDB",
+                        "Cover Art Archive"
+                    ],
+                    "ImageOptions": []
+                },
+                {
+                    "Type": "Audio",
+                    "MetadataFetchers": [],
+                    "MetadataFetcherOrder": [],
+                    "ImageFetchers": [
+                        "Image Extractor"
+                    ],
+                    "ImageFetcherOrder": [
+                        "Image Extractor"
+                    ],
+                    "ImageOptions": []
+                },
+                {
+                    "Type": "MusicVideo",
+                    "MetadataFetchers": [],
+                    "MetadataFetcherOrder": [],
+                    "ImageFetchers": [
+                        "Embedded Image Extractor",
+                        "Screen Grabber"
+                    ],
+                    "ImageFetcherOrder": [
+                        "Embedded Image Extractor",
+                        "Screen Grabber"
+                    ],
+                    "ImageOptions": []
+                }
+            ]
+        },
+        "ItemId": "32268d73ba0e3bad2266dad553af80cf",
+        "PrimaryImageItemId": "32268d73ba0e3bad2266dad553af80cf",
+        "RefreshStatus": "Idle"
+    },
+    {
+        "Name": "Grizzly Stream",
+        "Locations": [
+            "/home/papaours/Vid\u00e9os",
+            "/media/papaours",
+            "/media/papaours",
+            "/mnt/hdd-films",
+            "/mnt/papaours_e",
+            "/mnt/papaours_f/Films",
+            "/mnt/papaours_f/S\u00e9ries",
+            "/var/lib/jellyfin/content/Series"
+        ],
+        "LibraryOptions": {
+            "Enabled": true,
+            "EnablePhotos": true,
+            "EnableRealtimeMonitor": true,
+            "EnableLUFSScan": true,
+            "EnableChapterImageExtraction": false,
+            "ExtractChapterImagesDuringLibraryScan": false,
+            "EnableTrickplayImageExtraction": false,
+            "ExtractTrickplayImagesDuringLibraryScan": false,
+            "PathInfos": [
+                {
+                    "Path": "/mnt/papaours_e"
+                },
+                {
+                    "Path": "/media/papaours"
+                },
+                {
+                    "Path": "/var/lib/jellyfin/content/Series"
+                },
+                {
+                    "Path": "/media/papaours"
+                },
+                {
+                    "Path": "/mnt/hdd-films"
+                },
+                {
+                    "Path": "/home/papaours/Vid\u00e9os/"
+                },
+                {
+                    "Path": "/mnt/papaours_f/Films"
+                },
+                {
+                    "Path": "/mnt/papaours_f/S\u00e9ries"
+                }
+            ],
+            "SaveLocalMetadata": false,
+            "EnableInternetProviders": false,
+            "EnableAutomaticSeriesGrouping": false,
+            "EnableEmbeddedTitles": false,
+            "EnableEmbeddedExtrasTitles": false,
+            "EnableEmbeddedEpisodeInfos": false,
+            "AutomaticRefreshIntervalDays": 30,
+            "PreferredMetadataLanguage": "",
+            "MetadataCountryCode": "",
+            "SeasonZeroDisplayName": "Specials",
+            "MetadataSavers": [],
+            "DisabledLocalMetadataReaders": [],
+            "LocalMetadataReaderOrder": [
+                "Nfo"
+            ],
+            "DisabledSubtitleFetchers": [],
+            "SubtitleFetcherOrder": [],
+            "DisabledMediaSegmentProviders": [],
+            "MediaSegmentProviderOrder": [
+                "Chapter Segments Provider",
+                "Intro Skipper"
+            ],
+            "SkipSubtitlesIfEmbeddedSubtitlesPresent": false,
+            "SkipSubtitlesIfAudioTrackMatches": false,
+            "SubtitleDownloadLanguages": [
+                "eng",
+                "fra"
+            ],
+            "RequirePerfectSubtitleMatch": true,
+            "SaveSubtitlesWithMedia": true,
+            "SaveLyricsWithMedia": false,
+            "SaveTrickplayWithMedia": false,
+            "DisabledLyricFetchers": [],
+            "LyricFetcherOrder": [],
+            "PreferNonstandardArtistsTag": false,
+            "UseCustomTagDelimiters": false,
+            "CustomTagDelimiters": [
+                "/",
+                "|",
+                ";",
+                "\\"
+            ],
+            "DelimiterWhitelist": [],
+            "AutomaticallyAddToCollection": false,
+            "AllowEmbeddedSubtitles": "AllowAll",
+            "TypeOptions": [
+                {
+                    "Type": "Series",
+                    "MetadataFetchers": [
+                        "TheMovieDb",
+                        "The Open Movie Database"
+                    ],
+                    "MetadataFetcherOrder": [
+                        "TheMovieDb",
+                        "The Open Movie Database"
+                    ],
+                    "ImageFetchers": [
+                        "TheMovieDb"
+                    ],
+                    "ImageFetcherOrder": [
+                        "TheMovieDb"
+                    ],
+                    "ImageOptions": []
+                },
+                {
+                    "Type": "Season",
+                    "MetadataFetchers": [
+                        "TheMovieDb"
+                    ],
+                    "MetadataFetcherOrder": [
+                        "TheMovieDb"
+                    ],
+                    "ImageFetchers": [
+                        "TheMovieDb"
+                    ],
+                    "ImageFetcherOrder": [
+                        "TheMovieDb"
+                    ],
+                    "ImageOptions": []
+                },
+                {
+                    "Type": "Episode",
+                    "MetadataFetchers": [
+                        "TheMovieDb",
+                        "The Open Movie Database"
+                    ],
+                    "MetadataFetcherOrder": [
+                        "TheMovieDb",
+                        "The Open Movie Database"
+                    ],
+                    "ImageFetchers": [
+                        "TheMovieDb",
+                        "The Open Movie Database",
+                        "Embedded Image Extractor",
+                        "Screen Grabber"
+                    ],
+                    "ImageFetcherOrder": [
+                        "TheMovieDb",
+                        "The Open Movie Database",
+                        "Embedded Image Extractor",
+                        "Screen Grabber"
+                    ],
+                    "ImageOptions": []
+                },
+                {
+                    "Type": "Movie",
+                    "MetadataFetchers": [
+                        "TheMovieDb",
+                        "The Open Movie Database"
+                    ],
+                    "MetadataFetcherOrder": [
+                        "TheMovieDb",
+                        "The Open Movie Database"
+                    ],
+                    "ImageFetchers": [
+                        "TheMovieDb",
+                        "The Open Movie Database",
+                        "Embedded Image Extractor",
+                        "Screen Grabber"
+                    ],
+                    "ImageFetcherOrder": [
+                        "TheMovieDb",
+                        "The Open Movie Database",
+                        "Embedded Image Extractor",
+                        "Screen Grabber"
+                    ],
+                    "ImageOptions": []
+                }
+            ]
+        },
+        "ItemId": "b58b6a883574f86af16018ead0186e0e",
+        "PrimaryImageItemId": "b58b6a883574f86af16018ead0186e0e",
+        "RefreshStatus": "Idle"
+    },
+    {
+        "Name": "Beartify",
+        "Locations": [
+            "/home/papaours/Musique",
+            "/mnt/papaours_g",
+            "/mnt/papaours_g"
+        ],
+        "CollectionType": "music",
+        "LibraryOptions": {
+            "Enabled": true,
+            "EnablePhotos": true,
+            "EnableRealtimeMonitor": true,
+            "EnableLUFSScan": true,
+            "EnableChapterImageExtraction": false,
+            "ExtractChapterImagesDuringLibraryScan": false,
+            "EnableTrickplayImageExtraction": false,
+            "ExtractTrickplayImagesDuringLibraryScan": false,
+            "PathInfos": [
+                {
+                    "Path": "/home/papaours/Musique"
+                },
+                {
+                    "Path": "/mnt/papaours_g"
+                }
+            ],
+            "SaveLocalMetadata": false,
+            "EnableInternetProviders": false,
+            "EnableAutomaticSeriesGrouping": false,
+            "EnableEmbeddedTitles": false,
+            "EnableEmbeddedExtrasTitles": false,
+            "EnableEmbeddedEpisodeInfos": false,
+            "AutomaticRefreshIntervalDays": 0,
+            "PreferredMetadataLanguage": "",
+            "MetadataCountryCode": "",
+            "SeasonZeroDisplayName": "Specials",
+            "MetadataSavers": [],
+            "DisabledLocalMetadataReaders": [],
+            "LocalMetadataReaderOrder": [
+                "Nfo"
+            ],
+            "DisabledSubtitleFetchers": [],
+            "SubtitleFetcherOrder": [],
+            "DisabledMediaSegmentProviders": [],
+            "MediaSegmentProviderOrder": [
+                "Chapter Segments Provider",
+                "Intro Skipper"
+            ],
+            "SkipSubtitlesIfEmbeddedSubtitlesPresent": false,
+            "SkipSubtitlesIfAudioTrackMatches": false,
+            "SubtitleDownloadLanguages": [],
+            "RequirePerfectSubtitleMatch": true,
+            "SaveSubtitlesWithMedia": true,
+            "SaveLyricsWithMedia": false,
+            "SaveTrickplayWithMedia": false,
+            "DisabledLyricFetchers": [],
+            "LyricFetcherOrder": [
+                "LrcLib Lyrics"
+            ],
+            "PreferNonstandardArtistsTag": false,
+            "UseCustomTagDelimiters": false,
+            "CustomTagDelimiters": [
+                "/",
+                "|",
+                ";",
+                "\\"
+            ],
+            "DelimiterWhitelist": [],
+            "AutomaticallyAddToCollection": false,
+            "AllowEmbeddedSubtitles": "AllowAll",
+            "TypeOptions": [
+                {
+                    "Type": "MusicArtist",
+                    "MetadataFetchers": [
+                        "MusicBrainz"
+                    ],
+                    "MetadataFetcherOrder": [
+                        "TheAudioDB",
+                        "MusicBrainz"
+                    ],
+                    "ImageFetchers": [
+                        "TheAudioDB"
+                    ],
+                    "ImageFetcherOrder": [
+                        "TheAudioDB"
+                    ],
+                    "ImageOptions": []
+                },
+                {
+                    "Type": "MusicAlbum",
+                    "MetadataFetchers": [
+                        "MusicBrainz"
+                    ],
+                    "MetadataFetcherOrder": [
+                        "MusicBrainz",
+                        "TheAudioDB"
+                    ],
+                    "ImageFetchers": [
+                        "TheAudioDB",
+                        "Cover Art Archive"
+                    ],
+                    "ImageFetcherOrder": [
+                        "TheAudioDB",
+                        "Cover Art Archive"
+                    ],
+                    "ImageOptions": []
+                },
+                {
+                    "Type": "Audio",
+                    "MetadataFetchers": [],
+                    "MetadataFetcherOrder": [],
+                    "ImageFetchers": [
+                        "Image Extractor"
+                    ],
+                    "ImageFetcherOrder": [
+                        "Image Extractor"
+                    ],
+                    "ImageOptions": []
+                },
+                {
+                    "Type": "MusicVideo",
+                    "MetadataFetchers": [],
+                    "MetadataFetcherOrder": [],
+                    "ImageFetchers": [
+                        "Embedded Image Extractor",
+                        "Screen Grabber"
+                    ],
+                    "ImageFetcherOrder": [
+                        "Embedded Image Extractor",
+                        "Screen Grabber"
+                    ],
+                    "ImageOptions": []
+                }
+            ]
+        },
+        "ItemId": "464d17672298e4ba56eee79b8bb1b4a5",
+        "PrimaryImageItemId": "464d17672298e4ba56eee79b8bb1b4a5",
+        "RefreshStatus": "Idle"
+    },
+    {
+        "Name": "Collections",
+        "Locations": [
+            "/var/lib/jellyfin/data/collections"
+        ],
+        "CollectionType": "boxsets",
+        "LibraryOptions": {
+            "Enabled": true,
+            "EnablePhotos": true,
+            "EnableRealtimeMonitor": false,
+            "EnableLUFSScan": false,
+            "EnableChapterImageExtraction": false,
+            "ExtractChapterImagesDuringLibraryScan": false,
+            "EnableTrickplayImageExtraction": false,
+            "ExtractTrickplayImagesDuringLibraryScan": false,
+            "PathInfos": [
+                {
+                    "Path": "/var/lib/jellyfin/data/collections"
+                }
+            ],
+            "SaveLocalMetadata": true,
+            "EnableInternetProviders": false,
+            "EnableAutomaticSeriesGrouping": true,
+            "EnableEmbeddedTitles": false,
+            "EnableEmbeddedExtrasTitles": false,
+            "EnableEmbeddedEpisodeInfos": false,
+            "AutomaticRefreshIntervalDays": 0,
+            "SeasonZeroDisplayName": "Specials",
+            "DisabledLocalMetadataReaders": [],
+            "DisabledSubtitleFetchers": [],
+            "SubtitleFetcherOrder": [],
+            "DisabledMediaSegmentProviders": [],
+            "MediaSegmentProviderOrder": [],
+            "SkipSubtitlesIfEmbeddedSubtitlesPresent": false,
+            "SkipSubtitlesIfAudioTrackMatches": true,
+            "RequirePerfectSubtitleMatch": true,
+            "SaveSubtitlesWithMedia": true,
+            "SaveLyricsWithMedia": false,
+            "SaveTrickplayWithMedia": false,
+            "DisabledLyricFetchers": [],
+            "LyricFetcherOrder": [],
+            "PreferNonstandardArtistsTag": false,
+            "UseCustomTagDelimiters": false,
+            "CustomTagDelimiters": [
+                "/",
+                "|",
+                ";",
+                "\\"
+            ],
+            "DelimiterWhitelist": [],
+            "AutomaticallyAddToCollection": false,
+            "AllowEmbeddedSubtitles": "AllowAll",
+            "TypeOptions": []
+        },
+        "ItemId": "9d7ad6afe9afa2dab1a2f6e00ad28fa6",
+        "PrimaryImageItemId": "9d7ad6afe9afa2dab1a2f6e00ad28fa6",
+        "RefreshStatus": "Idle"
+    }
+]
+papaours@papaours:~$ 
