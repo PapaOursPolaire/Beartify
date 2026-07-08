@@ -1,8 +1,5 @@
-papaours@papaours:~$ curl -s -o /dev/null -w "Temps: %{time_total}s\n" "http://localhost:8096/Items?ParentId=464d17672298e4ba56eee79b8bb1b4a5&Recursive=true&IncludeItemTypes=Audio&Fields=AlbumArtist,Album,AlbumId,ProductionYear,DateCreated,PremiereDate,RunTimeTicks&Limit=2000&StartIndex=0" -H "X-Emby-Token: aaa8a7df4b364cf7bcc76f351d768798"
-Temps: 20.000986s
-papaours@papaours:~$ 
+sudo journalctl -u pocketbase-beartify -n 30 --no-pager
 
+curl -s -o /dev/null -w "%{http_code}\n" https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyAN1U4kdJl7BRbi7FB3aAdNwrqBQZLQhSk -X POST -H "Content-Type: application/json" -d '{"idToken":"test"}'
 
-
-
-
+curl -v -X POST http://127.0.0.1:8095/api/beartify/session/google -H "Content-Type: application/json" -d '{"idToken":"faux_token_de_test"}'
