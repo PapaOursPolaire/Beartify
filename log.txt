@@ -1,1 +1,62 @@
-712696916251-hl7b73n58mgou7ctjvtvfn8n0nmf2tb4.apps.googleusercontent.com
+papaours@papaours:~$ chmod +x ipb.sh
+papaours@papaours:~$ sudo ./ipb.sh
+[sudo] Mot de passe de papaours : 
+════════════════════════════════════════════════════
+ Réinstallation propre PocketBase — port 8095
+════════════════════════════════════════════════════
+❌ Le port 8095 est déjà occupé par un autre processus. Vérifie avec: ss -tlnp | grep 8095
+papaours@papaours:~$ sudo systemctl stop pocketbase-beartify
+sudo systemctl disable pocketbase-beartify
+sudo rm -f /etc/systemd/system/pocketbase-beartify.service
+sudo systemctl daemon-reload
+Removed '/etc/systemd/system/multi-user.target.wants/pocketbase-beartify.service'.
+papaours@papaours:~$ sudo rm -rf /opt/pocketbase
+sudo rm -f /usr/local/bin/backup-pocketbase-beartify.sh
+papaours@papaours:~$ sudo crontab -l 2>/dev/null | grep -v backup-pocketbase-beartify | sudo crontab -
+papaours@papaours:~$ sudo userdel -r pocketbase 2>/dev/null || true
+papaours@papaours:~$ sudo ./ipb.sh
+════════════════════════════════════════════════════
+ Réinstallation propre PocketBase — port 8095
+════════════════════════════════════════════════════
+→ Arrêt et nettoyage de toute installation précédente...
+✅ Utilisateur système 'pocketbase' créé
+→ Téléchargement de la dernière version de PocketBase...
+  URL: https://github.com/pocketbase/pocketbase/releases/download/v0.39.6/pocketbase_0.39.6_linux_amd64.zip
+✅ Binaire installé : pocketbase version 0.39.6
+✅ Fichier de migration écrit
+✅ Hook d'authentification écrit
+→ Application explicite des migrations (avant le premier démarrage)...
+Applied 1_init_collections.js
+✅ Migrations appliquées
+→ Vérification des collections créées (lecture directe SQLite)...
+✅ Les 10 collections attendues sont bien présentes dans la base
+✅ Service 'pocketbase-beartify' démarré et actif
+✅ PocketBase répond correctement sur le port 8095 (/api/health → 200)
+✅ Port 8095 bloqué en accès direct depuis l'extérieur
+✅ Sauvegarde quotidienne planifiée (4h du matin, rétention 14 jours)
+
+════════════════════════════════════════════════════
+✅ Réinstallation terminée avec succès sur le port 8095
+════════════════════════════════════════════════════
+
+ÉTAPES MANUELLES RESTANTES :
+1. Remplace FIREBASE_WEB_CLIENT_ID dans :
+   /opt/pocketbase/pb_hooks/beartify_auth_bridge.pb.js
+   puis: systemctl restart pocketbase-beartify
+
+2. Crée le compte super-admin :
+   sudo -u pocketbase /opt/pocketbase/pocketbase superuser create ton-email@example.com 'mot-de-passe-fort'
+
+3. Le Caddyfile fourni séparément utilise déjà le port 8095 —
+   vérifie juste qu'il correspond bien après import.
+
+4. Ancienne installation sauvegardée dans : /opt/pocketbase.old_* (si existait)
+   à supprimer une fois que tu as vérifié que tout fonctionne :
+   rm -rf /opt/pocketbase.old_*
+════════════════════════════════════════════════════
+papaours@papaours:~$ sudo -u pocketbase /opt/pocketbase/pocketbase superuser create papaourspolairegithub@gmail.com Banana2008g@mer
+failed to execute beartify_auth_bridge.pb.js:
+ - SyntaxError: SyntaxError: /home/papaours/pb.js: Line 3:32 Unexpected token ILLEGAL (and 23 more errors)
+Successfully created new superuser "papaourspolairegithub@gmail.com"!
+papaours@papaours:~$ rm -rf /opt/pocketbase.old_*
+papaours@papaours:~$ 
