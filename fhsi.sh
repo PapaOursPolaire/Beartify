@@ -15,7 +15,7 @@
 # ══════════════════════════════════════════════════════════════════
 set -euo pipefail
 
-FIREBASE_WEB_API_KEY="REMPLACE_MOI_PAR_TA_CLE_API_WEB"
+FIREBASE_WEB_API_KEY="AIzaSyAN1U4kdJl7BRbi7FB3aAdNwrqBQZLQhSk"
 PB_PORT="8095"
 
 [ "$FIREBASE_WEB_API_KEY" != "REMPLACE_MOI_PAR_TA_CLE_API_WEB" ] || {
