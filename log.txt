@@ -1,16 +1,1 @@
-papaours@papaours:~$ curl -s -o /dev/null -w "Temps: %{time_total}s\n" "http://localhost:8096/Items?Recursive=true&IncludeItemTypes=Audio&Fields=Artists,AlbumArtist,Album,AlbumId,ProductionYear,DateCreated,PremiereDate,RunTimeTicks&Limit=2000&StartIndex=0" -H "X-Emby-Token: aaa8a7df4b364cf7bcc76f351d768798"
-Temps: 20.998609s
-papaours@papaours:~$ 
-
-
-
-
-
-
-
-
-
-
-
-
-
+curl -s "http://localhost:8096/Library/VirtualFolders" -H "X-Emby-Token: aaa8a7df4b364cf7bcc76f351d768798" | python3 -m json.tool
