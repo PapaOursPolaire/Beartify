@@ -1,1 +1,51 @@
-curl -v --max-time 5 "https://lrclib.net/api/search?track_name=test&artist_name=test"
+papaours@papaours:~$ curl -v --max-time 5 "https://lrclib.net/api/search?track_name=test&artist_name=test"
+* Host lrclib.net:443 was resolved.
+* IPv6: (none)
+* IPv4: 65.21.226.122
+*   Trying 65.21.226.122:443...
+* ALPN: curl offers h2,http/1.1
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+*  CAfile: /etc/ssl/certs/ca-certificates.crt
+*  CApath: /etc/ssl/certs
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+* TLSv1.3 (IN), TLS change cipher, Change cipher spec (1):
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+* SSL connection using TLSv1.3 / TLS_AES_256_GCM_SHA384 / X25519MLKEM768 / id-ecPublicKey
+* ALPN: server accepted http/1.1
+* Server certificate:
+*  subject: CN=lrclib.net
+*  start date: May 15 06:58:34 2026 GMT
+*  expire date: Aug 13 06:58:33 2026 GMT
+*  subjectAltName: host "lrclib.net" matched cert's "lrclib.net"
+*  issuer: C=US; O=Let's Encrypt; CN=E8
+*  SSL certificate verify ok.
+*   Certificate level 0: Public key type EC/prime256v1 (256/128 Bits/secBits), signed using ecdsa-with-SHA384
+*   Certificate level 1: Public key type EC/secp384r1 (384/192 Bits/secBits), signed using sha256WithRSAEncryption
+*   Certificate level 2: Public key type RSA (4096/152 Bits/secBits), signed using sha256WithRSAEncryption
+* Connected to lrclib.net (65.21.226.122) port 443
+* using HTTP/1.x
+> GET /api/search?track_name=test&artist_name=test HTTP/1.1
+> Host: lrclib.net
+> User-Agent: curl/8.14.1
+> Accept: */*
+> 
+* Request completely sent off
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+* Operation timed out after 5002 milliseconds with 0 bytes received
+* closing connection #0
+curl: (28) Operation timed out after 5002 milliseconds with 0 bytes received
+papaours@papaours:~$ 
+
+
+
+
+
+
+
+
