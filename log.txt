@@ -1,50 +1,101 @@
-papaours@papaours:~$ npm install google-auth-library pocketbase
-
-up to date, audited 187 packages in 2s
-
-27 packages are looking for funding
-  run `npm fund` for details
-
-8 moderate severity vulnerabilities
-
-To address issues that do not require attention, run:
-  npm audit fix
-
-To address all issues (including breaking changes), run:
-  npm audit fix --force
-
-Run `npm audit` for details.
 papaours@papaours:~$ node mftp.js
-/home/papaours/mftp.js:7
-<!DOCTYPE html>
-^
-
-SyntaxError: Unexpected token '<'
-    at wrapSafe (node:internal/modules/cjs/loader:1464:18)
-    at Module._compile (node:internal/modules/cjs/loader:1495:20)
-    at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
-    at Module.load (node:internal/modules/cjs/loader:1266:32)
-    at Module._load (node:internal/modules/cjs/loader:1091:12)
-    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12)
-    at node:internal/main/run_main_module:28:49
-
-Node.js v20.20.2
-papaours@papaours:~$ node mftp.js
-/home/papaours/mftp.js:7
-<!DOCTYPE html>
-^
-
-SyntaxError: Unexpected token '<'
-    at wrapSafe (node:internal/modules/cjs/loader:1464:18)
-    at Module._compile (node:internal/modules/cjs/loader:1495:20)
-    at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
-    at Module.load (node:internal/modules/cjs/loader:1266:32)
-    at Module._load (node:internal/modules/cjs/loader:1091:12)
-    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12)
-    at node:internal/main/run_main_module:28:49
-
-Node.js v20.20.2
+→ Authentification Google (REST, sans gRPC)...
+❌ Erreur fatale: GaxiosError: invalid_grant: Invalid JWT Signature.
+    at Gaxios._request (/home/papaours/node_modules/google-auth-library/node_modules/gaxios/build/cjs/src/gaxios.js:155:23)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async getToken (/home/papaours/node_modules/google-auth-library/build/src/gtoken/getToken.js:52:26)
+    at async TokenHandler.getToken (/home/papaours/node_modules/google-auth-library/build/src/gtoken/tokenHandler.js:83:27)
+    at async JWT.refreshTokenNoCache (/home/papaours/node_modules/google-auth-library/build/src/auth/jwtclient.js:189:23)
+    at async JWT.refreshAccessTokenAsync (/home/papaours/node_modules/google-auth-library/build/src/auth/oauth2client.js:288:19)
+    at async JWT.getAccessTokenAsync (/home/papaours/node_modules/google-auth-library/build/src/auth/oauth2client.js:317:23)
+    at async GoogleAuth.getAccessToken (/home/papaours/node_modules/google-auth-library/build/src/auth/googleauth.js:803:17)
+    at async main (/home/papaours/mftp.js:187:17) {
+  config: {
+    method: 'POST',
+    url: URL {
+      href: 'https://oauth2.googleapis.com/token',
+      origin: 'https://oauth2.googleapis.com',
+      protocol: 'https:',
+      username: '',
+      password: '',
+      host: 'oauth2.googleapis.com',
+      hostname: 'oauth2.googleapis.com',
+      port: '',
+      pathname: '/token',
+      search: '',
+      searchParams: URLSearchParams {},
+      hash: ''
+    },
+    data: URLSearchParams {
+      'grant_type' => '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.',
+      'assertion' => '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.' },
+    responseType: 'json',
+    retryConfig: {
+      httpMethodsToRetry: [Array],
+      currentRetryAttempt: 0,
+      retry: 3,
+      noResponseRetries: 2,
+      retryDelayMultiplier: 2,
+      timeOfFirstRequest: 1783638994621,
+      totalTimeout: 9007199254740991,
+      maxRetryDelay: 9007199254740991,
+      statusCodesToRetry: [Array]
+    },
+    body: URLSearchParams {
+      'grant_type' => '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.',
+      'assertion' => '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.' },
+    validateStatus: [Function: validateStatus],
+    errorRedactor: [Function: defaultErrorRedactor],
+    duplex: 'half',
+    headers: Headers {
+      accept: 'application/json',
+      'x-goog-api-client': 'gl-node/20.20.2',
+      'User-Agent': 'google-api-nodejs-client/10.9.0'
+    }
+  },
+  response: Response {
+    size: 0,
+    data: {
+      error: 'invalid_grant',
+      error_description: 'Invalid JWT Signature.'
+    },
+    config: {
+      method: 'POST',
+      url: URL {},
+      data: [Object],
+      responseType: 'json',
+      retryConfig: [Object],
+      body: [Object],
+      validateStatus: [Function: validateStatus],
+      errorRedactor: [Function: defaultErrorRedactor],
+      duplex: 'half',
+      headers: Headers {
+        accept: 'application/json',
+        'x-goog-api-client': 'gl-node/20.20.2',
+        'User-Agent': 'google-api-nodejs-client/10.9.0'
+      }
+    },
+    [Symbol(Body internals)]: {
+      body: [Gunzip],
+      stream: [Gunzip],
+      boundary: null,
+      disturbed: true,
+      error: null
+    },
+    [Symbol(Response internals)]: {
+      type: 'default',
+      url: 'https://oauth2.googleapis.com/token',
+      status: 400,
+      statusText: 'Bad Request',
+      headers: [Object],
+      counter: 0,
+      highWaterMark: 16384
+    }
+  },
+  code: 400,
+  status: 400,
+  error: undefined,
+  [Symbol(gaxios-gaxios-error)]: '7.2.0',
+  [cause]: { message: 'invalid_grant', code: 400, status: 'Bad Request' }
+}
 papaours@papaours:~$ 
-
-
-
