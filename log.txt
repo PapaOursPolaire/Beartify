@@ -1,101 +1,44 @@
-papaours@papaours:~$ node mftp.js
-→ Authentification Google (REST, sans gRPC)...
-❌ Erreur fatale: GaxiosError: invalid_grant: Invalid JWT Signature.
-    at Gaxios._request (/home/papaours/node_modules/google-auth-library/node_modules/gaxios/build/cjs/src/gaxios.js:155:23)
-    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
-    at async getToken (/home/papaours/node_modules/google-auth-library/build/src/gtoken/getToken.js:52:26)
-    at async TokenHandler.getToken (/home/papaours/node_modules/google-auth-library/build/src/gtoken/tokenHandler.js:83:27)
-    at async JWT.refreshTokenNoCache (/home/papaours/node_modules/google-auth-library/build/src/auth/jwtclient.js:189:23)
-    at async JWT.refreshAccessTokenAsync (/home/papaours/node_modules/google-auth-library/build/src/auth/oauth2client.js:288:19)
-    at async JWT.getAccessTokenAsync (/home/papaours/node_modules/google-auth-library/build/src/auth/oauth2client.js:317:23)
-    at async GoogleAuth.getAccessToken (/home/papaours/node_modules/google-auth-library/build/src/auth/googleauth.js:803:17)
-    at async main (/home/papaours/mftp.js:187:17) {
-  config: {
-    method: 'POST',
-    url: URL {
-      href: 'https://oauth2.googleapis.com/token',
-      origin: 'https://oauth2.googleapis.com',
-      protocol: 'https:',
-      username: '',
-      password: '',
-      host: 'oauth2.googleapis.com',
-      hostname: 'oauth2.googleapis.com',
-      port: '',
-      pathname: '/token',
-      search: '',
-      searchParams: URLSearchParams {},
-      hash: ''
-    },
-    data: URLSearchParams {
-      'grant_type' => '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.',
-      'assertion' => '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.' },
-    responseType: 'json',
-    retryConfig: {
-      httpMethodsToRetry: [Array],
-      currentRetryAttempt: 0,
-      retry: 3,
-      noResponseRetries: 2,
-      retryDelayMultiplier: 2,
-      timeOfFirstRequest: 1783638994621,
-      totalTimeout: 9007199254740991,
-      maxRetryDelay: 9007199254740991,
-      statusCodesToRetry: [Array]
-    },
-    body: URLSearchParams {
-      'grant_type' => '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.',
-      'assertion' => '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.' },
-    validateStatus: [Function: validateStatus],
-    errorRedactor: [Function: defaultErrorRedactor],
-    duplex: 'half',
-    headers: Headers {
-      accept: 'application/json',
-      'x-goog-api-client': 'gl-node/20.20.2',
-      'User-Agent': 'google-api-nodejs-client/10.9.0'
+// Compare la clé privée intégrée avec le certificat PUBLIC que Google
+// publie pour ce compte de service — si les modulus ne correspondent
+// pas, la clé privée ne correspond definitivement pas à ce que Google
+// attend (peu importe la méthode utilisée pour signer).
+const crypto = require('crypto');
+const https = require('https');
+
+const script = require('fs').readFileSync('/home/papaours/mftp.js', 'utf8');
+const match = script.match(/const FIREBASE_SERVICE_ACCOUNT = (\{[\s\S]*?\n\};)/);
+const sa = eval('(' + match[1].slice(0, -1) + ')');
+
+https.get(sa.client_x509_cert_url, (res) => {
+  let body = '';
+  res.on('data', d => body += d);
+  res.on('end', () => {
+    const certs = JSON.parse(body);
+    const certPem = certs[sa.private_key_id];
+
+    if (!certPem) {
+      console.log('❌ Aucun certificat public trouvé pour private_key_id:', sa.private_key_id);
+      console.log('   Clés disponibles côté Google:', Object.keys(certs));
+      console.log('   → Cette clé a été RÉVOQUÉE ou n\'existe plus côté Google.');
+      return;
     }
-  },
-  response: Response {
-    size: 0,
-    data: {
-      error: 'invalid_grant',
-      error_description: 'Invalid JWT Signature.'
-    },
-    config: {
-      method: 'POST',
-      url: URL {},
-      data: [Object],
-      responseType: 'json',
-      retryConfig: [Object],
-      body: [Object],
-      validateStatus: [Function: validateStatus],
-      errorRedactor: [Function: defaultErrorRedactor],
-      duplex: 'half',
-      headers: Headers {
-        accept: 'application/json',
-        'x-goog-api-client': 'gl-node/20.20.2',
-        'User-Agent': 'google-api-nodejs-client/10.9.0'
-      }
-    },
-    [Symbol(Body internals)]: {
-      body: [Gunzip],
-      stream: [Gunzip],
-      boundary: null,
-      disturbed: true,
-      error: null
-    },
-    [Symbol(Response internals)]: {
-      type: 'default',
-      url: 'https://oauth2.googleapis.com/token',
-      status: 400,
-      statusText: 'Bad Request',
-      headers: [Object],
-      counter: 0,
-      highWaterMark: 16384
+
+    const privateKeyObj = crypto.createPrivateKey(sa.private_key);
+    const publicKeyFromPrivate = crypto.createPublicKey(privateKeyObj).export({ type: 'spki', format: 'pem' });
+
+    const cert = new crypto.X509Certificate(certPem);
+    const publicKeyFromCert = cert.publicKey.export({ type: 'spki', format: 'pem' });
+
+    console.log('Clé publique dérivée de TA clé privée :\n', publicKeyFromPrivate);
+    console.log('Clé publique publiée par Google pour ce key_id :\n', publicKeyFromCert);
+
+    if (publicKeyFromPrivate === publicKeyFromCert) {
+      console.log('✅ CORRESPONDANCE : ta clé privée correspond bien à ce que Google a en mémoire.');
+      console.log('   → Le problème est donc ailleurs (horodatage, format JWT, etc.)');
+    } else {
+      console.log('❌ AUCUNE CORRESPONDANCE : ta clé privée NE correspond PAS au certificat public de Google.');
+      console.log('   → Cette clé est invalide côté Google, quelle que soit la méthode utilisée.');
+      console.log('   → Il faut en régénérer une nouvelle ET la retransmettre par upload de fichier direct (pas de copier-coller).');
     }
-  },
-  code: 400,
-  status: 400,
-  error: undefined,
-  [Symbol(gaxios-gaxios-error)]: '7.2.0',
-  [cause]: { message: 'invalid_grant', code: 400, status: 'Bad Request' }
-}
-papaours@papaours:~$ 
+  });
+}).on('error', e => console.error('❌ Erreur réseau:', e.message));
