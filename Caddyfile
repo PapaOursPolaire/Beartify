@@ -1,38 +1,49 @@
-papaours@papaours:~$ sudo caddy validate --config /etc/caddy/Caddyfile
-2026/07/09 20:06:55.142 INFO    using config from file  {"file": "/etc/caddy/Caddyfile"}
-2026/07/09 20:06:55.147 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.147 WARN    caddyfile       Unnecessary header_up X-Forwarded-Proto: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.149 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.149 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.150 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.150 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.150 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.150 WARN    caddyfile       Unnecessary header_up X-Forwarded-Proto: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.150 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.150 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.150 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.152 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.152 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.152 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.152 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.153 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.153 WARN    caddyfile       Unnecessary header_up X-Forwarded-Proto: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.153 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.153 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.153 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.155 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.155 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.155 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.155 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.155 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.155 WARN    caddyfile       Unnecessary header_up X-Forwarded-Proto: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.155 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.155 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.155 WARN    caddyfile       Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream
-2026/07/09 20:06:55.160 INFO    adapted config to JSON  {"adapter": "caddyfile"}
-2026/07/09 20:06:55.161 WARN    Caddyfile input is not formatted; run 'caddy fmt --overwrite' to fix inconsistencies{"adapter": "caddyfile", "file": "/etc/caddy/Caddyfile", "line": 7}
-2026/07/09 20:06:55.164 INFO    redirected default logger       {"from": "stderr", "to": "/var/log/caddy/caddy.log"}
-Valid configuration
-papaours@papaours:~$ caddy version 
-v2.11.4 h1:XKxkMTgNSizEvKG6QHue6cAsFOteU2qA61w2tKkCWi0=
-papaours@papaours:~$ 
+// Test isolé : échange le compte de service contre un jeton OAuth2,
+// puis interroge Firestore via son API REST (pas gRPC) — permet de
+// savoir si le blocage vient de la clé elle-même, ou spécifiquement
+// du client gRPC utilisé par firebase-admin.
+const crypto = require('crypto');
+const https = require('https');
+
+const script = require('fs').readFileSync('/home/papaours/migrate-firestore-to-pocketbase.js', 'utf8');
+const match = script.match(/const FIREBASE_SERVICE_ACCOUNT = (\{[\s\S]*?\n\};)/);
+const sa = eval('(' + match[1].slice(0, -1) + ')');
+
+function base64url(input) {
+  return Buffer.from(input).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+const now = Math.floor(Date.now() / 1000);
+const header = { alg: 'RS256', typ: 'JWT' };
+const claims = {
+  iss: sa.client_email,
+  scope: 'https://www.googleapis.com/auth/datastore',
+  aud: 'https://oauth2.googleapis.com/token',
+  iat: now,
+  exp: now + 3600,
+};
+
+const unsigned = base64url(JSON.stringify(header)) + '.' + base64url(JSON.stringify(claims));
+const signer = crypto.createSign('RSA-SHA256');
+signer.update(unsigned);
+const signature = signer.sign(sa.private_key).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const jwt = unsigned + '.' + signature;
+
+console.log('→ Échange du JWT signé contre un access token OAuth2...');
+
+const postData = 'grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=' + encodeURIComponent(jwt);
+
+const req = https.request('https://oauth2.googleapis.com/token', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': Buffer.byteLength(postData) },
+}, (res) => {
+  let body = '';
+  res.on('data', d => body += d);
+  res.on('end', () => {
+    console.log('Code HTTP:', res.statusCode);
+    console.log('Réponse:', body);
+  });
+});
+req.on('error', e => console.error('❌ Erreur réseau:', e.message));
+req.write(postData);
+req.end();
