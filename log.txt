@@ -1,44 +1,222 @@
-// Compare la clé privée intégrée avec le certificat PUBLIC que Google
-// publie pour ce compte de service — si les modulus ne correspondent
-// pas, la clé privée ne correspond definitivement pas à ce que Google
-// attend (peu importe la méthode utilisée pour signer).
+/**
+ * ╔══════════════════════════════════════════════════════════════╗
+ * ║   Beartify — Migration Firestore → PocketBase (via REST,     ║
+ * ║   sans gRPC — contourne le blocage réseau rencontré)          ║
+ * ╚══════════════════════════════════════════════════════════════╝
+ *
+ * npm install google-auth-library pocketbase
+ */
+
+const { GoogleAuth } = require('google-auth-library');
+const PocketBase = require('pocketbase/cjs');
 const crypto = require('crypto');
 const https = require('https');
 
-const script = require('fs').readFileSync('/home/papaours/mftp.js', 'utf8');
-const match = script.match(/const FIREBASE_SERVICE_ACCOUNT = (\{[\s\S]*?\n\};)/);
-const sa = eval('(' + match[1].slice(0, -1) + ')');
+const FIREBASE_SERVICE_ACCOUNT = {
+  "type": "service_account",
+  "project_id": "beartify-firebase",
+  "private_key_id": "0e6329fa54e197464c6c4ff75c3fd8684982c771",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC1X+clf0NjKN20\nHBRMB33OcQuKyz2KVTVKeEWHYH6oTLbm8sDF9zL2EhT8o3FqhDchneybyhlDD6dH\nEpsI8vIDncvss9Jj5wMqORfTO4Z7SN4F7UJSLqaKlzOhS8w5SxI4UOHww/X5+Qry\nRK6QBY1hKGlQv7qbffVHg5fA4k2ikBej/UFsAuF8y4OghdLvbKb5snYH7RWVG9e2\nJ7ANXDEec/5BP5X+HZOYPp53fImGy0WOWyZTAYxi0i4dagoisoK+wZkl26a5/M10\nBq3CPDvH4sMhO5oE/ORIALkx7qUBY6s8zd+OaTI9FBxgSHa4rr5qeNW1jkiQWYR6\n9W/QpMOPAgMBAAECggEAU+3VgfIChmO2N+6Ya9g5nKqN+0NyLk2gs9202uDJq2qY\nZoVltBXgVKLoaEHfrTkSY/F2uF6MUw5uy0IuULVPTWIbJ+TMUiNnwQWbY0lTwT/m\nUZrJSktBELfIEfcHwWlePIYdD3M2o15ddN9YYdfX5OI03cNjACoIsvePZRezcinw\nH6fOEM5x6oIzhSbCzpK5W3fYHVVhFEUb0Ioyu6K9Q0yOJm6blJOnJKBBdzxCFQIN\nZSHb5IheyYfTELX3B5wkHcK2iGykAY++xaTGhtAHXFf3f2cyswMf5AefczScN/9Q\nKMljUrjyC2s5gMYiIYPq1srp6zyZM4/seStN6BPgBQKBgQDsu7hO0PgQvs60GTve\nnwE1sdKw5wgqJxrCiQ3OF2PLU2sJseorEUOWzRn17yyMx6hpoM/wSkDKRUk0QDSB\nMVsf/XJc1aqdh8b7/8CkfFNYIXmaQMk0Zpu5f3ZALgcNISYE+NqqT/dTRiVcnEPj\ntkEMhGpu+CZT5a6+1yhbDmTZtQKBgQDEIsx+nWJ5UHZ6Klmo+KUmH/LRR0pOewYK\nlt5InENb0ba16FAcs2nxLPwc+4YbZ11sLI6iRYMrvoVwMSaYghcCXw+PJe2K9OKW\nNoPz8eqtaRbYFr2eMh+et5PilwA3t+UDRt7RE5xNzmyKSf7RZz6Vl7i5EXQOnUci\nB+befmyiswKBgA/RXzhM+DZOOYuJIBn47+DBl/1gAoimgkA7XiPGJlHgqgdEzwu/\npI9/9tsa9xQVByi/qQU6QOgDBygpnhh/zsHtcmXHlRXfi6ks5pdXA06hNfnbmFYb\nAQ68+I7DRI9ZBqxQYHP+0dzLlBWDD3o4pFIMyvvNMupqL2nrAHRNGun9AoGAYs8F\nJmQzT9pxVWowcSeSS3qc4UGA9biUepE2um2+oWstGMdIVK0uGgoHmLI+BWA1eGGa\nGbXbNxZsMvEP+JTQ8qjhNcRtvytPW01rfGHLUEE4+PO74w5tT5A8OFLKEUfbX6M8\nbSfr/maX17MfZG8W4FXnAZUBWrtxMnu4my4lnHECgYEAy8dgVmFera+iR5E+DZUf\nciZFQehuRCkXOfxGAUGyYIsYfxVgx4p9ODJC1DHMu5SQeMNpj9URCvq721niPELK\nSUMDj2oVSqqZM3UDRk0YicNt6H8wIIuryEuYvAFhaKult8wVJmCPFsglO/lY4Bwq\nYfUjRUt31IrUZ6pb8qITyJQ=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fbsvc@beartify-firebase.iam.gserviceaccount.com",
+  "client_id": "115769592134913986346",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40beartify-firebase.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+};
 
-https.get(sa.client_x509_cert_url, (res) => {
-  let body = '';
-  res.on('data', d => body += d);
-  res.on('end', () => {
-    const certs = JSON.parse(body);
-    const certPem = certs[sa.private_key_id];
+const POCKETBASE_URL = 'http://127.0.0.1:8095';
+const PB_SUPERUSER_EMAIL = 'papaourspolairegithub@gmail.com';
+const PB_SUPERUSER_PASSWORD = 'Banana2008g@mer';
+const SERVER_BRIDGE_SECRET = '87b92f11263872ac7da00e5dbc1a3d76db53e9a753fda30e018f7bba818e6c9d';
+const PROJECT_ID = FIREBASE_SERVICE_ACCOUNT.project_id;
 
-    if (!certPem) {
-      console.log('❌ Aucun certificat public trouvé pour private_key_id:', sa.private_key_id);
-      console.log('   Clés disponibles côté Google:', Object.keys(certs));
-      console.log('   → Cette clé a été RÉVOQUÉE ou n\'existe plus côté Google.');
-      return;
-    }
+const pb = new PocketBase(POCKETBASE_URL);
+function derivePassword(externalId) {
+  return crypto.createHmac('sha256', SERVER_BRIDGE_SECRET).update(externalId).digest('hex');
+}
+function detectProvider(docId) { return docId.includes('@') ? 'google' : 'discord'; }
 
-    const privateKeyObj = crypto.createPrivateKey(sa.private_key);
-    const publicKeyFromPrivate = crypto.createPublicKey(privateKeyObj).export({ type: 'spki', format: 'pem' });
-
-    const cert = new crypto.X509Certificate(certPem);
-    const publicKeyFromCert = cert.publicKey.export({ type: 'spki', format: 'pem' });
-
-    console.log('Clé publique dérivée de TA clé privée :\n', publicKeyFromPrivate);
-    console.log('Clé publique publiée par Google pour ce key_id :\n', publicKeyFromCert);
-
-    if (publicKeyFromPrivate === publicKeyFromCert) {
-      console.log('✅ CORRESPONDANCE : ta clé privée correspond bien à ce que Google a en mémoire.');
-      console.log('   → Le problème est donc ailleurs (horodatage, format JWT, etc.)');
-    } else {
-      console.log('❌ AUCUNE CORRESPONDANCE : ta clé privée NE correspond PAS au certificat public de Google.');
-      console.log('   → Cette clé est invalide côté Google, quelle que soit la méthode utilisée.');
-      console.log('   → Il faut en régénérer une nouvelle ET la retransmettre par upload de fichier direct (pas de copier-coller).');
-    }
+// ── Requête HTTPS générique ──
+function httpsGet(url, token) {
+  return new Promise((resolve, reject) => {
+    https.get(url, { headers: { Authorization: 'Bearer ' + token } }, (res) => {
+      let body = '';
+      res.on('data', d => body += d);
+      res.on('end', () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) resolve(JSON.parse(body));
+        else reject(new Error(`HTTP ${res.statusCode}: ${body}`));
+      });
+    }).on('error', reject);
   });
-}).on('error', e => console.error('❌ Erreur réseau:', e.message));
+}
+
+// ── Décodeur de valeurs Firestore REST (format {stringValue:...}, {mapValue:...}, etc.) ──
+function decodeValue(v) {
+  if (v == null) return null;
+  if ('stringValue' in v) return v.stringValue;
+  if ('integerValue' in v) return parseInt(v.integerValue, 10);
+  if ('doubleValue' in v) return v.doubleValue;
+  if ('booleanValue' in v) return v.booleanValue;
+  if ('nullValue' in v) return null;
+  if ('timestampValue' in v) return v.timestampValue;
+  if ('arrayValue' in v) return (v.arrayValue.values || []).map(decodeValue);
+  if ('mapValue' in v) return decodeFields(v.mapValue.fields || {});
+  return null;
+}
+function decodeFields(fields) {
+  const out = {};
+  for (const [k, v] of Object.entries(fields || {})) out[k] = decodeValue(v);
+  return out;
+}
+
+async function fetchAllUsers(token) {
+  let all = [];
+  let pageToken = null;
+  do {
+    let url = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/users?pageSize=100`;
+    if (pageToken) url += '&pageToken=' + encodeURIComponent(pageToken);
+    const data = await httpsGet(url, token);
+    for (const doc of (data.documents || [])) {
+      const docId = doc.name.split('/').pop();
+      all.push({ id: docId, data: decodeFields(doc.fields) });
+    }
+    pageToken = data.nextPageToken || null;
+  } while (pageToken);
+  return all;
+}
+
+const stats = { usersCreated: 0, usersSkipped: 0, playlistsCreated: 0, playlistsSkipped: 0, followsCreated: 0, followsSkipped: 0, errors: [] };
+const pbIdCache = new Map();
+const firestoreUserCache = new Map();
+
+async function upsertPocketBaseUser(docId, data) {
+  if (pbIdCache.has(docId)) return pbIdCache.get(docId);
+  try {
+    const existing = await pb.collection('users').getFirstListItem(`externalId="${docId}"`);
+    pbIdCache.set(docId, existing.id);
+    stats.usersSkipped++;
+    return existing.id;
+  } catch (_) {}
+
+  const provider = detectProvider(docId);
+  const password = derivePassword(docId);
+  const email = provider + '_' + docId.replace(/[^a-zA-Z0-9]/g, '_') + '@bridge.local';
+  const displayName = data.displayName || data.profile?.displayName || data.publicProfile?.displayName || '';
+  const avatarUrl = data.photoURL || data.avatarUrl || '';
+
+  try {
+    const record = await pb.collection('users').create({
+      provider, externalId: docId, displayName, avatarUrl,
+      email, emailVisibility: false, password, passwordConfirm: password, verified: true,
+    });
+    pbIdCache.set(docId, record.id);
+    stats.usersCreated++;
+    return record.id;
+  } catch (err) {
+    stats.errors.push(`Utilisateur ${docId}: ${err.message}`);
+    return null;
+  }
+}
+
+function normalizeTracks(tracks = []) {
+  return (Array.isArray(tracks) ? tracks : []).map(t => ({
+    id: t.id || '', title: t.title || '', artist: t.artist || '',
+    album: t.album || '', imageUrl: t.imageUrl || '',
+    duration: t.duration || 0, addedAt: t.addedAt || Date.now(),
+  }));
+}
+
+async function migratePlaylists(pbUserId, docId, data) {
+  const playlists = data.playlists || {};
+  for (const [playlistId, playlist] of Object.entries(playlists)) {
+    if (!playlist || typeof playlist !== 'object') continue;
+    try {
+      const existing = await pb.collection('playlists').getFirstListItem(
+        `user="${pbUserId}" && name="${(playlist.name || '').replace(/"/g, '')}"`
+      ).catch(() => null);
+      if (existing) { stats.playlistsSkipped++; continue; }
+    } catch (_) {}
+    try {
+      await pb.collection('playlists').create({
+        user: pbUserId,
+        name: playlist.name || `Playlist ${playlistId}`,
+        description: playlist.description || '',
+        tracks: normalizeTracks(playlist.tracks),
+        coverUrl: playlist.coverUrl || '',
+        private: !!playlist.private,
+      });
+      stats.playlistsCreated++;
+    } catch (err) {
+      stats.errors.push(`Playlist ${playlistId} (${docId}): ${err.message}`);
+    }
+  }
+}
+
+async function migrateFollows(pbUserId, docId, data, token) {
+  const following = Array.isArray(data.following) ? data.following : [];
+  for (const targetDocId of following) {
+    if (!targetDocId || targetDocId === docId) continue;
+    let targetPbId = pbIdCache.get(targetDocId);
+    if (!targetPbId) {
+      let targetData = firestoreUserCache.get(targetDocId);
+      if (!targetData) {
+        try {
+          const doc = await httpsGet(`https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/users/${encodeURIComponent(targetDocId)}`, token);
+          targetData = decodeFields(doc.fields);
+        } catch (_) { targetData = {}; }
+        firestoreUserCache.set(targetDocId, targetData);
+      }
+      targetPbId = await upsertPocketBaseUser(targetDocId, targetData);
+    }
+    if (!targetPbId) continue;
+    try {
+      await pb.collection('follows').create({ follower: pbUserId, following: targetPbId });
+      stats.followsCreated++;
+    } catch (err) {
+      if (String(err.message).toLowerCase().includes('valid') || String(err.message).toLowerCase().includes('unique')) stats.followsSkipped++;
+      else stats.errors.push(`Follow ${docId} → ${targetDocId}: ${err.message}`);
+    }
+  }
+}
+
+async function main() {
+  console.log('→ Authentification Google (REST, sans gRPC)...');
+  const auth = new GoogleAuth({ credentials: FIREBASE_SERVICE_ACCOUNT, scopes: ['https://www.googleapis.com/auth/datastore'] });
+  const token = await auth.getAccessToken();
+  console.log('✅ Jeton Google obtenu.\n');
+
+  console.log('→ Authentification PocketBase (super-admin)...');
+  await pb.collection('_superusers').authWithPassword(PB_SUPERUSER_EMAIL, PB_SUPERUSER_PASSWORD);
+  console.log('✅ Authentifié.\n');
+
+  console.log('→ Lecture de tous les documents utilisateurs Firestore (via REST)...');
+  const users = await fetchAllUsers(token);
+  console.log(`   ${users.length} utilisateur(s) trouvé(s).\n`);
+
+  let i = 0;
+  for (const { id: docId, data } of users) {
+    i++;
+    process.stdout.write(`[${i}/${users.length}] ${docId} ... `);
+    const pbUserId = await upsertPocketBaseUser(docId, data);
+    if (!pbUserId) { console.log('❌ échec utilisateur'); continue; }
+    await migratePlaylists(pbUserId, docId, data);
+    await migrateFollows(pbUserId, docId, data, token);
+    console.log('✅');
+  }
+
+  console.log('\n════════════════════════════════════════');
+  console.log('RÉSUMÉ');
+  console.log('════════════════════════════════════════');
+  console.log(`Utilisateurs créés     : ${stats.usersCreated}`);
+  console.log(`Utilisateurs déjà là   : ${stats.usersSkipped}`);
+  console.log(`Playlists créées       : ${stats.playlistsCreated}`);
+  console.log(`Playlists déjà là      : ${stats.playlistsSkipped}`);
+  console.log(`Follows créés          : ${stats.followsCreated}`);
+  console.log(`Follows déjà là        : ${stats.followsSkipped}`);
+  console.log(`Erreurs                : ${stats.errors.length}`);
+  if (stats.errors.length) { console.log('\nDétail des erreurs :'); stats.errors.forEach(e => console.log('  - ' + e)); }
+}
+
+main().catch(err => { console.error('❌ Erreur fatale:', err); process.exit(1); });
