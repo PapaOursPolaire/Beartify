@@ -24,19 +24,32 @@
  * ── CONFIGURATION (variables ci-dessous, à adapter) ──────────────
  */
 
-const FIREBASE_SERVICE_ACCOUNT_PATH = './firebase-service-account.json';
-// ⚠️ Utilise la clé RÉGÉNÉRÉE si tu as suivi la recommandation de
-// révoquer l'ancienne clé exposée précédemment — pas l'ancienne.
+// Clé de compte de service intégrée directement (pas de fichier externe requis).
+// ⚠️ Ne commite jamais ce script dans un dépôt public tel quel — cette clé
+// donne un accès admin complet au projet Firebase.
+const FIREBASE_SERVICE_ACCOUNT = {
+  "type": "service_account",
+  "project_id": "beartify-firebase",
+  "private_key_id": "cfd6a8b2196433cbc3da2d7f13c0373017424f8e",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDHcMtFJtuYstoW\noZzk6pSwowRk0x+O4Um4KSIHlYSIN/Xq0bdCdCbj9LUZ2WAFmxlgOmfTk9elkBFn\nVCE2lULFpdskr63oZK+GH2s6Dg4eIvkdfDIccrhQbWSOUJhryV6t5FkPWNmOEL0B\nIIm9dMe6VWwPUF/91bvRzqm9Nkb4FDVWv6S2lON53k7cwc3+7FAdG6vSTuDnQMx7\n0WOqCK8HylaAR9Rzkn6L91zrv+dSEBqwsoRvkONA3Mti8VElhhiuUVWq5f85/vdt\nd2CjfrR8pgugCqArZo/M9SJb/QELdGhlBV6PnCfNiStLFR1BupFFBy0O5NlOFLaF\nxY0QUUlpAgMBAAECggEAR1F+5toX4dlnInulWrjF9go9Wn6ixNmsHnZbDGI7s+hr\nAI8A3PsjIxYRIs64Rxjo8J/CHAc8sKA9kPklLVsftwTxwgMuibFjkO8wTWDUTJOO\nCKyuULz3Sw9rS3bnoneuazmCXXoUxfgXVk1X5A9cErZUP3+q697f3I1t5lL/+trB\nRel8vLRJBf45RqTpG3xrOEEvs69I73MBOqqaSUJQgrXTHa7SmEt/UQCduEY4kOed\nA6DHciZs4GLuhEa2UNJa8uvmBo7DvcxnGQfWD9TAGF0Rbu8rpJ+bnf7kHbgGZ9w/\n1A15bGTSZiLKTW3ZieuWQxd1F6vi+EiuADJ41WdGRwKBgQDupBGYpgSnj9Cz6GrU\nD5ZnIQjx+C/acGPtC0MdrUpGko6f80jJlSoyX9lW9Q50aQE+d7ER6D96/iThJTpc\nBbigvUOcT/Vj7pUsVPs27GB4QWc2d/EeVTorAnA07ah+Sh73Utg5EU6t7ERza5yl\nwsW1NW2aCbZMSmXTCRhNDHaK5wKBgQDV8r5ygQ3sh4k1VWptsYNgmJ7J8aPM316Y\nFFL91TzL7Y75gykE0Nmn7jmTXYi2B3Co/QVePoZIXDzwLP/DJf0spGjrl+VV7dWt\nCkNhjg7wBY3d+jgp1ThmzixQYvwDCamk6T4I28zt8C1U3U++c+JQl4lGNwr3NjVo\n3ZHCrzvPLwKBgDLEaJHmz5qt96IuUXunjUGHP5XqTJPV0Qw+lxqbIO/+gaT5ZoSr\n3Pw2c9AR9e9B32fgoqTCma6anlHfT5kABpT7boS0ZenKeaWitoaqpqMulrx5q6ve\nSa+YpzI7VNr4/blzwFfznJ9XYgCD5iFFXDX+lcBtTIDSWvMYPjk164oFAoGALUGe\n5YvFDT6SWJTL4Y5GMx21oRQbSRAK63KJJ6Z+qMiEkOUcvScMk4hB55lGfPLP8v8q\nrofdUdspDMkIBRi5GENi6ksEOQwJQgREwpMRN9aE7uqqDLdMqfp8xzhZBK97kiXA\neJE+JSrD/AqgfrH2soOLhy3HhQmTfK450gvNRAMCgYEAi72SAoIdKa6TnIzmxHOw\nAcQ9VgQh/NDizivuhgc/9QGUFSS5iOz++5JsNHr3gjxeB34Bw7gOSnkJOQXv+3Ow\nrzIk1cOwfi2Uzw/0gSP0Cm+g4+M97JwWrmI2s6BGG8gxA1NhHLFNgJZv2E+Q1/Ps\nAPDTvlsluqpvZAJBrWoHwdc=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fbsvc@beartify-firebase.iam.gserviceaccount.com",
+  "client_id": "115769592134913986346",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40beartify-firebase.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+};
 
 const POCKETBASE_URL = 'http://127.0.0.1:8095';
 const PB_SUPERUSER_EMAIL = 'papaourspolairegithub@gmail.com';
-const PB_SUPERUSER_PASSWORD = 'REMPLACE_MOI';
+const PB_SUPERUSER_PASSWORD = 'Banana2008g@mer';
 
 // Copie EXACTE de la valeur SERVER_BRIDGE_SECRET trouvée dans
 // /opt/pocketbase/pb_hooks/bridge_utils.js sur le serveur — nécessaire
 // pour que le mot de passe créé ici corresponde à celui que le hook
 // dérivera plus tard lors d'une vraie connexion Google/Discord.
-const SERVER_BRIDGE_SECRET = 'REMPLACE_MOI_PAR_LE_SECRET_DU_SERVEUR';
+const SERVER_BRIDGE_SECRET = '87b92f11263872ac7da00e5dbc1a3d76db53e9a753fda30e018f7bba818e6c9d';
 
 // ══════════════════════════════════════════════════════════════════
 
@@ -45,7 +58,7 @@ const PocketBase = require('pocketbase/cjs');
 const crypto = require('crypto');
 
 admin.initializeApp({
-  credential: admin.credential.cert(require(FIREBASE_SERVICE_ACCOUNT_PATH)),
+  credential: admin.credential.cert(FIREBASE_SERVICE_ACCOUNT),
 });
 const firestore = admin.firestore();
 
