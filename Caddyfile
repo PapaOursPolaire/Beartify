@@ -215,7 +215,7 @@ beartify.duckdns.org {
     # PROXY POCKETBASE (Beartify — playlists / présence / social / stats)
     handle /api/pb/* {
         uri strip_prefix /api/pb
-        reverse_proxy 127.0.0.1:8090 {
+        reverse_proxy 127.0.0.1:8095 {
             header_up  X-Real-IP       {remote_host}
             header_up  X-Forwarded-For {remote_host}
         }
@@ -239,9 +239,6 @@ beartify.duckdns.org {
             header_down -X-Emby-Token
             header_down Access-Control-Allow-Origin "{http.request.header.Origin}"
             header_down Access-Control-Allow-Credentials "true"
-            header_down Access-Control-Allow-Origin "{http.request.header.Origin}"
-            header_down Access-Control-Allow-Credentials "true"
-            header_down -Access-Control-Allow-Origin
             header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
             header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
             header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
@@ -387,7 +384,7 @@ http://192.168.0.18 {
     # PROXY POCKETBASE (Beartify — playlists / présence / social / stats)
     handle /api/pb/* {
         uri strip_prefix /api/pb
-        reverse_proxy 127.0.0.1:8090 {
+        reverse_proxy 127.0.0.1:8095 {
             header_up  X-Real-IP       {remote_host}
             header_up  X-Forwarded-For {remote_host}
         }
@@ -522,7 +519,7 @@ http://192.168.0.2 {
     # PROXY POCKETBASE (Beartify — playlists / présence / social / stats)
     handle /api/pb/* {
         uri strip_prefix /api/pb
-        reverse_proxy 127.0.0.1:8090 {
+        reverse_proxy 127.0.0.1:8095 {
             header_up  X-Real-IP       {remote_host}
             header_up  X-Forwarded-For {remote_host}
         }
@@ -544,6 +541,8 @@ http://192.168.0.2 {
 
             header_down -Access-Control-Allow-Origin
             header_down -X-Emby-Token
+            header_down Access-Control-Allow-Origin "{http.request.header.Origin}"
+            header_down Access-Control-Allow-Credentials "true"
             header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
             header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
             header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
