@@ -1,72 +1,649 @@
-[Info] Successfully preconnected to https://www.gstatic.com/
-[Info] Successfully preconnected to https://fonts.googleapis.com/
-[Info] Successfully preconnected to https://cdn.jsdelivr.net/
-[Info] Successfully preconnected to https://lrclib.net/
-[Log] [DevTools] – "DevTools actifs↵  F12 / Ctrl+Shift+I → Ouvrir/fermer DevTools↵  Ctrl+Shift+R       → Recharger la WebView↵  Ctrl+Shift+D       → Pannea…" (tauri-devtools.js, line 181)
-"DevTools actifs
-  F12 / Ctrl+Shift+I → Ouvrir/fermer DevTools
-  Ctrl+Shift+R       → Recharger la WebView
-  Ctrl+Shift+D       → Panneau debug Beartify
-  Ctrl+Shift+L       → Exporter les logs console
-  Ctrl+Shift+P       → Infos plateforme"
-[Log] [FirebaseSyncNative] Module chargé ✅ (Tauri: – true – ")" (tauri-devtools.js, line 181)
-[Log] [FirebasePlaylistsNative] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [FirebaseReportsNative] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [FirebaseSocialNative] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [PocketBaseConfig] Client PocketBase initialisé ✅ (tauri-devtools.js, line 181)
-[Log] [PocketBaseAuthBridge] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [PocketBaseSync → PocketBase] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [PocketBasePlaylists → PocketBase] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [PocketBaseReports → PocketBase] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [PocketBaseSocial → PocketBase] Module chargé ✅ (normalisation docId activée) (tauri-devtools.js, line 181)
-[Log] [FallbackRouter] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [FriendsPanel] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [FallbackRouter] ✅ PocketBase disponible — mode nominal (tauri-devtools.js, line 181)
-[Log] [FriendsPanel] ✅ Présence audio patchée (5s interval + événements immédiats) (tauri-devtools.js, line 181)
-[Log] [FriendsPanel] ✅ Panel initialisé (tauri-devtools.js, line 181)
-[Log] ✅ Firebase initialisé avec succès (Tauri: – true – "/ Android:" – false – ")" (tauri-devtools.js, line 181)
-[Log] ✅ Firebase prêt (tauri-devtools.js, line 181)
-[Log] [FirebaseSyncNative] ⏱️ Synchronisation automatique activée (onSnapshot) (tauri-devtools.js, line 181)
-[Log] [Sync] ✅ Présence activée (interval unique, 30s) (tauri-devtools.js, line 181)
-[Log] [Beartify] 22602 titres chargés depuis le cache - actualisation en arrière-plan… (tauri-devtools.js, line 181)
-[Error] TypeError: undefined is not an object (evaluating 'gapi.iframes.getContext')
-	callback (firebase-auth-compat.js:1:101841)
-	(anonymous function) (api.js:23:491)
-	ja (api.js:16:704)
-	B (api.js:23:475)
-	(anonymous function) (api.js:24)
-	(anonymous function) (api.js:24:130)
-	Global Code (cb=gapi.loaded_0:1)
-[Error] Refused to connect to https://apis.google.com/_/jserror?script=https%3A%2F%2Fapis.google.com%2F_%2Fscs%2Fabc-static%2F_%2Fjs%2Fk%3Dgapi.lb.fr.nlcSf1XiR_U.O%2Fm%3Dgapi_iframes%2Frt%3Dj%2Fsv%3D1%2Fd%3D1%2Fed%3D1%2Frs%3DAHpOoo9DDegfHzV0ObBsXUYCy3nKOBYL1Q%2Fcb%3Dgapi.loaded_0&error=t%60tauri&line=157 because it does not appear in the connect-src directive of the Content Security Policy.
-[Error] Error: t`tauri
-	(anonymous function) (api.js:24:616)
-	(anonymous function) (api.js:23:491)
-	ja (api.js:16:704)
-	B (api.js:23:475)
-	(anonymous function) (api.js:24)
-	(anonymous function) (api.js:24:130)
-	Global Code (cb=gapi.loaded_1:1)
-[Error] Failed to load resource: the server responded with a status of 404 (Not Found) (extensions, line 0)
-[Warning] [Marketplace] GitHub discovery failed: – Error: GET /api/extensions → HTTP 404 (tauri-devtools.js, line 181)
-Error: GET /api/extensions → HTTP 404
-[Error] Failed to load resource: the server responded with a status of 404 (Not Found) (5b14022ecf046d874e47f597a0ec0d1a, line 0)
-[Warning] [HLS] Fallback URL directe : – "HLS session HTTP 404" (tauri-devtools.js, line 181)
-[Error] Access-Control-Allow-Origin cannot contain more than one origin.
-[Error] Failed to load resource: Access-Control-Allow-Origin cannot contain more than one origin. (stream, line 0)
-[Warning] Lecture automatique bloquée : – NotSupportedError: The operation is not supported. (tauri-devtools.js, line 181)
-NotSupportedError: The operation is not supported.
-[Error] Origin tauri://localhost is not allowed by Access-Control-Allow-Origin. Status code: 200
-[Error] Cannot load image https://beartify.duckdns.org//api/jellyfin/Items/5b14022ecf046d874e47f597a0ec0d1a/Images/Primary?width=300 due to access control checks.
-[Error] Failed to load resource: Origin tauri://localhost is not allowed by Access-Control-Allow-Origin. Status code: 200 (Primary, line 0)
-[Error] Access-Control-Allow-Origin cannot contain more than one origin.
-[Error] Fetch API cannot load https://beartify.duckdns.org//api/jellyfin/Items?Recursive=true&IncludeItemTypes=Audio&Fields=Id&Limit=1&StartIndex=0 due to access control checks.
-[Error] Failed to load resource: Access-Control-Allow-Origin cannot contain more than one origin. (Items, line 0)
-[Error] Erreur Jellyfin: – TypeError: Load failed
-TypeError: Load failed
-	(anonymous function) (tauri-devtools.js:181)
-	_refreshTracksFromServer (script.js:2692)
-[Error] Access-Control-Allow-Origin cannot contain more than one origin.
-[Error] Fetch API cannot load https://beartify.duckdns.org//api/jellyfin/Users due to access control checks.
-[Error] Failed to load resource: Access-Control-Allow-Origin cannot contain more than one origin. (Users, line 0)
-> Selected Element
-< <div class="home-row-scroll" id="recentlyGrid">…</div>
+# ══════════════════════════════════════════════════════════════════════
+#  BEARTIFY — Caddyfile durci v2.2 (Correction définitive CORS & Regexp)
+# ══════════════════════════════════════════════════════════════════════
+
+# ── Options globales ───────────────────────────────────────────────────
+{
+    # Email utilisé pour les certificats Let's Encrypt
+    email admin@grizzlyrics.duckdns.org
+
+    # Logs structurés centralisés
+    log {
+        output file /var/log/caddy/caddy.log
+        format json
+        level  INFO
+    }
+}
+
+
+# ══════════════════════════════════════════════════════════════════════
+#  SNIPPET — CORS pour Tauri V2 (Corrigé)
+# ══════════════════════════════════════════════════════════════════════
+(cors_tauri) {
+    # CORS dédié à Tauri/local et au domaine de prod
+    @origin_ok header_regexp Origin ^((https?://(?:beartify\.duckdns\.org|tauri\.localhost(?::\d+)?|192\.168\.0\.(?:2|18)(?::\d+)?))|tauri://localhost)$
+
+    @cors_preflight {
+        method OPTIONS
+        header Origin *
+    }
+
+    handle @cors_preflight {
+        @preflight_ok header_regexp Origin ^((https?://(?:beartify\.duckdns\.org|tauri\.localhost(?::\d+)?|192\.168\.0\.(?:2|18)(?::\d+)?))|tauri://localhost)$
+
+        header @preflight_ok Access-Control-Allow-Origin  "{http.request.header.Origin}"
+        header @preflight_ok Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
+        header @preflight_ok Access-Control-Allow-Headers "Content-Type, Authorization, Range, X-Requested-With, Accept, Origin"
+        header @preflight_ok Access-Control-Allow-Credentials "true"
+        header @preflight_ok Access-Control-Max-Age       "86400"
+        header @preflight_ok Vary "Origin"
+        respond "" 204
+    }
+
+    header @origin_ok Access-Control-Allow-Origin  "{http.request.header.Origin}"
+    header @origin_ok Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
+    header @origin_ok Access-Control-Allow-Headers "Content-Type, Authorization, Range, X-Requested-With, Accept, Origin"
+    header @origin_ok Access-Control-Allow-Credentials "true"
+    header @origin_ok Access-Control-Expose-Headers "Content-Length, Content-Range, Accept-Ranges"
+    header @origin_ok Vary "Origin"
+}
+
+# ══════════════════════════════════════════════════════════════════════
+#  SNIPPET — Routes HLS/DRM + Marketplace → drm.js (:3001)
+# ══════════════════════════════════════════════════════════════════════
+(drm_routes) {
+    handle /api/hls/* {
+        reverse_proxy 127.0.0.1:3001 {
+            flush_interval -1
+            header_up  X-Real-IP       {remote_host}
+            header_up  X-Forwarded-For {remote_host}
+        }
+    }
+
+    handle /api/extensions* {
+        reverse_proxy 127.0.0.1:3001 {
+            header_up  X-Real-IP       {remote_host}
+            header_up  X-Forwarded-For {remote_host}
+        }
+    }
+}
+
+
+# ══════════════════════════════════════════════════════════════════════
+#  SNIPPET — Lingva Translate auto-hébergé (:3003)
+# ══════════════════════════════════════════════════════════════════════
+(lingva_proxy) {
+    handle /api/translate/* {
+        uri strip_prefix /api/translate
+
+        reverse_proxy 127.0.0.1:3003 {
+            header_up  Host             127.0.0.1:3003
+            header_up  X-Real-IP        {remote_host}
+            header_up  X-Forwarded-For  {remote_host}
+            header_down -Access-Control-Allow-Origin
+
+            transport http {
+                response_header_timeout 15s
+                dial_timeout            5s
+            }
+        }
+    }
+}
+
+
+# ══════════════════════════════════════════════════════════════════════
+#  SNIPPET — Téléchargement VIP MP3
+# ══════════════════════════════════════════════════════════════════════
+(download_vip_headers) {
+    @mp3_download {
+        path /api/jellyfin/Audio/*/stream
+        query Container=mp3
+    }
+    header @mp3_download Content-Disposition "attachment"
+    header @mp3_download Cache-Control       "no-store, no-cache"
+}
+
+
+# ──────────────────────────────────────────────────────────────────────
+#  1. NEXTCLOUD — grizzlyrics.duckdns.org
+# ──────────────────────────────────────────────────────────────────────
+grizzlyrics.duckdns.org {
+
+    root * /var/www/nextcloud
+    php_fastcgi unix//run/php/php8.4-fpm.sock
+    file_server
+
+    encode zstd gzip
+
+    request_body {
+        max_size 10GB
+    }
+
+    header {
+        Strict-Transport-Security "max-age=15768000; includeSubDomains; preload"
+        X-Content-Type-Options    "nosniff"
+        X-Frame-Options           "SAMEORIGIN"
+        Referrer-Policy           "strict-origin-when-cross-origin"
+        Permissions-Policy        "geolocation=(), microphone=(), camera=()"
+        -Server
+    }
+
+    log {
+        output file /var/log/caddy/nextcloud-access.log
+        format json
+    }
+}
+
+
+# ──────────────────────────────────────────────────────────────────────
+#  2. JELLYFIN — grizzly-stream.duckdns.org
+# ──────────────────────────────────────────────────────────────────────
+grizzly-stream.duckdns.org {
+
+    encode zstd gzip
+
+    header {
+        Strict-Transport-Security "max-age=15768000; includeSubDomains; preload"
+        X-Content-Type-Options    "nosniff"
+        X-Frame-Options           "SAMEORIGIN"
+        Referrer-Policy           "strict-origin-when-cross-origin"
+        -Server
+    }
+
+    handle_path /wol* {
+        reverse_proxy 127.0.0.1:8080
+    }
+
+    handle {
+        reverse_proxy 127.0.0.1:8096 {
+            header_up  Host              {host}
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto {scheme}
+            header_up  Connection        {http.request.header.Connection}
+            header_up  Upgrade           {http.request.header.Upgrade}
+        }
+    }
+
+    log {
+        output file /var/log/caddy/jellyfin-access.log
+        format json
+    }
+}
+
+
+# ──────────────────────────────────────────────────────────────────────
+#  3. BEARTIFY — beartify.duckdns.org
+# ──────────────────────────────────────────────────────────────────────
+beartify.duckdns.org {
+
+    # Forcer le nettoyage des doubles slashes en amont
+    import cors_tauri
+    route {
+        uri replace // /
+    }
+
+    root * /var/www/html/player
+    encode zstd gzip
+
+    header {
+        Strict-Transport-Security "max-age=15768000; includeSubDomains; preload"
+        X-Content-Type-Options    "nosniff"
+        X-Frame-Options           "SAMEORIGIN"
+        Referrer-Policy           "strict-origin-when-cross-origin"
+        Permissions-Policy        "geolocation=(), microphone=(), camera=(), payment=()"
+
+        Content-Security-Policy "default-src 'self' https://beartify-firebase.firebaseapp.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://discord.com https://lrclib.net https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://apis.google.com https://accounts.google.com https://www.gstatic.com https://lingva.ml https://translate.plausibility.cloud https://lingva.thedaviddelta.com wss://grizzly-stream.duckdns.org https://grizzly-stream.duckdns.org; frame-src 'self' https://beartify-firebase.firebaseapp.com https://accounts.google.com; frame-ancestors 'none';"
+
+        -Server
+    }
+
+    @static {
+        path *.js *.css *.woff2 *.woff *.ttf *.png *.jpg *.svg *.ico *.webp *.gif
+    }
+    header @static Cache-Control "public, max-age=31536000, immutable"
+
+    # Covers Jellyfin proxifiées : le chemin ne se termine jamais par une
+    # extension de fichier (ex: /api/jellyfin/Items/{id}/Images/Primary),
+    # donc le matcher @static ci-dessus ne les attrape jamais malgré son nom
+    # trompeur — elles repartaient donc sans cache long, re-téléchargées à
+    # chaque session. Le tag d'image dans l'URL (?tag=...) les rend uniques
+    # par version, donc un cache "immutable" est sans danger ici aussi.
+    @jellyfin_images {
+        path /api/jellyfin/Items/*/Images/*
+    }
+    header @jellyfin_images Cache-Control "public, max-age=31536000, immutable"
+
+    # 🔐 HLS DRM
+    import drm_routes
+
+    # Lingva Translate
+    import lingva_proxy
+
+    # Headers téléchargement VIP MP3
+    import download_vip_headers
+
+    # PROXY POCKETBASE (Beartify — playlists / présence / social / stats)
+    handle /api/pb/* {
+        uri strip_prefix /api/pb
+        reverse_proxy 127.0.0.1:8095 {
+            header_up  X-Real-IP       {remote_host}
+            header_up  X-Forwarded-For {remote_host}
+        }
+    }
+
+    # PROXY JELLYFIN
+    handle /api/jellyfin/* {
+        uri strip_prefix /api/jellyfin
+
+        reverse_proxy 127.0.0.1:8096 {
+            flush_interval -1
+
+            header_up  X-Emby-Token      "aaa8a7df4b364cf7bcc76f351d768798"
+            header_up  Host              grizzly-stream.duckdns.org
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto {scheme}
+            header_up  Connection        {http.request.header.Connection}
+            header_up  Upgrade           {http.request.header.Upgrade}
+
+            header_down -X-Emby-Token
+            header_down -Access-Control-Allow-Origin
+            header_down Access-Control-Allow-Origin "{http.request.header.Origin}"
+            header_down Access-Control-Allow-Credentials "true"
+            header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
+            header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
+            header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
+            header_down Location `\?api_key=[^&]*&` `?`
+            header_down Location `\?api_key=[^&]*$` ``
+            header_down Location `&api_key=[^&]*`   ``
+        }
+    }
+
+    # PROXY LAST.FM
+    handle /api/lastfm/* {
+        uri strip_prefix /api/lastfm
+        rewrite * {path}?{query}&api_key=b25b959554ed76058ac220b7b2e0a026&format=json
+
+        reverse_proxy https://ws.audioscrobbler.com {
+            header_up  Host              ws.audioscrobbler.com
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_down -X-Api-Key
+            header_down -Access-Control-Allow-Origin
+        }
+    }
+
+    # PROXY GRIZZLYRICS
+    handle /api/lyrics/* {
+        uri strip_prefix /api/lyrics
+
+        reverse_proxy 127.0.0.1:443 {
+            header_up  Host              grizzlyrics.duckdns.org
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto https
+
+            header_down Location "https://grizzlyrics.duckdns.org:443" "/api/lyrics"
+            header_down Location "https://grizzlyrics.duckdns.org"     "/api/lyrics"
+            header_down Location "http://grizzlyrics.duckdns.org:443"  "/api/lyrics"
+            header_down Location "http://grizzlyrics.duckdns.org"      "/api/lyrics"
+            header_down -Access-Control-Allow-Origin
+
+            transport http {
+                tls
+                tls_server_name grizzlyrics.duckdns.org
+            }
+        }
+    }
+
+    # PROXY NEXTCLOUD
+    handle /api/nextcloud/* {
+        uri strip_prefix /api/nextcloud
+
+        reverse_proxy 127.0.0.1:443 {
+            header_up  Host              grizzlyrics.duckdns.org
+            header_up  Authorization     "Basic cGFwYW91cnM6MjkwODA5"
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto https
+
+            header_down -Authorization
+            header_down -WWW-Authenticate
+            header_down -Access-Control-Allow-Origin
+
+            transport http {
+                tls
+                tls_server_name grizzlyrics.duckdns.org
+            }
+        }
+    }
+
+    @notFile {
+        not path *.js *.css *.png *.jpg *.svg *.ico *.woff* *.ttf *.webp *.json *.html *.gif
+        not path /api/*
+    }
+    rewrite @notFile /index.html
+    file_server
+
+    log {
+        output file /var/log/caddy/beartify-access.log
+        format json
+    }
+}
+
+
+# ──────────────────────────────────────────────────────────────────────
+#  4. GRIZZLYFIN — grizzlyfin.duckdns.org
+# ──────────────────────────────────────────────────────────────────────
+grizzlyfin.duckdns.org {
+
+    root * /var/www/bearflix/
+    encode zstd gzip
+
+    header {
+        Strict-Transport-Security "max-age=15768000; includeSubDomains; preload"
+        X-Content-Type-Options    "nosniff"
+        X-Frame-Options           "SAMEORIGIN"
+        Referrer-Policy           "strict-origin-when-cross-origin"
+        Permissions-Policy        "geolocation=(), microphone=(), camera=()"
+        -Server
+    }
+
+    @static {
+        path *.js *.css *.woff2 *.woff *.ttf *.png *.jpg *.jpeg *.gif *.svg *.ico *.webp *.mp4 *.webm
+    }
+    header @static Cache-Control "public, max-age=31536000, immutable"
+
+    @jellyfin_images {
+        path /api/jellyfin/Items/*/Images/*
+    }
+    header @jellyfin_images Cache-Control "public, max-age=31536000, immutable"
+
+    file_server
+
+    log {
+        output file /var/log/caddy/grizzlyfin-access.log
+        format json
+    }
+}
+
+
+# ──────────────────────────────────────────────────────────────────────
+#  5. BEARTIFY LAN — http://192.168.0.18
+# ──────────────────────────────────────────────────────────────────────
+http://192.168.0.18 {
+
+    import cors_tauri
+    route {
+        uri replace // /
+    }
+
+    root * /var/www/html/player
+    encode zstd gzip
+
+    header {
+        X-Content-Type-Options    "nosniff"
+        X-Frame-Options           "SAMEORIGIN"
+        Referrer-Policy           "strict-origin-when-cross-origin"
+        -Server
+    }
+
+    @static {
+        path *.js *.css *.woff2 *.woff *.ttf *.png *.jpg *.svg *.ico *.webp
+    }
+    header @static Cache-Control "public, max-age=31536000, immutable"
+
+    @jellyfin_images {
+        path /api/jellyfin/Items/*/Images/*
+    }
+    header @jellyfin_images Cache-Control "public, max-age=31536000, immutable"
+
+    import drm_routes
+    import lingva_proxy
+    import download_vip_headers
+
+    # PROXY POCKETBASE (Beartify — playlists / présence / social / stats)
+    handle /api/pb/* {
+        uri strip_prefix /api/pb
+        reverse_proxy 127.0.0.1:8095 {
+            header_up  X-Real-IP       {remote_host}
+            header_up  X-Forwarded-For {remote_host}
+        }
+    }
+
+    handle /api/jellyfin/* {
+        uri strip_prefix /api/jellyfin
+
+        reverse_proxy 127.0.0.1:8096 {
+            flush_interval -1
+
+            header_up  X-Emby-Token      "aaa8a7df4b364cf7bcc76f351d768798"
+            header_up  Host              grizzly-stream.duckdns.org
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto {scheme}
+            header_up  Connection        {http.request.header.Connection}
+            header_up  Upgrade           {http.request.header.Upgrade}
+
+            header_down -Access-Control-Allow-Origin
+            header_down -X-Emby-Token
+            header_down Access-Control-Allow-Origin "{http.request.header.Origin}"
+            header_down Access-Control-Allow-Credentials "true"
+            header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
+            header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
+            header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
+            header_down Location `\?api_key=[^&]*&` `?`
+            header_down Location `\?api_key=[^&]*$` ``
+            header_down Location `&api_key=[^&]*`   ``
+        }
+    }
+
+    handle /api/lastfm/* {
+        uri strip_prefix /api/lastfm
+        rewrite * {path}?{query}&api_key=b25b959554ed76058ac220b7b2e0a026&format=json
+
+        reverse_proxy https://ws.audioscrobbler.com {
+            header_up  Host              ws.audioscrobbler.com
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_down -X-Api-Key
+            header_down -Access-Control-Allow-Origin
+        }
+    }
+
+    handle /api/lyrics/* {
+        uri strip_prefix /api/lyrics
+
+        reverse_proxy 127.0.0.1:443 {
+            header_up  Host              grizzlyrics.duckdns.org
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto https
+
+            header_down Location "https://grizzlyrics.duckdns.org:443" "/api/lyrics"
+            header_down Location "https://grizzlyrics.duckdns.org"     "/api/lyrics"
+            header_down Location "http://grizzlyrics.duckdns.org:443"  "/api/lyrics"
+            header_down Location "http://grizzlyrics.duckdns.org"      "/api/lyrics"
+            header_down -Access-Control-Allow-Origin
+
+            transport http {
+                tls
+                tls_server_name grizzlyrics.duckdns.org
+            }
+        }
+    }
+
+    handle /api/nextcloud/* {
+        uri strip_prefix /api/nextcloud
+
+        reverse_proxy 127.0.0.1:443 {
+            header_up  Host              grizzlyrics.duckdns.org
+            header_up  Authorization     "Basic cGFwYW91cnM6MjkwODA5"
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto https
+
+            header_down -Authorization
+            header_down -WWW-Authenticate
+            header_down -Access-Control-Allow-Origin
+
+            transport http {
+                tls
+                tls_server_name grizzlyrics.duckdns.org
+            }
+        }
+    }
+
+    @notFile {
+        not path *.js *.css *.png *.jpg *.svg *.ico *.woff* *.ttf *.webp *.json *.html
+        not path /api/*
+    }
+    rewrite @notFile /index.html
+    file_server
+
+    log {
+        output file /var/log/caddy/beartify-lan-access.log
+        format json
+    }
+}
+
+
+# ──────────────────────────────────────────────────────────────────────
+#  6. BEARTIFY LAN — http://192.168.0.2
+# ──────────────────────────────────────────────────────────────────────
+http://192.168.0.2 {
+
+    import cors_tauri
+    route {
+        uri replace // /
+    }
+
+    root * /var/www/html/player
+    encode zstd gzip
+
+    header {
+        X-Content-Type-Options    "nosniff"
+        X-Frame-Options           "SAMEORIGIN"
+        Referrer-Policy           "strict-origin-when-cross-origin"
+        -Server
+    }
+
+    @static {
+        path *.js *.css *.woff2 *.woff *.ttf *.png *.jpg *.svg *.ico *.webp
+    }
+    header @static Cache-Control "public, max-age=31536000, immutable"
+
+    @jellyfin_images {
+        path /api/jellyfin/Items/*/Images/*
+    }
+    header @jellyfin_images Cache-Control "public, max-age=31536000, immutable"
+
+    import drm_routes
+    import lingva_proxy
+    import download_vip_headers
+
+    # PROXY POCKETBASE (Beartify — playlists / présence / social / stats)
+    handle /api/pb/* {
+        uri strip_prefix /api/pb
+        reverse_proxy 127.0.0.1:8095 {
+            header_up  X-Real-IP       {remote_host}
+            header_up  X-Forwarded-For {remote_host}
+        }
+    }
+
+    handle /api/jellyfin/* {
+        uri strip_prefix /api/jellyfin
+
+        reverse_proxy 127.0.0.1:8096 {
+            flush_interval -1
+
+            header_up  X-Emby-Token      "aaa8a7df4b364cf7bcc76f351d768798"
+            header_up  Host              grizzly-stream.duckdns.org
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto {scheme}
+            header_up  Connection        {http.request.header.Connection}
+            header_up  Upgrade           {http.request.header.Upgrade}
+
+            header_down -Access-Control-Allow-Origin
+            header_down -X-Emby-Token
+            header_down Access-Control-Allow-Origin "{http.request.header.Origin}"
+            header_down Access-Control-Allow-Credentials "true"
+            header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
+            header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
+            header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
+            header_down Location `\?api_key=[^&]*&` `?`
+            header_down Location `\?api_key=[^&]*$` ``
+            header_down Location `&api_key=[^&]*`   ``
+        }
+    }
+
+    handle /api/lastfm/* {
+        uri strip_prefix /api/lastfm
+        rewrite * {path}?{query}&api_key=b25b959554ed76058ac220b7b2e0a026&format=json
+
+        reverse_proxy https://ws.audioscrobbler.com {
+            header_up  Host              ws.audioscrobbler.com
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_down -X-Api-Key
+            header_down -Access-Control-Allow-Origin
+        }
+    }
+
+    handle /api/lyrics/* {
+        uri strip_prefix /api/lyrics
+
+        reverse_proxy 127.0.0.1:443 {
+            header_up  Host              grizzlyrics.duckdns.org
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto https
+
+            header_down Location "https://grizzlyrics.duckdns.org:443" "/api/lyrics"
+            header_down Location "https://grizzlyrics.duckdns.org"     "/api/lyrics"
+            header_down Location "http://grizzlyrics.duckdns.org:443"  "/api/lyrics"
+            header_down Location "http://grizzlyrics.duckdns.org"      "/api/lyrics"
+            header_down -Access-Control-Allow-Origin
+
+            transport http {
+                tls
+                tls_server_name grizzlyrics.duckdns.org
+            }
+        }
+    }
+
+    handle /api/nextcloud/* {
+        uri strip_prefix /api/nextcloud
+
+        reverse_proxy 127.0.0.1:443 {
+            header_up  Host              grizzlyrics.duckdns.org
+            header_up  Authorization     "Basic cGFwYW91cnM6MjkwODA5"
+            header_up  X-Real-IP         {remote_host}
+            header_up  X-Forwarded-For   {remote_host}
+            header_up  X-Forwarded-Proto https
+
+            header_down -Authorization
+            header_down -WWW-Authenticate
+            header_down -Access-Control-Allow-Origin
+
+            transport http {
+                tls
+                tls_server_name grizzlyrics.duckdns.org
+            }
+        }
+    }
+
+    @notFile {
+        not path *.js *.css *.png *.jpg *.svg *.ico *.woff* *.ttf *.webp *.json *.html
+        not path /api/*
+    }
+    rewrite @notFile /index.html
+    file_server
+
+    log {
+        output file /var/log/caddy/beartify-node-server.log
+        format json
+    }
+}
