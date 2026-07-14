@@ -70,9 +70,9 @@
 
 
 # ══════════════════════════════════════════════════════════════════════
-#  SNIPPET — Lingva Translate auto-hébergé (:3003)
+#  SNIPPET — LibreTranslate auto-hébergé (:3003)
 # ══════════════════════════════════════════════════════════════════════
-(lingva_proxy) {
+(libretranslate_proxy) {
     handle /api/translate/* {
         uri strip_prefix /api/translate
 
@@ -83,7 +83,9 @@
             header_down -Access-Control-Allow-Origin
 
             transport http {
-                response_header_timeout 15s
+                # Inférence neuronale locale : plus lent que le scraping
+                # Lingva, d'où des délais augmentés.
+                response_header_timeout 25s
                 dial_timeout            5s
             }
         }
@@ -193,7 +195,7 @@ beartify.duckdns.org {
         Referrer-Policy           "strict-origin-when-cross-origin"
         Permissions-Policy        "geolocation=(), microphone=(), camera=(), payment=()"
 
-        Content-Security-Policy "default-src 'self' https://beartify-firebase.firebaseapp.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://discord.com https://lrclib.net https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://apis.google.com https://accounts.google.com https://www.gstatic.com https://lingva.ml https://translate.plausibility.cloud https://lingva.thedaviddelta.com wss://grizzly-stream.duckdns.org https://grizzly-stream.duckdns.org; frame-src 'self' https://beartify-firebase.firebaseapp.com https://accounts.google.com; frame-ancestors 'none';"
+        Content-Security-Policy "default-src 'self' https://beartify-firebase.firebaseapp.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://discord.com https://lrclib.net https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://apis.google.com https://accounts.google.com https://www.gstatic.com wss://grizzly-stream.duckdns.org https://grizzly-stream.duckdns.org; frame-src 'self' https://beartify-firebase.firebaseapp.com https://accounts.google.com; frame-ancestors 'none';"
 
         -Server
     }
@@ -217,8 +219,8 @@ beartify.duckdns.org {
     # 🔐 HLS DRM
     import drm_routes
 
-    # Lingva Translate
-    import lingva_proxy
+    # LibreTranslate
+    import libretranslate_proxy
 
     # Headers téléchargement VIP MP3
     import download_vip_headers
@@ -405,7 +407,7 @@ http://192.168.0.18 {
     header @jellyfin_images Cache-Control "public, max-age=31536000, immutable"
 
     import drm_routes
-    import lingva_proxy
+    import libretranslate_proxy
     import download_vip_headers
 
     # PROXY POCKETBASE (Beartify — playlists / présence / social / stats)
@@ -550,7 +552,7 @@ http://192.168.0.2 {
     header @jellyfin_images Cache-Control "public, max-age=31536000, immutable"
 
     import drm_routes
-    import lingva_proxy
+    import libretranslate_proxy
     import download_vip_headers
 
     # PROXY POCKETBASE (Beartify — playlists / présence / social / stats)
