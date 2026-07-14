@@ -1,44 +1,18 @@
-// Compare la clé privée intégrée avec le certificat PUBLIC que Google
-// publie pour ce compte de service — si les modulus ne correspondent
-// pas, la clé privée ne correspond definitivement pas à ce que Google
-// attend (peu importe la méthode utilisée pour signer).
-const crypto = require('crypto');
-const https = require('https');
+# 1. Le conteneur tourne et a fini de charger les modèles ?
+docker ps -a | grep libretranslate
+docker logs --tail 50 libretranslate
 
-const script = require('fs').readFileSync('/home/papaours/mftp.js', 'utf8');
-const match = script.match(/const FIREBASE_SERVICE_ACCOUNT = (\{[\s\S]*?\n\};)/);
-const sa = eval('(' + match[1].slice(0, -1) + ')');
+# 2. Test direct sur le conteneur (contourne Caddy)
+curl -X POST http://127.0.0.1:3003/translate \
+  -H "Content-Type: application/json" \
+  -d '{"q":"hello world","source":"en","target":"fr","format":"text"}'
 
-https.get(sa.client_x509_cert_url, (res) => {
-  let body = '';
-  res.on('data', d => body += d);
-  res.on('end', () => {
-    const certs = JSON.parse(body);
-    const certPem = certs[sa.private_key_id];
+# 3. Test via Caddy en local (contourne le DNS/HTTPS public)
+curl -X POST http://127.0.0.1/api/translate/translate \
+  -H "Content-Type: application/json" \
+  -H "Host: beartify.duckdns.org" \
+  -d '{"q":"hello world","source":"en","target":"fr","format":"text"}'
 
-    if (!certPem) {
-      console.log('❌ Aucun certificat public trouvé pour private_key_id:', sa.private_key_id);
-      console.log('   Clés disponibles côté Google:', Object.keys(certs));
-      console.log('   → Cette clé a été RÉVOQUÉE ou n\'existe plus côté Google.');
-      return;
-    }
-
-    const privateKeyObj = crypto.createPrivateKey(sa.private_key);
-    const publicKeyFromPrivate = crypto.createPublicKey(privateKeyObj).export({ type: 'spki', format: 'pem' });
-
-    const cert = new crypto.X509Certificate(certPem);
-    const publicKeyFromCert = cert.publicKey.export({ type: 'spki', format: 'pem' });
-
-    console.log('Clé publique dérivée de TA clé privée :\n', publicKeyFromPrivate);
-    console.log('Clé publique publiée par Google pour ce key_id :\n', publicKeyFromCert);
-
-    if (publicKeyFromPrivate === publicKeyFromCert) {
-      console.log('✅ CORRESPONDANCE : ta clé privée correspond bien à ce que Google a en mémoire.');
-      console.log('   → Le problème est donc ailleurs (horodatage, format JWT, etc.)');
-    } else {
-      console.log('❌ AUCUNE CORRESPONDANCE : ta clé privée NE correspond PAS au certificat public de Google.');
-      console.log('   → Cette clé est invalide côté Google, quelle que soit la méthode utilisée.');
-      console.log('   → Il faut en régénérer une nouvelle ET la retransmettre par upload de fichier direct (pas de copier-coller).');
-    }
-  });
-}).on('error', e => console.error('❌ Erreur réseau:', e.message));
+# 4. Caddy a bien rechargé sans erreur ?
+sudo systemctl status caddy --no-pager
+sudo journalctl -u caddy --since "10 min ago" --no-pager | tail -30
