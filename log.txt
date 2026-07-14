@@ -1,4 +1,4 @@
-# Identifier ce qui tient vraiment le port 3003
+papaours@papaours:~/Tauri$ # Identifier ce qui tient vraiment le port 3003
 sudo ss -tlnp | grep 3003
 docker ps -a
 
@@ -9,3 +9,56 @@ docker rm -f <nom-du-conteneur-lingva>
 # Le conteneur libretranslate est déjà créé, il suffit de le démarrer
 docker start libretranslate
 docker logs -f libretranslate   # surveille le téléchargement des modèles
+LISTEN 0      511                        0.0.0.0:3003       0.0.0.0:*    users:(("node",pid=1359,fd=18))       
+CONTAINER ID   IMAGE                                     COMMAND                  CREATED          STATUS                          PORTS                                                                                                                                   NAMES
+30f0d5211dea   libretranslate/libretranslate:latest      "./scripts/entrypoin…"   29 minutes ago   Created                                                                                                                                                                 libretranslate
+7a436e5c5042   guacamole/guacamole:latest                "/opt/guacamole/bin/…"   3 weeks ago      Up About an hour                0.0.0.0:8444->8080/tcp, [::]:8444->8080/tcp                                                                                             guacamole
+86fc10349763   ghcr.io/ajnart/homarr:latest              "sh ./scripts/run.sh"    3 weeks ago      Up About an hour (unhealthy)    0.0.0.0:7575->7575/tcp, [::]:7575->7575/tcp                                                                                             homarr
+2df6c7020cf9   postgres:15-alpine                        "docker-entrypoint.s…"   3 weeks ago      Up About an hour                5432/tcp                                                                                                                                guacamole_db
+a362e0cd178d   portainer/portainer-ce:latest             "/portainer"             3 weeks ago      Up About an hour                8000/tcp, 9000/tcp, 0.0.0.0:9443->9443/tcp, [::]:9443->9443/tcp                                                                         portainer
+09d77b852ab8   lscr.io/linuxserver/qbittorrent:latest    "/init"                  3 weeks ago      Up About an hour                0.0.0.0:6881->6881/tcp, 0.0.0.0:6881->6881/udp, [::]:6881->6881/tcp, [::]:6881->6881/udp, 0.0.0.0:8089->8080/tcp, [::]:8089->8080/tcp   qbittorrent
+7ffbbd023105   netdata/netdata:stable                    "/usr/sbin/run.sh"       3 weeks ago      Up About an hour (healthy)                                                                                                                                              netdata
+b6e7acfc1fe7   ghcr.io/analogj/scrutiny:master-omnibus   "/init"                  3 weeks ago      Up About an hour                0.0.0.0:8686->8686/tcp, [::]:8686->8686/tcp, 0.0.0.0:8060->8080/tcp, [::]:8060->8080/tcp                                                scrutiny
+b249aa20e3f2   lscr.io/linuxserver/sonarr:latest         "/init"                  3 weeks ago      Up About an hour                0.0.0.0:8989->8989/tcp, [::]:8989->8989/tcp                                                                                             sonarr
+09873958b307   lscr.io/linuxserver/radarr:latest         "/init"                  3 weeks ago      Up About an hour                0.0.0.0:7878->7878/tcp, [::]:7878->7878/tcp                                                                                             radarr
+216992c2c5bb   nicolargo/glances:latest-full             "/bin/sh -c '/venv/b…"   3 weeks ago      Up About an hour                0.0.0.0:61208->61208/tcp, [::]:61208->61208/tcp, 61209/tcp                                                                              glances
+824a8b5ed02a   fallenbagel/jellyseerr:latest             "/sbin/tini -- pnpm …"   3 weeks ago      Up About an hour                0.0.0.0:5055->5055/tcp, [::]:5055->5055/tcp                                                                                             jellyseerr
+80235a0d43b5   containrrr/watchtower:latest              "/watchtower"            3 weeks ago      Restarting (1) 19 seconds ago                                                                                                                                           watchtower
+9511218b9240   guacamole/guacd:latest                    "/opt/guacamole/entr…"   3 weeks ago      Up About an hour (healthy)      4822/tcp                                                                                                                                guacamole_guacd
+14dec8e83ace   henrygd/beszel-agent:latest               "/agent"                 3 weeks ago      Up About an hour                                                                                                                                                        beszel-agent
+8acd89c7635f   henrygd/beszel:latest                     "/beszel serve --htt…"   3 weeks ago      Up About an hour                0.0.0.0:8090->8090/tcp, [::]:8090->8090/tcp                                                                                             beszel
+bash: erreur de syntaxe près du symbole inattendu « newline »
+libretranslate
+
+░█░░░▀█▀░█▀▄░█▀▄░█▀▀░▀█▀░█▀▄░█▀█░█▀█░█▀▀░█░░░█▀█░▀█▀░█▀▀
+░█░░░░█░░█▀▄░█▀▄░█▀▀░░█░░█▀▄░█▀█░█░█░▀▀█░█░░░█▀█░░█░░█▀▀
+░▀▀▀░▀▀▀░▀▀░░▀░▀░▀▀▀░░▀░░▀░▀░▀░▀░▀░▀░▀▀▀░▀▀▀░▀░▀░░▀░░▀▀▀
+v1.9.6
+
+Booting...
+/app/venv/lib/python3.11/site-packages/requests/__init__.py:109: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+(URLError(gaierror(-3, 'Temporary failure in name resolution')),)
+(URLError(gaierror(-3, 'Temporary failure in name resolution')),)
+(URLError(gaierror(-3, 'Temporary failure in name resolution')),)
+(URLError(gaierror(-3, 'Temporary failure in name resolution')),)
+(URLError(gaierror(-3, 'Temporary failure in name resolution')),)
+(URLError(gaierror(-3, 'Temporary failure in name resolution')),)
+(URLError(gaierror(-3, 'Temporary failure in name resolution')),)
+(URLError(gaierror(-3, 'Temporary failure in name resolution')),)
+(URLError(gaierror(-3, 'Temporary failure in name resolution')),)
+(URLError(gaierror(-3, 'Temporary failure in name resolution')),)
+(URLError(gaierror(-3, 'Temporary failure in name resolution')),)
+(URLError(gaierror(-3, 'Temporary failure in name resolution')),)
+(URLError(gaierror(-3, 'Temporary failure in name resolution')),)
+(URLError(gaierror(-3, 'Temporary failure in name resolution')),)
+(URLError(gaierror(-3, 'Temporary failure in name resolution')),)
+(URLError(gaierror(-3, 'Temporary failure in name resolution')),)
+(URLError(gaierror(-3, 'Temporary failure in name resolution')),)
+(URLError(gaierror(-3, 'Temporary failure in name resolution')),)
+(URLError(gaierror(-3, 'Temporary failure in name resolution')),)
+(URLError(gaierror(-3, 'Temporary failure in name resolution')),)
+(URLError(gaierror(-3, 'Temporary failure in name resolution')),)
+(URLError(gaierror(-3, 'Temporary failure in name resolution')),)
+(URLError(gaierror(-3, 'Temporary failure in name resolution')),)
+(URLError(gaierror(-3, 'Temporary failure in name resolution')),)
