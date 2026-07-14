@@ -61,7 +61,19 @@ else
 fi
 systemctl enable --now docker >/dev/null 2>&1 || true
 
-# ── 2. Nettoyage d'une éventuelle instance Lingva ou LibreTranslate ─────────
+# ── 2. Libérer le port 3003, peu importe QUI l'occupe ──────────────────────
+# Important : si un ancien conteneur Lingva (ou autre) tourne encore sur ce
+# port, "docker run -d" pour LibreTranslate va ÉCHOUER à démarrer (le port
+# est déjà pris), mais laissera quand même un conteneur en état "Created" —
+# silencieux si on ne vérifie pas explicitement, d'où le check à l'étape 4.
+OCCUPANTS="$(docker ps -a --filter "publish=${HOST_PORT}" --format '{{.Names}}' 2>/dev/null || true)"
+if [[ -n "$OCCUPANTS" ]]; then
+  c_info "Port ${HOST_PORT} déjà utilisé par : ${OCCUPANTS} → suppression"
+  echo "$OCCUPANTS" | xargs -r docker rm -f >/dev/null
+fi
+# Filet de sécurité : un vieux conteneur nommé explicitement lingva-translate
+# ou libretranslate mais qui n'apparaîtrait pas via --filter publish (bug
+# connu sur de très vieilles versions de Docker).
 for old in lingva-translate "$NAME"; do
   if docker ps -a --format '{{.Names}}' | grep -qx "$old"; then
     c_info "Conteneur '$old' existant → suppression"
@@ -80,10 +92,37 @@ RUN_ARGS=(
   -d --name "$NAME" --restart unless-stopped
   -p "${HOST_BIND}:${HOST_PORT}:${CONTAINER_PORT}"
   --memory="$MEM_LIMIT"
+  # DNS publics explicites : sur beaucoup de systèmes (Ubuntu/Debian avec
+  # systemd-resolved), /etc/resolv.conf de l'hôte pointe vers 127.0.0.53,
+  # une adresse qui n'a aucun sens depuis l'intérieur d'un conteneur (c'est
+  # sa PROPRE loopback, pas celle de l'hôte). Sans ça, le téléchargement
+  # des modèles Argos échoue avec "Temporary failure in name resolution".
+  --dns=1.1.1.1 --dns=8.8.8.8
   -e LT_DISABLE_WEB_UI=true
 )
 [[ -n "$LANGUAGES" ]] && RUN_ARGS+=(-e "LT_LOAD_ONLY=${LANGUAGES}")
-docker run "${RUN_ARGS[@]}" "$IMAGE" >/dev/null
+if ! docker run "${RUN_ARGS[@]}" "$IMAGE" >/dev/null; then
+  c_err "\"docker run\" a échoué (voir l'erreur ci-dessus — souvent un port déjà occupé)."
+  exit 1
+fi
+
+# "docker run" peut réussir à CRÉER le conteneur tout en échouant à le
+# DÉMARRER (port déjà occupé, par ex.) sans faire remonter d'erreur au
+# shell — le conteneur reste alors bloqué en état "Created" pour toujours.
+# D'où cette vérification explicite de l'état réel avant de continuer.
+sleep 2
+STATUS="$(docker inspect -f '{{.State.Status}}' "$NAME" 2>/dev/null || echo unknown)"
+if [[ "$STATUS" != "running" ]]; then
+  c_err "Le conteneur est en état '${STATUS}' au lieu de 'running'."
+  echo "   Cause la plus fréquente : le port ${HOST_PORT} était déjà occupé"
+  echo "   par autre chose (ancien conteneur Lingva par ex.) au moment du"
+  echo "   démarrage. Pour identifier qui l'occupe :"
+  echo "     sudo ss -tlnp | grep ${HOST_PORT}"
+  echo "   Logs du conteneur (vides si jamais démarré) :"
+  docker logs --tail 40 "$NAME" 2>&1 || true
+  exit 1
+fi
+c_ok "Conteneur démarré (état: running)"
 
 # ── 5/6. Attente + test réel de traduction (combinés) ───────────────────────
 # Pas de vérification "le port répond" séparée : tant que les modèles ne sont
