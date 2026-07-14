@@ -70,14 +70,14 @@
 
 
 # ══════════════════════════════════════════════════════════════════════
-#  SNIPPET — LibreTranslate auto-hébergé (:3003)
+#  SNIPPET — LibreTranslate auto-hébergé (:3005)
 # ══════════════════════════════════════════════════════════════════════
 (libretranslate_proxy) {
     handle /api/translate/* {
         uri strip_prefix /api/translate
 
-        reverse_proxy 127.0.0.1:3003 {
-            header_up  Host             127.0.0.1:3003
+        reverse_proxy 127.0.0.1:3005 {
+            header_up  Host             127.0.0.1:3005
             header_up  X-Real-IP        {remote_host}
             header_up  X-Forwarded-For  {remote_host}
             header_down -Access-Control-Allow-Origin
