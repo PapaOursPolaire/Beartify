@@ -30,7 +30,6 @@
     "deep-link:default",
     "oauth:allow-start",
     "oauth:allow-cancel",
-    "opener:default",
     "notification:default",
     "notification:allow-request-permission",
     "notification:allow-is-permission-granted",
