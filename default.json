@@ -1,0 +1,51 @@
+{
+  "$schema": "https://schema.tauri.app/config/2/capability",
+  "identifier": "default",
+  "description": "Permissions Beartify — fenêtre principale",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:default",
+    "core:webview:allow-internal-toggle-devtools",
+    "core:webview:allow-create-webview-window",
+    "core:webview:allow-get-all-webviews",
+    "core:webview:allow-set-webview-focus",
+    "core:window:allow-create",
+    "core:window:allow-show",
+    "core:window:allow-hide",
+    "core:window:allow-close",
+    "core:window:allow-set-focus",
+    "core:window:allow-set-always-on-top",
+    "core:window:allow-set-position",
+    "core:window:allow-set-size",
+    "core:window:allow-start-dragging",
+    "core:event:allow-listen",
+    "core:event:allow-emit",
+    "core:event:allow-emit-to",
+    "core:event:allow-unlisten",
+    "shell:allow-open",
+    "http:allow-fetch",
+    "http:allow-fetch-read-body",
+    "deep-link:default",
+    "oauth:allow-start",
+    "oauth:allow-cancel",
+    "opener:default",
+    "notification:default",
+    "notification:allow-request-permission",
+    "notification:allow-is-permission-granted",
+    "notification:allow-notify",
+    {
+      "identifier": "http:default",
+      "allow": [
+        { "url": "https://beartify.duckdns.org/*" },
+        { "url": "https://lrclib.net/*" },
+        { "url": "https://*.googleapis.com/*" },
+        { "url": "https://*.firebaseio.com/*" },
+        { "url": "https://discord.com/api/*" },
+        { "url": "https://cdn.discordapp.com/*" },
+        { "url": "https://oauth2.googleapis.com/*" }
+      ]
+    }
+  ]
+}
