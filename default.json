@@ -35,6 +35,20 @@
     "notification:allow-request-permission",
     "notification:allow-is-permission-granted",
     "notification:allow-notify",
+
+    "fs:allow-create-dir",
+    "fs:allow-write-file",
+    "fs:allow-read-dir",
+    "fs:allow-read-text-file",
+    "fs:allow-read-file",
+    "fs:allow-remove-dir",
+    {
+      "identifier": "fs:scope",
+      "allow": [
+        { "path": "$APPLOCALDATA/beartify/extensions/**" }
+      ]
+    },
+
     {
       "identifier": "http:default",
       "allow": [
@@ -44,7 +58,9 @@
         { "url": "https://*.firebaseio.com/*" },
         { "url": "https://discord.com/api/*" },
         { "url": "https://cdn.discordapp.com/*" },
-        { "url": "https://oauth2.googleapis.com/*" }
+        { "url": "https://oauth2.googleapis.com/*" },
+        { "url": "https://api.github.com/*" },
+        { "url": "https://raw.githubusercontent.com/*" }
       ]
     }
   ]
