@@ -35,12 +35,12 @@
     "notification:allow-is-permission-granted",
     "notification:allow-notify",
 
-    "fs:allow-create-dir",
+    "fs:allow-mkdir",
     "fs:allow-write-file",
     "fs:allow-read-dir",
     "fs:allow-read-text-file",
     "fs:allow-read-file",
-    "fs:allow-remove-dir",
+    "fs:allow-remove",
     {
       "identifier": "fs:scope",
       "allow": [
