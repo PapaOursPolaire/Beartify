@@ -25,7 +25,14 @@
     ],
     "security": {
       "csp": "default-src 'self' tauri: asset: http://asset.localhost https://asset.localhost; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://apis.google.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' http://ipc.localhost tauri: asset: http://asset.localhost https://asset.localhost https://beartify.duckdns.org https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://lrclib.net https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://accounts.google.com https://www.gstatic.com https://discord.com https://discordapp.com https://grizzly-stream.duckdns.org https://grizzlyrics.duckdns.org https://api.github.com http://localhost:* http://127.0.0.1:* ws://localhost:*; img-src 'self' tauri: asset: http://asset.localhost https://asset.localhost data: blob: https: http://localhost:* http://127.0.0.1:* https://cdn.discordapp.com https://lh3.googleusercontent.com; media-src 'self' tauri: asset: http://asset.localhost https://asset.localhost blob: https://beartify.duckdns.org https://grizzly-stream.duckdns.org; font-src 'self' data: https://fonts.gstatic.com; frame-src https://accounts.google.com https://*.firebaseapp.com; worker-src 'self' blob:;",
-      "dangerousDisableAssetCspModification": ["script-src"]
+      "dangerousDisableAssetCspModification": ["script-src"],
+      "assetProtocol": {
+        "enable": true,
+        "scope": [
+          "$VIDEO/**",
+          "$HOME/Videos/**"
+        ]
+      }
     }
   },
   "plugins": {
