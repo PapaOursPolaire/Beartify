@@ -44,7 +44,7 @@
     {
       "identifier": "fs:scope",
       "allow": [
-        { "path": "$APPLOCALDATA/beartify/extensions/**" }
+        { "path": "$DATA/beartify/extensions/**" }
       ]
     },
 
