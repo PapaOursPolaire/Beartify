@@ -60,7 +60,7 @@ const path = require('path');
 const CONFIG = {
   jellyfinUrl:     process.env.JELLYFIN_URL || 'http://127.0.0.1:8096',
   jellyfinApiKey:  process.env.JELLYFIN_API_KEY || '',
-  lyricsDir:       process.env.LYRICS_DIR || '',
+  lyricsDir:       process.env.LYRICS_DIR || '/home/papaours/Téléchargements',
   nextcloudUrl:    process.env.NEXTCLOUD_WEBDAV_URL || '',
   nextcloudUser:   process.env.NEXTCLOUD_USER || '',
   nextcloudPass:   process.env.NEXTCLOUD_PASSWORD || '',
@@ -138,17 +138,11 @@ async function countWordSyncedLyrics() {
 }
 
 function classifyLyricsFile(json) {
-  // Format ligne par ligne explicite (Musixmatch/Spotify LINE_SYNCED)
-  if (json?.lyrics?.syncType === 'LINE_SYNCED') return 'line';
-  // Format SpicyLyrics v6 : lignes encodées en "array-of-references"
-  // avec un sous-tableau de mots horodatés individuellement par ligne.
-  const lines = json?.lyrics?.lines || json?.lines;
-  if (Array.isArray(lines) && lines.length) {
-    const hasWordTimings = lines.some(l => Array.isArray(l?.words) && l.words.length > 1);
-    if (hasWordTimings) return 'word';
-    return 'line';
-  }
-  return 'unknown';
+  // Format réel confirmé : présence de "syncType": "WORD" au niveau
+  // racine du fichier = synchronisation mot par mot. Son absence
+  // signifie une synchronisation ligne par ligne (pas de valeur
+  // "unknown" intermédiaire pour ce format).
+  return json?.syncType === 'WORD' ? 'word' : 'line';
 }
 
 // ── 3) Écriture des fichiers de sortie ─────────────────────────────────
