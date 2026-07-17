@@ -66,6 +66,33 @@
             header_up  X-Forwarded-For {remote_host}
         }
     }
+
+    # Liste blanche des ids "certifiés" pour le Marketplace communautaire.
+    # Fichier statique plutôt que route applicative : la certifier un id
+    # se résume à éditer ce fichier JSON, sans toucher au backend Node ni
+    # redéployer quoi que ce soit.
+    handle_path /api/certified* {
+        root * /var/www/beartify-certified
+        header Cache-Control "no-store"
+        file_server
+    }
+
+    # Recherche GitHub par topic (découverte communautaire du Marketplace),
+    # relayée directement par Caddy avec un token attaché côté serveur —
+    # évite que le client appelle api.github.com sans authentification
+    # (limite 10 req/min, vite épuisée et partagée entre tous les
+    # utilisateurs derrière la même IP). {$GITHUB_TOKEN} est résolu depuis
+    # une variable d'environnement au démarrage de Caddy (jamais exposée
+    # au client). GitHub exige aussi un User-Agent sur toute requête API.
+    handle_path /api/github/search* {
+        rewrite * /search/repositories?q=topic:{http.request.uri.query.topic}&per_page=50
+        reverse_proxy https://api.github.com {
+            header_up Host api.github.com
+            header_up Authorization "token {$GITHUB_TOKEN}"
+            header_up Accept "application/vnd.github+json"
+            header_up User-Agent "Beartify-Marketplace"
+        }
+    }
 }
 
 
