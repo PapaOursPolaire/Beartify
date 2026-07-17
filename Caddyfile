@@ -71,10 +71,15 @@
     # Fichier statique plutôt que route applicative : la certifier un id
     # se résume à éditer ce fichier JSON, sans toucher au backend Node ni
     # redéployer quoi que ce soit.
+    # "index index.json" est indispensable : le client appelle /api/certified
+    # sans nom de fichier, et file_server ne sert index.json par défaut que
+    # si on le lui indique explicitement (sinon il cherche index.html).
     handle_path /api/certified* {
         root * /var/www/beartify-certified
         header Cache-Control "no-store"
-        file_server
+        file_server {
+            index index.json
+        }
     }
 
     # Recherche GitHub par topic (découverte communautaire du Marketplace),
@@ -91,6 +96,13 @@
             header_up Authorization "token {$GITHUB_TOKEN}"
             header_up Accept "application/vnd.github+json"
             header_up User-Agent "Beartify-Marketplace"
+
+            # GitHub renvoie déjà son propre Access-Control-Allow-Origin: *.
+            # Sans le retirer ici, cors_tauri (importé plus bas dans le site
+            # block) en ajoute un second par-dessus, et le navigateur reçoit
+            # deux valeurs pour le même header → bloqué par CORS (déjà vu
+            # exactement ce bug avec le proxy PocketBase).
+            header_down -Access-Control-Allow-Origin
         }
     }
 }
@@ -443,10 +455,6 @@ http://192.168.0.18 {
         reverse_proxy 127.0.0.1:8095 {
             header_up  X-Real-IP       {remote_host}
             header_up  X-Forwarded-For {remote_host}
-            # flush_interval -1 : désactive la bufferisation de Caddy pour
-            # cette route — indispensable pour le temps réel PocketBase
-            # (Server-Sent Events), sinon les mises à jour de présence
-            # peuvent être retardées de plusieurs secondes.
             flush_interval -1
         }
     }
@@ -588,10 +596,6 @@ http://192.168.0.2 {
         reverse_proxy 127.0.0.1:8095 {
             header_up  X-Real-IP       {remote_host}
             header_up  X-Forwarded-For {remote_host}
-            # flush_interval -1 : désactive la bufferisation de Caddy pour
-            # cette route — indispensable pour le temps réel PocketBase
-            # (Server-Sent Events), sinon les mises à jour de présence
-            # peuvent être retardées de plusieurs secondes.
             flush_interval -1
         }
     }
