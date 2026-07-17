@@ -1,0 +1,56 @@
+# ═══════════════════════════════════════════════════════════════════
+#  Exemple de configuration systemd pour stats-cron.js
+# ═══════════════════════════════════════════════════════════════════
+#  Deux façons de faire tourner stats-cron.js :
+#    A) En continu (pm2, ou simplement `node stats-cron.js &` dans un
+#       service systemd classique) — le script boucle lui-même toutes
+#       les heures via setInterval.
+#    B) Via un timer systemd qui lance `node stats-cron.js --once`
+#       toutes les heures — plus robuste (pas de process longue durée
+#       à surveiller), c'est l'approche montrée ici.
+#
+#  Installation (option B) :
+#    sudo cp beartify-stats.service /etc/systemd/system/
+#    sudo cp beartify-stats.timer   /etc/systemd/system/
+#    sudo systemctl daemon-reload
+#    sudo systemctl enable --now beartify-stats.timer
+#    sudo systemctl start beartify-stats.service   # premier passage immédiat
+#    systemctl list-timers | grep beartify         # vérifier la planification
+#    journalctl -u beartify-stats.service -f       # suivre les logs
+# ═══════════════════════════════════════════════════════════════════
+
+
+# ── /etc/systemd/system/beartify-stats.service ───────────────────────
+# [Unit]
+# Description=Beartify - calcul horaire des statistiques du catalogue
+# After=network-online.target
+#
+# [Service]
+# Type=oneshot
+# User=beartify
+# WorkingDirectory=/opt/beartify
+# EnvironmentFile=/opt/beartify/.env.stats
+# ExecStart=/usr/bin/node /opt/beartify/stats-cron.js --once
+
+
+# ── /etc/systemd/system/beartify-stats.timer ──────────────────────────
+# [Unit]
+# Description=Déclenche beartify-stats.service toutes les heures
+#
+# [Timer]
+# OnCalendar=hourly
+# Persistent=true
+#
+# [Install]
+# WantedBy=timers.target
+
+
+# ── /opt/beartify/.env.stats (exemple — permissions 600, jamais commité) ─
+# JELLYFIN_URL=http://127.0.0.1:8096
+# JELLYFIN_API_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+# LYRICS_DIR=/opt/beartify/lyrics
+# NEXTCLOUD_WEBDAV_URL=https://ton-nextcloud/remote.php/dav/files/beartify
+# NEXTCLOUD_USER=beartify
+# NEXTCLOUD_PASSWORD=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+# NEXTCLOUD_REMOTE_DIR=/Beartify/public
+# OUTPUT_DIR=/opt/beartify/stats-output
