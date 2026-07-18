@@ -332,10 +332,17 @@ beartify.duckdns.org {
             header_up  Connection        {http.request.header.Connection}
             header_up  Upgrade           {http.request.header.Upgrade}
 
+            # ✅ FIX CORS : ne PAS réinjecter Access-Control-Allow-Origin ici.
+            # cors_tauri (importé en tête de ce site block) le fait déjà pour
+            # toute origine autorisée (@origin_ok). Le refaire ici ajoutait un
+            # second en-tête Access-Control-Allow-Origin en plus de celui posé
+            # par cors_tauri → deux valeurs pour le même header → le navigateur
+            # (WebView2/Tauri inclus) rejette la réponse comme si l'en-tête
+            # était absent (c'est le bug des covers d'arrière-plan immersif).
+            # On retire seulement un éventuel en-tête renvoyé par Jellyfin
+            # lui-même ; cors_tauri reste seul responsable de sa valeur.
             header_down -X-Emby-Token
             header_down -Access-Control-Allow-Origin
-            header_down Access-Control-Allow-Origin "{http.request.header.Origin}"
-            header_down Access-Control-Allow-Credentials "true"
             header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
             header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
             header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
@@ -513,10 +520,17 @@ http://192.168.0.18 {
             header_up  Connection        {http.request.header.Connection}
             header_up  Upgrade           {http.request.header.Upgrade}
 
+            # ✅ FIX CORS : ne PAS réinjecter Access-Control-Allow-Origin ici.
+            # cors_tauri (importé en tête de ce site block) le fait déjà pour
+            # toute origine autorisée (@origin_ok). Le refaire ici ajoutait un
+            # second en-tête Access-Control-Allow-Origin en plus de celui posé
+            # par cors_tauri → deux valeurs pour le même header → le navigateur
+            # (WebView2/Tauri inclus) rejette la réponse comme si l'en-tête
+            # était absent (c'est le bug des covers d'arrière-plan immersif).
+            # On retire seulement un éventuel en-tête renvoyé par Jellyfin
+            # lui-même ; cors_tauri reste seul responsable de sa valeur.
             header_down -Access-Control-Allow-Origin
             header_down -X-Emby-Token
-            header_down Access-Control-Allow-Origin "{http.request.header.Origin}"
-            header_down Access-Control-Allow-Credentials "true"
             header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
             header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
             header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
@@ -655,10 +669,17 @@ http://192.168.0.2 {
             header_up  Connection        {http.request.header.Connection}
             header_up  Upgrade           {http.request.header.Upgrade}
 
+            # ✅ FIX CORS : ne PAS réinjecter Access-Control-Allow-Origin ici.
+            # cors_tauri (importé en tête de ce site block) le fait déjà pour
+            # toute origine autorisée (@origin_ok). Le refaire ici ajoutait un
+            # second en-tête Access-Control-Allow-Origin en plus de celui posé
+            # par cors_tauri → deux valeurs pour le même header → le navigateur
+            # (WebView2/Tauri inclus) rejette la réponse comme si l'en-tête
+            # était absent (c'est le bug des covers d'arrière-plan immersif).
+            # On retire seulement un éventuel en-tête renvoyé par Jellyfin
+            # lui-même ; cors_tauri reste seul responsable de sa valeur.
             header_down -Access-Control-Allow-Origin
             header_down -X-Emby-Token
-            header_down Access-Control-Allow-Origin "{http.request.header.Origin}"
-            header_down Access-Control-Allow-Credentials "true"
             header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
             header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
             header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
