@@ -240,11 +240,7 @@ grizzly-stream.duckdns.org {
 # ──────────────────────────────────────────────────────────────────────
 beartify.duckdns.org {
 
-    # Forcer le nettoyage des doubles slashes en amont
     import cors_tauri
-    route {
-        uri replace // /
-    }
 
     root * /var/www/html/player
     encode zstd gzip
@@ -317,7 +313,6 @@ beartify.duckdns.org {
             header_up  Upgrade           {http.request.header.Upgrade}
 
             header_down -X-Emby-Token
-            header_down -Access-Control-Allow-Origin
             header_down Access-Control-Allow-Origin "{http.request.header.Origin}"
             header_down Access-Control-Allow-Credentials "true"
             header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
@@ -444,9 +439,6 @@ grizzlyfin.duckdns.org {
 http://192.168.0.18 {
 
     import cors_tauri
-    route {
-        uri replace // /
-    }
 
     root * /var/www/html/player
     encode zstd gzip
@@ -497,7 +489,6 @@ http://192.168.0.18 {
             header_up  Connection        {http.request.header.Connection}
             header_up  Upgrade           {http.request.header.Upgrade}
 
-            header_down -Access-Control-Allow-Origin
             header_down -X-Emby-Token
             header_down Access-Control-Allow-Origin "{http.request.header.Origin}"
             header_down Access-Control-Allow-Credentials "true"
@@ -586,9 +577,6 @@ http://192.168.0.18 {
 http://192.168.0.2 {
 
     import cors_tauri
-    route {
-        uri replace // /
-    }
 
     root * /var/www/html/player
     encode zstd gzip
@@ -639,7 +627,6 @@ http://192.168.0.2 {
             header_up  Connection        {http.request.header.Connection}
             header_up  Upgrade           {http.request.header.Upgrade}
 
-            header_down -Access-Control-Allow-Origin
             header_down -X-Emby-Token
             header_down Access-Control-Allow-Origin "{http.request.header.Origin}"
             header_down Access-Control-Allow-Credentials "true"
