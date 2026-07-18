@@ -141,20 +141,35 @@ function log(msg) {
 // léger qu'un Items?Recursive=true qui rapatrierait tout le catalogue.
 async function fetchJellyfinCounts() {
   if (!CONFIG.jellyfinApiKey) {
-    throw new Error('JELLYFIN_API_KEY manquant — voir la configuration en tête de fichier.');
+    throw new Error('JELLYFIN_API_KEY manquant dans .env.stats — édite le fichier et renseigne-le, puis relance.');
   }
-  const url = `${CONFIG.jellyfinUrl.replace(/\/$/, '')}/Items/Counts`;
-  const res = await fetch(url, {
-    headers: { 'X-Emby-Token': CONFIG.jellyfinApiKey },
-    signal: AbortSignal.timeout(15000),
-  });
-  if (!res.ok) throw new Error(`Jellyfin /Items/Counts a répondu ${res.status}`);
-  const data = await res.json();
-  return {
-    trackCount:  data.SongCount   ?? 0,
-    artistCount: data.ArtistCount ?? 0,
-    albumCount:  data.AlbumCount  ?? 0,
-  };
+  const base = CONFIG.jellyfinUrl.replace(/\/$/, '');
+  const headers = { 'X-Emby-Token': CONFIG.jellyfinApiKey };
+
+  async function totalRecordCount(path) {
+    const res = await fetch(`${base}${path}`, { headers, signal: AbortSignal.timeout(15000) });
+    if (!res.ok) {
+      const hint = res.status === 401
+        ? ' — clé API invalide ou manquante : vérifie JELLYFIN_API_KEY dans .env.stats (Jellyfin > Panneau admin > Clés API).'
+        : '';
+      throw new Error(`Jellyfin ${path} a répondu ${res.status}${hint}`);
+    }
+    const data = await res.json();
+    return data.TotalRecordCount ?? 0;
+  }
+
+  // ⚠️ /Items/Counts (utilisé initialement) renvoie ArtistCount=0 sur
+  // une vraie bibliothèque de 22 616 titres / 4951 albums — ce champ
+  // n'est fiable pour aucun des trois. On utilise à la place le motif
+  // standard Limit=0 + TotalRecordCount (Jellyfin ne sérialise aucun
+  // item avec Limit=0, seul le total est calculé — requêtes légères).
+  const [trackCount, albumCount, artistCount] = await Promise.all([
+    totalRecordCount('/Items?IncludeItemTypes=Audio&Recursive=true&Limit=0'),
+    totalRecordCount('/Items?IncludeItemTypes=MusicAlbum&Recursive=true&Limit=0'),
+    totalRecordCount('/Artists?Recursive=true&Limit=0'),
+  ]);
+
+  return { trackCount, albumCount, artistCount };
 }
 
 // ── 2) Décompte des paroles synchronisées mot par mot ──────────────────
@@ -330,6 +345,12 @@ echo ""
 read -rp "URL Jellyfin [http://127.0.0.1:8096] : " JELLYFIN_URL < /dev/tty
 JELLYFIN_URL="${JELLYFIN_URL:-http://127.0.0.1:8096}"
 read -rsp "Clé API Jellyfin (Panneau admin > API Keys) : " JELLYFIN_API_KEY < /dev/tty
+echo ""
+if [ -z "$JELLYFIN_API_KEY" ]; then
+  echo "⚠️  Clé API Jellyfin laissée vide — le calcul échouera (401) tant qu'elle"
+  echo "   n'est pas renseignée. Tu pourras la corriger après coup dans"
+  echo "   $INSTALL_DIR/.env.stats (variable JELLYFIN_API_KEY) sans tout relancer."
+fi
 echo ""
 read -rp "Dossier des paroles [$LYRICS_DIR_DEFAULT] : " LYRICS_DIR < /dev/tty
 LYRICS_DIR="${LYRICS_DIR:-$LYRICS_DIR_DEFAULT}"
