@@ -133,6 +133,28 @@
 
 
 # ══════════════════════════════════════════════════════════════════════
+#  SNIPPET — Import de playlists Spotify/Deezer (playlist-import-service.js, :4501)
+# ══════════════════════════════════════════════════════════════════════
+# Service Node autonome (pas server.js) — voir playlist-import-service.js.
+# Même schéma que les autres proxies /api/* : strip du préfixe, relais
+# vers le port local du service. Le service gère lui-même son propre
+# CORS (ALLOWED_ORIGIN) ; -Access-Control-Allow-Origin retire l'entête
+# que Caddy pourrait dupliquer via cors_tauri plus haut dans le bloc de
+# site, pour éviter le même bug à deux valeurs déjà rencontré avec
+# PocketBase et GitHub.
+(playlist_import_proxy) {
+    handle /api/playlist/* {
+        uri strip_prefix /api/playlist
+        reverse_proxy 127.0.0.1:4501 {
+            header_up  X-Real-IP       {remote_host}
+            header_up  X-Forwarded-For {remote_host}
+            header_down -Access-Control-Allow-Origin
+        }
+    }
+}
+
+
+# ══════════════════════════════════════════════════════════════════════
 #  SNIPPET — Téléchargement VIP MP3
 # ══════════════════════════════════════════════════════════════════════
 (download_vip_headers) {
@@ -260,6 +282,7 @@ beartify.duckdns.org {
 
     # LibreTranslate
     import libretranslate_proxy
+    import playlist_import_proxy
 
     # Headers téléchargement VIP MP3
     import download_vip_headers
@@ -447,6 +470,7 @@ http://192.168.0.18 {
 
     import drm_routes
     import libretranslate_proxy
+    import playlist_import_proxy
     import download_vip_headers
 
     # PROXY POCKETBASE (Beartify — playlists / présence / social / stats)
@@ -588,6 +612,7 @@ http://192.168.0.2 {
 
     import drm_routes
     import libretranslate_proxy
+    import playlist_import_proxy
     import download_vip_headers
 
     # PROXY POCKETBASE (Beartify — playlists / présence / social / stats)
