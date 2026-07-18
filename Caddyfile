@@ -313,8 +313,7 @@ beartify.duckdns.org {
             header_up  Upgrade           {http.request.header.Upgrade}
 
             header_down -X-Emby-Token
-            header_down Access-Control-Allow-Origin "{http.request.header.Origin}"
-            header_down Access-Control-Allow-Credentials "true"
+            header_down -Access-Control-Allow-Origin
             header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
             header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
             header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
@@ -490,8 +489,7 @@ http://192.168.0.18 {
             header_up  Upgrade           {http.request.header.Upgrade}
 
             header_down -X-Emby-Token
-            header_down Access-Control-Allow-Origin "{http.request.header.Origin}"
-            header_down Access-Control-Allow-Credentials "true"
+            header_down -Access-Control-Allow-Origin
             header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
             header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
             header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
@@ -628,8 +626,7 @@ http://192.168.0.2 {
             header_up  Upgrade           {http.request.header.Upgrade}
 
             header_down -X-Emby-Token
-            header_down Access-Control-Allow-Origin "{http.request.header.Origin}"
-            header_down Access-Control-Allow-Credentials "true"
+            header_down -Access-Control-Allow-Origin
             header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
             header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
             header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
