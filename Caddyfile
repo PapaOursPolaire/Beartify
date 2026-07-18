@@ -82,6 +82,22 @@
         }
     }
 
+    # Statistiques du catalogue (stats-cron.js, voir OUTPUT_DIR dans
+    # .env.stats) — servi directement en fichier statique plutôt que
+    # via un lien de partage Nextcloud, plus simple à exposer et plus
+    # stable d'une version de Nextcloud à l'autre (même logique que
+    # /api/certified* ci-dessus). Résultat : onboarding.js peut lire
+    # /api/stats/stats.json en same-origin, sans CORS ni token à gérer.
+    # ⚠️ Le dossier local doit être lisible par l'utilisateur système de
+    # Caddy : chmod -R a+rX /opt/beartify/stats-output
+    handle_path /api/stats* {
+        root * /opt/beartify/stats-output
+        header Cache-Control "no-store"
+        file_server {
+            index stats.json
+        }
+    }
+
     # Recherche GitHub par topic (découverte communautaire du Marketplace),
     # relayée directement par Caddy avec un token attaché côté serveur —
     # évite que le client appelle api.github.com sans authentification
@@ -240,7 +256,11 @@ grizzly-stream.duckdns.org {
 # ──────────────────────────────────────────────────────────────────────
 beartify.duckdns.org {
 
+    # Forcer le nettoyage des doubles slashes en amont
     import cors_tauri
+    route {
+        uri replace // /
+    }
 
     root * /var/www/html/player
     encode zstd gzip
@@ -314,6 +334,8 @@ beartify.duckdns.org {
 
             header_down -X-Emby-Token
             header_down -Access-Control-Allow-Origin
+            header_down Access-Control-Allow-Origin "{http.request.header.Origin}"
+            header_down Access-Control-Allow-Credentials "true"
             header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
             header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
             header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
@@ -438,6 +460,9 @@ grizzlyfin.duckdns.org {
 http://192.168.0.18 {
 
     import cors_tauri
+    route {
+        uri replace // /
+    }
 
     root * /var/www/html/player
     encode zstd gzip
@@ -488,8 +513,10 @@ http://192.168.0.18 {
             header_up  Connection        {http.request.header.Connection}
             header_up  Upgrade           {http.request.header.Upgrade}
 
-            header_down -X-Emby-Token
             header_down -Access-Control-Allow-Origin
+            header_down -X-Emby-Token
+            header_down Access-Control-Allow-Origin "{http.request.header.Origin}"
+            header_down Access-Control-Allow-Credentials "true"
             header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
             header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
             header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
@@ -575,6 +602,9 @@ http://192.168.0.18 {
 http://192.168.0.2 {
 
     import cors_tauri
+    route {
+        uri replace // /
+    }
 
     root * /var/www/html/player
     encode zstd gzip
@@ -625,8 +655,10 @@ http://192.168.0.2 {
             header_up  Connection        {http.request.header.Connection}
             header_up  Upgrade           {http.request.header.Upgrade}
 
-            header_down -X-Emby-Token
             header_down -Access-Control-Allow-Origin
+            header_down -X-Emby-Token
+            header_down Access-Control-Allow-Origin "{http.request.header.Origin}"
+            header_down Access-Control-Allow-Credentials "true"
             header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
             header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
             header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
