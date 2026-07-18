@@ -1,35 +1,48 @@
 #!/usr/bin/env bash
 # ═══════════════════════════════════════════════════════════════════
-#  Beartify — installation de playlist-import-service.js
+#  Beartify — installation de stats-cron.js
 # ═══════════════════════════════════════════════════════════════════
 #  À coller tel quel dans un terminal Cockpit (ou tout shell root/sudo).
-#  Crée le service, demande interactivement les identifiants Spotify,
-#  installe et démarre un service systemd persistant (redémarre tout
-#  seul en cas de crash, et au reboot).
+#  Crée le script, demande interactivement les identifiants (clé API
+#  Jellyfin, identifiants Nextcloud) pour éviter toute erreur de saisie
+#  manuelle, puis installe un timer systemd qui relance le calcul
+#  automatiquement toutes les heures en arrière-plan.
 # ═══════════════════════════════════════════════════════════════════
 set -euo pipefail
 
-# ── Authentification sudo (UNE SEULE FOIS) ────────────────────────────
-# En collant tout le bloc d'un coup, le terminal Cockpit continue de
-# recevoir les lignes suivantes du script pendant que sudo attend le
-# mot de passe — ces lignes collées finissent lues comme de mauvaises
-# tentatives de mot de passe, d'où le "3 saisies de mots de passe
-# incorrectes / disconnected" que tu as eu. On demande donc le mot de
-# passe UNE fois ici, tout au début, avant que quoi que ce soit d'autre
-# ne soit collé/lu, puis on garde le ticket sudo actif en arrière-plan
-# pour que tous les `sudo` suivants passent sans jamais re-demander.
-echo "🔑 Mot de passe sudo (une seule fois) :"
-sudo -v < /dev/tty
+# ── Authentification sudo — DOIT être déjà en cache ───────────────────
+# En collant tout ce bloc d'un coup, le terminal Cockpit a déjà mis en
+# file TOUTES les lignes du paste au moment où un `sudo` essaierait de
+# lire ton mot de passe — même en lisant depuis /dev/tty, c'est ce
+# contenu déjà en attente qui est lu à la place de ta frappe, d'où les
+# "3 saisies incorrectes / disconnected" que tu as eus : le script
+# n'attendait jamais réellement toi.
+#
+# La seule façon fiable d'éviter ça : authentifier sudo AVANT de coller
+# quoi que ce soit d'autre, avec le buffer du terminal vide.
+#
+#   1) Colle et exécute D'ABORD, seule, cette ligne :
+#        sudo -v
+#      tape ton mot de passe normalement, puis valide.
+#   2) Une fois "sudo -v" réussi (aucune erreur affichée), colle TOUT
+#      le reste du script ci-dessous en une fois — il n'y aura alors
+#      plus aucun prompt de mot de passe, le ticket sudo est en cache.
+if ! sudo -n true 2>/dev/null; then
+  echo "❌ Session sudo pas encore active."
+  echo "   Lance d'abord, seule : sudo -v"
+  echo "   Puis recolle ce script en entier une fois le mot de passe validé."
+  exit 1
+fi
 ( while true; do sudo -n true; sleep 60; kill -0 "$$" 2>/dev/null || exit; done ) 2>/dev/null &
 SUDO_KEEPALIVE_PID=$!
 trap 'kill "$SUDO_KEEPALIVE_PID" 2>/dev/null' EXIT
 
-INSTALL_DIR="/opt/beartify-playlist-import"
+INSTALL_DIR="/opt/beartify"
+LYRICS_DIR_DEFAULT="/home/papaours/Téléchargements"
 SERVICE_USER="${SUDO_USER:-$USER}"
-PORT_DEFAULT=4501
 
 echo "═══════════════════════════════════════════════════════════"
-echo " Beartify — installation du service d'import de playlists"
+echo " Beartify — installation des statistiques du catalogue"
 echo "═══════════════════════════════════════════════════════════"
 
 if ! command -v node >/dev/null 2>&1; then
@@ -43,264 +56,349 @@ if [ "$NODE_VERSION" -lt 18 ]; then
 fi
 
 echo "→ Création de $INSTALL_DIR ..."
-sudo mkdir -p "$INSTALL_DIR"
+sudo mkdir -p "$INSTALL_DIR/stats-output"
 sudo chown -R "$SERVICE_USER":"$SERVICE_USER" "$INSTALL_DIR"
 
-echo "→ Écriture de playlist-import-service.js ..."
-cat > "$INSTALL_DIR/playlist-import-service.js" <<'JSEOF'
+echo "→ Écriture de stats-cron.js ..."
+cat > "$INSTALL_DIR/stats-cron.js" <<'JSEOF'
 #!/usr/bin/env node
 'use strict';
 
 /**
  * ═══════════════════════════════════════════════════════════════════
- *  Beartify – playlist-import-service.js
+ *  Beartify – stats-cron.js
  * ═══════════════════════════════════════════════════════════════════
- *  Petit service Node AUTONOME (pas un module à greffer sur server.js,
- *  qui n'est qu'un serveur de test) — il tourne sur son propre port et
- *  expose uniquement les deux routes d'import de playlist. À déployer
- *  en process séparé (pm2/systemd) derrière Caddy, avec sa propre
- *  entrée de reverse-proxy, comme les autres services proxifiés du
- *  projet (Jellyfin, Last.fm, Grizzlyrics).
+ *  Calcule des statistiques réelles sur le catalogue (nombre de titres,
+ *  d'artistes, d'albums, et de titres disposant de paroles synchronisées
+ *  MOT PAR MOT) directement depuis Jellyfin + le dossier de paroles du
+ *  serveur, puis publie le résultat (stats.json + stats.js) sur
+ *  Nextcloud via WebDAV, pour que l'onboarding (onboarding.js) et
+ *  n'importe quelle autre page publique puissent les lire sans jamais
+ *  toucher au serveur Jellyfin ni scanner ~20 000 titres depuis le
+ *  navigateur du visiteur.
  *
- *  ── Pourquoi un service séparé plutôt qu'ajouté à un autre serveur ──
- *    • Isolation : un souci ici (quota Spotify, timeout Deezer) ne
- *      peut pas faire tomber le reste de la stack.
- *    • Déployable indépendamment, avec ses propres identifiants et son
- *      propre cycle de vie (redémarrage, logs, monitoring).
+ *  ── Pourquoi côté serveur et pas côté client ? ──────────────────────
+ *  Le décompte des paroles synchronisées mot par mot nécessite de lire
+ *  chaque fichier de paroles individuellement. Fait depuis le
+ *  navigateur d'un visiteur, ce serait des milliers de requêtes et
+ *  plusieurs dizaines de secondes à chaque affichage de l'onboarding —
+ *  exactement le problème de lenteur déjà rencontré avec la recherche
+ *  d'artistes. Ici, le calcul est fait UNE FOIS par heure sur le
+ *  serveur (qui a un accès disque direct au dossier de paroles, donc
+ *  pas de latence réseau), et le résultat est juste un petit fichier
+ *  JSON servi statiquement.
  *
- *  ── Pourquoi côté serveur (jamais dans le navigateur) ────────────────
- *    • Spotify : lire une playlist publique nécessite un token d'accès.
- *      Le "Client Credentials Flow" de Spotify permet de l'obtenir SANS
- *      connecter le compte de l'utilisateur — mais il faut un
- *      client_secret, qui ne doit JAMAIS être exposé côté navigateur.
- *    • Deezer : l'API publique (api.deezer.com) ne demande aucune
- *      authentification pour une playlist publique, MAIS elle bloque
- *      les requêtes CORS depuis un navigateur. Un simple relais suffit
- *      ici (pas de secret impliqué, juste un problème de CORS).
- *
- *  ── Démarrage ─────────────────────────────────────────────────────
- *    node playlist-import-service.js
- *    (ou via pm2 : pm2 start playlist-import-service.js --name beartify-playlist-import)
+ *  ── Utilisation ─────────────────────────────────────────────────────
+ *    node stats-cron.js            # tourne en continu, recalcule à
+ *                                   # chaque lancement puis toutes les
+ *                                   # heures (adapté à pm2/systemd
+ *                                   # --restart=always)
+ *    node stats-cron.js --once     # un seul passage puis quitte
+ *                                   # (adapté à un timer cron/systemd
+ *                                   # classique déclenché toutes les
+ *                                   # heures)
  *
  *  ── Configuration (variables d'environnement) ───────────────────────
- *    PORT                    port d'écoute (def: 4501)
- *    SPOTIFY_CLIENT_ID
- *    SPOTIFY_CLIENT_SECRET   créés gratuitement sur
- *                            https://developer.spotify.com/dashboard —
- *                            le Client Credentials Flow fonctionne dès
- *                            la création de l'app, pas besoin qu'elle
- *                            soit "publiée"
- *    ALLOWED_ORIGIN          origine autorisée en CORS pour l'app web
- *                            Beartify, ex: https://beartify.duckdns.org
- *                            (def: * — à restreindre en production)
+ *    JELLYFIN_URL        ex: http://127.0.0.1:8096
+ *    JELLYFIN_API_KEY    clé API admin Jellyfin (Panneau admin > API Keys)
+ *    LYRICS_DIR           dossier contenant les fichiers de paroles
+ *                          (.json / *-line.json) sauvegardés par
+ *                          lyrics.js — ajuste selon ton arborescence
+ *    NEXTCLOUD_WEBDAV_URL  ex: https://ton-nextcloud/remote.php/dav/files/USER
+ *    NEXTCLOUD_USER
+ *    NEXTCLOUD_PASSWORD    mot de passe d'application Nextcloud (PAS le mdp du compte)
+ *    NEXTCLOUD_REMOTE_DIR  dossier distant cible, ex: /Beartify/public
+ *    OUTPUT_DIR            dossier local de sortie (def: ./stats-output)
  *
- *  ── Exemple de configuration Caddy (reverse-proxy) ──────────────────
- *    handle /api/playlist/* {
- *        reverse_proxy 127.0.0.1:4501
- *    }
- *  Puis dans onboarding.js, PLAYLIST_API_BASE pointe simplement vers
- *  '/api/playlist' (même origine que le site, via ce reverse-proxy) —
- *  ou directement vers l'URL publique de ce service si tu préfères ne
- *  pas passer par Caddy pour celui-ci.
+ *  Toutes les credentials passent par l'environnement (jamais en dur
+ *  ici) — même principe que l'injection Caddy déjà utilisée ailleurs
+ *  dans le projet pour Nextcloud/Jellyfin/Last.fm.
  * ═══════════════════════════════════════════════════════════════════
  */
 
-const http = require('http');
-const { URL } = require('url');
+const fs   = require('fs');
+const fsp  = fs.promises;
+const path = require('path');
 
-const PORT = process.env.PORT || 4501;
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';
+const CONFIG = {
+  jellyfinUrl:     process.env.JELLYFIN_URL || 'http://127.0.0.1:8096',
+  jellyfinApiKey:  process.env.JELLYFIN_API_KEY || '',
+  lyricsDir:       process.env.LYRICS_DIR || '/home/papaours/Téléchargements',
+  nextcloudUrl:    process.env.NEXTCLOUD_WEBDAV_URL || '',
+  nextcloudUser:   process.env.NEXTCLOUD_USER || '',
+  nextcloudPass:   process.env.NEXTCLOUD_PASSWORD || '',
+  nextcloudDir:    process.env.NEXTCLOUD_REMOTE_DIR || '/Beartify/public',
+  outputDir:       process.env.OUTPUT_DIR || path.join(__dirname, 'stats-output'),
+  intervalMs:      60 * 60 * 1000, // 1 heure
+};
 
-// ── Cache mémoire du token Spotify (valable ~1h) ──────────────────────
-let _spotifyToken = null;
-let _spotifyTokenExpiresAt = 0;
+function log(msg) {
+  console.log(`[stats-cron] ${new Date().toISOString()} — ${msg}`);
+}
 
-async function getSpotifyToken() {
-  if (_spotifyToken && Date.now() < _spotifyTokenExpiresAt) return _spotifyToken;
-
-  const clientId = process.env.SPOTIFY_CLIENT_ID;
-  const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
-  if (!clientId || !clientSecret) {
-    throw new Error('SPOTIFY_CLIENT_ID / SPOTIFY_CLIENT_SECRET non configurés.');
+// ── 1) Comptages Jellyfin (titres / artistes / albums) ────────────────
+// Jellyfin expose un endpoint natif dédié aux comptages, bien plus
+// léger qu'un Items?Recursive=true qui rapatrierait tout le catalogue.
+async function fetchJellyfinCounts() {
+  if (!CONFIG.jellyfinApiKey) {
+    throw new Error('JELLYFIN_API_KEY manquant — voir la configuration en tête de fichier.');
   }
-
-  const basic = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
-  const res = await fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
-    headers: {
-      Authorization: `Basic ${basic}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: 'grant_type=client_credentials',
-    signal: AbortSignal.timeout(8000),
+  const url = `${CONFIG.jellyfinUrl.replace(/\/$/, '')}/Items/Counts`;
+  const res = await fetch(url, {
+    headers: { 'X-Emby-Token': CONFIG.jellyfinApiKey },
+    signal: AbortSignal.timeout(15000),
   });
-  if (!res.ok) throw new Error(`Auth Spotify a échoué (${res.status})`);
+  if (!res.ok) throw new Error(`Jellyfin /Items/Counts a répondu ${res.status}`);
   const data = await res.json();
-  _spotifyToken = data.access_token;
-  _spotifyTokenExpiresAt = Date.now() + (data.expires_in - 60) * 1000;
-  return _spotifyToken;
+  return {
+    trackCount:  data.SongCount   ?? 0,
+    artistCount: data.ArtistCount ?? 0,
+    albumCount:  data.AlbumCount  ?? 0,
+  };
 }
 
-async function fetchSpotifyPlaylist(playlistId) {
-  const token = await getSpotifyToken();
-  const plRes = await fetch(
-    `https://api.spotify.com/v1/playlists/${playlistId}?fields=name,tracks.items(track(name,artists(name))),tracks.next`,
-    { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(10000) }
+// ── 2) Décompte des paroles synchronisées mot par mot ──────────────────
+// Parcourt récursivement LYRICS_DIR et classe chaque fichier JSON en
+// "mot par mot" (word-synced) ou "ligne par ligne" (line-synced), selon
+// le même format que celui lu par script.js à la lecture (voir
+// jsonData.lyrics.syncType === 'LINE_SYNCED' et le format compressé
+// "array-of-references" du SpicyLyrics v6 utilisé par lyrics.js).
+//
+// ⚠️ Cette détection est un point d'ajustement : si ton format de
+// sauvegarde diffère légèrement, adapte `classifyLyricsFile()`
+// ci-dessous — le reste du script n'a pas besoin de changer.
+async function countWordSyncedLyrics() {
+  if (!CONFIG.lyricsDir) {
+    log('LYRICS_DIR non configuré — décompte des paroles ignoré (wordSyncedLyricsCount = null).');
+    return null;
+  }
+  let wordSynced = 0;
+  let lineSynced = 0;
+  let total = 0;
+  let unreadable = 0;
+
+  async function walk(dir) {
+    let entries;
+    try { entries = await fsp.readdir(dir, { withFileTypes: true }); }
+    catch (e) { log(`Impossible de lire ${dir} : ${e.message}`); return; }
+
+    for (const entry of entries) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) { await walk(full); continue; }
+      if (!entry.name.endsWith('.json')) continue;
+      total++;
+      try {
+        const raw = await fsp.readFile(full, 'utf-8');
+        const type = classifyLyricsFile(raw);
+        if (type === 'word') wordSynced++;
+        else if (type === 'line') lineSynced++;
+      } catch (e) {
+        unreadable++;
+        if (unreadable <= 5) log(`Fichier illisible ignoré (${entry.name}) : ${e.message}`);
+      }
+    }
+  }
+  await walk(CONFIG.lyricsDir);
+  log(`Paroles scannées : ${total} fichier(s) — ${wordSynced} mot par mot, ${lineSynced} ligne par ligne` +
+      (unreadable ? `, ${unreadable} illisible(s)` : '') + '.');
+  return wordSynced;
+}
+
+function classifyLyricsFile(rawText) {
+  // ⚠️ Volontairement une recherche de sous-chaîne sur le texte BRUT,
+  // exactement comme le script lyrics.py qui, lui, détecte correctement
+  // ces fichiers — et PAS un JSON.parse() suivi d'une lecture de
+  // `metadata.syncType` / `lyrics.syncType` comme la version précédente.
+  // Cette dernière approche renvoyait 0 sur l'ensemble du dossier réel
+  // (13531 fichiers), alors que lyrics.py — qui fait ce même test de
+  // sous-chaîne — en trouve bien. Plus robuste aux variations
+  // d'échappement/format qu'un chemin de clé JSON strict.
+  if (rawText.includes('"syncType": "WORD"') || /"syncType"\s*:\s*"WORD"/.test(rawText)) return 'word';
+  if (rawText.includes('"syncType": "LINE"') || /"syncType"\s*:\s*"LINE"/.test(rawText)) return 'line';
+  return null;
+}
+
+// ── 3) Écriture des fichiers de sortie ─────────────────────────────────
+async function writeOutputFiles(stats) {
+  await fsp.mkdir(CONFIG.outputDir, { recursive: true });
+
+  const jsonPath = path.join(CONFIG.outputDir, 'stats.json');
+  const jsPath   = path.join(CONFIG.outputDir, 'stats.js');
+
+  await fsp.writeFile(jsonPath, JSON.stringify(stats, null, 2), 'utf-8');
+  await fsp.writeFile(
+    jsPath,
+    `// Généré automatiquement par stats-cron.js — ne pas éditer à la main.\n` +
+    `window.__BEARTIFY_STATS__ = ${JSON.stringify(stats)};\n`,
+    'utf-8'
   );
-  if (!plRes.ok) {
-    const err = new Error(`Playlist Spotify introuvable ou privée (${plRes.status})`);
-    err.status = plRes.status;
-    throw err;
-  }
-  const plData = await plRes.json();
-
-  let items = plData.tracks?.items || [];
-  let nextUrl = plData.tracks?.next;
-
-  // Pagination plafonnée à 300 titres (3 pages de 100) — largement
-  // suffisant pour l'usage réel, évite un temps de réponse excessif.
-  let guard = 0;
-  while (nextUrl && guard < 2) {
-    const nextRes = await fetch(nextUrl, { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(10000) });
-    if (!nextRes.ok) break;
-    const nextData = await nextRes.json();
-    items = items.concat(nextData.items || []);
-    nextUrl = nextData.next;
-    guard++;
-  }
-
-  const tracksList = items
-    .map(it => it.track)
-    .filter(Boolean)
-    .map(t => ({ title: t.name, artist: t.artists?.[0]?.name || '' }))
-    .filter(t => t.title && t.artist);
-
-  return { name: plData.name || 'Playlist Spotify', tracks: tracksList };
+  log(`Fichiers écrits : ${jsonPath}, ${jsPath}`);
+  return { jsonPath, jsPath };
 }
 
-async function fetchDeezerPlaylist(playlistId) {
-  const dzRes = await fetch(`https://api.deezer.com/playlist/${playlistId}`, { signal: AbortSignal.timeout(10000) });
-  if (!dzRes.ok) {
-    const err = new Error(`Playlist Deezer introuvable (${dzRes.status})`);
-    err.status = dzRes.status;
-    throw err;
+// ── 4) Upload WebDAV vers Nextcloud ─────────────────────────────────────
+// Même principe d'auth Basic que l'intégration Nextcloud WebDAV déjà en
+// place pour les photos de profil (credentials côté serveur, jamais
+// exposées au client).
+async function uploadToNextcloud(localPath, remoteFileName) {
+  if (!CONFIG.nextcloudUrl || !CONFIG.nextcloudUser || !CONFIG.nextcloudPass) {
+    log('Configuration Nextcloud incomplète — upload ignoré (fichiers écrits localement uniquement).');
+    return false;
   }
-  const dzData = await dzRes.json();
-  if (dzData.error) {
-    const err = new Error(dzData.error.message || 'Playlist Deezer introuvable ou privée.');
-    err.status = 404;
-    throw err;
-  }
-  const tracksList = (dzData.tracks?.data || [])
-    .map(t => ({ title: t.title, artist: t.artist?.name || '' }))
-    .filter(t => t.title && t.artist);
+  const remoteUrl = `${CONFIG.nextcloudUrl.replace(/\/$/, '')}${CONFIG.nextcloudDir}/${remoteFileName}`;
+  const auth = Buffer.from(`${CONFIG.nextcloudUser}:${CONFIG.nextcloudPass}`).toString('base64');
+  const body = await fsp.readFile(localPath);
 
-  return { name: dzData.title || 'Playlist Deezer', tracks: tracksList };
-}
-
-// ── Serveur HTTP minimal (aucune dépendance externe requise) ─────────
-const server = http.createServer(async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', ALLOWED_ORIGIN);
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
-
-  const url = new URL(req.url, `http://localhost:${PORT}`);
-  const parts = url.pathname.split('/').filter(Boolean); // ['api','playlist','spotify','ID'] ou ['playlist','spotify','ID']
-
-  const platformIdx = parts.indexOf('playlist');
-  const platform = platformIdx !== -1 ? parts[platformIdx + 1] : null;
-  const playlistId = platformIdx !== -1 ? parts[platformIdx + 2] : null;
-
-  function sendJson(status, body) {
-    res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
-    res.end(JSON.stringify(body));
-  }
-
-  if (url.pathname === '/health') { sendJson(200, { ok: true }); return; }
-
-  if (!platform || !playlistId || !['spotify', 'deezer'].includes(platform)) {
-    sendJson(404, { error: 'Route inconnue. Utilise /playlist/spotify/:id ou /playlist/deezer/:id.' });
-    return;
+  async function attempt() {
+    const res = await fetch(remoteUrl, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Basic ${auth}`,
+        'Content-Type': remoteFileName.endsWith('.json') ? 'application/json' : 'application/javascript',
+      },
+      body,
+      signal: AbortSignal.timeout(20000),
+    });
+    if (!res.ok) throw new Error(`Upload WebDAV de ${remoteFileName} a échoué (HTTP ${res.status} — vérifie que le dossier ${CONFIG.nextcloudDir} existe déjà sur Nextcloud, WebDAV ne le crée pas tout seul)`);
+    return true;
   }
 
   try {
-    const data = platform === 'spotify'
-      ? await fetchSpotifyPlaylist(playlistId)
-      : await fetchDeezerPlaylist(playlistId);
-    sendJson(200, data);
+    await attempt();
   } catch (e) {
-    console.error(`[playlist-import] ${platform}:`, e.message);
-    sendJson(e.status || 500, { error: e.message || 'Erreur serveur' });
+    // "fetch failed" (erreur réseau/TLS/DNS de bas niveau, PAS un code
+    // HTTP — sinon on serait dans le if (!res.ok) ci-dessus) masque la
+    // vraie cause par défaut. e.cause la révèle (ex: ENOTFOUND,
+    // ECONNREFUSED, certificate error…) — on la journalise pour pouvoir
+    // diagnostiquer, plutôt que le message générique inexploitable vu
+    // dans les logs. Un essai supplémentaire couvre les échecs
+    // transitoires (résolution DNS ponctuelle, etc.).
+    log(`Premier essai d'upload (${remoteFileName}) échoué : ${e.message}` +
+        (e.cause ? ` — cause : ${e.cause.code || e.cause.message || e.cause}` : ''));
+    log(`Nouvel essai dans 3s… (teste aussi manuellement : curl -v -u '${CONFIG.nextcloudUser}:***' -T "${localPath}" "${remoteUrl}")`);
+    await new Promise(r => setTimeout(r, 3000));
+    await attempt();
   }
-});
+  log(`Envoyé sur Nextcloud : ${CONFIG.nextcloudDir}/${remoteFileName}`);
+  return true;
+}
 
-server.listen(PORT, () => {
-  console.log(`[playlist-import-service] à l'écoute sur le port ${PORT}`);
-  console.log(`  GET /playlist/spotify/:id`);
-  console.log(`  GET /playlist/deezer/:id`);
-  if (!process.env.SPOTIFY_CLIENT_ID || !process.env.SPOTIFY_CLIENT_SECRET) {
-    console.warn('  ⚠️  SPOTIFY_CLIENT_ID / SPOTIFY_CLIENT_SECRET non définis — les imports Spotify échoueront.');
+// ── Cycle complet ────────────────────────────────────────────────────
+async function runOnce() {
+  log('Démarrage du calcul des statistiques…');
+  try {
+    const counts = await fetchJellyfinCounts();
+    const wordSyncedLyricsCount = await countWordSyncedLyrics();
+
+    const stats = {
+      generatedAt: Date.now(),
+      trackCount:  counts.trackCount,
+      artistCount: counts.artistCount,
+      albumCount:  counts.albumCount,
+      wordSyncedLyricsCount, // null si LYRICS_DIR non configuré
+    };
+
+    const { jsonPath, jsPath } = await writeOutputFiles(stats);
+    await uploadToNextcloud(jsonPath, 'stats.json');
+    await uploadToNextcloud(jsPath, 'stats.js');
+
+    log(`Terminé : ${stats.trackCount} titres, ${stats.artistCount} artistes, ${stats.albumCount} albums, ` +
+        `${stats.wordSyncedLyricsCount ?? 'N/A'} paroles mot par mot.`);
+  } catch (e) {
+    // Une erreur ponctuelle (Jellyfin temporairement indisponible, etc.)
+    // ne doit jamais interrompre les cycles suivants.
+    log(`ÉCHEC de ce cycle : ${e.message}`);
   }
-});
+}
+
+async function main() {
+  const once = process.argv.includes('--once');
+  await runOnce();
+  if (once) return;
+  log(`Mode continu — prochain calcul dans ${CONFIG.intervalMs / 60000} min.`);
+  setInterval(runOnce, CONFIG.intervalMs);
+}
+
+main();
+
 JSEOF
 
 echo ""
-echo "── Configuration Spotify (Client Credentials Flow) ──────────────"
-echo "   Crée une app gratuite sur https://developer.spotify.com/dashboard"
-echo "   si ce n'est pas déjà fait — pas besoin qu'elle soit \"publiée\"."
+echo "── Configuration ──────────────────────────────────────────────"
+echo "   Chaque valeur est redemandée pour éviter les erreurs de copier/coller."
 echo ""
-read -rp "SPOTIFY_CLIENT_ID     : " SPOTIFY_CLIENT_ID < /dev/tty
-read -rsp "SPOTIFY_CLIENT_SECRET : " SPOTIFY_CLIENT_SECRET < /dev/tty
+read -rp "URL Jellyfin [http://127.0.0.1:8096] : " JELLYFIN_URL < /dev/tty
+JELLYFIN_URL="${JELLYFIN_URL:-http://127.0.0.1:8096}"
+read -rsp "Clé API Jellyfin (Panneau admin > API Keys) : " JELLYFIN_API_KEY < /dev/tty
 echo ""
-read -rp "Port d'écoute [$PORT_DEFAULT] : " SERVICE_PORT < /dev/tty
-SERVICE_PORT="${SERVICE_PORT:-$PORT_DEFAULT}"
-read -rp "Origine autorisée en CORS (ex: https://beartify.duckdns.org) [*] : " ALLOWED_ORIGIN < /dev/tty
-ALLOWED_ORIGIN="${ALLOWED_ORIGIN:-*}"
+read -rp "Dossier des paroles [$LYRICS_DIR_DEFAULT] : " LYRICS_DIR < /dev/tty
+LYRICS_DIR="${LYRICS_DIR:-$LYRICS_DIR_DEFAULT}"
+echo ""
+read -rp "URL WebDAV Nextcloud (ex: https://grizzlyrics.duckdns.org/remote.php/dav/files/USER) : " NEXTCLOUD_WEBDAV_URL < /dev/tty
+read -rp "Utilisateur Nextcloud : " NEXTCLOUD_USER < /dev/tty
+read -rsp "Mot de passe d'application Nextcloud (PAS le mot de passe du compte) : " NEXTCLOUD_PASSWORD < /dev/tty
+echo ""
+read -rp "Dossier distant Nextcloud [/Beartify/public] : " NEXTCLOUD_REMOTE_DIR < /dev/tty
+NEXTCLOUD_REMOTE_DIR="${NEXTCLOUD_REMOTE_DIR:-/Beartify/public}"
 
-ENV_FILE="$INSTALL_DIR/.env.playlist-import"
+ENV_FILE="$INSTALL_DIR/.env.stats"
+echo ""
 echo "→ Écriture de $ENV_FILE ..."
 cat > "$ENV_FILE" <<EOF
-PORT=$SERVICE_PORT
-SPOTIFY_CLIENT_ID=$SPOTIFY_CLIENT_ID
-SPOTIFY_CLIENT_SECRET=$SPOTIFY_CLIENT_SECRET
-ALLOWED_ORIGIN=$ALLOWED_ORIGIN
+JELLYFIN_URL=$JELLYFIN_URL
+JELLYFIN_API_KEY=$JELLYFIN_API_KEY
+LYRICS_DIR=$LYRICS_DIR
+NEXTCLOUD_WEBDAV_URL=$NEXTCLOUD_WEBDAV_URL
+NEXTCLOUD_USER=$NEXTCLOUD_USER
+NEXTCLOUD_PASSWORD=$NEXTCLOUD_PASSWORD
+NEXTCLOUD_REMOTE_DIR=$NEXTCLOUD_REMOTE_DIR
+OUTPUT_DIR=$INSTALL_DIR/stats-output
 EOF
 chmod 600 "$ENV_FILE"
 
-echo "→ Installation du service systemd (persistant, redémarre seul) ..."
-sudo tee /etc/systemd/system/beartify-playlist-import.service > /dev/null <<EOF
+echo "→ Installation du service + timer systemd (toutes les heures) ..."
+sudo tee /etc/systemd/system/beartify-stats.service > /dev/null <<EOF
 [Unit]
-Description=Beartify - service d'import de playlists Spotify/Deezer
+Description=Beartify - calcul horaire des statistiques du catalogue
 After=network-online.target
 
 [Service]
-Type=simple
+Type=oneshot
 User=$SERVICE_USER
 WorkingDirectory=$INSTALL_DIR
 EnvironmentFile=$ENV_FILE
-ExecStart=$(command -v node) $INSTALL_DIR/playlist-import-service.js
-Restart=always
-RestartSec=5
+ExecStart=$(command -v node) $INSTALL_DIR/stats-cron.js --once
+EOF
+
+sudo tee /etc/systemd/system/beartify-stats.timer > /dev/null <<EOF
+[Unit]
+Description=Déclenche beartify-stats.service toutes les heures
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=timers.target
 EOF
 
 sudo systemctl daemon-reload
-sudo systemctl enable --now beartify-playlist-import.service
+sudo systemctl enable --now beartify-stats.timer
+
+echo ""
+echo "→ Premier calcul immédiat (pour vérifier que tout fonctionne) ..."
+sudo systemctl start beartify-stats.service
 
 echo ""
 echo "═══════════════════════════════════════════════════════════"
-echo " ✅ Service démarré sur le port $SERVICE_PORT."
+echo " ✅ Installation terminée — recalcul automatique toutes les heures."
 echo "═══════════════════════════════════════════════════════════"
 echo ""
 echo "Vérifications :"
-echo "  systemctl status beartify-playlist-import.service"
-echo "  journalctl -u beartify-playlist-import.service -f"
-echo "  curl http://127.0.0.1:$SERVICE_PORT/health"
+echo "  journalctl -u beartify-stats.service -f"
+echo "  cat $INSTALL_DIR/stats-output/stats.json"
+echo "  systemctl list-timers | grep beartify"
 echo ""
-echo "N'oublie pas : le Caddyfile fourni à côté route déjà /api/playlist/*"
-echo "vers 127.0.0.1:$SERVICE_PORT (snippet playlist_import_proxy) — recharge"
-echo "Caddy si ce n'est pas encore fait :"
-echo "  sudo systemctl reload caddy"
+echo "Une fois stats.json confirmé sur Nextcloud, crée un lien de partage"
+echo "public pour ce fichier et colle-le dans STATS_URL (onboarding.js)."
 echo ""
