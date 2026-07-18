@@ -1,108 +1,65 @@
 papaours@papaours:~$ chmod +x spi.sh
 papaours@papaours:~$ ./spi.sh
-🔑 Mot de passe sudo (une seule fois) :
+❌ Session sudo pas encore active.
+   Lance d'abord, seule : sudo -v
+   Puis recolle ce script en entier une fois le mot de passe validé.
+papaours@papaours:~$ sudo -v
 [sudo] Mot de passe de papaours : 
+papaours@papaours:~$ ./spi.sh
 ═══════════════════════════════════════════════════════════
- Beartify — installation du service d'import de playlists
+ Beartify — installation des statistiques du catalogue
 ═══════════════════════════════════════════════════════════
-→ Création de /opt/beartify-playlist-import ...
-→ Écriture de playlist-import-service.js ...
+→ Création de /opt/beartify ...
+→ Écriture de stats-cron.js ...
 
-── Configuration Spotify (Client Credentials Flow) ──────────────
-   Crée une app gratuite sur https://developer.spotify.com/dashboard
-   si ce n'est pas déjà fait — pas besoin qu'elle soit "publiée".
+── Configuration ──────────────────────────────────────────────
+   Chaque valeur est redemandée pour éviter les erreurs de copier/coller.
 
-SPOTIFY_CLIENT_ID     : 4370c2bfe9b049b69a8cef778858edf3
-SPOTIFY_CLIENT_SECRET : 
-Port d'écoute [4501] : 
-Origine autorisée en CORS (ex: https://beartify.duckdns.org) [*] : 
-→ Écriture de /opt/beartify-playlist-import/.env.playlist-import ...
-→ Installation du service systemd (persistant, redémarre seul) ...
-Created symlink '/etc/systemd/system/multi-user.target.wants/beartify-playlist-import.service' → '/etc/systemd/system/beartify-playlist-import.service'.
+URL Jellyfin [http://127.0.0.1:8096] : 
+Clé API Jellyfin (Panneau admin > API Keys) : 
+Dossier des paroles [/home/papaours/Téléchargements] : 
+
+URL WebDAV Nextcloud (ex: https://grizzlyrics.duckdns.org/remote.php/dav/files/USER) : 
+Utilisateur Nextcloud : papaours
+Mot de passe d'application Nextcloud (PAS le mot de passe du compte) : 
+Dossier distant Nextcloud [/Beartify/public] : 
+
+→ Écriture de /opt/beartify/.env.stats ...
+→ Installation du service + timer systemd (toutes les heures) ...
+
+→ Premier calcul immédiat (pour vérifier que tout fonctionne) ...
 
 ═══════════════════════════════════════════════════════════
- ✅ Service démarré sur le port 4501.
+ ✅ Installation terminée — recalcul automatique toutes les heures.
 ═══════════════════════════════════════════════════════════
 
 Vérifications :
-  systemctl status beartify-playlist-import.service
-  journalctl -u beartify-playlist-import.service -f
-  curl http://127.0.0.1:4501/health
+  journalctl -u beartify-stats.service -f
+  cat /opt/beartify/stats-output/stats.json
+  systemctl list-timers | grep beartify
 
-N'oublie pas : le Caddyfile fourni à côté route déjà /api/playlist/*
-vers 127.0.0.1:4501 (snippet playlist_import_proxy) — recharge
-Caddy si ce n'est pas encore fait :
-  sudo systemctl reload caddy
+Une fois stats.json confirmé sur Nextcloud, crée un lien de partage
+public pour ce fichier et colle-le dans STATS_URL (onboarding.js).
 
-papaours@papaours:~$ systemctl status beartify-playlist-import.service
-  journalctl -u beartify-playlist-import.service -f
-  curl http://127.0.0.1:4501/health
-● beartify-playlist-import.service - Beartify - service d'import de playlists Spotify/Deezer
-     Loaded: loaded (/etc/systemd/system/beartify-playlist-import.service; enabled; preset: enabled)
-     Active: active (running) since Sat 2026-07-18 14:57:59 CEST; 11s ago
- Invocation: c4b1740d48424f418a582f0950842bc5
-   Main PID: 1173421 (node)
-      Tasks: 7 (limit: 38306)
-     Memory: 6.6M (peak: 6.8M)
-        CPU: 48ms
-     CGroup: /system.slice/beartify-playlist-import.service
-             └─1173421 /usr/bin/node /opt/beartify-playlist-import/playlist-import-service.js
-
-jui 18 14:57:59 papaours systemd[1]: Started beartify-playlist-import.service - Beartify - service d'import de play>
-jui 18 14:57:59 papaours node[1173421]: [playlist-import-service] à l'écoute sur le port 4501
-jui 18 14:57:59 papaours node[1173421]:   GET /playlist/spotify/:id
-jui 18 14:57:59 papaours node[1173421]:   GET /playlist/deezer/:id
-
-jui 18 14:57:59 papaours systemd[1]: Started beartify-playlist-import.service - Beartify - service d'import de playlists Spotify/Deezer.
-jui 18 14:57:59 papaours node[1173421]: [playlist-import-service] à l'écoute sur le port 4501
-jui 18 14:57:59 papaours node[1173421]:   GET /playlist/spotify/:id
-jui 18 14:57:59 papaours node[1173421]:   GET /playlist/deezer/:id
-^C
-{"ok":true}papaours@papaours:~$ chmod sbs.sh
-chmod: opérande manquant après ‘sbs.sh’
-Saisissez « chmod --help » pour plus d'informations.
-papaours@papaours:~$ chmod +x sbs.sh
-papaours@papaours:~$ ./sbs.sh
-═══════════════════════════════════════════════════════════
- Beartify — installation de l'automatisation des statistiques
-═══════════════════════════════════════════════════════════
-Dossier d'installation : /opt/beartify
-Dossier des paroles     : /home/papaours/Téléchargements
-Utilisateur système     : papaours
-
-→ Création de /opt/beartify ...
-→ Copie de stats-cron.js ...
-→ /opt/beartify/.env.stats existe déjà — non écrasé (pour ne pas perdre des identifiants déjà saisis).
-→ Installation du service et du timer systemd...
-
-═══════════════════════════════════════════════════════════
- ✅ Installation terminée.
-═══════════════════════════════════════════════════════════
-
-Il reste à faire, à la main :
-  1. Compléter /opt/beartify/.env.stats :
-       JELLYFIN_API_KEY, NEXTCLOUD_WEBDAV_URL, NEXTCLOUD_USER, NEXTCLOUD_PASSWORD
-  2. Démarrer le timer :
-       sudo systemctl start beartify-stats.timer
-  3. Lancer un premier calcul immédiat pour vérifier que tout fonctionne :
-       sudo systemctl start beartify-stats.service
-       journalctl -u beartify-stats.service -f
-  4. Une fois stats.json/stats.js confirmés sur Nextcloud, créer un lien de
-     partage public pour stats.json et mettre à jour STATS_URL dans
-     onboarding.js avec cette URL.
-
-papaours@papaours:~$ sudo systemctl start beartify-stats.timer
-papaours@papaours:~$ sudo systemctl start beartify-stats.service
-       journalctl -u beartify-stats.service -f
-jui 18 15:00:26 papaours systemd[1]: Finished beartify-stats.service - Beartify - calcul horaire des statistiques du catalogue.
-jui 18 15:00:26 papaours systemd[1]: beartify-stats.service: Consumed 13.673s CPU time, 91.6M memory peak.
-jui 18 15:05:19 papaours systemd[1]: Starting beartify-stats.service - Beartify - calcul horaire des statistiques du catalogue...
-jui 18 15:05:19 papaours node[1200049]: [stats-cron] 2026-07-18T13:05:19.240Z — Démarrage du calcul des statistiques…
-jui 18 15:05:48 papaours node[1200049]: [stats-cron] 2026-07-18T13:05:48.006Z — Paroles scannées : 13531 fichier(s), dont 0 synchronisé(s) mot par mot.
+papaours@papaours:~$ journalctl -u beartify-stats.service -f
+  cat /opt/beartify/stats-output/stats.json
+  systemctl list-timers | grep beartify
 jui 18 15:05:48 papaours node[1200049]: [stats-cron] 2026-07-18T13:05:48.009Z — Fichiers écrits : stats-output/stats.json, stats-output/stats.js
 jui 18 15:05:48 papaours node[1200049]: [stats-cron] 2026-07-18T13:05:48.097Z — ÉCHEC de ce cycle : fetch failed
 jui 18 15:05:48 papaours systemd[1]: beartify-stats.service: Deactivated successfully.
 jui 18 15:05:48 papaours systemd[1]: Finished beartify-stats.service - Beartify - calcul horaire des statistiques du catalogue.
 jui 18 15:05:48 papaours systemd[1]: beartify-stats.service: Consumed 13.619s CPU time, 888.8M memory peak.
+jui 18 15:14:35 papaours systemd[1]: Starting beartify-stats.service - Beartify - calcul horaire des statistiques du catalogue...
+jui 18 15:14:35 papaours node[1239204]: [stats-cron] 2026-07-18T13:14:35.941Z — Démarrage du calcul des statistiques…
+jui 18 15:14:36 papaours node[1239204]: [stats-cron] 2026-07-18T13:14:36.010Z — ÉCHEC de ce cycle : Jellyfin /Items/Counts a répondu 401
+jui 18 15:14:36 papaours systemd[1]: beartify-stats.service: Deactivated successfully.
+jui 18 15:14:36 papaours systemd[1]: Finished beartify-stats.service - Beartify - calcul horaire des statistiques du catalogue.
 ^C
+{
+  "generatedAt": 1784379948006,
+  "trackCount": 22616,
+  "artistCount": 0,
+  "albumCount": 4951,
+  "wordSyncedLyricsCount": 0
+}Sat 2026-07-18 16:00:00 CEST     44min Sat 2026-07-18 15:00:01 CEST    15min ago beartify-stats.timer         beartify-stats.service
 papaours@papaours:~$ 
