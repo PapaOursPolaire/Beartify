@@ -34,6 +34,8 @@ fn update_media_session(
 ) -> Result<(), String> {
     use tauri_plugin_notification::NotificationExt;
 
+    eprintln!("[Beartify] update_media_session appelé: title={} artist={} is_playing={}", title, artist, is_playing);
+
     let play_pause = if is_playing { "⏸" } else { "▶" };
     let body = if artist.is_empty() {
         "Beartify Player".to_string()
@@ -41,13 +43,20 @@ fn update_media_session(
         artist
     };
 
-    app.notification()
+    let result = app.notification()
     .builder()
     .title(format!("{} {}", play_pause, title))
     .body(body)
     .id(1) // ID fixe → mise à jour de la même notif à chaque piste
     .show() // Correction Tauri v2
-    .map_err(|e| e.to_string())
+    .map_err(|e| e.to_string());
+
+    match &result {
+        Ok(_) => eprintln!("[Beartify] update_media_session: .show() OK"),
+        Err(e) => eprintln!("[Beartify] update_media_session: .show() ECHEC: {}", e),
+    }
+
+    result
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -57,12 +66,27 @@ fn update_media_session(
 fn request_notification_permission(app: tauri::AppHandle) -> Result<bool, String> {
     use tauri_plugin_notification::NotificationExt;
 
-    let permission = app.notification().permission_state().map_err(|e| e.to_string())?;
-    if permission == tauri_plugin_notification::PermissionState::Granted {
+    eprintln!("[Beartify] request_notification_permission appelé");
+
+    let current = app.notification().permission_state().map_err(|e| {
+        eprintln!("[Beartify] permission_state() ECHEC: {}", e);
+        e.to_string()
+    })?;
+    eprintln!("[Beartify] permission_state() actuel = {:?}", current);
+
+    if current == tauri_plugin_notification::PermissionState::Granted {
         return Ok(true);
     }
 
-    Ok(true)
+    // C'est cet appel qui déclenche réellement le popup système Android
+    // (POST_NOTIFICATIONS, API 33+) — `permission_state()` seul ne fait que
+    // lire l'état existant, il ne demande jamais rien.
+    let requested = app.notification().request_permission().map_err(|e| {
+        eprintln!("[Beartify] request_permission() ECHEC: {}", e);
+        e.to_string()
+    })?;
+    eprintln!("[Beartify] request_permission() résultat = {:?}", requested);
+    Ok(requested == tauri_plugin_notification::PermissionState::Granted)
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -104,9 +128,9 @@ fn discord_set_activity(
     let client = guard.as_mut().ok_or("Discord non connecté — appelez discord_connect d'abord")?;
 
     let now = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map(|d| d.as_secs() as i64)
-        .unwrap_or(0);
+    .duration_since(UNIX_EPOCH)
+    .map(|d| d.as_secs() as i64)
+    .unwrap_or(0);
 
     // start = maintenant moins la position déjà écoulée dans le titre, pour
     // que Discord recalcule lui-même l'écoulé/restant en continu (pas besoin
@@ -124,10 +148,10 @@ fn discord_set_activity(
     }
 
     let mut act = activity::Activity::new()
-        .details(details.as_str())
-        .state(state_text.as_str())
-        .activity_type(ActivityType::Listening)
-        .timestamps(timestamps);
+    .details(details.as_str())
+    .state(state_text.as_str())
+    .activity_type(ActivityType::Listening)
+    .timestamps(timestamps);
 
     // La pochette n'est fournie que si l'appelant en a une (Option) — on
     // n'attache le bloc "assets" que dans ce cas plutôt que d'envoyer des
