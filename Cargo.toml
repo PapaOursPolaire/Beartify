@@ -26,6 +26,17 @@ serde_json = "1"
 tauri-plugin-fs = "2.5.1"
 discord-rich-presence = "1.1.0"
 
+# Nécessaire pour désactiver le Tracking Prevention de WebView2 (Windows
+# uniquement) — Tauri l'utilise déjà en interne mais ne l'expose pas
+# directement, donc on l'ajoute explicitement pour accéder à
+# ICoreWebView2Profile3::PreferredTrackingPreventionLevel.
+# ⚠️ Version à ajuster si `cargo build` signale une incompatibilité avec
+# la version interne utilisée par `tauri = "2"` (erreurs de type sur les
+# interfaces COM en cas de désaccord de version).
+[target.'cfg(windows)'.dependencies]
+webview2-com = "0.33"
+windows = { version = "0.58", features = ["Win32_Foundation"] }
+
 [features]
 custom-protocol = ["tauri/custom-protocol"]
 
