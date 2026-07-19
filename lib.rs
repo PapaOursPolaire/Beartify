@@ -7,6 +7,79 @@ use std::sync::Mutex;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 // ══════════════════════════════════════════════════════════════════
+//  Désactive le Tracking Prevention de WebView2 pour CETTE fenêtre.
+//
+//  Contexte : les covers Jellyfin (beartify.duckdns.org, un domaine
+//  DuckDNS chargé en cross-origin depuis http://tauri.localhost) sont
+//  bloquées côté WebView2 avant même réception de la réponse (Network
+//  tab : aucun Response Header, statut vide) alors que le serveur
+//  répond correctement (vérifié via curl). Tracking Prevention classe
+//  parfois ce type de domaine dynamique comme traqueur tiers et bloque
+//  la requête en amont — d'où un message "CORS" trompeur dans la
+//  console (Chromium réutilise ce message générique même quand la
+//  vraie cause est ailleurs).
+//
+//  ⚠️ Ceci désactive Tracking Prevention pour TOUTE la fenêtre (donc
+//  tous les domaines chargés dedans), pas seulement beartify.duckdns.org
+//  — WebView2 ne permet pas un scope par domaine sur ce réglage. Pour
+//  une app qui ne navigue que vers des domaines de confiance (comme
+//  Beartify), c'est un compromis raisonnable ; à revoir si vous chargez
+//  un jour du contenu tiers non maîtrisé dans cette même fenêtre.
+//
+//  ⚠️ Non testable de mon côté (interop COM Windows) — teste la
+//  compilation avant de faire confiance à ce patch. Si `cargo build`
+//  signale une incompatibilité de type sur les interfaces COM, c'est
+//  probablement un désaccord de version entre `webview2-com` (ajouté
+//  explicitement dans Cargo.toml) et celle utilisée en interne par
+//  `tauri = "2"` — ajuste la version dans Cargo.toml en conséquence.
+// ══════════════════════════════════════════════════════════════════
+#[cfg(windows)]
+fn disable_tracking_prevention(window: &tauri::WebviewWindow) {
+    use webview2_com::Microsoft::Web::WebView2::Win32::{
+        ICoreWebView2_13, ICoreWebView2Profile3, COREWEBVIEW2_TRACKING_PREVENTION_LEVEL_NONE,
+    };
+    use windows::core::Interface;
+
+    let result = window.with_webview(|webview| {
+        unsafe {
+            // Controller → CoreWebView2 (interface de base) → cast vers la
+            // version 13 qui expose get_Profile() → cast vers Profile3 qui
+            // seul expose PreferredTrackingPreventionLevel.
+            let core = match webview.controller().CoreWebView2() {
+                Ok(c) => c,
+                Err(e) => { eprintln!("[TrackingPrevention] CoreWebView2() a échoué: {e}"); return; }
+            };
+            let core13: ICoreWebView2_13 = match core.cast() {
+                Ok(c) => c,
+                Err(e) => { eprintln!("[TrackingPrevention] cast ICoreWebView2_13 a échoué: {e}"); return; }
+            };
+            let profile = match core13.Profile() {
+                Ok(p) => p,
+                Err(e) => { eprintln!("[TrackingPrevention] Profile() a échoué: {e}"); return; }
+            };
+            let profile3: ICoreWebView2Profile3 = match profile.cast() {
+                Ok(p) => p,
+                Err(e) => { eprintln!("[TrackingPrevention] cast ICoreWebView2Profile3 a échoué: {e}"); return; }
+            };
+            match profile3.SetPreferredTrackingPreventionLevel(COREWEBVIEW2_TRACKING_PREVENTION_LEVEL_NONE) {
+                Ok(_)  => println!("[TrackingPrevention] ✅ Désactivé pour cette fenêtre"),
+                Err(e) => eprintln!("[TrackingPrevention] SetPreferredTrackingPreventionLevel a échoué: {e}"),
+            }
+        }
+    });
+    if let Err(e) = result {
+        eprintln!("[TrackingPrevention] with_webview a échoué: {e}");
+    }
+}
+
+#[cfg(not(windows))]
+fn disable_tracking_prevention(_window: &tauri::WebviewWindow) {
+    // No-op sur macOS/Linux — Tracking Prevention est une fonctionnalité
+    // spécifique à WebView2 (Edge/Chromium sous Windows), le bug d'origine
+    // n'a d'ailleurs été observé que là.
+}
+
+// ══════════════════════════════════════════════════════════════════
 //  Relay événement JS fenêtre → fenêtre via le backend Rust
 // ══════════════════════════════════════════════════════════════════
 #[tauri::command]
@@ -232,6 +305,9 @@ pub fn run() {
             if let Some(win) = app.get_webview_window("main") {
                 win.open_devtools();
             }
+        }
+        if let Some(win) = app.get_webview_window("main") {
+            disable_tracking_prevention(&win);
         }
         Ok(())
     })
