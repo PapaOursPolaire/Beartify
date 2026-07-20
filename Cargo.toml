@@ -34,8 +34,8 @@ discord-rich-presence = "1.1.0"
 # la version interne utilisée par `tauri = "2"` (erreurs de type sur les
 # interfaces COM en cas de désaccord de version).
 [target.'cfg(windows)'.dependencies]
-webview2-com = "0.33"
-windows = { version = "0.58", features = ["Win32_Foundation"] }
+webview2-com = "0.38.2"
+windows = { version = "0.61.3", features = ["Win32_Foundation"] }
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]
