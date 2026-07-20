@@ -36,19 +36,19 @@ use std::time::{SystemTime, UNIX_EPOCH};
 #[cfg(windows)]
 fn disable_tracking_prevention(window: &tauri::WebviewWindow) {
     use webview2_com::Microsoft::Web::WebView2::Win32::{
-        ICoreWebView2_13, ICoreWebView2Profile3, COREWEBVIEW2_TRACKING_PREVENTION_LEVEL_NONE,
+        ICoreWebView2_13, ICoreWebView2Profile3, ICoreWebView2Settings8,
+        COREWEBVIEW2_TRACKING_PREVENTION_LEVEL_NONE,
     };
     use windows::core::Interface;
 
     let result = window.with_webview(|webview| {
         unsafe {
-            // Controller → CoreWebView2 (interface de base) → cast vers la
-            // version 13 qui expose get_Profile() → cast vers Profile3 qui
-            // seul expose PreferredTrackingPreventionLevel.
             let core = match webview.controller().CoreWebView2() {
                 Ok(c) => c,
                 Err(e) => { eprintln!("[TrackingPrevention] CoreWebView2() a échoué: {e}"); return; }
             };
+
+            // ── 1. Tracking Prevention (déjà en place, laissé tel quel) ──
             let core13: ICoreWebView2_13 = match core.cast() {
                 Ok(c) => c,
                 Err(e) => { eprintln!("[TrackingPrevention] cast ICoreWebView2_13 a échoué: {e}"); return; }
@@ -64,6 +64,27 @@ fn disable_tracking_prevention(window: &tauri::WebviewWindow) {
             match profile3.SetPreferredTrackingPreventionLevel(COREWEBVIEW2_TRACKING_PREVENTION_LEVEL_NONE) {
                 Ok(_)  => println!("[TrackingPrevention] ✅ Désactivé pour cette fenêtre"),
                 Err(e) => eprintln!("[TrackingPrevention] SetPreferredTrackingPreventionLevel a échoué: {e}"),
+            }
+
+            // ── 2. SmartScreen / vérification de réputation (NOUVEAU) ──
+            // Couche distincte de Tracking Prevention : vérifie la réputation
+            // d'un domaine AVANT d'autoriser la requête. Un domaine DuckDNS
+            // (DNS dynamique) est un candidat typique aux faux positifs de
+            // ce genre d'heuristique. Contrairement à Tracking Prevention,
+            // ce réglage est partagé par TOUTES les WebView2 utilisant le
+            // même user data folder — désactivé une fois, ça reste désactivé
+            // pour les navigations suivantes de cette fenêtre.
+            let settings = match core.Settings() {
+                Ok(s) => s,
+                Err(e) => { eprintln!("[SmartScreen] Settings() a échoué: {e}"); return; }
+            };
+            let settings8: ICoreWebView2Settings8 = match settings.cast() {
+                Ok(s) => s,
+                Err(e) => { eprintln!("[SmartScreen] cast ICoreWebView2Settings8 a échoué: {e}"); return; }
+            };
+            match settings8.SetIsReputationCheckingRequired(false) {
+                Ok(_)  => println!("[SmartScreen] ✅ Vérification de réputation désactivée"),
+                Err(e) => eprintln!("[SmartScreen] SetIsReputationCheckingRequired a échoué: {e}"),
             }
         }
     });
