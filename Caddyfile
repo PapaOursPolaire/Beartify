@@ -343,6 +343,7 @@ beartify.duckdns.org {
             # lui-même ; cors_tauri reste seul responsable de sa valeur.
             header_down -X-Emby-Token
             header_down -Access-Control-Allow-Origin
+            header_down -Cache-Control
             header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
             header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
             header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
@@ -531,6 +532,7 @@ http://192.168.0.18 {
             # lui-même ; cors_tauri reste seul responsable de sa valeur.
             header_down -Access-Control-Allow-Origin
             header_down -X-Emby-Token
+            header_down -Cache-Control
             header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
             header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
             header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
@@ -680,6 +682,7 @@ http://192.168.0.2 {
             # lui-même ; cors_tauri reste seul responsable de sa valeur.
             header_down -Access-Control-Allow-Origin
             header_down -X-Emby-Token
+            header_down -Cache-Control
             header_down Location "https://grizzly-stream.duckdns.org" "/api/jellyfin"
             header_down Location "http://grizzly-stream.duckdns.org"  "/api/jellyfin"
             header_down Location "http://127.0.0.1:8096"              "/api/jellyfin"
