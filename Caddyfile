@@ -291,7 +291,7 @@ beartify.duckdns.org {
     @jellyfin_images {
         path /api/jellyfin/Items/*/Images/*
     }
-    header @jellyfin_images Cache-Control "public, max-age=31536000, immutable"
+    header @jellyfin_images Cache-Control "no-cache"
 
     # 🔐 HLS DRM
     import drm_routes
@@ -457,7 +457,7 @@ grizzlyfin.duckdns.org {
     @jellyfin_images {
         path /api/jellyfin/Items/*/Images/*
     }
-    header @jellyfin_images Cache-Control "public, max-age=31536000, immutable"
+    header @jellyfin_images Cache-Control "no-cache"
 
     file_server
 
@@ -496,7 +496,7 @@ http://192.168.0.18 {
     @jellyfin_images {
         path /api/jellyfin/Items/*/Images/*
     }
-    header @jellyfin_images Cache-Control "public, max-age=31536000, immutable"
+    header @jellyfin_images Cache-Control "no-cache"
 
     import drm_routes
     import libretranslate_proxy
@@ -652,7 +652,7 @@ http://192.168.0.2 {
     @jellyfin_images {
         path /api/jellyfin/Items/*/Images/*
     }
-    header @jellyfin_images Cache-Control "public, max-age=31536000, immutable"
+    header @jellyfin_images Cache-Control "no-cache"
 
     import drm_routes
     import libretranslate_proxy
