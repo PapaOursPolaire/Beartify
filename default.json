@@ -27,6 +27,7 @@
     "shell:allow-open",
     "http:allow-fetch",
     "http:allow-fetch-read-body",
+    "opener:default",
     "deep-link:default",
     "oauth:allow-start",
     "oauth:allow-cancel",
@@ -45,6 +46,14 @@
       "identifier": "fs:scope",
       "allow": [
         { "path": "$DATA/beartify/extensions/**" }
+      ]
+    },
+
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [
+        { "url": "https://discord.com/*" },
+        { "url": "https://accounts.google.com/*" }
       ]
     },
 

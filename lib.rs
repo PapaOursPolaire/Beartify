@@ -45,25 +45,25 @@ fn disable_tracking_prevention(window: &tauri::WebviewWindow) {
         unsafe {
             let core = match webview.controller().CoreWebView2() {
                 Ok(c) => c,
-                Err(e) => { eprintln!("[TrackingPrevention] CoreWebView2() a échoué: {e}"); return; }
+                                     Err(e) => { eprintln!("[TrackingPrevention] CoreWebView2() a échoué: {e}"); return; }
             };
 
             // ── 1. Tracking Prevention (déjà en place, laissé tel quel) ──
             let core13: ICoreWebView2_13 = match core.cast() {
                 Ok(c) => c,
-                Err(e) => { eprintln!("[TrackingPrevention] cast ICoreWebView2_13 a échoué: {e}"); return; }
+                                     Err(e) => { eprintln!("[TrackingPrevention] cast ICoreWebView2_13 a échoué: {e}"); return; }
             };
             let profile = match core13.Profile() {
                 Ok(p) => p,
-                Err(e) => { eprintln!("[TrackingPrevention] Profile() a échoué: {e}"); return; }
+                                     Err(e) => { eprintln!("[TrackingPrevention] Profile() a échoué: {e}"); return; }
             };
             let profile3: ICoreWebView2Profile3 = match profile.cast() {
                 Ok(p) => p,
-                Err(e) => { eprintln!("[TrackingPrevention] cast ICoreWebView2Profile3 a échoué: {e}"); return; }
+                                     Err(e) => { eprintln!("[TrackingPrevention] cast ICoreWebView2Profile3 a échoué: {e}"); return; }
             };
             match profile3.SetPreferredTrackingPreventionLevel(COREWEBVIEW2_TRACKING_PREVENTION_LEVEL_NONE) {
                 Ok(_)  => println!("[TrackingPrevention] ✅ Désactivé pour cette fenêtre"),
-                Err(e) => eprintln!("[TrackingPrevention] SetPreferredTrackingPreventionLevel a échoué: {e}"),
+                                     Err(e) => eprintln!("[TrackingPrevention] SetPreferredTrackingPreventionLevel a échoué: {e}"),
             }
 
             // ── 2. SmartScreen / vérification de réputation (NOUVEAU) ──
@@ -76,15 +76,15 @@ fn disable_tracking_prevention(window: &tauri::WebviewWindow) {
             // pour les navigations suivantes de cette fenêtre.
             let settings = match core.Settings() {
                 Ok(s) => s,
-                Err(e) => { eprintln!("[SmartScreen] Settings() a échoué: {e}"); return; }
+                                     Err(e) => { eprintln!("[SmartScreen] Settings() a échoué: {e}"); return; }
             };
             let settings8: ICoreWebView2Settings8 = match settings.cast() {
                 Ok(s) => s,
-                Err(e) => { eprintln!("[SmartScreen] cast ICoreWebView2Settings8 a échoué: {e}"); return; }
+                                     Err(e) => { eprintln!("[SmartScreen] cast ICoreWebView2Settings8 a échoué: {e}"); return; }
             };
             match settings8.SetIsReputationCheckingRequired(false) {
                 Ok(_)  => println!("[SmartScreen] ✅ Vérification de réputation désactivée"),
-                Err(e) => eprintln!("[SmartScreen] SetIsReputationCheckingRequired a échoué: {e}"),
+                                     Err(e) => eprintln!("[SmartScreen] SetIsReputationCheckingRequired a échoué: {e}"),
             }
         }
     });
@@ -292,6 +292,7 @@ pub fn run() {
     // Enregistrement des plugins standards
     builder = builder
     .plugin(tauri_plugin_shell::init())
+    .plugin(tauri_plugin_opener::init()) // <-- AJOUTÉ : requis par plugin:opener|open_url (Google/Discord sur Android)
     .plugin(tauri_plugin_http::init())
     .plugin(tauri_plugin_oauth::init())
     .plugin(tauri_plugin_deep_link::init())
