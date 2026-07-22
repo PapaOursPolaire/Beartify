@@ -41,6 +41,10 @@
  *    LYRICS_DIR           dossier contenant les fichiers de paroles
  *                          (.json / *-line.json) sauvegardés par
  *                          lyrics.js — ajuste selon ton arborescence
+ *    PLAYER_DIR            racine du site servi (def: /var/www/html/player)
+ *                          utilisé pour additionner les lignes de tous
+ *                          les fichiers de code source (voir
+ *                          countLinesOfCode() ci-dessous)
  *    NEXTCLOUD_WEBDAV_URL  ex: https://ton-nextcloud/remote.php/dav/files/USER
  *    NEXTCLOUD_USER
  *    NEXTCLOUD_PASSWORD    mot de passe d'application Nextcloud (PAS le mdp du compte)
@@ -61,6 +65,7 @@ const CONFIG = {
   jellyfinUrl:     process.env.JELLYFIN_URL || 'http://127.0.0.1:8096',
   jellyfinApiKey:  process.env.JELLYFIN_API_KEY || '',
   lyricsDir:       process.env.LYRICS_DIR || '/home/papaours/Téléchargements',
+  playerDir:       process.env.PLAYER_DIR || '/var/www/html/player',
   nextcloudUrl:    process.env.NEXTCLOUD_WEBDAV_URL || '',
   nextcloudUser:   process.env.NEXTCLOUD_USER || '',
   nextcloudPass:   process.env.NEXTCLOUD_PASSWORD || '',
@@ -145,7 +150,58 @@ function classifyLyricsFile(json) {
   return json?.syncType === 'WORD' ? 'word' : 'line';
 }
 
-// ── 3) Écriture des fichiers de sortie ─────────────────────────────────
+// ── 3) Comptage des lignes de code du site ──────────────────────────────
+// Parcourt récursivement PLAYER_DIR et additionne le nombre de lignes de
+// tous les fichiers dont l'extension correspond à du code source/texte
+// (JS, CSS, HTML, JSON, etc.). Ignore les dossiers de dépendances/build
+// qui gonfleraient artificiellement le chiffre.
+const CODE_EXTENSIONS = new Set([
+  '.js', '.mjs', '.cjs', '.ts', '.jsx', '.tsx',
+  '.html', '.htm', '.css', '.scss', '.json',
+  '.php', '.py', '.sh', '.md', '.vue',
+]);
+const SKIP_DIR_NAMES = new Set(['node_modules', '.git', 'dist', 'build', 'vendor']);
+
+async function countLinesOfCode() {
+  if (!CONFIG.playerDir) {
+    log('PLAYER_DIR non configuré — décompte des lignes de code ignoré (linesOfCodeCount = null).');
+    return null;
+  }
+  let totalLines = 0;
+  let fileCount = 0;
+
+  async function walk(dir) {
+    let entries;
+    try { entries = await fsp.readdir(dir, { withFileTypes: true }); }
+    catch (e) { log(`Impossible de lire ${dir} : ${e.message}`); return; }
+
+    for (const entry of entries) {
+      if (entry.isDirectory()) {
+        if (SKIP_DIR_NAMES.has(entry.name)) continue;
+        await walk(path.join(dir, entry.name));
+        continue;
+      }
+      const ext = path.extname(entry.name).toLowerCase();
+      if (!CODE_EXTENSIONS.has(ext)) continue;
+      try {
+        const raw = await fsp.readFile(path.join(dir, entry.name), 'utf-8');
+        // Compte de lignes simple (nombre de \n + 1) — suffisant pour un
+        // ordre de grandeur affiché à l'onboarding, pas besoin d'exclure
+        // lignes vides/commentaires ici.
+        totalLines += raw.split('\n').length;
+        fileCount++;
+      } catch (e) {
+        // Fichier illisible/binaire malgré l'extension : on l'ignore
+        // plutôt que de faire échouer tout le calcul.
+      }
+    }
+  }
+  await walk(CONFIG.playerDir);
+  log(`Code scanné : ${fileCount} fichier(s), ${totalLines} ligne(s) au total.`);
+  return totalLines;
+}
+
+// ── 4) Écriture des fichiers de sortie ─────────────────────────────────
 async function writeOutputFiles(stats) {
   await fsp.mkdir(CONFIG.outputDir, { recursive: true });
 
@@ -163,7 +219,7 @@ async function writeOutputFiles(stats) {
   return { jsonPath, jsPath };
 }
 
-// ── 4) Upload WebDAV vers Nextcloud ─────────────────────────────────────
+// ── 5) Upload WebDAV vers Nextcloud ─────────────────────────────────────
 // Même principe d'auth Basic que l'intégration Nextcloud WebDAV déjà en
 // place pour les photos de profil (credentials côté serveur, jamais
 // exposées au client).
@@ -196,6 +252,7 @@ async function runOnce() {
   try {
     const counts = await fetchJellyfinCounts();
     const wordSyncedLyricsCount = await countWordSyncedLyrics();
+    const linesOfCodeCount = await countLinesOfCode();
 
     const stats = {
       generatedAt: Date.now(),
@@ -203,6 +260,7 @@ async function runOnce() {
       artistCount: counts.artistCount,
       albumCount:  counts.albumCount,
       wordSyncedLyricsCount, // null si LYRICS_DIR non configuré
+      linesOfCodeCount,      // null si PLAYER_DIR non configuré
     };
 
     const { jsonPath, jsPath } = await writeOutputFiles(stats);
@@ -210,7 +268,7 @@ async function runOnce() {
     await uploadToNextcloud(jsPath, 'stats.js');
 
     log(`Terminé : ${stats.trackCount} titres, ${stats.artistCount} artistes, ${stats.albumCount} albums, ` +
-        `${stats.wordSyncedLyricsCount ?? 'N/A'} paroles mot par mot.`);
+        `${stats.wordSyncedLyricsCount ?? 'N/A'} paroles mot par mot, ${stats.linesOfCodeCount ?? 'N/A'} lignes de code.`);
   } catch (e) {
     // Une erreur ponctuelle (Jellyfin temporairement indisponible, etc.)
     // ne doit jamais interrompre les cycles suivants.
