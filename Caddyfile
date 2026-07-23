@@ -272,7 +272,7 @@ beartify.duckdns.org {
         Referrer-Policy           "strict-origin-when-cross-origin"
         Permissions-Policy        "geolocation=(), microphone=(), camera=(), payment=()"
 
-        Content-Security-Policy "default-src 'self' https://beartify-firebase.firebaseapp.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://discord.com https://lrclib.net https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://apis.google.com https://accounts.google.com https://www.gstatic.com wss://grizzly-stream.duckdns.org https://grizzly-stream.duckdns.org; frame-src 'self' https://beartify-firebase.firebaseapp.com https://accounts.google.com; frame-ancestors 'none';"
+        Content-Security-Policy "default-src 'self' https://beartify-firebase.firebaseapp.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://discord.com https://lrclib.net https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://apis.google.com https://accounts.google.com https://www.gstatic.com wss://grizzly-stream.duckdns.org https://grizzly-stream.duckdns.org; frame-src 'self' https://beartify-firebase.firebaseapp.com https://accounts.google.com; frame-ancestors 'none';"
 
         -Server
     }
@@ -281,6 +281,24 @@ beartify.duckdns.org {
         path *.js *.css *.woff2 *.woff *.ttf *.png *.jpg *.svg *.ico *.webp *.gif
     }
     header @static Cache-Control "public, max-age=31536000, immutable"
+
+    # sw.js ne doit JAMAIS être mis en cache longue durée par le navigateur :
+    # c'est ce fichier qui déclenche la détection de mise à jour du Service
+    # Worker (P2-3) — @static ci-dessus le catégorise à tort comme un *.js
+    # normal et le rendrait immutable pendant un an, bloquant toute mise à
+    # jour du SW. manifest.json est moins critique mais reçoit un cache
+    # court plutôt que le "immutable" 1 an de @static, au cas où icônes ou
+    # nom changeraient.
+    @sw_file {
+        path /sw.js
+    }
+    header @sw_file Cache-Control "no-cache, no-store, must-revalidate"
+    header @sw_file Service-Worker-Allowed "/"
+
+    @manifest_file {
+        path /manifest.json
+    }
+    header @manifest_file Cache-Control "public, max-age=86400"
 
     # Covers Jellyfin proxifiées : le chemin ne se termine jamais par une
     # extension de fichier (ex: /api/jellyfin/Items/{id}/Images/Primary),
@@ -493,6 +511,24 @@ http://192.168.0.18 {
     }
     header @static Cache-Control "public, max-age=31536000, immutable"
 
+    # sw.js ne doit JAMAIS être mis en cache longue durée par le navigateur :
+    # c'est ce fichier qui déclenche la détection de mise à jour du Service
+    # Worker (P2-3) — @static ci-dessus le catégorise à tort comme un *.js
+    # normal et le rendrait immutable pendant un an, bloquant toute mise à
+    # jour du SW. manifest.json est moins critique mais reçoit un cache
+    # court plutôt que le "immutable" 1 an de @static, au cas où icônes ou
+    # nom changeraient.
+    @sw_file {
+        path /sw.js
+    }
+    header @sw_file Cache-Control "no-cache, no-store, must-revalidate"
+    header @sw_file Service-Worker-Allowed "/"
+
+    @manifest_file {
+        path /manifest.json
+    }
+    header @manifest_file Cache-Control "public, max-age=86400"
+
     @jellyfin_images {
         path /api/jellyfin/Items/*/Images/*
     }
@@ -648,6 +684,24 @@ http://192.168.0.2 {
         path *.js *.css *.woff2 *.woff *.ttf *.png *.jpg *.svg *.ico *.webp
     }
     header @static Cache-Control "public, max-age=31536000, immutable"
+
+    # sw.js ne doit JAMAIS être mis en cache longue durée par le navigateur :
+    # c'est ce fichier qui déclenche la détection de mise à jour du Service
+    # Worker (P2-3) — @static ci-dessus le catégorise à tort comme un *.js
+    # normal et le rendrait immutable pendant un an, bloquant toute mise à
+    # jour du SW. manifest.json est moins critique mais reçoit un cache
+    # court plutôt que le "immutable" 1 an de @static, au cas où icônes ou
+    # nom changeraient.
+    @sw_file {
+        path /sw.js
+    }
+    header @sw_file Cache-Control "no-cache, no-store, must-revalidate"
+    header @sw_file Service-Worker-Allowed "/"
+
+    @manifest_file {
+        path /manifest.json
+    }
+    header @manifest_file Cache-Control "public, max-age=86400"
 
     @jellyfin_images {
         path /api/jellyfin/Items/*/Images/*
