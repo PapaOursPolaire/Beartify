@@ -290,7 +290,14 @@ function startTranscode(itemId, token, tempDir) {
       console.error('[HLS] ffmpeg introuvable :', e.message);
     });
 
-    // Polling : ready dès init.mp4 + 2 segments disponibles
+    // Polling : ready dès init.mp4 + 3 segments disponibles
+    // ⚠️ Seuil relevé de 2 → 3 : avec seulement 2 segments, le client
+    // (HLS.js) commence à consommer quasiment au même instant où ffmpeg
+    // vient tout juste de finir de les écrire — sur une machine partagée
+    // (Jellyfin + tout le reste du stack), cette marge est parfois trop
+    // fine et le tout premier segment peut être livré dans un état limite.
+    // Un segment de marge supplémentaire donne à ffmpeg une avance
+    // confortable avant que le client ne commence à réclamer.
     const watcher = setInterval(() => {
       const s = sessions.get(token);
       if (!s || s.ready || s.ffmpegError) { clearInterval(watcher); return; }
@@ -298,7 +305,7 @@ function startTranscode(itemId, token, tempDir) {
         const initOk   = fs.existsSync(path.join(tempDir, 'init.mp4'));
         const segFiles = fs.readdirSync(tempDir).filter(f => /^seg\d+\.m4s$/.test(f));
         s.segCount = segFiles.length;
-        if (initOk && segFiles.length >= 2) {
+        if (initOk && segFiles.length >= 3) {
           s.ready = true;
           clearInterval(watcher);
           console.log(`[HLS] ▶ Prêt (${segFiles.length} segments) — ${itemId}`);
