@@ -251,7 +251,15 @@ function startTranscode(itemId, token, tempDir) {
   '-hls_segment_filename',   path.join(tempDir, 'seg%03d.m4s'),
                    '-hls_time',               '4',
                    '-hls_list_size',          '0',
-                   '-hls_flags',              'independent_segments',
+                   // ⚠️ FIX : +temp_file force ffmpeg à écrire chaque segment
+                   // sous un nom temporaire puis à le renommer atomiquement une
+                   // fois complet. Sans ça, le serveur peut lire un segment
+                   // encore en cours d'écriture (fichier tronqué) — le
+                   // démuxeur du navigateur échoue alors avec fragParsingError.
+                   // Le rename() est atomique au niveau du système de fichiers :
+                   // fs.existsSync()/readFile() côté serveur ne peuvent plus
+                   // jamais voir un fichier partiel.
+                   '-hls_flags',              'independent_segments+temp_file',
                    '-y',
                    path.join(tempDir, 'playlist.m3u8'),
   ], { stdio: ['ignore', 'ignore', 'pipe'] });
