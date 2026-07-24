@@ -69,9 +69,24 @@ function generateToken(itemId, ip, expiresAt) {
 
 function validateSession(token, itemId, req) {
   const s = sessions.get(token);
-  if (!s) return null;
-  if (Date.now() > s.expiresAt) { destroySession(token); return null; }
-  if (s.itemId !== itemId || s.ip !== clientIp(req)) return null;
+  if (!s) {
+    console.warn(`[Session] 401 : token inconnu (déjà détruit/expiré ou jamais créé) — item=${itemId}`);
+    return null;
+  }
+  if (Date.now() > s.expiresAt) {
+    console.warn(`[Session] 401 : expirée depuis ${Date.now() - s.expiresAt}ms — item=${itemId}`);
+    destroySession(token);
+    return null;
+  }
+  if (s.itemId !== itemId) {
+    console.warn(`[Session] 401 : itemId ne correspond pas (session=${s.itemId}, requête=${itemId})`);
+    return null;
+  }
+  const reqIp = clientIp(req);
+  if (s.ip !== reqIp) {
+    console.warn(`[Session] 401 : IP ne correspond pas (session créée avec ip=${s.ip}, requête actuelle ip=${reqIp}) — item=${itemId}`);
+    return null;
+  }
   return s;
 }
 
