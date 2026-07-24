@@ -70,7 +70,7 @@ function generateToken(itemId, ip, expiresAt) {
 function validateSession(token, itemId, req) {
   const s = sessions.get(token);
   if (!s) {
-    console.warn(`[Session] 401 : token inconnu (déjà détruit/expiré ou jamais créé) — item=${itemId}`);
+    console.warn(`[Session] 401 : token inconnu (déjà détruit/expiré ou jamais créé) — item=${itemId} (PID ${process.pid}, taille Map=${sessions.size})`);
     return null;
   }
   if (Date.now() > s.expiresAt) {
@@ -461,6 +461,7 @@ app.get('/api/hls/session/:id', async (req, res) => {
         honeypotTag,         // Fix 1
         segCount: 0,
       });
+      console.log(`[Session] Créée — item=${itemId} token=${token.slice(0,20)}… (PID ${process.pid}, taille Map=${sessions.size})`);
 
       startTranscode(itemId, token, tempDir);
 
