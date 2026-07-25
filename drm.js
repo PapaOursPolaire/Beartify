@@ -305,7 +305,7 @@ function startTranscode(itemId, token, tempDir) {
         const initOk   = fs.existsSync(path.join(tempDir, 'init.mp4'));
         const segFiles = fs.readdirSync(tempDir).filter(f => /^seg\d+\.m4s$/.test(f));
         s.segCount = segFiles.length;
-        if (initOk && segFiles.length >= 4) {
+        if (initOk && segFiles.length >= 6) {
           s.ready = true;
           clearInterval(watcher);
           console.log(`[HLS] ▶ Prêt (${segFiles.length} segments) — ${itemId}`);
