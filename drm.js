@@ -235,14 +235,22 @@ async function generateHoneypotSegments() {
 // ══════════════════════════════════════════════════════════════════════
 //  Transcodage ffmpeg → HLS FLAC fMP4 (segments en clair sur disque)
 // ══════════════════════════════════════════════════════════════════════
-function startTranscode(itemId, token, tempDir) {
+function startTranscode(itemId, token, tempDir, seekOffset) {
   const sess = sessions.get(token);
   if (!sess) return;
 
   const jellyUrl = `http://${JELLYFIN_HOST}:${JELLYFIN_PORT}/Audio/${itemId}/stream`
   + `?static=true&api_key=${JELLYFIN_TOKEN}`;
 
-  const ff = spawn('ffmpeg', [
+  const ffArgs = [];
+  // ⚠️ -ss AVANT -i : seek côté source (rapide, avant décodage), permet à
+  // ffmpeg de démarrer le transcodage directement à la position demandée
+  // au lieu de toujours repartir de 0 — c'est ce qui rend un seek loin
+  // dans une piste fraîchement démarrée quasi-instantané (délai constant,
+  // ~ le temps de démarrage normal d'une session) plutôt que proportionnel
+  // à la distance parcourue dans la piste.
+  if (seekOffset > 0) ffArgs.push('-ss', String(seekOffset));
+  ffArgs.push(
     '-i',                      jellyUrl,
     '-vn',
     '-c:a',                    'flac',     // LOSSLESS — sans -ar ni -ac (passthrough)
@@ -262,7 +270,8 @@ function startTranscode(itemId, token, tempDir) {
                    '-hls_flags',              'independent_segments+temp_file',
                    '-y',
                    path.join(tempDir, 'playlist.m3u8'),
-  ], { stdio: ['ignore', 'ignore', 'pipe'] });
+  );
+  const ff = spawn('ffmpeg', ffArgs, { stdio: ['ignore', 'ignore', 'pipe'] });
 
   // Fix 3 : stocker la référence du processus pour pouvoir le tuer
   sess.ffProcess = ff;
@@ -440,6 +449,12 @@ app.get('/api/hls/session/:id', async (req, res) => {
   if (!itemId || !/^[a-f0-9]{32}$/i.test(itemId))
     return res.status(400).json({ error: 'ID invalide' });
 
+  // Position de départ optionnelle (secondes) — voir startTranscode : permet
+  // un seek quasi-instantané dans une piste pas encore entièrement
+  // transcodée, en démarrant ffmpeg directement à cette position plutôt
+  // que de retranscoder depuis 0.
+  const seekOffset = Math.max(0, parseFloat(req.query.seek) || 0);
+
     const ip        = clientIp(req);
     const expiresAt = Date.now() + SESSION_TTL_MS;
     const key       = crypto.randomBytes(16);  // AES-128
@@ -460,14 +475,16 @@ app.get('/api/hls/session/:id', async (req, res) => {
         ffProcess: null,     // Fix 3
         honeypotTag,         // Fix 1
         segCount: 0,
+        seekOffset,           // position de départ réelle dans la piste
       });
-      console.log(`[Session] Créée — item=${itemId} token=${token.slice(0,20)}… (PID ${process.pid}, taille Map=${sessions.size})`);
+      console.log(`[Session] Créée — item=${itemId} token=${token.slice(0,20)}… (PID ${process.pid}, taille Map=${sessions.size}${seekOffset ? `, seek=${seekOffset}s` : ''})`);
 
-      startTranscode(itemId, token, tempDir);
+      startTranscode(itemId, token, tempDir, seekOffset);
 
       res.setHeader('Cache-Control', 'no-store');
-      // Retourner aussi le honeypotTag pour que le client puisse le filtrer
-      res.json({ sessionToken: token, honeypotTag });
+      // Retourner aussi le honeypotTag pour que le client puisse le filtrer,
+      // et seekOffset pour qu'il sache à quelle position réelle la session démarre.
+      res.json({ sessionToken: token, honeypotTag, seekOffset });
 
     } catch (err) {
       console.error('[Session] Erreur :', err.message);
