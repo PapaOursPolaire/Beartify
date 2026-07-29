@@ -1,65 +1,40 @@
-papaours@papaours:~$ chmod +x spi.sh
-papaours@papaours:~$ ./spi.sh
-❌ Session sudo pas encore active.
-   Lance d'abord, seule : sudo -v
-   Puis recolle ce script en entier une fois le mot de passe validé.
-papaours@papaours:~$ sudo -v
-[sudo] Mot de passe de papaours : 
-papaours@papaours:~$ ./spi.sh
-═══════════════════════════════════════════════════════════
- Beartify — installation des statistiques du catalogue
-═══════════════════════════════════════════════════════════
-→ Création de /opt/beartify ...
-→ Écriture de stats-cron.js ...
+papaours@papaours:~$ keytool -list -v -keystore beartify.jks
+Entrez le mot de passe du fichier de clés :  
+Type de fichier de clés : PKCS12
+Fournisseur de fichier de clés : SUN
 
-── Configuration ──────────────────────────────────────────────
-   Chaque valeur est redemandée pour éviter les erreurs de copier/coller.
+Votre fichier de clés d'accès contient 1 entrée
 
-URL Jellyfin [http://127.0.0.1:8096] : 
-Clé API Jellyfin (Panneau admin > API Keys) : 
-Dossier des paroles [/home/papaours/Téléchargements] : 
+Nom d'alias : beartify
+Date de création : 26 juin 2026
+Type d'entrée : PrivateKeyEntry
+Longueur de chaîne du certificat : 1
+Certificat[1]:
+Propriétaire : CN=papaours, OU=beartify, O=beartify, L=namur, ST=belgique, C=be
+Emetteur : CN=papaours, OU=beartify, O=beartify, L=namur, ST=belgique, C=be
+Numéro de série : 5e334975c0162057
+Valide du Fri Jun 26 01:17:05 CEST 2026 au Tue Nov 11 00:17:05 CET 2053
+Empreintes du certificat :
+         SHA 1: B7:92:41:F0:34:94:25:E3:D8:E3:DA:38:73:79:55:A8:A9:F4:05:1A
+         SHA 256: 36:7E:2C:6C:39:5D:58:66:75:0B:F8:C9:F0:B9:B4:62:16:57:DA:51:BA:41:75:35:09:88:7F:10:64:73:3C:36
+Nom de l'algorithme de signature : SHA384withRSA
+Algorithme de clé publique du sujet : Clé RSA 2048 bits
+Version : 3
 
-URL WebDAV Nextcloud (ex: https://grizzlyrics.duckdns.org/remote.php/dav/files/USER) : 
-Utilisateur Nextcloud : papaours
-Mot de passe d'application Nextcloud (PAS le mot de passe du compte) : 
-Dossier distant Nextcloud [/Beartify/public] : 
+Extensions : 
 
-→ Écriture de /opt/beartify/.env.stats ...
-→ Installation du service + timer systemd (toutes les heures) ...
+#1: ObjectId: 2.5.29.14 Criticality=false
+SubjectKeyIdentifier [
+KeyIdentifier [
+0000: A8 98 26 8D 02 4C 77 EE   5D 3D E6 72 DD 72 49 BF  ..&..Lw.]=.r.rI.
+0010: DC 5B 76 C8                                        .[v.
+]
+]
 
-→ Premier calcul immédiat (pour vérifier que tout fonctionne) ...
 
-═══════════════════════════════════════════════════════════
- ✅ Installation terminée — recalcul automatique toutes les heures.
-═══════════════════════════════════════════════════════════
 
-Vérifications :
-  journalctl -u beartify-stats.service -f
-  cat /opt/beartify/stats-output/stats.json
-  systemctl list-timers | grep beartify
+*******************************************
+*******************************************
 
-Une fois stats.json confirmé sur Nextcloud, crée un lien de partage
-public pour ce fichier et colle-le dans STATS_URL (onboarding.js).
 
-papaours@papaours:~$ journalctl -u beartify-stats.service -f
-  cat /opt/beartify/stats-output/stats.json
-  systemctl list-timers | grep beartify
-jui 18 15:05:48 papaours node[1200049]: [stats-cron] 2026-07-18T13:05:48.009Z — Fichiers écrits : stats-output/stats.json, stats-output/stats.js
-jui 18 15:05:48 papaours node[1200049]: [stats-cron] 2026-07-18T13:05:48.097Z — ÉCHEC de ce cycle : fetch failed
-jui 18 15:05:48 papaours systemd[1]: beartify-stats.service: Deactivated successfully.
-jui 18 15:05:48 papaours systemd[1]: Finished beartify-stats.service - Beartify - calcul horaire des statistiques du catalogue.
-jui 18 15:05:48 papaours systemd[1]: beartify-stats.service: Consumed 13.619s CPU time, 888.8M memory peak.
-jui 18 15:14:35 papaours systemd[1]: Starting beartify-stats.service - Beartify - calcul horaire des statistiques du catalogue...
-jui 18 15:14:35 papaours node[1239204]: [stats-cron] 2026-07-18T13:14:35.941Z — Démarrage du calcul des statistiques…
-jui 18 15:14:36 papaours node[1239204]: [stats-cron] 2026-07-18T13:14:36.010Z — ÉCHEC de ce cycle : Jellyfin /Items/Counts a répondu 401
-jui 18 15:14:36 papaours systemd[1]: beartify-stats.service: Deactivated successfully.
-jui 18 15:14:36 papaours systemd[1]: Finished beartify-stats.service - Beartify - calcul horaire des statistiques du catalogue.
-^C
-{
-  "generatedAt": 1784379948006,
-  "trackCount": 22616,
-  "artistCount": 0,
-  "albumCount": 4951,
-  "wordSyncedLyricsCount": 0
-}Sat 2026-07-18 16:00:00 CEST     44min Sat 2026-07-18 15:00:01 CEST    15min ago beartify-stats.timer         beartify-stats.service
 papaours@papaours:~$ 
