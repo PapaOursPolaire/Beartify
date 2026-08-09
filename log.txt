@@ -1,1 +1,23 @@
-https://drive.proton.me/urls/H9HB1SQSYC#xTzWLJVERO3A
+
+Nom
+Beartify Android
+Nom de votre client OAuth 2.0. Ce nom ne sert qu'à identifier le client dans la console. Il n'est pas visible par les utilisateurs finaux.
+Nom du package
+org.beartify.player
+Dans votre fichier AndroidManifest.xml.
+Empreinte numérique du certificat SHA-1
+B7:92:41:F0:34:94:25:E3:D8:E3:DA:38:73:79:55:A8:A9:F4:05:1A
+L'empreinte du certificat de signature SHA-1 limite l'utilisation de vos applications Android.En savoir plus 
+For Google Play distribution, find the fingerprint in the Google Play Console under "Protected with Play > Play Store protection > Manage Play app signing". For other distributions (such as local APKs), use this command to get the fingerprint:
+
+$
+keytool -keystore path-to-debug-or-production-keystore -list -v
+Valider la propriété de l'application (facultatif)
+Lorsque vous êtes prêt, validez la propriété de votre application. Learn more 
+Schéma d'URI personnalisé
+Ce paramètre n'est pas recommandé pour les clients Android.
+
+
+Activer le schéma d'URI personnalisé
+Remarque : L'application des paramètres peut prendre de cinq minutes à quelques heures
+
