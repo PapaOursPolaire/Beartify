@@ -262,7 +262,7 @@ beartify.duckdns.org {
         uri replace // /
     }
 
-    root * /var/www/html/player
+    root * /var/www/beartify
     encode zstd gzip
 
     header {
@@ -496,7 +496,7 @@ http://192.168.0.18 {
         uri replace // /
     }
 
-    root * /var/www/html/player
+    root * /var/www/beartify
     encode zstd gzip
 
     header {
@@ -670,7 +670,7 @@ http://192.168.0.2 {
         uri replace // /
     }
 
-    root * /var/www/html/player
+    root * /var/www/beartify
     encode zstd gzip
 
     header {
