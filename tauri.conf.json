@@ -37,6 +37,22 @@
   },
   "plugins": {
     "deep-link": {
+      "mobile": [
+        {
+          "scheme": ["beartify"],
+          "appLink": false
+        },
+        {
+          "scheme": ["com.googleusercontent.apps.712696916251-af361ouqco64fv93fg4qpdkbl0dh9tmo"],
+          "appLink": false
+        },
+        {
+          "scheme": ["https"],
+          "host": "beartify.duckdns.org",
+          "pathPrefix": ["/discord-callback.html"],
+          "appLink": true
+        }
+      ],
       "desktop": {
         "schemes": ["beartify"]
       }
