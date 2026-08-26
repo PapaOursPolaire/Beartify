@@ -1,3 +1,0 @@
-root@PapaOurs:/opt/pocketbase# ./pocketbase serve
-Error: failed to apply migration 1756000000_blindtest_daily_and_modes.js: TypeError: could not convert function call parameter 0: could not convert [object Object] to core.Field at reflect.methodValueCall (native)
-root@PapaOurs:/opt/pocketbase# 
