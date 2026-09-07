@@ -1,0 +1,19 @@
+{
+  "id": "9oajg1imtycb6sr",
+  "created": "2026-09-07 23:19:55.149Z",
+  "data": {
+    "auth": "users",
+    "error": "ReferenceError: _safeTrack is not defined at /opt/pocketbase/pb.js:32:45(79)",
+    "execTime": 2.052814,
+    "method": "POST",
+    "referer": "",
+    "remoteIP": "127.0.0.1",
+    "status": 0,
+    "type": "request",
+    "url": "/api/beartify/playlist-track-add",
+    "userAgent": "curl/8.14.1",
+    "userIP": "127.0.0.1"
+  },
+  "message": "POST /api/beartify/playlist-track-add",
+  "level": 8
+}
