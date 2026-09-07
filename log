@@ -1,3 +1,7 @@
+[Info] Successfully preconnected to https://lrclib.net/
+[Info] Successfully preconnected to https://www.gstatic.com/
+[Info] Successfully preconnected to https://fonts.googleapis.com/
+[Info] Successfully preconnected to https://cdn.jsdelivr.net/
 [Log] [DevTools] – "DevTools actifs↵  F12 / Ctrl+Shift+I → Ouvrir/fermer DevTools↵  Ctrl+Shift+R       → Recharger la WebView↵  Ctrl+Shift+D       → Pannea…" (tauri-devtools.js, line 181)
 "DevTools actifs
   F12 / Ctrl+Shift+I → Ouvrir/fermer DevTools
@@ -9,10 +13,6 @@
 [Log] [FirebasePlaylistsNative] Module chargé ✅ (tauri-devtools.js, line 181)
 [Log] [FirebaseReportsNative] Module chargé ✅ (tauri-devtools.js, line 181)
 [Log] [FirebaseSocialNative] Module chargé ✅ (tauri-devtools.js, line 181)
-[Info] Successfully preconnected to https://www.gstatic.com/
-[Info] Successfully preconnected to https://lrclib.net/
-[Info] Successfully preconnected to https://fonts.googleapis.com/
-[Info] Successfully preconnected to https://cdn.jsdelivr.net/
 [Log] [PocketBaseConfig] Client PocketBase initialisé ✅ (tauri-devtools.js, line 181)
 [Log] [PocketBaseAuthBridge] Module chargé ✅ (tauri-devtools.js, line 181)
 [Log] [PocketBaseSync → PocketBase] Module chargé ✅ (tauri-devtools.js, line 181)
@@ -54,134 +54,12 @@
 	(anonymous function) (api.js:24:130)
 	Global Code (cb=gapi.loaded_1:1)
 [Log] [Beartify] 64875 titres chargés depuis le cache - actualisation en arrière-plan… (tauri-devtools.js, line 181)
-[Log] [Beartify] Delta sync : 0 titre(s) mis à jour depuis 2026-09-07T18:49:15.241Z (tauri-devtools.js, line 181)
-[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:40113" (tauri-devtools.js, line 181)
+[Log] [Beartify] Delta sync : 0 titre(s) mis à jour depuis 2026-09-07T22:09:14.988Z (tauri-devtools.js, line 181)
+[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:39383" (tauri-devtools.js, line 181)
 [Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
-[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:43399" (tauri-devtools.js, line 181)
-[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
-[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:35379" (tauri-devtools.js, line 181)
-[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
-[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:36403" (tauri-devtools.js, line 181)
-[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
-[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:41529" (tauri-devtools.js, line 181)
-[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
-[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:38643" (tauri-devtools.js, line 181)
-[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
-[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:46561" (tauri-devtools.js, line 181)
-[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
-[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:33881" (tauri-devtools.js, line 181)
-[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
-[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:45693" (tauri-devtools.js, line 181)
-[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
-[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:44763" (tauri-devtools.js, line 181)
-[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
-[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:39805" (tauri-devtools.js, line 181)
-[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
-[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:41017" (tauri-devtools.js, line 181)
-[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
-[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:39297" (tauri-devtools.js, line 181)
-[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
-[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:33605" (tauri-devtools.js, line 181)
-[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
-[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:46751" (tauri-devtools.js, line 181)
-[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
-[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:39475" (tauri-devtools.js, line 181)
-[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
+[Warning] [Firebase] oauth|cancel : – "Connexion refusée (os error 111)" (tauri-devtools.js, line 181)
+[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:39383/?iss=https://accounts.google.com&code=4/0ATsMZqCWiPN1lsMTR3G1Al9nopPduY36S7KvK13yPdjpZzZoiCQQKRPIrZ6SDT5V1Tv-ig&scope…" (tauri-devtools.js, line 181)
+"http://127.0.0.1:39383/?iss=https://accounts.google.com&code=4/0ATsMZqCWiPN1lsMTR3G1Al9nopPduY36S7KvK13yPdjpZzZoiCQQKRPIrZ6SDT5V1Tv-ig&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
+[Log] [Firebase] Échange du code Google contre les tokens... (tauri-devtools.js, line 181)
 > Selected Element
 < <div class="auth-overlay open" id="authOverlay">…</div>
-[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope…" (tauri-devtools.js, line 181)
-"http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
-[Log] [Firebase] Échange du code Google contre les tokens... (tauri-devtools.js, line 181)
-[Log] [DEBUG] Appel invoke(google_token_exchange)... (tauri-devtools.js, line 181)
-[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope…" (tauri-devtools.js, line 181)
-"http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
-[Error] [Firebase] _pkceState manquant — flow corrompu
-	(anonymous function) (tauri-devtools.js:181)
-	(anonymous function) (firebase-config.js:375)
-	(anonymous function) (firebase-config.js:265)
-[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope…" (tauri-devtools.js, line 181)
-"http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
-[Error] [Firebase] _pkceState manquant — flow corrompu
-	(anonymous function) (tauri-devtools.js:181)
-	(anonymous function) (firebase-config.js:375)
-	(anonymous function) (firebase-config.js:265)
-[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope…" (tauri-devtools.js, line 181)
-"http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
-[Error] [Firebase] _pkceState manquant — flow corrompu
-	(anonymous function) (tauri-devtools.js:181)
-	(anonymous function) (firebase-config.js:375)
-	(anonymous function) (firebase-config.js:265)
-[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope…" (tauri-devtools.js, line 181)
-"http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
-[Error] [Firebase] _pkceState manquant — flow corrompu
-	(anonymous function) (tauri-devtools.js:181)
-	(anonymous function) (firebase-config.js:375)
-	(anonymous function) (firebase-config.js:265)
-[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope…" (tauri-devtools.js, line 181)
-"http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
-[Error] [Firebase] _pkceState manquant — flow corrompu
-	(anonymous function) (tauri-devtools.js:181)
-	(anonymous function) (firebase-config.js:375)
-	(anonymous function) (firebase-config.js:265)
-[Warning] [Firebase] oauth|cancel : – "Connexion refusée (os error 111)" (tauri-devtools.js, line 181)
-[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope…" (tauri-devtools.js, line 181)
-"http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
-[Error] [Firebase] _pkceState manquant — flow corrompu
-	(anonymous function) (tauri-devtools.js:181)
-	(anonymous function) (firebase-config.js:375)
-	(anonymous function) (firebase-config.js:265)
-[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope…" (tauri-devtools.js, line 181)
-"http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
-[Error] [Firebase] _pkceState manquant — flow corrompu
-	(anonymous function) (tauri-devtools.js:181)
-	(anonymous function) (firebase-config.js:375)
-	(anonymous function) (firebase-config.js:265)
-[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope…" (tauri-devtools.js, line 181)
-"http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
-[Error] [Firebase] _pkceState manquant — flow corrompu
-	(anonymous function) (tauri-devtools.js:181)
-	(anonymous function) (firebase-config.js:375)
-	(anonymous function) (firebase-config.js:265)
-[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope…" (tauri-devtools.js, line 181)
-"http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
-[Error] [Firebase] _pkceState manquant — flow corrompu
-	(anonymous function) (tauri-devtools.js:181)
-	(anonymous function) (firebase-config.js:375)
-	(anonymous function) (firebase-config.js:265)
-[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope…" (tauri-devtools.js, line 181)
-"http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
-[Error] [Firebase] _pkceState manquant — flow corrompu
-	(anonymous function) (tauri-devtools.js:181)
-	(anonymous function) (firebase-config.js:375)
-	(anonymous function) (firebase-config.js:265)
-[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope…" (tauri-devtools.js, line 181)
-"http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
-[Error] [Firebase] _pkceState manquant — flow corrompu
-	(anonymous function) (tauri-devtools.js:181)
-	(anonymous function) (firebase-config.js:375)
-	(anonymous function) (firebase-config.js:265)
-[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope…" (tauri-devtools.js, line 181)
-"http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
-[Error] [Firebase] _pkceState manquant — flow corrompu
-	(anonymous function) (tauri-devtools.js:181)
-	(anonymous function) (firebase-config.js:375)
-	(anonymous function) (firebase-config.js:265)
-[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope…" (tauri-devtools.js, line 181)
-"http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
-[Error] [Firebase] _pkceState manquant — flow corrompu
-	(anonymous function) (tauri-devtools.js:181)
-	(anonymous function) (firebase-config.js:375)
-	(anonymous function) (firebase-config.js:265)
-[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope…" (tauri-devtools.js, line 181)
-"http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
-[Error] [Firebase] _pkceState manquant — flow corrompu
-	(anonymous function) (tauri-devtools.js:181)
-	(anonymous function) (firebase-config.js:375)
-	(anonymous function) (firebase-config.js:265)
-[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope…" (tauri-devtools.js, line 181)
-"http://127.0.0.1:39475/?iss=https://accounts.google.com&code=4/0ATsMZqDFX1tp2f1hYSd60G3qLr3mLecUOSfYYSb3osWAuvhRWoefJV4bJnjDehkMvzd75A&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
-[Error] [Firebase] _pkceState manquant — flow corrompu
-	(anonymous function) (tauri-devtools.js:181)
-	(anonymous function) (firebase-config.js:375)
-	(anonymous function) (firebase-config.js:265)
-[Error] Unhandled Promise Rejection: Command plugin:dialog|message not allowed by ACL
