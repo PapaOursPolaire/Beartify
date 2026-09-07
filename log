@@ -1,67 +1,14 @@
-[Info] Successfully preconnected to https://fonts.googleapis.com/
-[Info] Successfully preconnected to https://www.gstatic.com/
-[Info] Successfully preconnected to https://cdn.jsdelivr.net/
-[Info] Successfully preconnected to https://lrclib.net/
-[Log] [DevTools] – "DevTools actifs↵  F12 / Ctrl+Shift+I → Ouvrir/fermer DevTools↵  Ctrl+Shift+R       → Recharger la WebView↵  Ctrl+Shift+D       → Pannea…" (tauri-devtools.js, line 181)
-"DevTools actifs
-  F12 / Ctrl+Shift+I → Ouvrir/fermer DevTools
-  Ctrl+Shift+R       → Recharger la WebView
-  Ctrl+Shift+D       → Panneau debug Beartify
-  Ctrl+Shift+L       → Exporter les logs console
-  Ctrl+Shift+P       → Infos plateforme"
-[Log] [FirebaseSyncNative] Module chargé ✅ (Tauri: – true – ")" (tauri-devtools.js, line 181)
-[Log] [FirebasePlaylistsNative] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [FirebaseReportsNative] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [FirebaseSocialNative] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [PocketBaseConfig] Client PocketBase initialisé ✅ (tauri-devtools.js, line 181)
-[Log] [PocketBaseAuthBridge] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [PocketBaseSync → PocketBase] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [PocketBaseParty] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [PocketBasePlaylists → PocketBase] Module chargé ✅ (échappement filtres activé, collaboration P3-3 activée) (tauri-devtools.js, line 181)
-[Log] [PocketBaseReports → PocketBase] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [PocketBaseSocial → PocketBase] Module chargé ✅ (normalisation docId + échappement filtres activés) (tauri-devtools.js, line 181)
-[Log] [PocketBaseAvatar] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [FallbackRouter] Module chargé ✅ (tauri-devtools.js, line 181)
-[Info] [Lyrics] spicy-lyrics-engine.js — beta-22 chargé. (spicy-lyrics-engine.js, line 2018)
-[Info] [Lyrics] Diagnostic : window.__spicyLyricsDebug.getState() dans la console pour l'état live. (spicy-lyrics-engine.js, line 2022)
-[Log] [FriendsPanel] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [BeartifyI18n] Fichier i18n.js atteint et en cours d'exécution… (tauri-devtools.js, line 181)
-[Log] [BeartifyI18n] Module chargé ✅ (périmètre : navigation + titres de section des Réglages). Diagnostic disponible via window.debugI18n() dans la console. (tauri-devtools.js, line 181)
-[Log] [FallbackRouter] ✅ PocketBase disponible — mode nominal (tauri-devtools.js, line 181)
-[Log] [FriendsPanel] ✅ Présence audio patchée (5s interval + événements immédiats) (tauri-devtools.js, line 181)
-[Log] [FriendsPanel] ✅ Panel initialisé (tauri-devtools.js, line 181)
-[Error] Failed to load resource: the server responded with a status of 404 (Not Found) (certified, line 0)
-[Error] Failed to load resource: the server responded with a status of 404 (Not Found) (config, line 0)
-[Error] Failed to load resource: the server responded with a status of 401 (Unauthorized) (search, line 0)
-[Warning] [Marketplace] GitHub search "beartify-extensions" → HTTP 401 (tauri-devtools.js, line 181)
-[Error] Failed to load resource: the server responded with a status of 401 (Unauthorized) (search, line 0)
-[Warning] [Marketplace] GitHub search "beartify-themes" → HTTP 401 (tauri-devtools.js, line 181)
-[Error] TypeError: undefined is not an object (evaluating 'gapi.iframes.getContext')
-	callback (firebase-auth-compat.js:1:101841)
-	(anonymous function) (api.js:23:491)
-	ja (api.js:16:704)
-	B (api.js:23:475)
-	(anonymous function) (api.js:24)
-	(anonymous function) (api.js:24:130)
-	Global Code (cb=gapi.loaded_0:1)
-[Error] Error: t`tauri
-	(anonymous function) (api.js:24:616)
-	(anonymous function) (api.js:23:491)
-	ja (api.js:16:704)
-	B (api.js:23:475)
-	(anonymous function) (api.js:24)
-	(anonymous function) (api.js:24:130)
-	Global Code (cb=gapi.loaded_1:1)
-[Log] [Beartify] 64875 titres chargés depuis le cache - actualisation en arrière-plan… (tauri-devtools.js, line 181)
-[Error] Cross-origin redirection to http://developers.google.com/ denied by Cross-Origin Resource Sharing policy: Origin tauri://localhost is not allowed by Access-Control-Allow-Origin. Status code: 301
-[Error] XMLHttpRequest cannot load https://apis.google.com/_/jserror?script=https%3A%2F%2Fapis.google.com%2F_%2Fscs%2Fabc-static%2F_%2Fjs%2Fk%3Dgapi.lb.fr.u1YzuBbBpqg.O%2Fm%3Dgapi_iframes%2Frt%3Dj%2Fsv%3D1%2Fd%3D1%2Fed%3D1%2Frs%3DAHpOoo8duhQcXZMuEcPyUghpXlpXTVvDfA%2Fcb%3Dgapi.loaded_0&error=t%60tauri&line=156 due to access control checks.
-[Error] Failed to load resource: Cross-origin redirection to http://developers.google.com/ denied by Cross-Origin Resource Sharing policy: Origin tauri://localhost is not allowed by Access-Control-Allow-Origin. Status code: 301 (jserror, line 0)
-[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:33863" (tauri-devtools.js, line 181)
-[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
-[Warning] [Firebase] oauth|cancel : – "Connexion refusée (os error 111)" (tauri-devtools.js, line 181)
-[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:33863/?iss=https://accounts.google.com&code=4/0ATsMZqBCiDOdLQ9Z7_XBPOrravQ6h7JN79rqL6IEhGiUX63fqFOgMwQ_8uLR2xxhbHZdfw&scope…" (tauri-devtools.js, line 181)
-"http://127.0.0.1:33863/?iss=https://accounts.google.com&code=4/0ATsMZqBCiDOdLQ9Z7_XBPOrravQ6h7JN79rqL6IEhGiUX63fqFOgMwQ_8uLR2xxhbHZdfw&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
-[Log] [Firebase] Échange du code Google contre les tokens... (tauri-devtools.js, line 181)
-[Log] [Beartify] Delta sync : 0 titre(s) mis à jour depuis 2026-09-07T23:02:43.815Z (tauri-devtools.js, line 181)
-> Selected Element
-< <div class="auth-overlay open" id="authOverlay">…</div>
+papaours@PapaOurs:~/Projets informatique/Sites/Beartify/Tauri/src-tauri/target/release/bundle/appimage$ ./Beartify_1.0.0_amd64.AppImage
+papaours@PapaOurs:~/Projets informatique/Sites/Beartify/Tauri/src-tauri/target/release/bundle/appimage$ ./Beartify_1.0.0_amd64.AppImage
+/tmp/.mount_BeartiXSJkV4/usr/bin//xdg-mime: 856: qtpaths: not found
+[MARQUEUR_BUILD_UNIQUE_84729] google_token_exchange invoquée
+[DEBUG google_token_exchange] Commande invoquée, params reçus : 6 clés
+[DEBUG google_token_exchange] Client HTTP créé, envoi de la requête POST vers Google...
+[DEBUG google_token_exchange] Réponse reçue de Google, status = 200 OK
+
+
+
+
+
+
+
