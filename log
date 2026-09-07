@@ -1,14 +1,6 @@
-papaours@PapaOurs:~/Projets informatique/Sites/Beartify/Tauri/src-tauri/target/release/bundle/appimage$ ./Beartify_1.0.0_amd64.AppImage
-papaours@PapaOurs:~/Projets informatique/Sites/Beartify/Tauri/src-tauri/target/release/bundle/appimage$ ./Beartify_1.0.0_amd64.AppImage
-/tmp/.mount_BeartiXSJkV4/usr/bin//xdg-mime: 856: qtpaths: not found
-[MARQUEUR_BUILD_UNIQUE_84729] google_token_exchange invoquée
-[DEBUG google_token_exchange] Commande invoquée, params reçus : 6 clés
-[DEBUG google_token_exchange] Client HTTP créé, envoi de la requête POST vers Google...
-[DEBUG google_token_exchange] Réponse reçue de Google, status = 200 OK
-
-
-
-
-
-
-
+[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:33463" (tauri-devtools.js, line 181)
+[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
+[Warning] [Firebase] oauth|cancel : – "Connexion refusée (os error 111)" (tauri-devtools.js, line 181)
+[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:33463/?iss=https://accounts.google.com&code=4/0ATsMZqAK1jsytDkA0qweQGOdab1cDKc8ikSFE4-40nWH-SaoR-NRiDYIsZcU0HMr_pberw&scope…" (tauri-devtools.js, line 181)
+"http://127.0.0.1:33463/?iss=https://accounts.google.com&code=4/0ATsMZqAK1jsytDkA0qweQGOdab1cDKc8ikSFE4-40nWH-SaoR-NRiDYIsZcU0HMr_pberw&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
+[Log] [Firebase] Échange du code Google contre les tokens... (tauri-devtools.js, line 181)
