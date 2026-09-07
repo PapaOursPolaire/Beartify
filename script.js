@@ -3,6 +3,28 @@
 //  ✅ Compatible Tauri V2 : desktop (.exe / .AppImage) + Android (.apk)
 // ══════════════════════════════════════════════════════════════════
 
+// ── i18n : wrapper sûr, quel que soit l'ordre de chargement ─────────
+// ⚠️ CORRECTIF CRITIQUE : plusieurs blocs de ce fichier s'exécutent en
+// IIFE, donc IMMÉDIATEMENT au chargement de script.js (pas au clic de
+// l'utilisateur) — ex. le panneau de raccourcis clavier ligne ~933,
+// initAuth, initEtcBtn, _initRightPanelToggle. Si i18n.js n'a pas
+// encore fini de s'exécuter à ce moment précis (une simple question
+// d'ordre des balises <script>, jamais garanti), un appel direct à
+// _t(...) lève un TypeError. En JavaScript, une
+// exception non interceptée dans le flux synchrone d'un script arrête
+// l'exécution du RESTE de ce fichier — tout ce qui suit le point de
+// crash (des milliers de lignes ici) ne s'exécute jamais. C'est
+// exactement ce qui s'est produit : plus une simple traduction
+// manquante, mais un plantage en cascade de toute l'app.
+// _t() ne peut jamais lever d'exception : si BeartifyI18n n'est pas
+// encore prêt, il retombe silencieusement sur le texte français fourni.
+function _t(key, fallback, params) {
+  try {
+    if (window.BeartifyI18n) return window.BeartifyI18n.t(key, fallback, params);
+  } catch (e) { /* ne jamais laisser un souci de traduction casser l'app */ }
+  return fallback;
+}
+
 // ── Détection Tauri V2 ────────────────────────────────────────────
 /**
  * _IS_TAURI  : true quand le code tourne dans un WebView Tauri (desktop ou mobile).
@@ -46,10 +68,28 @@ if (_IS_ANDROID_UA) document.documentElement.classList.add('is-android');
  *   localStorage.setItem('beartify_server_url', 'http://192.168.1.10:3000')
  *   puis relancer l'application.
  */
-const _TAURI_SERVER_BASE = _IS_TAURI
-  ? (localStorage.getItem('beartify_server_url') || 'https://beartify.duckdns.org/')
-  : '';
-window._TAURI_SERVER_BASE = _TAURI_SERVER_BASE;
+/**
+ * ⚠️ CORRECTIF : transformé en fonction plutôt qu'une const figée au
+ * chargement. Avant ce correctif, changer le serveur dans les Réglages
+ * n'avait aucun effet tant que l'app n'était pas relancée (la valeur
+ * était lue une seule fois au tout premier chargement de script.js).
+ * Cette fonction relit localStorage à chaque appel, donc un changement
+ * de serveur prend effet sur la requête suivante, sans redémarrage.
+ * Le .replace(/\/+$/, '') est fait ICI, une seule fois, pour que toute
+ * la suite du fichier travaille sur une base déjà propre (plus besoin
+ * de le refaire à chaque appelant — voir normalizeJellyfinUrl et
+ * _rewriteToProxy plus bas, qui oubliaient l'un ou l'autre de le faire
+ * et causaient un bug de double-slash latent).
+ */
+function _getServerBase() {
+  return _IS_TAURI
+    ? (localStorage.getItem('beartify_server_url') || 'https://beartify.duckdns.org/').replace(/\/+$/, '')
+    : '';
+}
+// Conservé pour compatibilité avec le code existant qui lit encore
+// window._TAURI_SERVER_BASE directement (ex: affichage dans les Réglages) —
+// recalculé à chaque appel de _getServerBase(), pas figé.
+Object.defineProperty(window, '_TAURI_SERVER_BASE', { get: _getServerBase });
 
 /**
  * Résout un chemin /api/... en URL complète quand on est dans Tauri.
@@ -60,12 +100,11 @@ window._TAURI_SERVER_BASE = _TAURI_SERVER_BASE;
  */
 function _resolveProxyUrl(path) {
   if (!_IS_TAURI) return path;
-  if (path.startsWith('/')) return _TAURI_SERVER_BASE.replace(/\/+$/, '') + path;
+  if (path.startsWith('/')) return _getServerBase() + path;
   return path;
 }
 // Exposé sur window pour que firebase-sync.js puisse l'appeler
 window._resolveProxyUrl = _resolveProxyUrl;
-
 // ── Configuration ─────────────────────────────────────────────────
 // Toutes les APIs passent TOUJOURS par le proxy local (/api/*).
 // Les clés et domaines réels ne sont jamais envoyés ni visibles côté client.
@@ -123,9 +162,47 @@ function lyricsProxyUrl(url) {
  * Construit une URL Jellyfin via le proxy /api/jellyfin/*.
  * La clé X-Emby-Token est injectée par Caddy/server.js, jamais exposée.
  * ✅ TAURI FIX : retourne une URL absolue quand _IS_TAURI est vrai.
+ *
+ * ✅ FIX SOURCE MULTIPLE : jusqu'ici cette fonction ignorait complètement
+ * musicServerType/musicServerProfiles — le panneau "Serveurs" changeait
+ * bien le réglage stocké, mais AUCUN appel réel (lecture, bibliothèque,
+ * covers…) n'en tenait compte : tout continuait de passer par le proxy
+ * par défaut. Seul le bouton "Tester la connexion" fonctionnait, car lui
+ * seul fait un fetch direct vers l'URL saisie — d'où l'impression que
+ * "ça marche au test mais pas en vrai". On transmet maintenant la source
+ * active en paramètres de requête pour que le serveur puisse router
+ * vers le bon Jellyfin/Plex/Autre. Nécessite un traitement correspondant
+ * côté serveur (lire _src/_srcUrl/_srcToken/_srcLib et les utiliser pour
+ * choisir l'hôte/l'auth du proxy au lieu de la config par défaut).
  */
 function jellyfinUrl(path) {
-  return _resolveProxyUrl('/api/jellyfin' + (path.startsWith('/') ? path : '/' + path));
+  const base = _resolveProxyUrl('/api/jellyfin' + (path.startsWith('/') ? path : '/' + path));
+  return _appendActiveSourceParams(base);
+}
+
+/**
+ * Ajoute les paramètres de la source musicale active (si différente de
+ * 'default') à une URL /api/jellyfin/*, pour que le proxy serveur sache
+ * vers quel serveur réel router la requête.
+ */
+function _appendActiveSourceParams(url) {
+  const type = window.getSetting ? window.getSetting('musicServerType') : null;
+  if (!type || type === 'default') return url; // comportement historique inchangé
+  try {
+    const profiles = (window.getSetting && window.getSetting('musicServerProfiles')) || {};
+    const profile  = profiles[type] || {};
+    const wasAbsolute = /^https?:\/\//i.test(url);
+    const u = new URL(url, window.location.origin);
+    u.searchParams.set('_src', type);
+    if (profile.url)   u.searchParams.set('_srcUrl', profile.url);
+    if (profile.token) u.searchParams.set('_srcToken', profile.token);
+    if (type === 'plex'  && profile.library)    u.searchParams.set('_srcLib', profile.library);
+    if (type === 'other') {
+      if (profile.name)       u.searchParams.set('_srcName', profile.name);
+      if (profile.authHeader) u.searchParams.set('_srcAuthHeader', profile.authHeader);
+    }
+    return wasAbsolute ? u.toString() : (u.pathname + u.search);
+  } catch { return url; } // paramètres invalides — on retombe sur le comportement par défaut
 }
 
 /**
@@ -177,8 +254,14 @@ const IMG_SIZE_ZOOM  = 1200; // zoom cover plein écran
 //   - FLAC lossless passthrough (sans -ar ni -ac)
 // ══════════════════════════════════════════════════════════════════
 
-let _hlsPlayer = null;
 let _hlsLoadGen = 0; // incremented on every new playCurrentTrack call; stale load calls abort themselves
+
+// Position réelle dans la piste = position dans la session HLS actuelle +
+// décalage de départ de cette session (0 pour une lecture normale depuis
+// le début ; > 0 pour une session ouverte via un seek-ahead, voir seekTo).
+function _realCurrentTime() {
+  return (audioPlayer._hlsSeekOffset || 0) + (audioPlayer.currentTime || 0);
+}
 function _loadHlsJs() {
   if (typeof Hls !== 'undefined') return Promise.resolve(window.Hls);
   return new Promise((resolve, reject) => {
@@ -224,28 +307,78 @@ function _createHoneypotLoader(DefaultLoader, honeypotTag) {
   };
 }
 
-async function loadHLSPlayer(itemId, audioEl, bitrate) {
+// ⚠️ FIX CRITIQUE : anciennement une simple variable globale unique,
+// partagée par erreur entre le lecteur principal et le préchargement
+// double-lecteur (P2-1/P2-2). Résultat : _preloadNextTrack() détruisait
+// l'instance HLS.js de la piste EN COURS de lecture 5s après son
+// démarrage (loadHLSPlayer() appelait _hlsPlayer.destroy() sur la
+// mauvaise instance), coupant la lecture sans aucune erreur console.
+// Un slot par élément <audio> cible résout le problème à la racine.
+let _hlsPlayers = { primary: null, secondary: null };
+
+async function loadHLSPlayer(itemId, audioEl, bitrate, myGen, seekOffset) {
+  const slot = (audioEl === audioPlayer) ? 'primary' : 'secondary';
   const Hls = await _loadHlsJs();
 
   if (!Hls.isSupported()) {
     // Safari : HLS natif (AES-128 supporté nativement)
-    const sessR = await fetch(_resolveProxyUrl('/api/hls/session/' + itemId));
+    let sessU = _resolveProxyUrl('/api/hls/session/' + itemId);
+    if (seekOffset > 0) sessU += '?seek=' + seekOffset;
+    const sessR = await fetch(sessU);
     if (!sessR.ok) throw new Error('session ' + sessR.status);
     const { sessionToken } = await sessR.json();
     let url = _resolveProxyUrl('/api/hls/playlist/' + itemId) + '?s=' + encodeURIComponent(sessionToken);
     if (bitrate) url += '&bitrate=' + bitrate;
     audioEl.src = url;
+    audioEl._hlsSeekOffset = seekOffset || 0;
     return null;
   }
 
-  if (_hlsPlayer) { _hlsPlayer.destroy(); _hlsPlayer = null; }
+  if (_hlsPlayers[slot]) { _hlsPlayers[slot].destroy(); _hlsPlayers[slot] = null; }
+  // ⚠️ FIX : la garde "une seule tentative de récupération" se réinitialisait
+  // à CHAQUE appel de loadHLSPlayer — y compris celui déclenché par la
+  // récupération elle-même, annulant la limite et permettant des tentatives
+  // illimitées en boucle si l'erreur se reproduit. Elle est maintenant liée
+  // à l'itemId : elle ne se réinitialise que sur une piste réellement
+  // différente, jamais sur un rechargement de la même piste.
+  if (slot === 'primary' && audioEl._fatalRecoveryItemId !== itemId) {
+    audioEl._fatalRecoveryItemId = itemId;
+    audioEl._fatalRecoveryAttempted = false;
+  }
 
   // Créer la session DRM (clé AES + ffmpeg + honeypotTag aléatoire)
-  let sessUrl = _resolveProxyUrl('/api/hls/session/' + itemId);
-  if (bitrate) sessUrl += '?bitrate=' + bitrate;
+  // seekOffset : position réelle de départ (secondes) — voir drm.js. Permet
+  // un seek quasi-instantané dans une piste pas encore entièrement
+  // transcodée, en démarrant ffmpeg directement à cette position.
+  const sessParams = new URLSearchParams();
+  if (bitrate) sessParams.set('bitrate', bitrate);
+  if (seekOffset > 0) sessParams.set('seek', seekOffset);
+  const qs = sessParams.toString();
+  const sessUrl = _resolveProxyUrl('/api/hls/session/' + itemId) + (qs ? '?' + qs : '');
   const sessResp = await fetch(sessUrl);
+
+  // ⚠️ FIX CRITIQUE (course entre appels concurrents) : le fetch ci-dessus
+  // est le principal point d'attente async. Si un appel plus récent à
+  // playCurrentTrack() a démarré pendant ce temps (double-clic, changement
+  // rapide de piste, handover…), on abandonne ICI — AVANT de créer
+  // l'instance HLS.js et de l'attacher à l'élément partagé. Sans ce
+  // contrôle, l'ancien garde-fou de playCurrentTrack() (myGen) arrivait
+  // trop tard : la session serveur était déjà créée et l'attachMedia()
+  // déjà effectué, laissant potentiellement DEUX instances HLS.js
+  // attachées au même <audio>, chacune avec sa propre session serveur —
+  // exactement le motif "session créée deux fois" observé dans les logs.
+  if (slot === 'primary' && myGen !== undefined && myGen !== _hlsLoadGen) {
+    console.warn('[HLS] Appel obsolète après la création de session — abandon (une piste plus récente a démarré entre-temps)');
+    return null;
+  }
+
   if (!sessResp.ok) throw new Error('HLS session HTTP ' + sessResp.status);
   const { sessionToken, honeypotTag } = await sessResp.json();
+  audioEl._hlsSeekOffset = seekOffset || 0;
+  // 🔍 Traçage temporaire : permet de corréler précisément avec les logs
+  // serveur ([Session] 401 : ... affiche aussi le token) — à retirer une
+  // fois le mystère des 401 élucidé.
+  console.log(`[HLS] Session créée — slot=${slot} item=${itemId} token=${sessionToken.slice(0, 20)}…${seekOffset ? ` (départ à ${seekOffset.toFixed(1)}s)` : ''}`);
 
   const playlistUrl = _resolveProxyUrl('/api/hls/playlist/' + itemId)
                     + '?s=' + encodeURIComponent(sessionToken);
@@ -267,15 +400,28 @@ async function loadHLSPlayer(itemId, audioEl, bitrate) {
 
   hls.on(Hls.Events.ERROR, (_evt, data) => {
     if (data.fatal) {
-      console.error('[HLS] Erreur fatale :', data.type, data.details);
+      console.error(`[HLS] Erreur fatale : slot=${slot} item=${itemId} token=${sessionToken.slice(0, 20)}… →`, data.type, data.details);
       hls.destroy();
-      _hlsPlayer = null;
+      _hlsPlayers[slot] = null;
+      // ⚠️ Filet de sécurité : sans ça, une session invalidée côté serveur
+      // (401 en boucle sur les segments — possiblement causé par
+      // l'ouverture d'une 2e session via le double lecteur, voir
+      // _preloadNextTrack) laissait la lecture définitivement morte.
+      // Une seule tentative de récupération par piste, sur le lecteur
+      // PRINCIPAL uniquement — jamais sur le préchargement secondaire,
+      // pour ne pas boucler indéfiniment si c'est bien lui la cause.
+      if (slot === 'primary' && audioEl === audioPlayer && !audioEl._fatalRecoveryAttempted) {
+        audioEl._fatalRecoveryAttempted = true;
+        console.warn('[HLS] Récupération : rechargement d\'une session fraîche…');
+        setTimeout(() => { playCurrentTrack(); }, 1500);
+      }
     }
   });
 
   hls.loadSource(playlistUrl);
   hls.attachMedia(audioEl);
-  _hlsPlayer = hls;
+  console.log(`[HLS] Lecteur attaché — slot=${slot} item=${itemId} token=${sessionToken.slice(0, 20)}…`);
+  _hlsPlayers[slot] = hls;
   return hls;
 }
 
@@ -300,7 +446,14 @@ function normalizeJellyfinUrl(url) {
   // Déjà un chemin proxy relatif → résoudre (no-op en navigateur, absolu en Tauri)
   if (url.startsWith('/api/jellyfin/')) return _resolveProxyUrl(url);
   // Déjà une URL absolue vers le serveur proxy (cas Tauri après résolution)
-  if (_IS_TAURI && url.startsWith(_TAURI_SERVER_BASE + '/api/jellyfin/')) return url;
+  // ✅ FIX : _TAURI_SERVER_BASE conserve son slash final ('https://.../'),
+  // donc sans .replace() ici la comparaison testait en réalité contre
+  // '.../org//api/jellyfin/' (double slash dans le test lui-même). Une URL
+  // déjà cassée par un ancien build (double slash en cache IndexedDB)
+  // matchait ce test et était renvoyée TELLE QUELLE, sans jamais repasser
+  // par la reconstruction propre ci-dessous. _resolveProxyUrl() fait déjà
+  // ce .replace(/\/+$/, '') ailleurs — on aligne ce test sur le même calcul.
+  if (_IS_TAURI && url.startsWith(_TAURI_SERVER_BASE.replace(/\/+$/, '') + '/api/jellyfin/')) return url;
   try {
     const u = new URL(url);
     u.searchParams.delete('api_key');
@@ -353,7 +506,7 @@ function _rewriteToProxy(rawUrl) {
   // même origine, donc pas besoin de les réécrire. Dans Tauri, l'origine
   // tauri://localhost n'a aucune route /api/* → on préfixe avec le serveur.
   if (_IS_TAURI && rawUrl.startsWith('/api/')) {
-    return _TAURI_SERVER_BASE + rawUrl;
+    return _getServerBase() + rawUrl;
   }
 
   return rawUrl;
@@ -530,10 +683,46 @@ function _getLibArtistMap() {
 function _invalidateLibCache() { _libAlbumCache = null; _libArtistCache = null; }
 
 // ── Exposition sur window pour Firebase Sync ──────────────────────
-window.likedTracks     = likedTracks;
-window.favoriteAlbums  = favoriteAlbums;
-window.favoriteArtists = favoriteArtists;
-window.recentlyPlayed  = recentlyPlayed;
+// ⚠️ CORRECTIF : pocketbase-config.js (chargé AVANT script.js) crée déjà
+// ces Sets — vides ou restaurés depuis PocketBase — via
+// applyFavoritesFromRecord(). On DOIT adopter cet objet existant tel
+// quel (même vide) plutôt que le remplacer par un nouveau Set : sinon,
+// la prochaine fois qu'applyFavoritesFromRecord() se rejoue (refresh
+// 5 min, écho temps réel), il mute EN PLACE l'objet qu'il a créé au
+// départ — si script.js en a créé un autre entre-temps, les .add()/
+// .delete() faits ici via les toggles like/favori n'atteignent plus
+// jamais l'objet que PocketBase lit pour la sauvegarde. Un test sur
+// `.size > 0` était insuffisant : le cas le plus courant (aucun like
+// pour l'instant) a justement une taille de 0.
+if (window.likedTracks instanceof Set) {
+  likedTracks = window.likedTracks;
+} else {
+  window.likedTracks = likedTracks;
+}
+if (window.favoriteAlbums instanceof Set) {
+  favoriteAlbums = window.favoriteAlbums;
+} else {
+  window.favoriteAlbums = favoriteAlbums;
+}
+if (window.favoriteArtists instanceof Set) {
+  favoriteArtists = window.favoriteArtists;
+} else {
+  window.favoriteArtists = favoriteArtists;
+}
+// ⚠️ CORRECTIF : pocketbase-config.js (chargé AVANT script.js) restaure déjà
+// l'historique via applyHistoryFromRecord() dans window.recentlyPlayed, à
+// partir du record PocketBase persisté en localStorage. Écraser
+// systématiquement window.recentlyPlayed avec le tableau vide d'AppState
+// ci-dessous détruisait cette restauration à chaque chargement de page —
+// c'était la cause du carrousel "Récemment joués" qui semblait ne jamais
+// vraiment persister côté PocketBase. On ne l'écrase donc que si
+// PocketBase n'avait rien restauré (nouvel utilisateur, ou pas encore
+// connecté à ce stade).
+if (Array.isArray(window.recentlyPlayed) && window.recentlyPlayed.length > 0) {
+  recentlyPlayed = window.recentlyPlayed;
+} else {
+  window.recentlyPlayed  = recentlyPlayed;
+}
 // Exposé pour onboarding.js (liste d'artistes réels pour l'étape de sélection des goûts)
 window.tracks           = tracks;
 window.customPlaylists = {}; // sera rempli depuis Firestore au chargement
@@ -582,6 +771,14 @@ function _ensureTrackInLibrary(track) {
   if (!track?.id) return -1;
   let idx = tracks.findIndex(t => t.id === track.id);
   if (idx !== -1) return idx; // déjà présente, rien à faire (pas de doublon)
+  // 🐛 FIX : les pistes de secours viennent de contextTracks (playlists,
+  // récemment joué…), une source qui ne passe jamais par normalizeTrack().
+  // streamUrl/imageUrl pouvaient donc rester en URL Jellyfin brute (non
+  // proxifiée /api/jellyfin/…, éventuellement avec api_key) au lieu d'être
+  // réécrits vers le proxy — d'où le "NotSupportedError : no supported
+  // sources" à la lecture d'un titre de playlist/récemment joué pas encore
+  // synchronisé dans `tracks`.
+  track = normalizeTrack(track);
   tracks.push(track);
   idx = tracks.length - 1;
   if (Array.isArray(shuffleOrder)) shuffleOrder.push(idx);
@@ -744,6 +941,9 @@ let extendedInfoAbort    = AppState._data.extendedInfoAbort;
 (function initToastSystem() {
   const c = document.createElement('div');
   c.id = 'toast-container';
+  c.setAttribute('role', 'status');
+  c.setAttribute('aria-live', 'polite');
+  c.setAttribute('aria-atomic', 'false');
   c.style.cssText = [
     'position:fixed', 'bottom:108px', 'left:50%', 'transform:translateX(-50%)',
     'display:flex', 'flex-direction:column', 'align-items:center', 'gap:8px',
@@ -760,6 +960,7 @@ window.showToast = function(message, type = 'default', duration = 2800) {
   const col = colors[type] || colors.default;
 
   const toast = document.createElement('div');
+  if (type === 'error') { toast.setAttribute('role', 'alert'); toast.setAttribute('aria-live', 'assertive'); }
   toast.style.cssText = [
     'display:flex', 'align-items:center', 'gap:10px',
     'background:rgba(28,28,28,0.97)',
@@ -805,13 +1006,13 @@ window.showToast = function(message, type = 'default', duration = 2800) {
   ].join(';');
 
   const SHORTCUTS = [
-    ['Espace', 'Lecture / Pause'],
-    ['← →',    'Reculer / Avancer 5 s'],
-    ['↑ ↓',    'Volume +/−'],
-    ['M',       'Muet'],
-    ['S',       'Aléatoire'],
-    ['R',       'Répéter'],
-    ['?',       'Ce panneau'],
+    ['Espace', _t('sc2-play-pause', 'Lecture / Pause')],
+    ['← →',    _t('sc2-seek', 'Reculer / Avancer 5 s')],
+    ['↑ ↓',    _t('sc2-volume', 'Volume +/−')],
+    ['M',       _t('sc2-mute', 'Muet')],
+    ['S',       _t('sc2-shuffle', 'Aléatoire')],
+    ['R',       _t('sc2-repeat', 'Répéter')],
+    ['?',       _t('sc2-this-panel', 'Ce panneau')],
   ];
   const rows = SHORTCUTS.map(([k, v]) => `
     <div style="display:flex;align-items:center;justify-content:space-between;
@@ -823,14 +1024,14 @@ window.showToast = function(message, type = 'default', duration = 2800) {
     </div>`).join('');
 
   overlay.innerHTML = `
-    <div style="background:#181818;border:1px solid rgba(255,255,255,0.1);
+    <div role="dialog" aria-modal="true" aria-labelledby="shortcutsTitle" style="background:#181818;border:1px solid rgba(255,255,255,0.1);
       border-radius:14px;padding:32px;min-width:340px;max-width:460px;
       box-shadow:0 20px 60px rgba(0,0,0,0.8);
       animation:beartifyFadeIn 0.22s ease">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px">
-        <h2 style="font-size:1.05rem;font-weight:700;color:#fff;letter-spacing:-0.02em">Raccourcis clavier</h2>
+        <h2 id="shortcutsTitle" style="font-size:1.05rem;font-weight:700;color:#fff;letter-spacing:-0.02em">${_t('text-keyboard-shortcuts', 'Raccourcis clavier')}</h2>
         <button id="shortcutsClose" style="background:none;border:none;color:rgba(255,255,255,0.45);
-          cursor:pointer;font-size:1.2rem;padding:4px;line-height:1">✕</button>
+          cursor:pointer;font-size:1.2rem;padding:4px;line-height:1" aria-label="${_t('tt-close', 'Fermer')}">✕</button>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 20px">${rows}</div>
     </div>`;
@@ -838,917 +1039,26 @@ window.showToast = function(message, type = 'default', duration = 2800) {
 
   document.getElementById('shortcutsClose')?.addEventListener('click', () => { overlay.style.display = 'none'; });
   overlay.addEventListener('click', e => { if (e.target === overlay) overlay.style.display = 'none'; });
-  window._openShortcuts = () => { overlay.style.display = 'flex'; };
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && overlay.style.display !== 'none') overlay.style.display = 'none';
+  });
+  window._openShortcuts = () => { overlay.style.display = 'flex'; document.getElementById('shortcutsClose')?.focus(); };
 })();
 
 // Lyrics state
 let lyricsData       = null;
-let currentLyricLine = -1;
-let currentLyricWord = -1;
 
-// ── SpicyLyrics State ─────────────────────────────────────────────
+// ── SpicyLyrics shared state ────────────────────────────────────────
+// Le rendu/l'animation complets vivent désormais dans
+// Lyrics/spicy-lyrics-engine.js (voir Lyrics/README.md), qui redéfinit au
+// chargement renderSpicyLyrics / spicyAnimateLyrics / toggleSimpleLyricsMode /
+// _forceLyricsSync / renderLyricsLoading / renderNoLyricsFound /
+// renderPlainLyrics. Ce fichier ne conserve que l'état minimal partagé
+// (position de lecture) et la boucle qui pousse chaque frame vers le moteur.
 const spicy = {
-  lyricsObject: { Lines: [] },
   isPlaying: false,
   currentPosition: 0,
 };
-let spicyLastFrameTime   = performance.now();
-let spicyLastAnimateTime = 0;
-const SPICY_FPS          = 1000 / 60;
-let spicyBlurLastLine    = null;
-let spicyLastActiveLine  = -1;
-let spicyScrollTimeout   = null;
-
-// ── SpicyLyrics Engine Config ─────────────────────────────────────
-const SpicyConfig = {
-  SimpleLyricsMode: false,
-  SimpleLyricsMode_RenderingType: 'animate', // 'animate' | 'calculate'
-};
-const BLUR_MULTIPLIER        = 0.4; // ⚠️ Était 1.25 — réduit fortement : le flou des
-// lignes voisines de la ligne active pouvait déborder visuellement dans son
-// espace (filter:blur() n'est pas garanti d'être parfaitement contenu par
-// overflow:hidden sur le MÊME élément selon les navigateurs), créant un
-// effet de texte dédoublé/fantôme au début de chaque ligne. Avec cette
-// valeur, même une éventuelle imperfection de confinement CSS ne produit
-// plus assez de flou visible pour créer cet effet.
-const SUNG_LETTER_GLOW       = 0.2;
-const LETTER_GLOW_MULTIPLIER = 185;
-const LETTER_MAX_LENGTH      = 60;   // all words get letter treatment
-const LETTER_MIN_DURATION    = 0;    // no minimum duration
-
-// ── GPU promotion + setStyleIfChanged (spicy-lyrics 5.21.5) ──────
-// WeakSet: each element gets will-change applied only once
-const _gpuPromotedSet = new WeakSet();
-function _promoteGPU(el) {
-  if (_gpuPromotedSet.has(el)) return;
-  // ⚠️ FIX : la référence Mixed.css originale (portée par ce projet) déclare
-  // `will-change: transform, opacity, text-shadow, scale, background-image`
-  // pour mots/lettres. Le port utilisait `filter` à la place de
-  // `text-shadow` — or filter ne s'applique jamais aux mots/lettres (ça ne
-  // concerne que .line, pour le flou de profondeur de champ), alors que
-  // text-shadow est justement ce qui anime réellement à chaque frame via
-  // --text-shadow-blur-radius/--text-shadow-opacity. Le navigateur recevait
-  // le mauvais indice d'optimisation.
-  el.style.willChange = 'transform, opacity, text-shadow, scale, background-image';
-  _gpuPromotedSet.add(el);
-}
-
-// Per-element style cache → skip redundant DOM writes
-const _styleCache = new WeakMap();
-function _setStyleIfChanged(el, prop, val, epsilon = 0) {
-  let cache = _styleCache.get(el);
-  if (!cache) { cache = Object.create(null); _styleCache.set(el, cache); }
-  const prev = cache[prop];
-  if (prev !== undefined) {
-    if (epsilon > 0) {
-      const a = parseFloat(prev), b = parseFloat(val);
-      if (!isNaN(a) && !isNaN(b) && Math.abs(a - b) <= epsilon) return;
-    } else if (prev === val) return;
-  }
-  cache[prop] = val;
-  if (prop.startsWith('--')) el.style.setProperty(prop, val);
-  else el.style[prop] = val;
-}
-
-// ══════════════════════════════════════════════════════════════════
-//  SpicyLyrics - Full Engine Port (CubicSpline + Spring + Letter
-//  animation, bg-vocals, SimpleLyricsMode, interlude dots)
-// ══════════════════════════════════════════════════════════════════
-
-class CubicSpline {
-  constructor(xs, ys) {
-    this.xs = xs; this.ys = ys;
-    this.ks = this.getNaturalKs(new Float64Array(xs.length));
-  }
-  getNaturalKs(ks) {
-    const n = this.xs.length - 1;
-    const A = Array.from({length:n+1}, () => new Float64Array(n+2));
-    for (let i = 1; i < n; i++) {
-      A[i][i-1] = 1/(this.xs[i]-this.xs[i-1]);
-      A[i][i]   = 2*(1/(this.xs[i]-this.xs[i-1]) + 1/(this.xs[i+1]-this.xs[i]));
-      A[i][i+1] = 1/(this.xs[i+1]-this.xs[i]);
-      A[i][n+1] = 3*((this.ys[i]-this.ys[i-1])/((this.xs[i]-this.xs[i-1])**2)
-                    +(this.ys[i+1]-this.ys[i])/((this.xs[i+1]-this.xs[i])**2));
-    }
-    A[0][0]   = 2/(this.xs[1]-this.xs[0]);
-    A[0][1]   = 1/(this.xs[1]-this.xs[0]);
-    A[0][n+1] = 3*(this.ys[1]-this.ys[0])/(this.xs[1]-this.xs[0])**2;
-    A[n][n-1] = 1/(this.xs[n]-this.xs[n-1]);
-    A[n][n]   = 2/(this.xs[n]-this.xs[n-1]);
-    A[n][n+1] = 3*(this.ys[n]-this.ys[n-1])/(this.xs[n]-this.xs[n-1])**2;
-    return this._solve(A, ks);
-  }
-  _solve(A, ks) {
-    const m = A.length;
-    for (let k = 0; k < m; k++) {
-      let imax = 0, vali = Number.NEGATIVE_INFINITY;
-      for (let i = k; i < m; i++) if (A[i][k] > vali) { imax = i; vali = A[i][k]; }
-      [A[k], A[imax]] = [A[imax], A[k]];
-      for (let i = k+1; i < m; i++) {
-        for (let j = k+1; j < m+1; j++) A[i][j] -= A[k][j]*(A[i][k]/A[k][k]);
-        A[i][k] = 0;
-      }
-    }
-    for (let i = m-1; i >= 0; i--) {
-      ks[i] = A[i][m]/A[i][i];
-      for (let j = i-1; j >= 0; j--) { A[j][m] -= A[j][i]*ks[i]; A[j][i] = 0; }
-    }
-    return ks;
-  }
-  at(x) {
-    let i = 1;
-    while (i < this.xs.length && this.xs[i] < x) i++;
-    if (i >= this.xs.length) i = this.xs.length - 1;
-    if (i === 0) i = 1;
-    const t = (x-this.xs[i-1])/(this.xs[i]-this.xs[i-1]);
-    const a = this.ks[i-1]*(this.xs[i]-this.xs[i-1])-(this.ys[i]-this.ys[i-1]);
-    const b = -this.ks[i]*(this.xs[i]-this.xs[i-1])+(this.ys[i]-this.ys[i-1]);
-    return (1-t)*this.ys[i-1]+t*this.ys[i]+t*(1-t)*(a*(1-t)+b*t);
-  }
-}
-
-class Spring {
-  constructor(init, freq=1, damp=0.5) {
-    this.value=init; this.velocity=0; this.target=init;
-    this.frequency=freq; this.damping=damp;
-  }
-  SetGoal(t, immediate=false) {
-    this.target = t;
-    if (immediate) { this.value = t; this.velocity = 0; }
-  }
-  Step(dt) {
-    // Oscillateur harmonique amorti - port fidèle de @spikerko/web-modules/Spring.
-    //
-    // Les paramètres de LyricsAnimator.ts sont :
-    //   frequency = fréquence naturelle en Hz  (ex: 0.7, 1.0, 1.25)
-    //   damping   = ratio d'amortissement ζ    (0 = sans amorti, 1 = critique)
-    //
-    // L'ancienne formule traitait `frequency` comme une raideur brute k et
-    // `damping` comme un coefficient linéaire c, ce qui produisait des forces
-    // ~27× trop faibles (invisible à 60fps sur une fenêtre d'1 seconde).
-    //
-    // Formule correcte :
-    //   ω = 2π × f          (fréquence angulaire en rad/s)
-    //   F = ω² × (cible − valeur)  −  2 × ζ × ω × vitesse
-    //       ↑ force de rappel             ↑ force d'amortissement
-    const omega = 2 * Math.PI * this.frequency;
-    const force = omega * omega * (this.target - this.value)
-                - 2 * this.damping * omega * this.velocity;
-    this.velocity += force * dt;
-    this.value    += this.velocity * dt;
-    return this.value;
-  }
-}
-
-// ── Animation Curves ───────────────────────────────────────────────
-function _mkSpline(r) { return new CubicSpline(r.map(v=>v.Time), r.map(v=>v.Value)); }
-
-// ── Exact values from LyricsAnimator.ts source ────────────────────
-// Scale: 0.95 idle → 1.025 overshoot at 70% → lands at 1.0
-const ScaleSpline      = _mkSpline([{Time:0,Value:0.95},{Time:0.7,Value:1.025},{Time:1,Value:1}]);
-// YOffset: 0.01 start (slight drop), peak up at 90%, return to 0
-let   YOffSpline       = _mkSpline([{Time:0,Value:0.01},{Time:0.9,Value:-(1/60)},{Time:1,Value:0}]);
-const YOffSplineSimple = _mkSpline([{Time:0,Value:0.01},{Time:1,Value:-0.04}]);
-const LetterYOffSpline = _mkSpline([{Time:0,Value:0.01},{Time:0.9,Value:-(1/60)},{Time:1,Value:0}]);
-// Glow: fast rise to 1 by 15%, held until 60%, decays to 0 - NO residual glow
-const GlowSpline       = _mkSpline([{Time:0,Value:0},{Time:0.15,Value:1},{Time:0.6,Value:1},{Time:1,Value:0}]);
-// Dot splines - sequential 1/3-window bounce from DotAnimations in LyricsAnimator.ts
-const DotScaleSpline   = _mkSpline([{Time:0,Value:0.75},{Time:0.7,Value:1.05},{Time:1,Value:1}]);
-// Peak Y porté à -0.28 (× DefaultLyricsSize ≈ 10 px) pour que la montée/descente
-// soit clairement visible - LyricsAnimator.ts utilise -0.12 mais sur des
-// containers cqw-based beaucoup plus grands; on compense ici.
-const DotYSpline       = _mkSpline([{Time:0,Value:0},{Time:0.9,Value:-0.28},{Time:1,Value:0}]);
-const DotGlowSpline    = _mkSpline([{Time:0,Value:0},{Time:0.6,Value:1},{Time:1,Value:1}]);
-const DotOpacSpline    = _mkSpline([{Time:0,Value:0.35},{Time:0.6,Value:1},{Time:1,Value:1}]);
-
-// ── Spring Factories ───────────────────────────────────────────────
-// Exact params from LyricsAnimator.ts:
-//   Scale:   freq=0.7 / damp=0.6
-//   YOffset: freq=1.25 / damp=0.4
-//   Glow:    freq=1.0  / damp=0.5
-function _wordSprings() {
-  if (SpicyConfig.SimpleLyricsMode) {
-    return {
-      Scale:   { Step: () => ScaleSpline.at(0), SetGoal: () => {}, value: ScaleSpline.at(0) },
-      YOffset: new Spring(YOffSpline.at(0), 1.25, 0.4),
-      Glow:    { Step: () => 0, SetGoal: () => {}, value: 0 },
-    };
-  }
-  return {
-    Scale:   new Spring(ScaleSpline.at(0), 0.7,  0.6),
-    YOffset: new Spring(YOffSpline.at(0),  1.25, 0.4),
-    Glow:    new Spring(GlowSpline.at(0),  1.0,  0.5),
-  };
-}
-function _letterSprings() {
-  return {
-    Scale:   new Spring(ScaleSpline.at(0),      0.7,  0.6),
-    YOffset: new Spring(LetterYOffSpline.at(0), 1.25, 0.4),
-    Glow:    new Spring(GlowSpline.at(0),       1.0,  0.5),
-  };
-}
-function _dotSprings() {
-  if (SpicyConfig.SimpleLyricsMode) {
-    return {
-      Scale:   { Step: () => DotScaleSpline.at(0), SetGoal: () => {}, value: DotScaleSpline.at(0) },
-      YOffset: { Step: () => 0, SetGoal: () => {}, value: 0 },
-      Glow:    { Step: () => 0, SetGoal: () => {}, value: 0 },
-      Opacity: new Spring(DotOpacSpline.at(0), 1.0, 0.5),
-    };
-  }
-  // Dot params from LyricsAnimator.ts DotAnimations:
-  // Scale: freq=0.7, damp=0.6 | YOffset: freq=1.25, damp=0.4 | Glow/Opacity: freq=1.0, damp=0.5
-  return {
-    Scale:   new Spring(DotScaleSpline.at(0), 0.7,  0.6),
-    YOffset: new Spring(DotYSpline.at(0),     1.25, 0.4),
-    Glow:    new Spring(DotGlowSpline.at(0),  1.0,  0.5),
-    Opacity: new Spring(DotOpacSpline.at(0),  1.0,  0.5),
-  };
-}
-
-// ── Ensure a dot word has its AnimatorStore initialised (idempotent) ─
-function _ensureDotStore(word) {
-  if (word.AnimatorStore) return;
-  word.AnimatorStore = _dotSprings();
-  word.AnimatorStore.Scale.SetGoal(DotScaleSpline.at(0),  true);
-  word.AnimatorStore.YOffset.SetGoal(DotYSpline.at(0),    true);
-  word.AnimatorStore.Glow.SetGoal(DotGlowSpline.at(0),    true);
-  word.AnimatorStore.Opacity.SetGoal(DotOpacSpline.at(0), true);
-  // Force-write initial DOM values AND prime the style cache.
-  // Without this, if the CSS initial value matches the spring's initial
-  // value, _setStyleIfChanged sees no change on the first rAF tick and
-  // skips the write - making the dot appear stuck.
-  const initScale   = DotScaleSpline.at(0).toFixed(5);
-  const initOpacity = DotOpacSpline.at(0).toFixed(5);
-  const initGlow    = DotGlowSpline.at(0);
-  const initY       = (DotYSpline.at(0) || 0).toFixed(5);
-  const initTransform = `translate3d(0,${initY}em,0)`;
-  word.HTMLElement.style.scale     = initScale;
-  word.HTMLElement.style.opacity   = initOpacity;
-  word.HTMLElement.style.transform = initTransform;
-  word.HTMLElement.style.setProperty('--text-shadow-blur-radius', `${(4 + 6 * initGlow).toFixed(2)}px`);
-  word.HTMLElement.style.setProperty('--text-shadow-opacity',     `${(initGlow * 90).toFixed(2)}%`);
-  let cache = _styleCache.get(word.HTMLElement);
-  if (!cache) { cache = Object.create(null); _styleCache.set(word.HTMLElement, cache); }
-  cache['scale']                     = initScale;
-  cache['opacity']                   = initOpacity;
-  cache['transform']                 = initTransform;
-  cache['--text-shadow-blur-radius'] = `${(4 + 6 * initGlow).toFixed(2)}px`;
-  cache['--text-shadow-opacity']     = `${(initGlow * 90).toFixed(2)}%`;
-}
-
-// ── Utilities ──────────────────────────────────────────────────────
-function _state(now, s, e) {
-  if (now < s) return 'NotSung';
-  if (now > e) return 'Sung';
-  return 'Active';
-}
-function _pct(now, s, e) {
-  if (now <= s) return 0;
-  if (now >= e) return 1;
-  return (now - s) / (e - s);
-}
-function _easeSinOut(t) { return Math.sin((t * Math.PI) / 2); }
-function _isLetterCapable(len, dur) {
-  return len <= LETTER_MAX_LENGTH && dur >= (SpicyConfig.SimpleLyricsMode ? 800 : LETTER_MIN_DURATION);
-}
-function _slmAnimation(dur) { return `SLM_Animation ${dur}ms linear forwards`; }
-function _preSLMAnimation(dur) { return `Pre_SLM_GradientAnimation ${dur}ms linear forwards`; }
-
-// ── Apply progressive blur around active line ──────────────────────
-function _applyBlur(arr, activeIdx) {
-  // Flou symétrique : même intensité en avant (NotSung) et en arrière (Sung)
-  // Les lignes passées sont grisées (via CSS opacity) avec un léger flou identique aux futures.
-  const BLUR_PER_LEVEL = BLUR_MULTIPLIER * 0.7; // flou doux par niveau de distance
-  const max = BLUR_PER_LEVEL * 3;               // plafond à 3 niveaux
-  for (let i = 0; i < arr.length; i++) {
-    // Dot lines are hidden/shown via CSS classes - never blur them
-    if (arr[i].DotLine) {
-      _setStyleIfChanged(arr[i].HTMLElement, '--BlurAmount', '0px', 0.25);
-      continue;
-    }
-    if (i === activeIdx || _state(spicy.currentPosition, arr[i].StartTime, arr[i].EndTime) === 'Active') {
-      // Ligne active : aucun flou
-      _setStyleIfChanged(arr[i].HTMLElement, '--BlurAmount', '0px', 0.25);
-    } else {
-      // Distance symétrique : même flou avant ET après la ligne active
-      const dist = Math.abs(i - activeIdx);
-      const blur = Math.min(BLUR_PER_LEVEL * dist, max);
-      _setStyleIfChanged(arr[i].HTMLElement, '--BlurAmount', `${blur.toFixed(2)}px`, 0.25);
-    }
-  }
-}
-
-function _scrollToActiveLine() {
-  if (spicyScrollTimeout) return;
-  spicyScrollTimeout = setTimeout(() => {
-    const container = document.getElementById('lyricsDisplay');
-    let active = container?.querySelector('.line.Active:not(.musical-line)');
-    // Si la ligne est déjà passée à Sung avant la fin du délai (ligne courte < 80ms),
-    // on scroll vers la dernière ligne Sung - c'est exactement celle qu'on voulait centrer.
-    if (!active && container) {
-      const sungLines = container.querySelectorAll('.line.Sung:not(.musical-line)');
-      if (sungLines.length) active = sungLines[sungLines.length - 1];
-    }
-    if (active && container) {
-      const ch = container.clientHeight;
-      const ct = container.scrollTop;
-      const lt = active.offsetTop;
-      const lh = active.clientHeight;
-      const target = lt - ch / 2 + lh / 2;
-      // Clamp pour ne pas scroller au-delà du contenu → évite le vide sous la dernière ligne
-      const maxScroll = container.scrollHeight - container.clientHeight;
-      const clampedTarget = Math.max(0, Math.min(target, maxScroll));
-      if (Math.abs((ct + ch/2) - (lt + lh/2)) > ch * 0.25) {
-        _manualSmoothScrollTo(container, clampedTarget, 500);
-      }
-    }
-    spicyScrollTimeout = null;
-  }, 80);
-}
-
-let _manualScrollRAF = null;
-function _manualSmoothScrollTo(container, targetTop, durationMs) {
-  if (_manualScrollRAF) cancelAnimationFrame(_manualScrollRAF);
-  const startTop = container.scrollTop;
-  const delta = targetTop - startTop;
-  const startTime = performance.now();
-  if (Math.abs(delta) < 1) return;
-  function step(now) {
-    const t = Math.min(1, (now - startTime) / durationMs);
-    const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-    container.scrollTop = startTop + delta * eased;
-    if (t < 1) { _manualScrollRAF = requestAnimationFrame(step); }
-    else { _manualScrollRAF = null; }
-  }
-  _manualScrollRAF = requestAnimationFrame(step);
-}
-
-// ── Scroll instantané vers la position actuelle à l'ouverture du panneau ──
-// Trouve la dernière ligne dont le StartTime est ≤ position courante.
-// Si aucune ligne n'est encore atteinte (intro dots), remonte au sommet.
-function _forceLyricsSync() {
-  const container = document.getElementById('lyricsDisplay');
-  if (!container) return;
-  const posMs = spicy.currentPosition;
-  const arr   = spicy.lyricsObject?.Lines;
-  if (!arr || !arr.length) return;
-
-  // Trouver la dernière ligne réelle dont on a atteint le début
-  let targetEl  = null;
-  let targetIdx = -1;
-  for (let i = 0; i < arr.length; i++) {
-    if (arr[i].DotLine) continue;          // ignorer les dots musicaux
-    if (arr[i].StartTime <= posMs) { targetEl = arr[i].HTMLElement; targetIdx = i; }
-  }
-
-  if (!targetEl) {
-    // Intro : aucune ligne n'a commencé → remonter tout en haut
-    container.scrollTo({ top: 0, behavior: 'instant' });
-    return;
-  }
-
-  // Réinitialiser le tracker pour que la prochaine transition déclenche bien un scroll
-  spicyLastActiveLine = -1;
-  spicyBlurLastLine   = -1;
-
-  // Centrer la ligne cible sans animation (ouverture = instantané)
-  if (container.clientHeight > 0) {
-    const target = targetEl.offsetTop - container.clientHeight / 2 + targetEl.clientHeight / 2;
-    container.scrollTo({ top: Math.max(0, target), behavior: 'instant' });
-  }
-}
-
-// ── Sync mini-lyrics panel ─────────────────────────────────────────
-function _syncMiniLyrics(lineIdx) {
-  const miniLines = lyricsMiniContent.querySelectorAll('.lyrics-mini-line');
-  miniLines.forEach((el, i) => {
-    el.classList.remove('active', 'past');
-    if (i < lineIdx) el.classList.add('past');
-    else if (i === lineIdx) el.classList.add('active');
-  });
-  lyricsMiniContent.querySelector('.lyrics-mini-line.active')
-    ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-
-// ══════════════════════════════════════════════════════════════════
-//  MAIN ANIMATION LOOP  (driven by requestAnimationFrame)
-// ══════════════════════════════════════════════════════════════════
-
-function spicyAnimateLyrics(posMs) {
-  const now = performance.now();
-  // Always advance the frame-time clock so dt is correct even when the
-  // FPS throttle fires (i.e. spicyLastFrameTime must tick every rAF, not
-  // only every processed frame).
-  const rawDt = now - spicyLastFrameTime;
-  spicyLastFrameTime = now;
-
-  if (now - spicyLastAnimateTime < SPICY_FPS) return;
-  const dt = Math.min(rawDt / 1000, 0.05);
-  spicyLastAnimateTime = now;
-
-  const SLM = SpicyConfig.SimpleLyricsMode;
-  const arr = spicy.lyricsObject.Lines;
-
-  // ── Seek detection ─────────────────────────────────────────────────
-  // If the playback position jumped by more than 1 s compared with what
-  // we processed last frame, treat it as a seek: reset cached line indices
-  // so blur / scroll refresh immediately for the new position.
-  if (spicyAnimateLyrics._lastPosMs !== undefined &&
-      Math.abs(posMs - spicyAnimateLyrics._lastPosMs) > 1000) {
-    spicyBlurLastLine   = -1;
-    spicyLastActiveLine = -1;
-  }
-  spicyAnimateLyrics._lastPosMs = posMs;
-
-  for (let idx = 0; idx < arr.length; idx++) {
-    const line = arr[idx];
-    const ls = _state(posMs, line.StartTime, line.EndTime);
-
-    // ── ACTIVE ──────────────────────────────────────────────────
-    if (ls === 'Active') {
-      if (spicyBlurLastLine !== idx) { _applyBlur(arr, idx); spicyBlurLastLine = idx; }
-      if (spicyLastActiveLine !== idx) {
-        _scrollToActiveLine();
-        _syncMiniLyrics(idx);
-        spicyLastActiveLine = idx;
-      }
-      line.HTMLElement.classList.remove('NotSung', 'Sung');
-      line.HTMLElement.classList.add('Active');
-
-      const words = line.Syllables?.Lead;
-      if (!words) continue;
-
-      for (let wi = 0; wi < words.length; wi++) {
-        const word = words[wi];
-        const ws = _state(posMs, word.StartTime, word.EndTime);
-        const wp = _pct(posMs, word.StartTime, word.EndTime);
-
-        // ── DOT ─────────────────────────────────────────────────
-        if (word.Dot) {
-          _ensureDotStore(word);
-          _promoteGPU(word.HTMLElement);
-          let ts, tg, to;
-          // Y is computed DIRECTLY via Math.sin - NOT via a spring.
-          // Root cause: the YOffset spring has freq=1.25 Hz (period 800ms) and
-          // each dot window is totalTime/3 ≈ 800-1400ms. The spring barely reaches
-          // its peak before the target returns to 0, producing near-invisible motion.
-          // sin(wp × π) gives a full rise-and-fall in exactly one dot window,
-          // regardless of duration. Amplitude -0.4em ≈ 20 px at typical font sizes.
-          let cy = 0;
-          if (ws === 'Active') {
-            ts = DotScaleSpline.at(wp);
-            tg = DotGlowSpline.at(wp);  to = DotOpacSpline.at(wp);
-            cy = Math.sin(wp * Math.PI) * -0.4; // em - direct sine bounce
-          } else if (ws === 'NotSung') {
-            ts = DotScaleSpline.at(0);
-            tg = DotGlowSpline.at(0);  to = DotOpacSpline.at(0);
-            cy = 0;
-          } else { // Sung - remain fully lit
-            ts = DotScaleSpline.at(1);
-            tg = DotGlowSpline.at(1);  to = DotOpacSpline.at(1);
-            cy = 0;
-          }
-          word.AnimatorStore.Scale.SetGoal(ts);
-          // Keep YOffset spring in sync so NotSung decay is smooth after a seek
-          word.AnimatorStore.YOffset.SetGoal(cy, ws !== 'Active' /* immediate when not bouncing */);
-          word.AnimatorStore.Glow.SetGoal(tg);
-          word.AnimatorStore.Opacity.SetGoal(to);
-          const cs = word.AnimatorStore.Scale.Step(dt);
-          word.AnimatorStore.YOffset.Step(dt); // advance spring (used for smooth decay on seek)
-          const cg = word.AnimatorStore.Glow.Step(dt);
-          const co = word.AnimatorStore.Opacity.Step(dt);
-          _setStyleIfChanged(word.HTMLElement, 'transform', `translate3d(0,${cy.toFixed(5)}em,0)`);
-          _setStyleIfChanged(word.HTMLElement, 'scale', `${cs.toFixed(5)}`);
-          _setStyleIfChanged(word.HTMLElement, 'opacity', `${co.toFixed(5)}`);
-          _setStyleIfChanged(word.HTMLElement, '--text-shadow-blur-radius', `${(4 + 6*cg).toFixed(2)}px`, 0.25);
-          _setStyleIfChanged(word.HTMLElement, '--text-shadow-opacity', `${(cg * 90).toFixed(2)}%`, 1);
-          continue;
-        }
-
-        // ── LETTER GROUP ────────────────────────────────────────
-        if (word.LetterGroup && word.Letters) {
-          // Find which letter is active and its progress
-          let activeLetterIdx = -1, activeLetterPct = 0;
-          for (let k = 0; k < word.Letters.length; k++) {
-            const ltr = word.Letters[k];
-            if (_state(posMs, ltr.StartTime, ltr.EndTime) === 'Active') {
-              activeLetterIdx = k; activeLetterPct = _pct(posMs, ltr.StartTime, ltr.EndTime);
-              break;
-            }
-          }
-          // Détecter si TOUTES les lettres sont Sung (fin d'animation du mot)
-          const allLettersSung = word.Letters.every(
-            ltr => _state(posMs, ltr.StartTime, ltr.EndTime) === 'Sung'
-          );
-          for (let k = 0; k < word.Letters.length; k++) {
-            const ltr = word.Letters[k];
-            const ltrState = _state(posMs, ltr.StartTime, ltr.EndTime);
-            if (!ltr.AnimatorStore) {
-              ltr.AnimatorStore = _letterSprings();
-              ltr.AnimatorStore.Scale.SetGoal(ScaleSpline.at(0), true);
-              ltr.AnimatorStore.YOffset.SetGoal(LetterYOffSpline.at(0), true);
-              ltr.AnimatorStore.Glow.SetGoal(GlowSpline.at(0), true);
-            }
-            let tScale = ScaleSpline.at(0), tY = LetterYOffSpline.at(0), tGlow = GlowSpline.at(0), tGrad;
-            if (allLettersSung) {
-              // Toutes les lettres sont Sung : forcer immédiatement la position de repos
-              // (scale=1, Y=0, glow=0) sans ressort résiduel. C'est le cas qui causait
-              // la dernière lettre « bloquée » en position intermédiaire.
-              tScale = ScaleSpline.at(1);     // 1.0
-              tY     = LetterYOffSpline.at(1); // 0.0
-              tGlow  = GlowSpline.at(1);       // 0.0
-              tGrad  = 100;
-              ltr.AnimatorStore.Scale.SetGoal(tScale, true);
-              ltr.AnimatorStore.YOffset.SetGoal(tY, true);
-              ltr.AnimatorStore.Glow.SetGoal(tGlow, true);
-            } else if (activeLetterIdx !== -1) {
-              const pct = SLM ? _pct(posMs, word.StartTime, word.EndTime) : activeLetterPct;
-              // LyricsAnimator.ts uses falloff factor 0.9 (steeper - more focused on active letter)
-              const falloff = Math.max(0, 1 / (1 + Math.abs(k - activeLetterIdx) * 0.9));
-              tScale = ScaleSpline.at(0) + (ScaleSpline.at(pct) - ScaleSpline.at(0)) * falloff;
-              tY     = LetterYOffSpline.at(0) + (LetterYOffSpline.at(pct) - LetterYOffSpline.at(0)) * falloff;
-              tGlow  = GlowSpline.at(0) + (GlowSpline.at(pct) - GlowSpline.at(0)) * falloff;
-            }
-            if (!allLettersSung) {
-              if (ltrState === 'Active') {
-                const lp = _pct(posMs, ltr.StartTime, ltr.EndTime);
-                // LyricsAnimator.ts: only the active letter gets gradient sweep; others stay at -20%
-                tGrad = k === activeLetterIdx
-                  ? (SLM ? -50 + 120 * _easeSinOut(lp) : -20 + 120 * _easeSinOut(lp))
-                  : (SLM ? -50 : -20);
-              } else if (ltrState === 'NotSung') {
-                tGrad = SLM ? -50 : -20;
-                if (!SLM) { tScale = ScaleSpline.at(0); tY = LetterYOffSpline.at(0); tGlow = GlowSpline.at(0); }
-              } else { // Sung individuel (mais pas toutes Sung)
-                tGrad = 100;
-                tGlow = Math.min(tGlow, SUNG_LETTER_GLOW);
-              }
-              ltr.AnimatorStore.Scale.SetGoal(tScale);
-              ltr.AnimatorStore.YOffset.SetGoal(tY);
-              ltr.AnimatorStore.Glow.SetGoal(tGlow);
-            }
-            const cs = ltr.AnimatorStore.Scale.Step(dt);
-            const cy = ltr.AnimatorStore.YOffset.Step(dt);
-            const cg = ltr.AnimatorStore.Glow.Step(dt);
-            _promoteGPU(ltr.HTMLElement);
-            if (SLM) {
-              if (SpicyConfig.SimpleLyricsMode_RenderingType === 'calculate') {
-                _setStyleIfChanged(ltr.HTMLElement, '--SLM_GradientPosition', `${tGrad.toFixed(2)}%`);
-              } else {
-                if (ltrState === 'Active' && !ltr.SLMAnimated) {
-                  ltr.HTMLElement.style.removeProperty('--SLM_GradientPosition');
-                  ltr.HTMLElement.style.animation = _slmAnimation(ltr.TotalTime);
-                  ltr.SLMAnimated = true;
-                } else if (ltrState === 'NotSung') {
-                  ltr.HTMLElement.style.animation = 'none';
-                  _setStyleIfChanged(ltr.HTMLElement, '--SLM_GradientPosition', '-50%');
-                  ltr.SLMAnimated = false;
-                } else if (ltrState === 'Sung') {
-                  ltr.HTMLElement.style.animation = 'none';
-                  _setStyleIfChanged(ltr.HTMLElement, '--SLM_GradientPosition', '100%');
-                  ltr.SLMAnimated = false;
-                }
-              }
-            } else {
-              _setStyleIfChanged(ltr.HTMLElement, '--gradient-position', `${tGrad.toFixed(2)}%`);
-            }
-            // Quand toutes les lettres sont Sung, epsilon=0 pour forcer la valeur exacte
-            // (epsilon=0.001 bloquait la mise à jour quand le spring était à 0.9999 → 1.0000)
-            const epsilonFinal = allLettersSung ? 0 : 0.001;
-            _setStyleIfChanged(ltr.HTMLElement, 'transform', `translate3d(0,calc(var(--DefaultLyricsSize) * ${(cy * 2).toFixed(5)}),0)`, epsilonFinal);
-            _setStyleIfChanged(ltr.HTMLElement, 'scale', `${cs.toFixed(5)}`, epsilonFinal);
-            _setStyleIfChanged(ltr.HTMLElement, '--text-shadow-blur-radius', `${(4 + 12*cg).toFixed(2)}px`, 0.25);
-            _setStyleIfChanged(ltr.HTMLElement, '--text-shadow-opacity', `${(cg * LETTER_GLOW_MULTIPLIER).toFixed(2)}%`, 1);
-          }
-          continue;
-        }
-
-        // ── PLAIN WORD / LRC LINE ────────────────────────────────
-        if (!word.AnimatorStore) {
-          word.AnimatorStore = _wordSprings();
-          word.AnimatorStore.Scale.SetGoal(ScaleSpline.at(0), true);
-          word.AnimatorStore.YOffset.SetGoal(YOffSpline.at(0), true);
-          word.AnimatorStore.Glow.SetGoal(GlowSpline.at(0), true);
-        }
-        _promoteGPU(word.HTMLElement);
-        const totalDur = word.EndTime - word.StartTime;
-
-        // ── LRC / -line.json : balayage vertical haut → bas ─────────
-        // Pas de zoom (scale fixé à 1). Le glow reste piloté par le spring
-        // pour la douceur. La progression du balayage est calculée directement
-        // depuis wp (0→1) avec une ease-in-out sinusoïdale.
-        if (word.IsLrcLine) {
-          // word.HTMLElement = span.lrc-line-inner (flex-item neutre).
-          // word.LrcWordEls  = array des span.lrc-word enfants.
-          // On met à jour --lrc-fill-progress sur chaque lrc-word directement
-          // (pas d'héritage CSS à traverser) et le glow/shadow sur innerEl.
-          const lrcEls = word.LrcWordEls || [];
-          const _setLrcProgress = (val) => {
-            for (const el of lrcEls) el.style.setProperty('--lrc-fill-progress', val);
-          };
-          if (ws === 'Active') {
-            _setLrcProgress(wp.toFixed(4));
-
-            // Glow : spring pour la douceur
-            word.AnimatorStore.Glow.SetGoal(GlowSpline.at(wp));
-            const cg = word.AnimatorStore.Glow.Step(dt);
-            _setStyleIfChanged(word.HTMLElement, '--text-shadow-blur-radius', `${(4 + 16*cg).toFixed(2)}px`, 0.25);
-            _setStyleIfChanged(word.HTMLElement, '--text-shadow-opacity',     `${Math.min(cg * 55, 100).toFixed(2)}%`, 1);
-
-            if (word.HTMLElement.style.animation) word.HTMLElement.style.animation = 'none';
-            word.LrcAnimated = true;
-
-            // Pré-activer légèrement la ligne suivante à 60% de progression
-            if (!word.LrcNextPrepped && wp >= 0.6) {
-              word.LrcNextPrepped = true;
-              const nextLine = line.HTMLElement.nextElementSibling;
-              if (nextLine && nextLine.classList.contains('lrc-line') &&
-                  nextLine.classList.contains('NotSung')) {
-                nextLine.style.opacity   = '0.68';
-                nextLine.style.transition = 'opacity 0.22s ease';
-              }
-            }
-
-          } else if (ws === 'NotSung') {
-            _setLrcProgress('0');
-            word.AnimatorStore.Glow.SetGoal(GlowSpline.at(0));
-            word.AnimatorStore.Glow.Step(dt);
-            if (word.LrcAnimated) {
-              word.HTMLElement.style.animation = 'none';
-              word.LrcAnimated = false;
-            }
-            if (word.HTMLElement.style.opacity) {
-              word.HTMLElement.style.opacity   = '';
-              word.HTMLElement.style.transition = '';
-            }
-            word.LrcNextPrepped = false;
-            _setStyleIfChanged(word.HTMLElement, '--text-shadow-blur-radius', '4px');
-            _setStyleIfChanged(word.HTMLElement, '--text-shadow-opacity',     '0%');
-
-          } else { // Sung : balayage complet à 1, glow résiduel doux
-            _setLrcProgress('1');
-            word.AnimatorStore.Glow.SetGoal(GlowSpline.at(1));
-            const cg = word.AnimatorStore.Glow.Step(dt);
-            if (word.HTMLElement.style.animation) word.HTMLElement.style.animation = 'none';
-            if (word.HTMLElement.style.opacity) {
-              word.HTMLElement.style.opacity   = '';
-              word.HTMLElement.style.transition = '';
-            }
-            _setStyleIfChanged(word.HTMLElement, '--text-shadow-blur-radius', `${(4 + 2*cg).toFixed(2)}px`, 0.25);
-            _setStyleIfChanged(word.HTMLElement, '--text-shadow-opacity',     `${Math.min(cg * 22, 100).toFixed(2)}%`, 1);
-            word.LrcAnimated    = false;
-            word.LrcNextPrepped = false;
-          }
-          continue;
-        }
-
-        let tScale, tY, tGlow, tGrad;
-        if (ws === 'Active') {
-          tScale = ScaleSpline.at(wp); tY = YOffSpline.at(wp);
-          tGlow  = GlowSpline.at(wp);
-          // spicy-lyrics gradient sweep: -20% → 100% over the word's duration
-          // SLM: -50% → 100% (wider band for the larger SLM gradient offset)
-          tGrad  = SLM ? -50 + 150*wp : -20 + 120*wp;
-        } else if (ws === 'NotSung') {
-          tScale = ScaleSpline.at(0); tY = YOffSpline.at(0);
-          tGlow  = GlowSpline.at(0);
-          tGrad  = SLM ? -50 : -20;
-        } else {
-          tScale = ScaleSpline.at(1); tY = YOffSpline.at(1);
-          tGlow  = GlowSpline.at(1); tGrad = 100;
-        }
-        word.AnimatorStore.Scale.SetGoal(tScale);
-        word.AnimatorStore.YOffset.SetGoal(tY);
-        word.AnimatorStore.Glow.SetGoal(tGlow);
-        const cs = word.AnimatorStore.Scale.Step(dt);
-        const cy = word.AnimatorStore.YOffset.Step(dt);
-        const cg = word.AnimatorStore.Glow.Step(dt);
-        // ⚠️ TEST DE DIAGNOSTIC TEMPORAIRE : transform/scale figés (pas de
-        // décalage Y ni de zoom par mot) pour isoler si le système
-        // d'animation par mot est la cause de la "fusion" visuelle en
-        // début de ligne active. À retirer une fois le diagnostic confirmé.
-        _setStyleIfChanged(word.HTMLElement, 'scale', '1', 0.001);
-        _setStyleIfChanged(word.HTMLElement, 'transform', 'none', 0.001);
-        if (SLM) {
-          if (SpicyConfig.SimpleLyricsMode_RenderingType === 'calculate') {
-            _setStyleIfChanged(word.HTMLElement, '--SLM_GradientPosition', `${tGrad.toFixed(2)}%`);
-          } else {
-            if (ws === 'Active' && !word.SLMAnimated) {
-              word.HTMLElement.style.removeProperty('--SLM_GradientPosition');
-              word.HTMLElement.style.animation = _slmAnimation(totalDur);
-              word.SLMAnimated = true; word.PreSLMAnimated = false;
-              const nextW = words[wi + 1];
-              if (nextW && !nextW.Dot && !nextW.PreSLMAnimated) {
-                nextW.PreSLMAnimated = true;
-                // spicy-lyrics: pre-animate next word starting at 60% of current word's duration
-                // minus 22ms buffer. Duration of pre-animation is 125ms.
-                const preDelay = Math.max(0, totalDur * 0.6 - 22);
-                setTimeout(() => {
-                  if (nextW.HTMLElement) {
-                    nextW.HTMLElement.style.removeProperty('--SLM_GradientPosition');
-                    nextW.HTMLElement.style.animation = _preSLMAnimation(125);
-                  }
-                }, preDelay);
-              }
-            } else if (ws === 'NotSung') {
-              if (!word.PreSLMAnimated) {
-                word.HTMLElement.style.animation = 'none';
-                _setStyleIfChanged(word.HTMLElement, '--SLM_GradientPosition', '-50%');
-              }
-              word.SLMAnimated = false;
-            } else if (ws === 'Sung') {
-              word.HTMLElement.style.animation = 'none';
-              _setStyleIfChanged(word.HTMLElement, '--SLM_GradientPosition', '100%');
-              word.SLMAnimated = false; word.PreSLMAnimated = false;
-            }
-          }
-        } else {
-          _setStyleIfChanged(word.HTMLElement, '--gradient-position', `${tGrad.toFixed(2)}%`);
-        }
-        _setStyleIfChanged(word.HTMLElement, '--text-shadow-blur-radius', `${(4 + 2*cg).toFixed(2)}px`, 0.25);
-        // spicy-lyrics: plain words glow multiplier is lower (35) than letters (185)
-        _setStyleIfChanged(word.HTMLElement, '--text-shadow-opacity', `${Math.min(cg * 35, 100).toFixed(2)}%`, 1);
-      }
-
-    // ── NOT SUNG ────────────────────────────────────────────────
-    } else if (ls === 'NotSung') {
-      line.HTMLElement.classList.remove('Active', 'Sung');
-      line.HTMLElement.classList.add('NotSung');
-      if (line.DotLine) {
-        for (const d of (line.Syllables?.Lead || [])) {
-          if (!d.Dot) continue;
-          _ensureDotStore(d);
-          _promoteGPU(d.HTMLElement);
-          d.AnimatorStore.Scale.SetGoal(DotScaleSpline.at(0));
-          d.AnimatorStore.YOffset.SetGoal(0, true); // immediate - no spring lag at rest
-          d.AnimatorStore.Glow.SetGoal(DotGlowSpline.at(0));
-          d.AnimatorStore.Opacity.SetGoal(DotOpacSpline.at(0));
-          const cs = d.AnimatorStore.Scale.Step(dt);
-          d.AnimatorStore.YOffset.Step(dt);
-          const cg = d.AnimatorStore.Glow.Step(dt);
-          const co = d.AnimatorStore.Opacity.Step(dt);
-          _setStyleIfChanged(d.HTMLElement, 'transform', 'translate3d(0,0em,0)');
-          _setStyleIfChanged(d.HTMLElement, 'scale', `${cs.toFixed(5)}`);
-          _setStyleIfChanged(d.HTMLElement, 'opacity', `${co.toFixed(5)}`);
-          _setStyleIfChanged(d.HTMLElement, '--text-shadow-blur-radius', `${(4+6*cg).toFixed(2)}px`, 0.25);
-          _setStyleIfChanged(d.HTMLElement, '--text-shadow-opacity', `${(cg*90).toFixed(2)}%`, 1);
-        }
-      } else {
-        // ── Decay regular-word springs toward rest (NotSung targets). ────
-        // This is critical after seeks backward: if the line was Active and
-        // mid-animation, its inline style.scale / style.transform retain the
-        // last spring value.  Without stepping them here the words look
-        // slightly wrong (off-scale, offset) in the NotSung dimmed state.
-        for (const word of (line.Syllables?.Lead || [])) {
-          if (!word.AnimatorStore) continue;   // spring not yet created → no-op
-          _promoteGPU(word.HTMLElement);
-          if (word.LetterGroup && word.Letters) {
-            // Step each letter spring toward its NotSung rest position
-            for (const ltr of word.Letters) {
-              if (!ltr.AnimatorStore) continue;
-              ltr.AnimatorStore.Scale.SetGoal(ScaleSpline.at(0));
-              ltr.AnimatorStore.YOffset.SetGoal(LetterYOffSpline.at(0));
-              ltr.AnimatorStore.Glow.SetGoal(GlowSpline.at(0));
-              const cs = ltr.AnimatorStore.Scale.Step(dt);
-              const cy = ltr.AnimatorStore.YOffset.Step(dt);
-              const cg = ltr.AnimatorStore.Glow.Step(dt);
-              _promoteGPU(ltr.HTMLElement);
-              _setStyleIfChanged(ltr.HTMLElement, 'scale', `${cs.toFixed(5)}`);
-              _setStyleIfChanged(ltr.HTMLElement, 'transform', `translate3d(0,calc(var(--DefaultLyricsSize) * ${(cy*2).toFixed(5)}),0)`);
-              _setStyleIfChanged(ltr.HTMLElement, '--text-shadow-blur-radius', `${(4 + 12*cg).toFixed(2)}px`, 0.25);
-              _setStyleIfChanged(ltr.HTMLElement, '--text-shadow-opacity', `${(cg * LETTER_GLOW_MULTIPLIER).toFixed(2)}%`, 1);
-            }
-          } else {
-            // Plain word / LRC line
-            word.AnimatorStore.Glow.SetGoal(GlowSpline.at(0));
-            const cg = word.AnimatorStore.Glow.Step(dt);
-            if (!word.IsLrcLine) {
-              word.AnimatorStore.Scale.SetGoal(ScaleSpline.at(0));
-              word.AnimatorStore.YOffset.SetGoal(YOffSpline.at(0));
-              const cs = word.AnimatorStore.Scale.Step(dt);
-              const cy = word.AnimatorStore.YOffset.Step(dt);
-              _setStyleIfChanged(word.HTMLElement, 'scale', `${cs.toFixed(5)}`);
-              _setStyleIfChanged(word.HTMLElement, 'transform', `translate3d(0,calc(var(--DefaultLyricsSize) * ${cy.toFixed(5)}),0)`);
-            }
-            _setStyleIfChanged(word.HTMLElement, '--text-shadow-blur-radius', `${(4 + 2*cg).toFixed(2)}px`, 0.25);
-            _setStyleIfChanged(word.HTMLElement, '--text-shadow-opacity', `${Math.min(cg * 35, 100).toFixed(2)}%`, 1);
-          }
-        }
-      }
-
-    // ── SUNG ────────────────────────────────────────────────────
-    } else {
-      line.HTMLElement.classList.remove('Active', 'NotSung');
-      line.HTMLElement.classList.add('Sung');
-
-      for (const word of (line.Syllables?.Lead || [])) {
-        if (word.Dot) {
-          _ensureDotStore(word);
-          _promoteGPU(word.HTMLElement);
-          word.AnimatorStore.Scale.SetGoal(DotScaleSpline.at(1));
-          word.AnimatorStore.YOffset.SetGoal(0, true); // Y immediately at rest
-          word.AnimatorStore.Glow.SetGoal(DotGlowSpline.at(1));
-          word.AnimatorStore.Opacity.SetGoal(DotOpacSpline.at(1));
-          const cs = word.AnimatorStore.Scale.Step(dt);
-          word.AnimatorStore.YOffset.Step(dt);
-          const cg = word.AnimatorStore.Glow.Step(dt);
-          const co = word.AnimatorStore.Opacity.Step(dt);
-          _setStyleIfChanged(word.HTMLElement, 'transform', 'translate3d(0,0em,0)');
-          _setStyleIfChanged(word.HTMLElement, 'scale', `${cs.toFixed(5)}`);
-          _setStyleIfChanged(word.HTMLElement, 'opacity', `${co.toFixed(5)}`);
-          _setStyleIfChanged(word.HTMLElement, '--text-shadow-blur-radius', `${(4+6*cg).toFixed(2)}px`, 0.25);
-          _setStyleIfChanged(word.HTMLElement, '--text-shadow-opacity', `${(cg*90).toFixed(2)}%`, 1);
-        } else if (word.LetterGroup && word.Letters) {
-          // ── LETTRE GROUP dans état SUNG ─────────────────────────────
-          // Les mots LetterGroup font un `continue` dans le bloc Active et
-          // n'ont donc JAMAIS de word.AnimatorStore → la branche
-          // `else if (!word.Dot && word.AnimatorStore)` ci-dessous les ignore.
-          // Cette branche dédiée remet chaque lettre à sa position de repos.
-          _promoteGPU(word.HTMLElement);
-          if (SpicyConfig.SimpleLyricsMode) {
-            word.HTMLElement.style.animation = 'none';
-            _setStyleIfChanged(word.HTMLElement, '--SLM_GradientPosition', '100%');
-          } else {
-            _setStyleIfChanged(word.HTMLElement, '--gradient-position', '100%');
-          }
-          for (const ltr of word.Letters) {
-            if (!ltr.AnimatorStore) ltr.AnimatorStore = _letterSprings();
-            // Snap immédiat à la position de repos : scale=1, Y=0, glow=0
-            ltr.AnimatorStore.Scale.SetGoal(ScaleSpline.at(1), true);
-            ltr.AnimatorStore.YOffset.SetGoal(LetterYOffSpline.at(1), true);
-            ltr.AnimatorStore.Glow.SetGoal(GlowSpline.at(1), true);
-            ltr.AnimatorStore.Scale.Step(dt);
-            ltr.AnimatorStore.YOffset.Step(dt);
-            ltr.AnimatorStore.Glow.Step(dt);
-            _promoteGPU(ltr.HTMLElement);
-            if (SpicyConfig.SimpleLyricsMode) {
-              ltr.HTMLElement.style.animation = 'none';
-              _setStyleIfChanged(ltr.HTMLElement, '--SLM_GradientPosition', '100%');
-            } else {
-              _setStyleIfChanged(ltr.HTMLElement, '--gradient-position', '100%');
-            }
-            // Écriture directe (sans cache, sans epsilon) pour garantir la position exacte
-            ltr.HTMLElement.style.transform = 'translate3d(0,0,0)';
-            ltr.HTMLElement.style.scale = '1';
-            ltr.HTMLElement.style.setProperty('--text-shadow-blur-radius', '4px');
-            ltr.HTMLElement.style.setProperty('--text-shadow-opacity', '0%');
-          }
-        } else if (!word.Dot && word.AnimatorStore) {
-          word.AnimatorStore.Glow.SetGoal(GlowSpline.at(1));
-          const cg = word.AnimatorStore.Glow.Step(dt);
-          _promoteGPU(word.HTMLElement);
-          if (word.IsLrcLine) {
-            // LRC sung : progress à 1, pas de scale/transform
-            _setStyleIfChanged(word.HTMLElement, '--lrc-fill-progress', '1');
-            word.LrcAnimated = false;
-          } else {
-            word.AnimatorStore.Scale.SetGoal(ScaleSpline.at(1));
-            word.AnimatorStore.YOffset.SetGoal(YOffSpline.at(1));
-            const cs = word.AnimatorStore.Scale.Step(dt);
-            const cy = word.AnimatorStore.YOffset.Step(dt);
-            _setStyleIfChanged(word.HTMLElement, 'scale', `${cs.toFixed(5)}`, 0.001);
-            _setStyleIfChanged(word.HTMLElement, 'transform', `translate3d(0,calc(var(--DefaultLyricsSize) * ${cy.toFixed(5)}),0)`, 0.001);
-          }
-          if (word.IsLrcLine) {
-            // already handled above
-          } else if (SpicyConfig.SimpleLyricsMode) {
-            word.HTMLElement.style.animation = 'none';
-            _setStyleIfChanged(word.HTMLElement, '--SLM_GradientPosition', '100%');
-          } else {
-            _setStyleIfChanged(word.HTMLElement, '--gradient-position', '100%');
-          }
-          _setStyleIfChanged(word.HTMLElement, '--text-shadow-blur-radius', `${(4 + 2*cg).toFixed(2)}px`, 0.25);
-          _setStyleIfChanged(word.HTMLElement, '--text-shadow-opacity', `${Math.min(cg * 35, 100).toFixed(2)}%`, 1);
-          if (word.LetterGroup && word.Letters) {
-            for (const ltr of word.Letters) {
-              if (!ltr.AnimatorStore) ltr.AnimatorStore = _letterSprings();
-              // immediate=true : snapper directement à la position finale (scale=1, Y=0, glow=0)
-              // pour que les lettres reviennent proprement à leur position de repos sans rebond résiduel.
-              ltr.AnimatorStore.Scale.SetGoal(ScaleSpline.at(1), true);
-              ltr.AnimatorStore.YOffset.SetGoal(LetterYOffSpline.at(1), true);
-              ltr.AnimatorStore.Glow.SetGoal(GlowSpline.at(1), true);
-              const lcs = ltr.AnimatorStore.Scale.Step(dt);
-              const lcy = ltr.AnimatorStore.YOffset.Step(dt);
-              const lcg = ltr.AnimatorStore.Glow.Step(dt);
-              _promoteGPU(ltr.HTMLElement);
-              if (SpicyConfig.SimpleLyricsMode) {
-                ltr.HTMLElement.style.animation = 'none';
-                _setStyleIfChanged(ltr.HTMLElement, '--SLM_GradientPosition', '100%');
-              } else {
-                _setStyleIfChanged(ltr.HTMLElement, '--gradient-position', '100%');
-              }
-              _setStyleIfChanged(ltr.HTMLElement, 'transform', `translate3d(0,calc(var(--DefaultLyricsSize) * ${(lcy * 2).toFixed(5)}),0)`, 0);
-              _setStyleIfChanged(ltr.HTMLElement, 'scale', `${lcs.toFixed(5)}`, 0);
-              _setStyleIfChanged(ltr.HTMLElement, '--text-shadow-blur-radius', `${(4 + 12*lcg).toFixed(2)}px`, 0.25);
-              _setStyleIfChanged(ltr.HTMLElement, '--text-shadow-opacity', `${(lcg * LETTER_GLOW_MULTIPLIER).toFixed(2)}%`, 1);
-            }
-          }
-        }
-      }
-    }
-  }
-}
 
 // ══════════════════════════════════════════════════════════════════
 //  AUDIO GRAPH INIT + BACKGROUND CSS VARS
@@ -1981,7 +1291,6 @@ function updateBackground(imageUrl) {
   }, 400);
 }
 
-
 function spicyAnimationLoop() {
   // Pull the freshest position on every rAF frame instead of relying on
   // timeupdate (~4 Hz) - fixes the 250 ms position-step that made the
@@ -1993,370 +1302,11 @@ function spicyAnimationLoop() {
   // ── Springs run ALWAYS (not just when playing) ─────────────────────
   // This ensures:
   //  • springs decay to rest when the user pauses mid-bounce
-  //  • spicyLastFrameTime stays current so dt is never stale on resume
   //  • blur/scroll state refreshes correctly after a seek
   if (lyricsData) {
     spicyAnimateLyrics(spicy.currentPosition);
-  } else {
-    // Even without lyrics, keep lastFrameTime fresh to avoid a huge dt
-    // spike on the first frame after lyrics are loaded.
-    spicyLastFrameTime = performance.now();
   }
   requestAnimationFrame(spicyAnimationLoop);
-}
-
-// ── Toggle SimpleLyricsMode ────────────────────────────────────────
-function toggleSimpleLyricsMode(on) {
-  SpicyConfig.SimpleLyricsMode = on ?? !SpicyConfig.SimpleLyricsMode;
-  // Simple mode uses a simpler 2-point spline; normal mode uses the full 3-point
-  YOffSpline = SpicyConfig.SimpleLyricsMode ? YOffSplineSimple
-    : _mkSpline([{Time:0,Value:0.01},{Time:0.9,Value:-(1/60)},{Time:1,Value:0}]);
-  lyricsDisplay.classList.toggle('SimpleLyricsMode', SpicyConfig.SimpleLyricsMode);
-  if (lyricsData) renderSpicyLyrics(lyricsData.lines, lyricsData.type);
-}
-
-// ══════════════════════════════════════════════════════════════════
-//  DOM RENDERER - builds .line / .word / .letterGroup / .letter
-// ══════════════════════════════════════════════════════════════════
-
-function renderSpicyLyrics(lines, type) {
-  // ── Reset all state ────────────────────────────────────────────
-  spicy.lyricsObject  = { Lines: [] };
-  spicyBlurLastLine   = -1;
-  spicyLastActiveLine = -1;
-  audioPlayer._lastLineScrolled = false; // réinitialiser le scroll de fin
-  audioPlayer._hlsEndedFired    = false; // réinitialiser le guard de fin HLS
-  lyricsDisplay.innerHTML = '';
-
-  const scrollCont = document.createElement('div');
-  scrollCont.className = 'spicy-scroll-container';
-  lyricsDisplay.appendChild(scrollCont);
-
-  const innerCont = document.createElement('div');
-  innerCont.className = 'lyrics-inner';
-  scrollCont.appendChild(innerCont);
-
-  const GAP_MS = 2500;  // Trigger interlude dots after 2.5s gap (was 3s)
-
-  // ── Normalise input ────────────────────────────────────────────
-  // json → per-word syllables with IsPartOfWord from source data.
-  // lrc  → one syllable per line (whole-line highlight).
-  const content = lines.map((line, i) => {
-    let endMs = line.endMs ?? lines[i + 1]?.startMs ?? (line.startMs + 4500);
-    // ⚠️ Garde-fou : parseJsonLyricsData gère plusieurs formats JSON avec des
-    // conventions d'unités différentes (certains traitent startTime/endTime
-    // comme des ms directement, _parsePNLContent les traite comme des
-    // secondes et fait ×1000). Si une piste passe par la mauvaise branche
-    // de détection, endMs peut se retrouver avec une valeur aberrante (ex:
-    // secondes utilisées telles quelles → valeur ~1000x trop petite), ce
-    // qui crée un "faux grand écart" détecté après CHAQUE ligne (points
-    // d'interlude partout). Une ligne ne peut pas se terminer avant d'avoir
-    // commencé : si endMs < startMs, la valeur est forcément corrompue —
-    // on retombe sur le fallback sûr (début de la ligne suivante) plutôt
-    // que de propager une donnée invalide dans le calcul d'écart.
-    if (endMs < line.startMs) {
-      endMs = lines[i + 1]?.startMs ?? (line.startMs + 4500);
-    }
-    const isLrc = !(type === 'json' && line.words?.length);
-    const syls = !isLrc
-      ? line.words
-          .map(w => ({
-            Text:        (w.text || '').trim(),
-            StartTime:   w.startMs,
-            EndTime:     w.endMs ?? (w.startMs + 500),
-            // Preserve isPartOfWord from PNL format; default false for plain word-sync
-            IsPartOfWord: w.isPartOfWord ?? false,
-          }))
-          .filter(w => w.Text.length > 0)   // drop any blank/whitespace-only tokens
-      : [{ Text: (line.text || '').trim(), StartTime: line.startMs, EndTime: endMs, IsPartOfWord: false, IsLrcLine: true }];
-    // Normaliser line.background / line.backgrounds vers le format interne attendu :
-    //   [{ StartTime, EndTime, Syllables: [{ Text, StartTime, EndTime, IsPartOfWord }] }]
-    //
-    // Origines possibles selon la version du fichier JSON :
-    //   1. undefined/null               → aucun backing vocal
-    //   2. backgrounds[] (Array)        → nouveau format lyrics.js v7+ (priorité)
-    //      ├─ éléments au format PNL    → { Syllables[], StartTime, EndTime } (issu de _parsePNLContent)
-    //      └─ éléments au format words  → { text, startTime, endTime, words[] } (parsé word-sync)
-    //   3. background (Array déjà PNL)  → issu de _parsePNLContent (ancien rawLyrics/originalData)
-    //   4. background (objet PNL brut)  → cas défensif non enveloppé
-    //   5. background (objet words)     → fallback lyrics.lines ancien format
-    const rawBg  = line.background;
-    const rawBgs = line.backgrounds;   // tableau complet (lyrics.js v7+)
-
-    // Convertit un objet bg au format words → format PNL interne
-    function _bgWordsToInternal(bg) {
-      return {
-        StartTime: bg.startTime,
-        EndTime:   bg.endTime,
-        Syllables: (bg.words || []).map(w => ({
-          Text:         (w.text || '').trim(),
-          StartTime:    w.startTime,
-          EndTime:      w.endTime ?? (w.startTime + 500),
-          IsPartOfWord: false,
-        })).filter(w => w.Text.length > 0),
-      };
-    }
-
-    let normBg;
-    if (rawBgs && Array.isArray(rawBgs) && rawBgs.length > 0) {
-      // Priorité : backgrounds[] (lyrics.js v7+) - tableau complet de toutes les sections
-      normBg = rawBgs.flatMap(bg => {
-        if (!bg) return [];
-        if (bg.Syllables) return [bg];       // déjà format PNL interne (depuis _parsePNLContent)
-        if (bg.words)     return [_bgWordsToInternal(bg)];
-        return [];
-      }).filter(b => b.Syllables?.length > 0);
-    } else if (!rawBg) {
-      normBg = [];
-    } else if (Array.isArray(rawBg)) {
-      normBg = rawBg;   // déjà au bon format (issu de _parsePNLContent)
-    } else if (rawBg.Syllables) {
-      normBg = [rawBg]; // objet PNL brut non enveloppé (cas défensif)
-    } else if (rawBg.words) {
-      // Format lyrics.lines : { text, startTime, endTime, words[] } - temps en ms
-      normBg = [_bgWordsToInternal(rawBg)];
-    } else {
-      normBg = [];
-    }
-
-    return {
-      Lead: { StartTime: line.startMs, EndTime: endMs, Syllables: syls },
-      Background: normBg,
-      OppositeAligned: line.oppositeAligned || false,
-      IsLrcLine: isLrc,
-    };
-  });
-
-  // ── Intro dots ─────────────────────────────────────────────────
-  if (content.length && content[0].Lead.StartTime >= GAP_MS) {
-    _createMusicalDots(innerCont,  0, content[0].Lead.StartTime, false);
-  }
-
-  // ── Helper: create initial CSS state for a word/letter element ─
-  function _initWordEl(el, SLM) {
-    el.style.setProperty(SLM ? '--SLM_GradientPosition' : '--gradient-position', SLM ? '-50%' : '-20%');
-    el.style.setProperty('--text-shadow-opacity', '0%');
-    el.style.setProperty('--text-shadow-blur-radius', '4px');
-    el.style.scale     = `${ScaleSpline.at(0)}`;
-    el.style.transform = `translateY(calc(var(--DefaultLyricsSize) * ${YOffSpline.at(0)}))`;
-  }
-
-  content.forEach((lineData, i) => {
-    // ── Lead vocal line ──────────────────────────────────────────
-    const lineEl = document.createElement('div');
-    lineEl.className = 'line NotSung';
-    if (lineData.OppositeAligned) lineEl.classList.add('OppositeAligned');
-    if (lineData.IsLrcLine) lineEl.classList.add('lrc-line');
-
-    const lineObj = {
-      HTMLElement: lineEl,
-      StartTime: lineData.Lead.StartTime,
-      EndTime:   lineData.Lead.EndTime,
-      TotalTime: lineData.Lead.EndTime - lineData.Lead.StartTime,
-      Syllables: { Lead: [] },
-      IsLrcLine: lineData.IsLrcLine || false,
-    };
-    spicy.lyricsObject.Lines.push(lineObj);
-    const lineIdx = spicy.lyricsObject.Lines.length - 1;
-
-    const syls = lineData.Lead.Syllables || [];
-    syls.forEach((syl, si) => {
-      const dur    = syl.EndTime - syl.StartTime;
-      const isLast = si === syls.length - 1;
-      const SLM    = SpicyConfig.SimpleLyricsMode;
-
-      if (!syl.IsLrcLine && _isLetterCapable(syl.Text.length, dur)) {
-        // ── Per-letter animation (word-sync JSON with real per-syllable timing) ──
-        // LRC and -line.json lines are explicitly excluded: they only have line-level
-        // timestamps, so distributing animation letter-by-letter is pure simulation
-        // and looks broken.  Those lines always fall through to the plain word-span
-        // path below which uses the proper whole-phrase IsLrcLine sweep animation.
-        const grpEl = document.createElement('span');
-        grpEl.className = 'letterGroup'
-          + (isLast           ? ' LastWordInLine' : '')
-          + (syl.IsPartOfWord ? ' PartOfWord'     : '');
-
-        const letters  = syl.Text.split('');
-        const letDur   = dur / Math.max(letters.length, 1);
-        const lettersData = [];
-
-        letters.forEach((ch, li) => {
-          const lEl = document.createElement('span');
-          lEl.textContent = ch;
-          lEl.className   = 'letter Emphasis';
-          _initWordEl(lEl, SLM);
-          const ls = syl.StartTime + li * letDur;
-          const le = ls + letDur;
-          lettersData.push({ HTMLElement: lEl, StartTime: ls, EndTime: le, TotalTime: letDur });
-          grpEl.appendChild(lEl);
-        });
-
-        spicy.lyricsObject.Lines[lineIdx].Syllables.Lead.push({
-          HTMLElement: grpEl,
-          StartTime: syl.StartTime, EndTime: syl.EndTime, TotalTime: dur,
-          LetterGroup: true, Letters: lettersData,
-        });
-        lineEl.appendChild(grpEl);
-        // ⚠️ FIX : espace géré en CSS pur (::after, voir style.css), comme
-        // dans la référence Mixed.css, plutôt qu'un vrai nœud texte inséré
-        // dans le DOM entre des éléments animés à chaque frame.
-
-      } else if (syl.IsLrcLine) {
-        // ── LRC line : un span.lrc-word par mot, directement sur lineEl ──
-        // Pas de wrapper — appendés directement sur lineEl pour que
-        // text-align:center et OppositeAligned de style.css s'appliquent
-        // sans interférence. display:inline-block est déjà dans style.css.
-        // --lrc-fill-progress est mis à jour par le moteur sur chaque span.
-        const tokens = syl.Text.split(/\s+/).filter(t => t.length > 0);
-        const lrcWordEls = [];
-        tokens.forEach((tok, ti) => {
-          const wEl = document.createElement('span');
-          wEl.textContent = tok;
-          wEl.className = 'lrc-word' + (ti === tokens.length - 1 ? ' LastWordInLine' : '');
-          wEl.style.setProperty('--lrc-fill-progress', '0');
-          lrcWordEls.push(wEl);
-          lineEl.appendChild(wEl);
-          if (ti < tokens.length - 1) lineEl.appendChild(document.createTextNode('\u00a0'));
-        });
-        spicy.lyricsObject.Lines[lineIdx].Syllables.Lead.push({
-          HTMLElement: lineEl,
-          StartTime: syl.StartTime, EndTime: syl.EndTime, TotalTime: dur,
-          IsLrcLine: true, LrcWordEls: lrcWordEls,
-        });
-
-      } else {
-        // ── Plain word span ────────────────────────────────────
-        const wordEl = document.createElement('span');
-        wordEl.textContent = syl.Text;
-        wordEl.className   = 'word'
-          + (isLast          ? ' LastWordInLine' : '')
-          + (syl.IsPartOfWord ? ' PartOfWord'    : '');
-        _initWordEl(wordEl, SLM);
-
-        spicy.lyricsObject.Lines[lineIdx].Syllables.Lead.push({
-          HTMLElement: wordEl,
-          StartTime: syl.StartTime, EndTime: syl.EndTime, TotalTime: dur,
-          IsLrcLine: false,
-        });
-        lineEl.appendChild(wordEl);
-        // ⚠️ FIX : espace géré en CSS pur (::after, voir style.css), comme
-        // dans la référence Mixed.css, plutôt qu'un vrai nœud texte inséré
-        // dans le DOM entre des éléments animés à chaque frame.
-      }
-    });
-
-    // Click to seek
-    lineEl.addEventListener('click', () => {
-      audioPlayer.currentTime = lineData.Lead.StartTime / 1000;
-      if (audioPlayer.paused) audioPlayer.play().catch(console.error);
-    });
-    innerCont.appendChild(lineEl);
-
-    // ── Background / harmony vocal line ─────────────────────────
-    (lineData.Background || []).forEach(bg => {
-      const bgEl = document.createElement('div');
-      bgEl.className = 'line bg-line NotSung';
-      if (lineData.OppositeAligned) bgEl.classList.add('OppositeAligned');
-
-      spicy.lyricsObject.Lines.push({
-        HTMLElement: bgEl,
-        StartTime: bg.StartTime, EndTime: bg.EndTime,
-        TotalTime: bg.EndTime - bg.StartTime,
-        Syllables: { Lead: [] }, BGLine: true,
-      });
-      const bgIdx = spicy.lyricsObject.Lines.length - 1;
-
-      (bg.Syllables || []).forEach((syl, si) => {
-        const isLastBg = si === bg.Syllables.length - 1;
-        const wEl = document.createElement('span');
-        wEl.textContent = syl.Text;
-        const SLM = SpicyConfig.SimpleLyricsMode;
-        wEl.className = 'word'
-          + (isLastBg ? ' LastWordInLine' : '')
-          + (syl.IsPartOfWord ? ' PartOfWord' : '');
-        _initWordEl(wEl, SLM);
-        spicy.lyricsObject.Lines[bgIdx].Syllables.Lead.push({
-          HTMLElement: wEl,
-          StartTime: syl.StartTime, EndTime: syl.EndTime,
-          TotalTime: syl.EndTime - syl.StartTime, BGWord: true,
-        });
-        bgEl.appendChild(wEl);
-        // ⚠️ FIX : espace géré en CSS pur (::after), voir style.css.
-      });
-      innerCont.appendChild(bgEl);
-    });
-
-    // ── Interlude dots between lines ─────────────────────────────
-    const next = content[i + 1];
-    if (next && (next.Lead.StartTime - lineData.Lead.EndTime) >= GAP_MS) {
-      _createMusicalDots(innerCont, lineData.Lead.EndTime, next.Lead.StartTime, lineData.OppositeAligned);
-    }
-  });
-
-  // ── Mini lyrics strip ──────────────────────────────────────────
-  lyricsMiniContent.innerHTML = lines.map((line, li) =>
-    `<div class="lyrics-mini-line" data-line="${li}">${escapeHtml(line.text)}</div>`
-  ).join('');
-
-  // Scroll to top
-  requestAnimationFrame(() => { if (lyricsDisplay) lyricsDisplay.scrollTop = 0; });
-
-  // Ré-applique la traduction si le réglage est actif (nouveau morceau,
-  // bascule simple/complet...) — voir _autoTranslateIfEnabled plus bas.
-  _autoTranslateIfEnabled();
-}
-
-// ── Create animated interlude dot group ───────────────────────────
-// Timing matches Syllable.ts exactly:
-//   totalTime = silence duration; dotTime = totalTime / 3
-//   dot0: [start,         start + dotTime)
-//   dot1: [start+dotTime, start + dotTime*2)
-//   dot2: [start+dotTime*2, end - 400ms)  (last dot ends slightly before next line)
-function _createMusicalDots(container, startTime, endTime, oppositeAligned) {
-  const musLine = document.createElement('div');
-  musLine.className = 'line musical-line NotSung';
-  if (oppositeAligned) musLine.classList.add('OppositeAligned');
-
-  const lineObj = {
-    HTMLElement: musLine,
-    StartTime: startTime, EndTime: endTime,
-    TotalTime: endTime - startTime,
-    DotLine: true, Syllables: { Lead: [] },
-  };
-  spicy.lyricsObject.Lines.push(lineObj);
-  const lineIdx = spicy.lyricsObject.Lines.length - 1;
-
-  const dotGroup = document.createElement('div');
-  dotGroup.className = 'dotGroup';
-
-  const totalTime = endTime - startTime;
-  // Source (Syllable.ts): dotTime = totalTime / 3, sequential non-overlapping windows
-  const dotTime = totalTime / 3;
-
-  const dotWindows = [
-    { ds: startTime,              de: startTime + dotTime },
-    { ds: startTime + dotTime,    de: startTime + dotTime * 2 },
-    // Last dot ends 400ms before the next line starts (endInterludeEarlierBy = -400 in source)
-    { ds: startTime + dotTime * 2, de: endTime - 400 },
-  ];
-
-  for (let i = 0; i < 3; i++) {
-    const dot = document.createElement('span');
-    dot.textContent = '•';
-    dot.className = 'word dot';
-    dot.dataset.dotIndex = i;
-    const { ds, de } = dotWindows[i];
-    spicy.lyricsObject.Lines[lineIdx].Syllables.Lead.push({
-      HTMLElement: dot,
-      StartTime: ds, EndTime: Math.max(de, ds + 100),
-      TotalTime: Math.max(de - ds, 100),
-      Dot: true, DotIndex: i,
-    });
-    dotGroup.appendChild(dot);
-  }
-
-  musLine.appendChild(dotGroup);
-  container.appendChild(musLine);
 }
 
 // ── DOM refs ───────────────────────────────────────────────────────
@@ -2397,7 +1347,6 @@ const panelArtistWrap   = document.getElementById('panelArtistWrap');
 const panelAlbumWrap    = document.getElementById('panelAlbumWrap');
 const albumArtLarge     = document.getElementById('albumArtLarge');
 const playerThumb       = document.getElementById('playerThumb');
-const lyricsMiniContent = document.getElementById('lyricsMiniContent');
 const likeBtn           = document.getElementById('likeBtn');
 const miniEtc           = document.getElementById('miniEtc');
 const closePanelBtn     = document.getElementById('closePanelBtn');
@@ -2531,9 +1480,46 @@ async function _writeCacheTracks(db, trackList, totalCount) {
   });
 }
 
+// Écriture "légère" : ne touche qu'à la métadonnée cachedAt, sans jamais
+// itérer/réécrire les pistes elles-mêmes. Utilisée après un delta sync à
+// 0 changement, pour que DELTA_MAX_AGE_MS reste calculé depuis une date
+// récente sans payer le coût d'un store.clear()+put() sur toute la lib.
+async function _touchCacheTimestamp(db) {
+  return new Promise(resolve => {
+    const tx = db.transaction(CACHE_META_STORE, 'readwrite');
+    tx.objectStore(CACHE_META_STORE).put(Date.now(), 'cachedAt');
+    tx.oncomplete = () => resolve();
+    tx.onerror    = () => resolve();
+  });
+}
+
+// ⚠️ FIX MICRO-FREEZE : normaliser 60 000+ titres d'un coup dans un seul
+// .map() synchrone bloque le thread principal le temps de tous les
+// traiter (aucune occasion de peindre/répondre à un clic entre-temps) —
+// c'est le micro-freeze observé juste après "titres chargés depuis le
+// cache". On découpe le traitement en tranches, en rendant la main au
+// navigateur (setTimeout 0, qui passe après le prochain paint) entre
+// chaque tranche, pour un résultat identique mais réparti sur plusieurs
+// tâches courtes au lieu d'une seule longue.
+const _NORMALIZE_CHUNK_SIZE = 4000;
+function _normalizeTracksChunked(list, onDone) {
+  const out = new Array(list.length);
+  let i = 0;
+  function step() {
+    const end = Math.min(i + _NORMALIZE_CHUNK_SIZE, list.length);
+    for (; i < end; i++) out[i] = normalizeTrack(list[i]);
+    if (i < list.length) {
+      setTimeout(step, 0);
+    } else {
+      onDone(out);
+    }
+  }
+  step();
+}
+
 async function fetchTracks() {
   let db = null;
-  try { db = await _openCacheDB(); } catch {}
+  try { db = await _openCacheDB(); } catch (e) { console.warn('[Beartify] Ouverture du cache IndexedDB échouée, poursuite sans cache :', e); }
 
   // ── 1. Cache IndexedDB → UI instantanée ───────────────────────
   if (db) {
@@ -2543,19 +1529,28 @@ async function fetchTracks() {
       _readCacheMeta(db, 'cachedAt'),
     ]);
     if (cachedTracks.length > 0 && cachedServer === 'beartify-v2') {
-      tracks       = cachedTracks.map(normalizeTrack);
-      shuffleOrder = [...tracks.keys()];
-      _invalidateLibCache();
-      renderSidebarView('playlists');
-      renderHomePage();
-      renderQueueList();
-      console.log(`[Beartify] ${tracks.length} titres chargés depuis le cache - actualisation en arrière-plan…`);
-      // Refresh silencieux différé : on attend 8 s avant de lancer les requêtes
-      // vers Jellyfin. Sans ce délai, le rafraîchissement tire toutes les pages
-      // de la bibliothèque en parallèle dès le chargement de la page, ce qui
-      // sature le proxy Caddy → Jellyfin et empêche les streams audio de démarrer
-      // immédiatement (la 2ème piste pouvait être bloquée jusqu'à ~30 secondes).
-      setTimeout(() => _refreshTracksFromServer(db, /* isBackgroundRefresh */ true, cachedAt).catch(console.warn), 8000);
+      _normalizeTracksChunked(cachedTracks, (normalized) => {
+        tracks       = normalized;
+        window.tracks = tracks; // ⚠️ AJOUTÉ — cf. note en tête de fichier sur la resynchronisation de window.tracks
+        shuffleOrder = [...tracks.keys()];
+        _invalidateLibCache();
+        renderSidebarView('playlists');
+        renderHomePage();
+        renderQueueList();
+        console.log(`[Beartify] ${tracks.length} titres chargés depuis le cache - actualisation en arrière-plan…`);
+        // Refresh silencieux différé : on attend 8 s avant de lancer les requêtes
+        // vers Jellyfin. Sans ce délai, le rafraîchissement tire toutes les pages
+        // de la bibliothèque en parallèle dès le chargement de la page, ce qui
+        // sature le proxy Caddy → Jellyfin et empêche les streams audio de démarrer
+        // immédiatement (la 2ème piste pouvait être bloquée jusqu'à ~30 secondes).
+        setTimeout(() => _refreshTracksFromServer(db, /* isBackgroundRefresh */ true, cachedAt).catch(console.warn), 8000);
+      });
+      // ⚠️ return SYNCHRONE ici (pas dans le callback) : _normalizeTracksChunked
+      // termine son travail de façon asynchrone (setTimeout entre les tranches),
+      // donc sans ce return immédiat, l'exécution de fetchTracks tomberait tout
+      // de suite dans la section 2 ("pas de cache") ci-dessous et lancerait un
+      // chargement complet en double pendant que le traitement par tranches
+      // tourne encore en arrière-plan.
       return;
     }
   }
@@ -2577,7 +1572,7 @@ async function _refreshTracksFromServer(db, isBackgroundRefresh = false, cachedA
       countResp.ok ? countResp.json() : { TotalRecordCount: 0 },
     ]);
     const userId     = users[0]?.Id;
-    if (!userId) throw new Error('Aucun utilisateur trouvé');
+    if (!userId) throw new Error(_t('text-no-user-found', 'Aucun utilisateur trouvé'));
     window._jellyfinUserId = userId; // réutilisé par les fetchs à la demande (pages album/artiste)
     const totalCount = countData.TotalRecordCount || 0;
 
@@ -2608,7 +1603,16 @@ async function _refreshTracksFromServer(db, isBackgroundRefresh = false, cachedA
           }
           console.log(`[Beartify] Delta sync : ${changed.length} titre(s) mis à jour depuis ${sinceIso}`);
           window._librarySyncComplete = true;
-          if (db) setTimeout(() => _writeCacheTracks(db, tracks, tracks.length), 0);
+          // ⚠️ FIX FREEZE : ne réécrire tout le cache IndexedDB (store.clear() +
+          // store.put() pour chaque piste, potentiellement 22 000+) QUE si le
+          // delta a réellement changé quelque chose. Avant ce fix, ça tournait
+          // à CHAQUE sync — même à 0 titre mis à jour — et cette boucle
+          // synchrone sur le thread principal causait le micro-freeze observé.
+          if (db && changed.length > 0) {
+            setTimeout(() => _writeCacheTracks(db, tracks, tracks.length), 0);
+          } else if (db) {
+            setTimeout(() => _touchCacheTimestamp(db), 0);
+          }
           return; // ✅ terminé — pas besoin de la pagination complète ci-dessous
         }
         console.warn('[Beartify] Delta sync : réponse HTTP non-OK, fallback en sync complète');
@@ -2645,6 +1649,7 @@ async function _refreshTracksFromServer(db, isBackgroundRefresh = false, cachedA
           const previewData = await previewResp.json();
           if (previewData?.Items?.length) {
             tracks = previewData.Items.map(normaliseTrack);
+            window.tracks = tracks; // ⚠️ AJOUTÉ — resynchronisation, voir plus haut
             if (!window._playContext) shuffleOrder = [...tracks.keys()];
             _resolveCtx();
             _resolveCurrentIndex();
@@ -2693,6 +1698,7 @@ async function _refreshTracksFromServer(db, isBackgroundRefresh = false, cachedA
       if (!firstRendered) {
         firstRendered = true;
         tracks        = batch;
+        window.tracks = tracks; // ⚠️ AJOUTÉ — resynchronisation, voir plus haut
         if (!window._playContext) shuffleOrder = [...tracks.keys()];
         _resolveCtx();
         _resolveCurrentIndex();
@@ -2721,6 +1727,7 @@ async function _refreshTracksFromServer(db, isBackgroundRefresh = false, cachedA
 
     if (allTracks.length > 0) {
       tracks       = allTracks;
+      window.tracks = tracks; // ⚠️ AJOUTÉ — resynchronisation, voir plus haut
       if (!window._playContext) shuffleOrder = [...tracks.keys()];
       _resolveCtx();
       _resolveCurrentIndex();
@@ -2751,8 +1758,15 @@ async function _refreshTracksFromServer(db, isBackgroundRefresh = false, cachedA
     if (tracks.length === 0) {
       trackListDiv.innerHTML = `<div class="error">Erreur de chargement.<br>${escapeHtml(error.message)}</div>`;
     } else {
-      showToast('⚠️ Actualisation impossible – musiques en cache utilisées', 'warning');
+      showToast(_t('toast-refresh-failed-cache', '⚠️ Actualisation impossible – musiques en cache utilisées'), 'warning');
     }
+    // ⚠️ AJOUTÉ : jusqu'ici, rien ne signalait qu'un rafraîchissement
+    // Jellyfin venait d'échouer une fois l'app déjà lancée — le pop-up
+    // "Aucun serveur détecté" ne s'affichait donc qu'au tout premier
+    // démarrage (via LocalLibrary.init()), jamais si le serveur tombait
+    // en cours d'utilisation. local-library.js écoute cet événement pour
+    // proposer le repli sur les fichiers locaux à tout moment.
+    document.dispatchEvent(new CustomEvent('beartify:jellyfinUnreachable', { detail: { error: String(error?.message || error) } }));
   }
 }
 
@@ -2795,6 +1809,16 @@ function normaliseTrack(item) {
     duration:  item.RunTimeTicks ? item.RunTimeTicks / 10_000_000 : 0,
     dateAdded:    item.DateCreated  || '',
     premiereDate: item.PremiereDate || '',
+    // ── Facteur de difficulté Blindtest ──────────────────────────
+    // UserData est renvoyé par défaut par Jellyfin sur les requêtes
+    // /Items?userId=... (pas besoin de l'ajouter à JELLY_FIELDS) : on
+    // récupère ici le nombre d'écoutes RÉEL de l'utilisateur sur ce
+    // morceau, qui sert de proxy de familiarité pour trier la
+    // bibliothèque par quintiles dans blindtest.js (voir
+    // getDifficultyPool()), plutôt que de piocher un morceau au hasard
+    // sans tenir compte de la difficulté choisie.
+    playCount:  item.UserData?.PlayCount || 0,
+    isFavorite: item.UserData?.IsFavorite || false,
     streamUrl: jellyfinUrl(`/Audio/${item.Id}/stream?static=true`),
     // Cover "standard" (cards home, cover album/lecteur) — 300px, tag de
     // cache inclus → immutable côté navigateur/Caddy.
@@ -3142,12 +2166,23 @@ async function playCurrentTrack() {
   // Fallback silencieux vers URL directe si drm.js indisponible.
   const qualityBitrates = { low: 96000, normal: 192000, high: 320000 };
   const bitrate = qualityBitrates[window._settingsAudioQuality || 'high'];
+  // 🐛 FIX RACINE : on extrayait l'itemId HLS en parsant `track.streamUrl` par
+  // regex. Ça casse pour toute piste dont le streamUrl n'a pas exactement ce
+  // format — notamment les pistes de playlists/"récemment joué" stockées via
+  // Firestore/PocketBase, dont le streamUrl peut être dans un format différent
+  // ou périmé selon quand/comment il a été enregistré. Or `track.id` EST déjà
+  // l'ID Jellyfin brut (32 hex, voir normaliseTrack: `id: item.Id`) — le même
+  // identifiant que celui présent dans l'URL /Audio/{id}/stream. On l'utilise
+  // donc directement, ce qui rend l'extraction indépendante du format exact
+  // de streamUrl. On garde le fallback par regex uniquement si track.id ne
+  // ressemble pas à un GUID Jellyfin valide (piste non-Jellyfin, cas limite).
+  const _hlsIdShape = /^[a-f0-9]{32}$/i;
   const _hlsItemIdMatch = (track.streamUrl || '').match(/\/Audio\/([a-f0-9]{32})\/stream/i);
-  const _hlsItemId = _hlsItemIdMatch ? _hlsItemIdMatch[1] : null;
+  const _hlsItemId = _hlsIdShape.test(track.id || '') ? track.id : (_hlsItemIdMatch ? _hlsItemIdMatch[1] : null);
 
   if (_hlsItemId) {
     try {
-      await loadHLSPlayer(_hlsItemId, audioPlayer, bitrate < 320000 ? bitrate : null);
+      await loadHLSPlayer(_hlsItemId, audioPlayer, bitrate < 320000 ? bitrate : null, myGen);
     } catch (err) {
       console.warn('[HLS] Fallback URL directe :', err.message);
       let streamSrc = track.streamUrl;
@@ -3158,7 +2193,7 @@ async function playCurrentTrack() {
           u.searchParams.set('AudioBitRate', bitrate);
           streamSrc = streamSrc.startsWith('/') ? u.pathname + u.search : u.toString();
         }
-      } catch {}
+      } catch (e) { console.warn('[Beartify] Ajustement du bitrate de streaming échoué (non bloquant) :', e); }
       audioPlayer.src = streamSrc;
     }
     // FIX: if a newer playCurrentTrack() was called while we were awaiting, abort silently.
@@ -3596,12 +2631,7 @@ async function fetchLyrics(trackName, artist) {
   const _stillCurrent = () => _token === _lyricsFetchToken;
 
   lyricsData = null;
-  spicy.lyricsObject  = { Lines: [] };
-  spicyBlurLastLine   = -1;
-  spicyLastActiveLine = -1;
-
-  lyricsDisplay.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div><span>Recherche des paroles…</span></div>';
-  lyricsMiniContent.innerHTML = '<p class="placeholder-mini">Chargement…</p>';
+  window.renderLyricsLoading?.();
 
   // Démarré tout de suite, en parallèle des tentatives GrizzLyrics ci-dessous
   // (voir commentaire de _fetchLrclibRaw). Pas de await ici — juste amorcé.
@@ -3650,14 +2680,12 @@ async function fetchLyrics(trackName, artist) {
   }
   if (lrclibResult?.type === 'plain') {
     const plain = lrclibResult.text;
-    lyricsDisplay.innerHTML = `<div class="spicy-scroll-container"><div class="lyrics-plain" style="padding:0 32px">${escapeHtml(plain).replace(/\n/g, '<br>')}</div></div>`;
-    lyricsMiniContent.innerHTML = `<div class="lyrics-plain-mini">${escapeHtml(plain.slice(0, 400)).replace(/\n/g, '<br>')}${plain.length > 400 ? '…' : ''}</div>`;
+    window.renderPlainLyrics?.(plain);
     _autoTranslateIfEnabled();
     return;
   }
 
-  lyricsDisplay.innerHTML = '<p class="placeholder" style="padding:60px 32px;color:var(--text-subdued);text-align:center">Aucune parole trouvée pour ce morceau.</p>';
-  lyricsMiniContent.innerHTML = '<p class="placeholder-mini">Paroles non disponibles</p>';
+  window.renderNoLyricsFound?.(_t('text-no-lyrics-found', 'Aucune parole trouvée pour ce morceau.'));
 }
 
 // ── Traduction des paroles ──────────────────────────────────────────
@@ -3762,7 +2790,7 @@ async function _translateLyricsDisplay(targetLang) {
   try {
     if (!lyricsData) {
       // Paroles plain text : pas de karaoké ici, patch direct du DOM sans risque
-      const plainEl = lyricsDisplay.querySelector('.lyrics-plain');
+      const plainEl = lyricsDisplay.querySelector('.sl2-lyrics-plain');
       if (plainEl) {
         const original = plainEl.dataset.original || plainEl.innerText;
         plainEl.dataset.original = original;
@@ -3809,7 +2837,7 @@ function _restoreOriginalLyrics() {
     renderSpicyLyrics(lyricsData.lines, lyricsData.type);
     _isTranslatedRender = false;
   } else {
-    const plainEl = lyricsDisplay.querySelector('.lyrics-plain');
+    const plainEl = lyricsDisplay.querySelector('.sl2-lyrics-plain');
     if (plainEl?.dataset.original) {
       plainEl.innerHTML = escapeHtml(plainEl.dataset.original).replace(/\n/g, '<br>');
     }
@@ -3842,7 +2870,7 @@ window.addEventListener('beartify:lyricsTranslationChanged', e => {
   const btn = document.getElementById('lyricsTranslateBtn');
   if (btn) btn.style.display = e.detail.enabled ? '' : 'none';
   // Si activé automatiquement et paroles disponibles → traduire
-  if (e.detail.enabled && (lyricsData || lyricsDisplay.querySelector('.lyrics-plain'))) {
+  if (e.detail.enabled && (lyricsData || lyricsDisplay.querySelector('.sl2-lyrics-plain'))) {
     _translateLyricsDisplay(e.detail.lang || 'fr');
   } else if (!e.detail.enabled) {
     _restoreOriginalLyrics();
@@ -3878,33 +2906,33 @@ function _showVipGate() {
       <!-- Icon + titre -->
       <div style="text-align:center;margin-bottom:20px">
         <svg width="44" height="44" viewBox="0 0 246.989 246.989" fill="rgba(255,190,50,0.95)" style="margin-bottom:12px;display:block;margin-left:auto;margin-right:auto"><path d="M246.038,83.955l-39.424-70.664c-1.325-2.374-3.831-3.846-6.55-3.846H46.93c-2.719,0-5.225,1.471-6.55,3.846L0.951,83.955c-1.497,2.683-1.206,6.008,0.734,8.391l116.002,142.432a8.08,8.08,0,0,0,10.636,0L245.304,92.346C247.244,89.963,247.535,86.638,246.038,83.955z"/></svg>
-        <div style="font-size:1.15rem;font-weight:800;color:#fff;letter-spacing:-0.02em">Fonctionnalité VIP</div>
-        <div style="font-size:0.8rem;color:rgba(255,255,255,0.45);margin-top:6px;line-height:1.5">Le téléchargement est réservé aux membres VIP.<br>Les codes VIP sont distribués par les administrateurs<br>de Beartify via Discord ou les événements communautaires.</div>
+        <div style="font-size:1.15rem;font-weight:800;color:#fff;letter-spacing:-0.02em">${_t('text-vip-feature', 'Fonctionnalité VIP')}</div>
+        <div style="font-size:0.8rem;color:rgba(255,255,255,0.45);margin-top:6px;line-height:1.5">${_t('text-vip-download-desc', 'Le téléchargement est réservé aux membres VIP.<br>Les codes VIP sont distribués par les administrateurs<br>de Beartify via Discord ou les événements communautaires.')}</div>
       </div>
 
       <!-- Avantages -->
       <div style="background:linear-gradient(135deg,rgba(255,200,0,0.06),rgba(255,150,0,0.04));border:1px solid rgba(255,200,0,0.15);border-radius:10px;padding:12px 14px;margin-bottom:18px">
-        <div style="font-size:0.72rem;font-weight:700;color:rgba(255,200,0,0.8);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">✦ Avantages VIP</div>
+        <div style="font-size:0.72rem;font-weight:700;color:rgba(255,200,0,0.8);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">${_t('text-vip-advantages', '✦ Avantages VIP')}</div>
         <ul style="font-size:0.77rem;color:rgba(255,255,255,0.55);line-height:1.8;list-style:none;padding:0;margin:0">
-          <li>⬡ Téléchargement en MP3 ou FLAC haute qualité</li>
-          <li>⬡ Badge VIP exclusif sur votre profil</li>
-          <li>⬡ Accès anticipé aux nouvelles fonctionnalités</li>
-          <li>⬡ Support prioritaire</li>
+          <li>${_t('text-vip-perk-download', '⬡ Téléchargement en MP3 ou FLAC haute qualité')}</li>
+          <li>${_t('text-vip-perk-badge', '⬡ Badge VIP exclusif sur votre profil')}</li>
+          <li>${_t('text-vip-perk-early', '⬡ Accès anticipé aux nouvelles fonctionnalités')}</li>
+          <li>${_t('text-vip-perk-support', '⬡ Support prioritaire')}</li>
         </ul>
       </div>
 
       <!-- Saisie du code -->
-      <label style="font-size:0.75rem;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em">Code d'activation VIP</label>
+      <label style="font-size:0.75rem;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em">${_t('text-vip-activation-code', 'Code d\'activation VIP')}</label>
       <input id="vipGateCodeInput" type="text" maxlength="16" placeholder="XXXXXXXXXXXXXXXX" autocomplete="off" spellcheck="false"
         style="width:100%;box-sizing:border-box;padding:11px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#fff;font-size:0.95rem;letter-spacing:0.12em;text-align:center;outline:none;font-family:monospace;margin-bottom:8px;transition:border-color 0.15s">
       <p id="vipGateError" style="font-size:0.73rem;color:#e74c3c;margin:0 0 10px;display:none;text-align:center"></p>
 
       <button id="vipGateActivateBtn"
         style="width:100%;padding:12px;background:linear-gradient(135deg,#f5a623,#e08a00);border:none;border-radius:500px;color:#fff;font-weight:700;font-size:0.9rem;cursor:pointer;margin-bottom:10px;transition:opacity 0.15s">
-        Activer le statut VIP
+        ${_t('text-activate-vip', 'Activer le statut VIP')}
       </button>
       <div style="text-align:center;font-size:0.74rem;color:rgba(255,255,255,0.3)">
-        Pas de code ? Rejoins notre <a href="https://discord.gg/" target="_blank" rel="noopener" style="color:rgba(255,180,0,0.7);text-decoration:none">Discord</a> pour en obtenir un.
+        ${_t('text-vip-no-code', 'Pas de code ? Rejoins notre')} <a href="https://discord.gg/" target="_blank" rel="noopener" style="color:rgba(255,180,0,0.7);text-decoration:none">Discord</a> ${_t('text-vip-no-code-suffix', 'pour en obtenir un.')}
       </div>
     </div>`;
 
@@ -3931,34 +2959,34 @@ function _showVipGate() {
   const doActivate = async () => {
     const code = input.value.trim().replace(/[-\s]/g, '').toUpperCase();
     if (code.length !== 16) {
-      errEl.textContent = 'Le code doit contenir exactement 16 caractères.';
+      errEl.textContent = _t('text-code-length', 'Le code doit contenir exactement 16 caractères.');
       errEl.style.display = 'block';
       return;
     }
     actBtn.disabled = true;
-    actBtn.textContent = 'Vérification…';
+    actBtn.textContent = _t('text-verifying', 'Vérification…');
     errEl.style.display = 'none';
 
     if (window.FirebaseSync?.activateVip) {
       const ok = await window.FirebaseSync.activateVip(code);
       if (ok) {
         closeGate();
-        showToast('✦ Statut VIP activé avec succès ! Bienvenue 🎉', 'success');
+        showToast(_t('toast-vip-activated', '✦ Statut VIP activé avec succès ! Bienvenue 🎉'), 'success');
         window._vipActive = true;
         if (window._authUser) window._authUser.vip = true;
         document.body.classList.add('is-vip');
         _refreshVipUI();
       } else {
-        errEl.textContent = 'Code invalide, déjà utilisé ou expiré.';
+        errEl.textContent = _t('text-code-invalid', 'Code invalide, déjà utilisé ou expiré.');
         errEl.style.display = 'block';
         actBtn.disabled = false;
-        actBtn.textContent = 'Activer le statut VIP';
+        actBtn.textContent = _t('text-activate-vip', 'Activer le statut VIP');
       }
     } else {
-      errEl.textContent = 'Service indisponible. Réessayez après connexion.';
+      errEl.textContent = _t('text-service-unavailable', 'Service indisponible. Réessayez après connexion.');
       errEl.style.display = 'block';
       actBtn.disabled = false;
-      actBtn.textContent = 'Activer le statut VIP';
+      actBtn.textContent = _t('text-activate-vip', 'Activer le statut VIP');
     }
   };
 
@@ -4397,9 +3425,9 @@ async function _tagMp3Blob(mp3Blob, track) {
 
 async function _downloadTrack(track) {
   if (!_isVipUser()) { _showVipGate(); return; }
-  if (!track?.id) { showToast('Piste introuvable', 'error'); return; }
+  if (!track?.id) { showToast(_t('toast-track-not-found', 'Piste introuvable'), 'error'); return; }
   const p = window._downloadQualityProfile || { ext: 'flac', label: 'FLAC CD' };
-  showToast(`⬇️ Téléchargement "${escapeHtml(track.title)}" en ${p.label}…`, 'info');
+  showToast(_t('toast-download-track', '⬇️ Téléchargement "{title}" en {quality}…', {title: escapeHtml(track.title), quality: p.label}), 'info');
   try {
     const resp = await fetch(_buildDownloadUrl(track.id));
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
@@ -4426,10 +3454,10 @@ async function _downloadTrack(track) {
     a.click();
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 10000);
-    showToast('✅ Téléchargement démarré', 'success');
+    showToast(_t('toast-download-started', '✅ Téléchargement démarré'), 'success');
   } catch (e) {
     console.error('[Download]', e);
-    showToast('Erreur lors du téléchargement', 'error');
+    showToast(_t('toast-error-download', 'Erreur lors du téléchargement'), 'error');
   }
 }
 
@@ -4477,7 +3505,7 @@ function _showDownloadProgress(opts = {}) {
         : `<svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".3"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`}
       </div>
       <div class="dlp-cover-info">
-        <div class="dlp-title">${isZip ? '📦 Compression ZIP…' : '⬇️ Téléchargement'}</div>
+        <div class="dlp-title">${isZip ? '📦 Compression ZIP…' : '⬇️ ' + _t('text-download-title', 'Téléchargement')}</div>
         <div class="dlp-playlist-name">${escapeHtml(name)}</div>
         <div class="dlp-quality">${window._downloadQualityProfile?.label || 'FLAC CD'}</div>
       </div>
@@ -4512,9 +3540,9 @@ function _closeDownloadProgress() {
 
 async function _downloadPlaylist(plTracks, playlistName) {
   if (!_isVipUser()) { _showVipGate(); return; }
-  if (!plTracks?.length) { showToast('Aucun titre à télécharger', 'error'); return; }
+  if (!plTracks?.length) { showToast(_t('toast-no-track-to-download', 'Aucun titre à télécharger'), 'error'); return; }
   if (_downloadInProgress) {
-    showToast('Un téléchargement est déjà en cours — veuillez patienter.', 'warning');
+    showToast(_t('toast-download-in-progress', 'Un téléchargement est déjà en cours — veuillez patienter.'), 'warning');
     return;
   }
   _downloadInProgress = true;
@@ -4523,13 +3551,13 @@ async function _downloadPlaylist(plTracks, playlistName) {
   const total      = plTracks.length;
   const coverUrl   = plTracks.find(t => t.imageUrl)?.imageUrl || null;
 
-  _showDownloadProgress({ name: playlistName, coverUrl, done: 0, total, currentTrack: 'Chargement de JSZip…', phase: 'init' });
+  _showDownloadProgress({ name: playlistName, coverUrl, done: 0, total, currentTrack: _t('text-loading-jszip', 'Chargement de JSZip…'), phase: 'init' });
 
   let JSZip;
   try { JSZip = await _loadJSZip(); }
   catch (e) {
     _downloadInProgress = false; _closeDownloadProgress();
-    showToast('Impossible de charger JSZip — vérifiez votre connexion', 'error');
+    showToast(_t('toast-error-jszip-load', 'Impossible de charger JSZip — vérifiez votre connexion'), 'error');
     return;
   }
 
@@ -4595,7 +3623,7 @@ async function _downloadPlaylist(plTracks, playlistName) {
 
   if (success === 0) {
     _downloadInProgress = false; _closeDownloadProgress();
-    showToast('Aucun fichier récupéré — vérifiez votre connexion', 'error');
+    showToast(_t('toast-no-file-retrieved', 'Aucun fichier récupéré — vérifiez votre connexion'), 'error');
     return;
   }
 
@@ -4608,7 +3636,7 @@ async function _downloadPlaylist(plTracks, playlistName) {
       meta => _showDownloadProgress({
         name: playlistName, coverUrl, done: total, total,
         phase: 'zipping', zipPct: Math.round(meta.percent),
-        currentTrack: `Compression : ${Math.round(meta.percent)}%`,
+        currentTrack: _t('text-compressing', 'Compression : {pct}%', {pct: Math.round(meta.percent)}),
       })
     );
 
@@ -4625,7 +3653,7 @@ async function _downloadPlaylist(plTracks, playlistName) {
     showToast(`✅ ZIP prêt — ${success} titre${success>1?'s':''}${failMsg}`, 'success');
   } catch (e) {
     console.error('[Download ZIP] Erreur génération', e);
-    showToast('Erreur lors de la création du ZIP', 'error');
+    showToast(_t('toast-error-zip-creation', 'Erreur lors de la création du ZIP'), 'error');
   } finally {
     _downloadInProgress = false;
     _closeDownloadProgress();
@@ -4883,6 +3911,48 @@ function _fisherYates(arr) {
   return a;
 }
 
+// ── Diversité artiste dans les carrousels ───────────────────────────
+// Deux variantes selon que l'ordre d'origine de la liste est
+// significatif ou non.
+
+// Plafonne le nombre d'occurrences d'un même artiste SANS changer
+// l'ordre des éléments conservés — pour les listes déjà triées par un
+// critère qui compte (ex: "Récemment ajoutés" trié par date).
+function _capPerArtist(list, maxPerArtist = 3) {
+  const counts = new Map();
+  return list.filter(t => {
+    const key = (t.artist || '').toLowerCase();
+    const n = counts.get(key) || 0;
+    if (n >= maxPerArtist) return false;
+    counts.set(key, n + 1);
+    return true;
+  });
+}
+
+// Plafonne ET réordonne en tourniquet (une piste de chaque artiste à
+// tour de rôle) — pour que les toutes premières cartes affichées soient
+// déjà variées, plutôt que de risquer plusieurs titres du même artiste
+// à la suite même après un simple mélange aléatoire. Utile pour les
+// carrousels sans ordre initial signifiant (recommandations, genres,
+// populaires, découverte).
+function _diversifyTrackList(list, maxPerArtist = 3) {
+  const byArtist = new Map();
+  for (const t of list) {
+    const key = (t.artist || '').toLowerCase();
+    if (!byArtist.has(key)) byArtist.set(key, []);
+    const arr = byArtist.get(key);
+    if (arr.length < maxPerArtist) arr.push(t);
+  }
+  const buckets = [...byArtist.values()];
+  const result = [];
+  let i = 0;
+  while (buckets.some(b => i < b.length)) {
+    for (const b of buckets) { if (i < b.length) result.push(b[i]); }
+    i++;
+  }
+  return result;
+}
+
 // Joue la piste à l'indice global idx.
 // shuffleOrder n'est pas modifié : goNext continue simplement depuis
 // la position de idx dans shuffleOrder.
@@ -4988,37 +4058,94 @@ function goNext() {
   playCurrentTrack();
 }
 
-// ── Crossfade engine ───────────────────────────────────────────────
-// ⚠️ Choix architectural délibéré : PAS de second <audio>/HLS.js en
-// parallèle pour un vrai chevauchement audio. Un second élément <audio>
-// déclencherait une seconde session DRM (clé éphémère IP-lockée) et un
-// second processus ffmpeg côté serveur pour la durée du fade — coût
-// serveur doublé pour chaque transition. Voir _preloadNextTrack()
-// ci-dessous, qui documente déjà ce choix pour le gapless.
-// Ce qu'on fait à la place : fade-out précis en fin de piste (déjà en
-// place) + fade-in symétrique au démarrage du titre suivant, pour que
-// la coupure soit ressentie comme une transition plutôt qu'un silence
-// suivi d'un démarrage brutal à plein volume.
-let _crossfadeTimer = null;
+// ── Crossfade / Gapless engine ───────────────────────────────────────
+// Par défaut (crossfadeDualPlayer = false) : comportement historique —
+// fade-out en fin de piste + fade-in symétrique au démarrage du titre
+// suivant sur le MÊME élément <audio>. Pas de vrai chevauchement audible,
+// mais aucun coût serveur supplémentaire.
+//
+// P2-1 / P2-2 — opt-in (Réglages → "Chevauchement réel (double lecteur)") :
+// un second élément <audio> (audioPlayerB, voir _ensureAudioPlayerB) ouvre
+// sa PROPRE session HLS/DRM et joue réellement la piste suivante en même
+// temps que la piste en cours se termine sur l'élément principal — vrai
+// crossfade audible pour P2-1, et transition à zéro silence pour P2-2.
+// ⚠️ Coût assumé et documenté : ceci ouvre une seconde session DRM
+// (clé éphémère IP-lockée) et un second process ffmpeg côté serveur
+// pendant quelques secondes à chaque transition — d'où l'opt-in.
+// Limite connue : le second lecteur ne passe PAS par le graphe Web Audio
+// partagé (EQ / normalisation / visualiseur, voir _initAudioGraph) —
+// pendant la fenêtre de chevauchement, EQ et normalisation ne s'appliquent
+// qu'à l'élément principal. L'élément principal reprend la main dès que
+// sa nouvelle session est prête (voir _handoverToPreloadedTrack), donc ce
+// n'est audible que pendant la transition elle-même.
+let audioPlayerB = null;
+function _ensureAudioPlayerB() {
+  if (audioPlayerB) return audioPlayerB;
+  audioPlayerB = document.createElement('audio');
+  audioPlayerB.id = 'audioPlayerB';
+  audioPlayerB.style.display = 'none';
+  audioPlayerB.preload = 'auto';
+  audioPlayerB.volume = 0;
+  document.body.appendChild(audioPlayerB);
+  return audioPlayerB;
+}
+
+let _crossfadeTimer   = null;
+let _dualHandoverDone = false;
 function _startCrossfade() {
   const dur = window._settingsCrossfade || 0;
+  _dualHandoverDone = false;
   if (dur <= 0) return;
   if (_crossfadeTimer) clearInterval(_crossfadeTimer);
   _crossfadeTimer = setInterval(() => {
-    if (!audioPlayer.duration) return;
-    const remaining = audioPlayer.duration - audioPlayer.currentTime;
+    // ⚠️ FIX : audioPlayer.duration peut brièvement remonter une valeur
+    // fausse/instable juste après un seek (le streaming n'a pas encore
+    // rattrapé). _expectedDuration (métadonnée de la piste, stable) est
+    // la source de vérité déjà utilisée ailleurs dans le fichier — sans
+    // ce fix, un seek en plein milieu d'une piste pouvait faire croire à
+    // "remaining" qu'on était proche de la fin, déclenchant un handover
+    // intempestif vers une autre piste, en pleine progression.
+    const knownDur = audioPlayer._expectedDuration || audioPlayer.duration || 0;
+    if (!knownDur) return;
+    const remaining = knownDur - _realCurrentTime();
+    const dualActive = window._settingsDualPlayer && audioPlayerB && _preloadedTrackId;
+
     if (remaining <= dur && remaining > 0) {
-      // Fade out current
-      const vol = Math.max(0, remaining / dur);
-      // Fade out uniquement le volume de lecture - _masterVolume reste intact
-      // pour que la prochaine piste démarre au bon volume.
-      audioPlayer.volume = vol * (window._masterVolume ?? 1);
+      if (dualActive && !_dualHandoverDone) {
+        // ── Vrai chevauchement : les deux pistes sont audibles en même
+        // temps, l'une descend pendant que l'autre monte.
+        const t = Math.max(0, Math.min(1, 1 - remaining / dur));
+        audioPlayer.volume  = (1 - t) * (window._masterVolume ?? 1);
+        audioPlayerB.volume = t * (window._masterVolume ?? 1);
+        if (audioPlayerB.paused) audioPlayerB.play().catch(() => {});
+      } else {
+        // Comportement historique : simple fondu au silence sur le
+        // même élément.
+        const vol = Math.max(0, remaining / dur);
+        audioPlayer.volume = vol * (window._masterVolume ?? 1);
+      }
     }
-    if (remaining <= 0) {
+
+    if (remaining <= 0.15 && !_dualHandoverDone) {
+      _dualHandoverDone = true;
       clearInterval(_crossfadeTimer);
-      audioPlayer.volume = window._masterVolume ?? 1;
+      _crossfadeTimer = null;
+      // ⚠️ FIX : si un seek atterrit très près de la fin, B peut ne pas
+      // avoir eu le temps de démarrer réellement (currentTime encore à 0).
+      // Forcer un handover dans ce cas n'a rien à quoi se raccrocher et ne
+      // fait que déclencher une cascade de sessions/erreurs inutiles —
+      // on retombe alors sur le comportement normal (fade + avance via
+      // 'ended') plutôt que d'insister sur un B pas prêt.
+      const bReady = dualActive && audioPlayerB.currentTime > 0.5;
+      if (bReady) {
+        console.log('[Handover] Déclenché par _startCrossfade (remaining<=0.15s)');
+        _handoverToPreloadedTrack();
+      } else {
+        if (dualActive) console.log('[Handover] Ignoré : B pas prêt (currentTime=' + audioPlayerB.currentTime + ') — repli sur avance normale');
+        audioPlayer.volume = window._masterVolume ?? 1;
+      }
     }
-  }, 200);
+  }, 100);
 }
 
 let _fadeInTimer = null;
@@ -5026,6 +4153,9 @@ function _startFadeIn() {
   const dur = window._settingsCrossfade || 0;
   const target = window._masterVolume ?? 1;
   if (_fadeInTimer) { clearInterval(_fadeInTimer); _fadeInTimer = null; }
+  // En mode double lecteur, le fade-in a déjà été réalisé pendant le
+  // chevauchement (voir _startCrossfade) — ne pas l'écraser ici.
+  if (window._settingsDualPlayer && _dualHandoverDone) return;
   if (dur <= 0) { audioPlayer.volume = target; return; }
   audioPlayer.volume = 0;
   const start = Date.now();
@@ -5041,10 +4171,35 @@ function _startFadeIn() {
   }, 100);
 }
 
-// ── Gapless preload ────────────────────────────────────────────────
-let _preloadAudio = null;
-function _preloadNextTrack() {
-  if (!window._settingsGapless) return;
+// ── Préchargement réel (P2-1 / P2-2, opt-in) ─────────────────────────
+let _preloadedTrackId = null;
+let _dualPlayerHintShown = false;
+async function _preloadNextTrack() {
+  // Comportement historique : gapless "simple" désactivé et pas de
+  // crossfade en cours → rien à faire, comme avant.
+  if (!window._settingsGapless && !(window._settingsCrossfade > 0)) {
+    // Piège fréquent : activer "Chevauchement réel" SEUL, sans crossfade
+    // ni gapless, ne fait rien de visible — c'est un modificateur des
+    // deux réglages existants, pas une fonctionnalité autonome. On le
+    // signale une fois en console plutôt que d'échouer silencieusement.
+    if (window._settingsDualPlayer && !_dualPlayerHintShown) {
+      _dualPlayerHintShown = true;
+      console.info('[DualPlayer] "Chevauchement réel" est activé mais sans effet : il faut aussi régler un fondu enchaîné (> 0s) ou activer "Titres enchaînés" dans Réglages → Lecture.');
+    }
+    return;
+  }
+  // Le vrai préchargement double-lecteur est strictement opt-in : sans
+  // ça, HLS.js bufferise déjà ~30s d'avance nativement sur l'élément
+  // principal, et ouvrir un second <audio> ici doublerait la session
+  // DRM + le process ffmpeg côté serveur pour rien.
+  if (!window._settingsDualPlayer) return;
+  // Évite d'ouvrir une 2e session DRM pendant un seek actif : c'est le
+  // moment où le lecteur principal a le plus besoin de sa session pour
+  // récupérer de nouveaux segments — le pire moment pour risquer une
+  // collision de session côté serveur (voir le filet de sécurité dans
+  // loadHLSPlayer). Le prochain 'playing' relancera le préchargement.
+  if (typeof isDragging !== 'undefined' && isDragging) return;
+
   const ctx = window._playContext;
   let nextIdx;
   if (isShuffled) {
@@ -5056,13 +4211,103 @@ function _preloadNextTrack() {
   } else {
     nextIdx = (currentIndex + 1) % tracks.length;
   }
+  // ⚠️ FIX CONFIRMÉ : quand le contexte de lecture ne contient qu'un seul
+  // titre (ex : lecture d'un résultat de recherche isolé, hors playlist),
+  // ce calcul retombe sur nextIdx === currentIndex — le "préchargement"
+  // ouvrait alors une 2e session DRM/ffmpeg pour LA MÊME piste déjà en
+  // cours sur le lecteur principal. Confirmé par les logs serveur
+  // (chaque piste transcodée deux fois) : ça enclenchait ensuite un
+  // handover vers cette session redondante, qui elle-même relançait un
+  // nouveau cycle sur la même piste — cascade de sessions qui expliquait
+  // les 401 "token inconnu" pendant les seeks.
+  if (nextIdx === currentIndex || nextIdx === undefined || nextIdx === -1) return;
+
   const nextTrack = normalizeTrack(tracks[nextIdx]);
   if (!nextTrack?.streamUrl) return;
-  // HLS.js bufferise 30s d'avance nativement via l'instance active.
-  // Un second <audio> en preload créerait une double session drm.js
-  // et un double processus ffmpeg. On le désactive.
-  if (_preloadAudio) { try { _preloadAudio.src = ''; } catch (_) {} }
-  _preloadAudio = null;
+  if (_preloadedTrackId === nextTrack.id) return; // déjà préchargée
+
+  const b = _ensureAudioPlayerB();
+  try { b.pause(); } catch {}
+  b.currentTime = 0;
+  b.volume = 0;
+  _preloadedTrackId = null;
+
+  // Même fix racine que playCurrentTrack : privilégier nextTrack.id (GUID
+  // Jellyfin déjà correct) plutôt qu'un parsing fragile de streamUrl.
+  const match  = (nextTrack.streamUrl || '').match(/\/Audio\/([a-f0-9]{32})\/stream/i);
+  const itemId = /^[a-f0-9]{32}$/i.test(nextTrack.id || '') ? nextTrack.id : (match ? match[1] : null);
+  try {
+    if (itemId) await loadHLSPlayer(itemId, b, null);
+    else b.src = nextTrack.streamUrl;
+    _preloadedTrackId = nextTrack.id;
+  } catch (e) {
+    console.warn('[DualPlayer] Préchargement échoué :', e.message);
+    _preloadedTrackId = null;
+  }
+}
+
+// ── Handover réel : la piste suivante est déjà audible sur B, on avance
+// l'état applicatif (index, UI, MediaSession, listeners…) via goNext()
+// exactement comme d'habitude — playCurrentTrack() rouvre une session
+// fraîche sur l'élément PRINCIPAL en tâche de fond pendant que B continue
+// de jouer pour masquer la latence de rechargement, puis B est coupé dès
+// que le principal a effectivement repris la main. ──────────────────────
+let _handoverInProgress = false;
+function _handoverToPreloadedTrack() {
+  if (!audioPlayerB) return;
+  if (_handoverInProgress) return; // garde-fou : jamais deux goNext() en parallèle
+  _handoverInProgress = true;
+  const b = audioPlayerB;
+  const wasPreloadedId = _preloadedTrackId;
+  goNext(); // avance l'index/l'UI/le contexte — logique existante inchangée
+
+  // ⚠️ FIX : pause() seul n'arrête PAS HLS.js — l'instance continue de
+  // bufferiser/réclamer des segments en arrière-plan avec sa propre
+  // session, même piste en pause. On détruit explicitement l'instance
+  // secondaire pour couper net toute requête résiduelle après handover.
+  function _destroyB() {
+    try { b.pause(); } catch {}
+    b.volume = 0;
+    if (_hlsPlayers.secondary) { try { _hlsPlayers.secondary.destroy(); } catch {} _hlsPlayers.secondary = null; }
+  }
+
+  const onPrimaryPlaying = () => {
+    audioPlayer.removeEventListener('playing', onPrimaryPlaying);
+    // ⚠️ FIX : le lecteur principal recharge la piste depuis 0:00 (nouvelle
+    // session fraîche), alors que B en est déjà à plusieurs secondes (la
+    // durée du fondu). Sans resynchronisation, les deux positions du même
+    // morceau se superposaient de façon audible — perçu comme un
+    // redémarrage. On aligne immédiatement le principal sur la position
+    // réelle de B avant de laisser passer la marge de coupure.
+    try {
+      if (Number.isFinite(b.currentTime) && b.currentTime > 0) {
+        console.log(`[Handover] Resync position : B était à ${b.currentTime.toFixed(2)}s, principal était à ${audioPlayer.currentTime.toFixed(2)}s`);
+        audioPlayer.currentTime = b.currentTime;
+      } else {
+        console.log(`[Handover] Resync ignorée — b.currentTime invalide :`, b.currentTime);
+      }
+    } catch (e) {
+      console.warn('[Handover] Resync échouée :', e.message);
+    }
+    // Petite marge pour laisser le buffer du lecteur principal s'installer
+    // avant de couper B, afin d'éviter tout micro-trou audible.
+    setTimeout(() => {
+      _destroyB();
+      if (_preloadedTrackId === wasPreloadedId) _preloadedTrackId = null;
+      _handoverInProgress = false;
+    }, 150);
+  };
+  audioPlayer.addEventListener('playing', onPrimaryPlaying);
+  // Filet de sécurité : si 'playing' ne se déclenche jamais (erreur réseau
+  // sur le lecteur principal), on ne laisse pas B tourner indéfiniment.
+  setTimeout(() => {
+    audioPlayer.removeEventListener('playing', onPrimaryPlaying);
+    if (_preloadedTrackId === wasPreloadedId) {
+      _destroyB();
+      _preloadedTrackId = null;
+    }
+    _handoverInProgress = false;
+  }, 8000);
 }
 
 // ── Volume normalization ───────────────────────────────────────────
@@ -5094,15 +4339,43 @@ function _applyNormalization(enabled) {
 }
 
 // Hook into audio events for gapless + crossfade
+// ⚠️ FIX : 'playing' se déclenche à CHAQUE reprise de lecture, pas
+// seulement au vrai début d'une piste — y compris après un seek sur la
+// barre de progression (re-bufferisation brève → pause → 'playing' à
+// nouveau) ou un micro-freeze réseau. Sans ce garde, chaque seek relançait
+// _startCrossfade()/le préchargement, ce qui pouvait redéclencher un
+// handover (saut de piste) en plein scrubbing avec le double lecteur actif.
+// On n'arme ces mécanismes qu'une fois par piste réellement nouvelle.
+let _lastPlayingHandledTrackId = null;
 audioPlayer.addEventListener('playing', () => {
-  _startCrossfade();
-  _startFadeIn();
-  setTimeout(_preloadNextTrack, 5000);
+  const isNewTrack = window._currentTrackId !== _lastPlayingHandledTrackId;
+  if (isNewTrack) {
+    _lastPlayingHandledTrackId = window._currentTrackId;
+    // ⚠️ FIX : _startFadeIn() doit s'exécuter AVANT _startCrossfade(), car
+    // ce dernier réinitialise _dualHandoverDone = false dès sa première
+    // ligne (pour armer la PROCHAINE transition). Dans le mauvais ordre,
+    // _startFadeIn() ne voit jamais _dualHandoverDone=true et rejoue un
+    // fondu artificiel (volume à 0 puis remontée) même juste après un
+    // handover déjà géré en douceur par le double lecteur.
+    _startFadeIn();
+    _startCrossfade();
+    setTimeout(_preloadNextTrack, 5000);
+  }
   if (window._settingsNormalize) _applyNormalization(true);
   else if (_gainNode) _gainNode.gain.value = 1.0;
+  // P3-4 : réappliquer la vitesse choisie à chaque nouvelle piste — le
+  // changement de `src` (ou le handover vers audioPlayerB en gapless) peut
+  // repartir sur playbackRate=1 selon le navigateur/WebView.
+  if (window._playbackSpeed && window._playbackSpeed !== 1) {
+    audioPlayer.playbackRate = window._playbackSpeed;
+    if (audioPlayerB) audioPlayerB.playbackRate = window._playbackSpeed;
+  }
+  window.LastfmScrobble?.onTrackStart(window.currentTrack);
 });
 
 audioPlayer.addEventListener('ended', () => {
+  window.LastfmScrobble?.onTrackStop();
+
   // ── Firebase History : enregistrer l'écoute complète ──
   if (window._settingsSaveHistory !== false && window.FirebaseSync?.addToHistory && window.currentTrack) {
     const trackDur = audioPlayer._expectedDuration || window.currentTrack?.duration || 0;
@@ -5133,7 +4406,21 @@ audioPlayer.addEventListener('ended', () => {
     // normale en même temps que _radioPlayNext() choisit un autre titre,
     // et les deux se chevauchent (double changement de piste audible).
   } else if (window._settingsAutoplay !== false) {
-    goNext();
+    // P2-2 (réel, opt-in) : si le double lecteur est activé et la piste
+    // suivante déjà préchargée sur B, transition à zéro silence — B est
+    // lancé à l'instant même où A se termine (aucun fondu ici : c'est le
+    // cas crossfadeDuration = 0, donc _startCrossfade() n'a jamais tourné
+    // et B est encore en pause à ce stade).
+    if (window._settingsGapless && window._settingsDualPlayer && audioPlayerB && _preloadedTrackId) {
+      console.log('[Handover] Déclenché par \'ended\' naturel (gapless) — crossfadeDuration actuel:', window._settingsCrossfade);
+      if (audioPlayerB.paused) {
+        audioPlayerB.volume = window._masterVolume ?? 1;
+        audioPlayerB.play().catch(() => {});
+      }
+      _handoverToPreloadedTrack();
+    } else {
+      goNext();
+    }
   } else {
     // Autoplay désactivé et pas de suite : masquer l'UI player
     _hidePlayerUI();
@@ -5161,7 +4448,7 @@ shuffleBtn.addEventListener('click', () => {
     shuffleOrder = [...pool];
     window._resetShuffleHistory?.();
   }
-  showToast(isShuffled ? '⇄ Lecture aléatoire activée' : '⇄ Lecture aléatoire désactivée', isShuffled ? 'info' : 'default');
+  showToast(isShuffled ? _t('toast-shuffle-on', '⇄ Lecture aléatoire activée') : _t('toast-shuffle-off', '⇄ Lecture aléatoire désactivée'), isShuffled ? 'info' : 'default');
 });
 
 // ── Repeat ─────────────────────────────────────────────────────────
@@ -5177,7 +4464,7 @@ repeatBtn.addEventListener('click', () => {
       ri.innerHTML = `<path d="M0 4.75A3.75 3.75 0 0 1 3.75 1h8.5A3.75 3.75 0 0 1 16 4.75v5a3.75 3.75 0 0 1-3.75 3.75H9.81l1.018 1.018a.75.75 0 1 1-1.06 1.06L6.939 12.75l2.829-2.828a.75.75 0 1 1 1.06 1.06L9.811 12h2.439a2.25 2.25 0 0 0 2.25-2.25v-5a2.25 2.25 0 0 0-2.25-2.25h-8.5A2.25 2.25 0 0 0 1.5 4.75v5A2.25 2.25 0 0 0 3.75 12H5v1.5H3.75A3.75 3.75 0 0 1 0 9.75z"></path>`;
     }
   }
-  const labels = ['Répétition désactivée', 'Répéter la liste', 'Répéter le titre'];
+  const labels = [_t('text-repeat-off', 'Répétition désactivée'), _t('text-repeat-list', 'Répéter la liste'), _t('text-repeat-track', 'Répéter le titre')];
   showToast('↻ ' + labels[repeatMode], repeatMode > 0 ? 'info' : 'default');
 });
 
@@ -5196,10 +4483,12 @@ audioPlayer.addEventListener('timeupdate', () => {
 
   // Durée de référence = UNIQUEMENT Jellyfin. audioPlayer.duration n'est jamais utilisé
   // pour l'affichage : il fluctue pendant le chargement HLS.js et provoque des flashs.
-  const _dur = audioPlayer._expectedDuration || 0;
-  const pct  = _dur > 0 ? Math.min((audioPlayer.currentTime / _dur) * 100, 100) : 0;
-  updateProgressUI(pct, audioPlayer.currentTime);
-  spicy.currentPosition = audioPlayer.currentTime * 1000;
+  const _dur  = audioPlayer._expectedDuration || 0;
+  const _real = _realCurrentTime(); // position réelle dans la piste (offset seek-ahead inclus)
+  const pct   = _dur > 0 ? Math.min((_real / _dur) * 100, 100) : 0;
+  updateProgressUI(pct, _real);
+  spicy.currentPosition = _real * 1000;
+  window.LastfmScrobble?.onTimeUpdate(_real);
 
   // MediaSession : mise à jour légère de la position uniquement (timeline
   // fluide sur l'écran de verrouillage Android/PC), sans recharger les
@@ -5207,11 +4496,11 @@ audioPlayer.addEventListener('timeupdate', () => {
   if ('mediaSession' in navigator) {
     try {
       const _msDur = audioPlayer._expectedDuration || audioPlayer.duration || 0;
-      if (isFinite(_msDur) && _msDur > 0 && isFinite(audioPlayer.currentTime)) {
+      if (isFinite(_msDur) && _msDur > 0 && isFinite(_real)) {
         navigator.mediaSession.setPositionState({
           duration:     _msDur,
           playbackRate: audioPlayer.playbackRate || 1,
-          position:     Math.min(audioPlayer.currentTime, _msDur),
+          position:     Math.min(_real, _msDur),
         });
       }
     } catch (e) { /* incohérence transitoire pendant un changement de piste — ignorée */ }
@@ -5227,7 +4516,7 @@ audioPlayer.addEventListener('timeupdate', () => {
   // Déclenché 3 s avant la fin de la chanson, une seule fois par lecture.
   // On centre la dernière ligne de paroles dans le container de lyrics.
   // Guard : le panneau doit être visible, sinon offsetTop/clientHeight valent 0.
-  const remaining = audioPlayer.duration - audioPlayer.currentTime;
+  const remaining = (_dur || audioPlayer.duration || 0) - _real;
   if (remaining < 3 && remaining > 0 && !audioPlayer._lastLineScrolled) {
     audioPlayer._lastLineScrolled = true;
     const lyrPanel  = document.getElementById('lyricsPanel');
@@ -5251,7 +4540,8 @@ audioPlayer.addEventListener('timeupdate', () => {
     const trackDur = audioPlayer._expectedDuration || window.currentTrack?.duration || 0;
     // On utilise la durée Jellyfin si disponible, sinon audioPlayer.duration
     const refDur = (trackDur > 10) ? trackDur : (isFinite(audioPlayer.duration) ? audioPlayer.duration : 0);
-    if (refDur > 0 && audioPlayer.currentTime >= refDur - 0.3) {
+    if (refDur > 0 && _realCurrentTime() >= refDur - 0.3) {
+      console.log(`[EndedFallback] Déclenché manuellement — currentTime réel=${_realCurrentTime().toFixed(1)}s refDur=${refDur.toFixed(1)}s trackDur=${trackDur.toFixed(1)}s audioPlayer.duration=${audioPlayer.duration}`);
       audioPlayer._hlsEndedFired = true;
       // Simuler l'événement 'ended' en le déclenchant manuellement
       audioPlayer.dispatchEvent(new Event('ended'));
@@ -5268,20 +4558,72 @@ function updateProgressUI(pct, current) {
   // il n'est jamais réécrit ici ni ailleurs.
 }
 
-progressContainer.addEventListener('mousedown', e => { isDragging = true; seekTo(e); });
-document.addEventListener('mousemove', e => { if (isDragging) seekTo(e); });
-document.addEventListener('mouseup',   e => { if (isDragging) { isDragging = false; seekTo(e); } });
-function seekTo(e) {
+progressContainer.addEventListener('mousedown', e => { isDragging = true; seekTo(e, true); });
+document.addEventListener('mousemove', e => { if (isDragging) seekTo(e, false); }); // aperçu visuel seulement
+document.addEventListener('mouseup',   e => { if (isDragging) { isDragging = false; seekTo(e, true); } });
+
+// commit=false : simple aperçu visuel pendant un drag (aucun appel réseau —
+// sinon chaque mousemove spammerait une nouvelle session ffmpeg côté
+// serveur). commit=true : position réellement appliquée (clic simple, ou
+// relâchement de la barre après un drag).
+function seekTo(e, commit) {
   const rect = progressContainer.getBoundingClientRect();
   const pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
   const dur  = audioPlayer._expectedDuration || 0;
-  if (dur > 0) {
-    audioPlayer.currentTime   = pct * dur;
-    spicy.currentPosition     = audioPlayer.currentTime * 1000;
-    progressFill.style.width  = (pct * 100) + '%';
-    progressThumb.style.left  = (pct * 100) + '%';
-    currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
-    // totalTimeEl : pas touché
+  if (dur <= 0) return;
+
+  const wanted = pct * dur;
+
+  // Retour visuel immédiat dans tous les cas (aperçu pendant le drag inclus)
+  progressFill.style.width  = (pct * 100) + '%';
+  progressThumb.style.left  = (pct * 100) + '%';
+  currentTimeEl.textContent = formatTime(wanted);
+  if (!commit) return;
+
+  const currentOffset = audioPlayer._hlsSeekOffset || 0;
+  // Position réellement disponible dans la session HLS actuelle : l'offset
+  // de départ de cette session + ce que ffmpeg a transcodé depuis.
+  const knownAvailable = currentOffset + ((audioPlayer.duration && isFinite(audioPlayer.duration)) ? audioPlayer.duration : 0);
+  console.log(`[Seek] pct=${(pct*100).toFixed(1)}% visé=${wanted.toFixed(1)}s disponible jusqu'à ${knownAvailable.toFixed(1)}s (offset session=${currentOffset.toFixed(1)}s)`);
+
+  spicy.currentPosition = wanted * 1000;
+
+  if (wanted >= currentOffset && wanted <= knownAvailable - 0.5) {
+    // Cible déjà couverte par la session actuelle : seek instantané normal.
+    audioPlayer.currentTime = wanted - currentOffset;
+  } else {
+    // ⚠️ Cible hors de ce qui est déjà transcodé (ou avant le début de la
+    // session actuelle) : on ouvre une nouvelle session ffmpeg qui démarre
+    // directement à cette position (seek-ahead côté serveur, voir drm.js).
+    // Délai quasi-constant (le temps de démarrage normal d'une session)
+    // au lieu de proportionnel à la distance dans la piste.
+    _seekAheadTo(wanted);
+  }
+}
+
+let _seekAheadInProgress = false;
+async function _seekAheadTo(targetSeconds) {
+  const track = window.currentTrack;
+  if (!track?.streamUrl) return;
+  // Même fix racine que playCurrentTrack : privilégier track.id.
+  const match  = (track.streamUrl || '').match(/\/Audio\/([a-f0-9]{32})\/stream/i);
+  const itemId = /^[a-f0-9]{32}$/i.test(track.id || '') ? track.id : (match ? match[1] : null);
+  if (!itemId) { audioPlayer.currentTime = targetSeconds; return; } // pas de HLS : seek classique
+
+  if (_seekAheadInProgress) return; // évite les doubles requêtes (clic + relâchement quasi simultanés)
+  _seekAheadInProgress = true;
+  const myGen = ++_hlsLoadGen; // invalide tout chargement en cours pour cette piste
+  const qualityBitrates = { low: 96000, normal: 192000, high: 320000 };
+  const bitrate = qualityBitrates[window._settingsAudioQuality || 'high'];
+  try {
+    await loadHLSPlayer(itemId, audioPlayer, bitrate < 320000 ? bitrate : null, myGen, targetSeconds);
+    if (myGen !== _hlsLoadGen) return; // un chargement plus récent a pris le dessus entre-temps
+    audioPlayer.currentTime = 0; // la nouvelle session démarre déjà à targetSeconds (via l'offset)
+    audioPlayer.play().catch(() => {});
+  } catch (e) {
+    console.warn('[Seek] Seek-ahead échoué :', e.message);
+  } finally {
+    _seekAheadInProgress = false;
   }
 }
 
@@ -5309,16 +4651,16 @@ function updateVolIcon(val) {
   const v = parseInt(val);
   if (v === 0) {
     vi.innerHTML = `<path d="M13.86 5.47a.75.75 0 0 0-1.061 0l-1.47 1.47-1.47-1.47A.75.75 0 0 0 8.8 6.53L10.269 8l-1.47 1.47a.75.75 0 1 0 1.06 1.06l1.47-1.47 1.47 1.47a.75.75 0 0 0 1.06-1.06L12.39 8l1.47-1.47a.75.75 0 0 0 0-1.06"></path><path d="M10.116 1.5A.75.75 0 0 0 8.991.85l-6.925 4a3.64 3.64 0 0 0-1.33 4.967 3.64 3.64 0 0 0 1.33 1.332l6.925 4a.75.75 0 0 0 1.125-.649v-1.906a4.7 4.7 0 0 1-1.5-.694v1.3L2.817 9.852a2.14 2.14 0 0 1-.781-2.92c.187-.324.456-.594.78-.782l5.8-3.35v1.3c.45-.313.956-.55 1.5-.694z"></path>`;
-    vi.setAttribute('aria-label', 'Volume désactivé');
+    vi.setAttribute('aria-label', _t('aria-vol-off', 'Volume désactivé'));
   } else if (v < 30) {
     vi.innerHTML = `<path d="M9.741.85a.75.75 0 0 1 .375.65v13a.75.75 0 0 1-1.125.65l-6.925-4a3.64 3.64 0 0 1-1.33-4.967 3.64 3.64 0 0 1 1.33-1.332l6.925-4a.75.75 0 0 1 .75 0zm-6.924 5.3a2.14 2.14 0 0 0 0 3.7l5.8 3.35V2.8zm8.683 4.29V5.56a2.75 2.75 0 0 1 0 4.88"></path>`;
-    vi.setAttribute('aria-label', 'Volume faible');
+    vi.setAttribute('aria-label', _t('aria-vol-low', 'Volume faible'));
   } else if (v < 70) {
     vi.innerHTML = `<path d="M9.741.85a.75.75 0 0 1 .375.65v13a.75.75 0 0 1-1.125.65l-6.925-4a3.64 3.64 0 0 1-1.33-4.967 3.64 3.64 0 0 1 1.33-1.332l6.925-4a.75.75 0 0 1 .75 0zm-6.924 5.3a2.14 2.14 0 0 0 0 3.7l5.8 3.35V2.8zm8.683 6.087a4.502 4.502 0 0 0 0-8.474v1.65a3 3 0 0 1 0 5.175z"></path>`;
-    vi.setAttribute('aria-label', 'Volume moyen');
+    vi.setAttribute('aria-label', _t('aria-vol-mid', 'Volume moyen'));
   } else {
     vi.innerHTML = `<path d="M9.741.85a.75.75 0 0 1 .375.65v13a.75.75 0 0 1-1.125.65l-6.925-4a3.64 3.64 0 0 1-1.33-4.967 3.64 3.64 0 0 1 1.33-1.332l6.925-4a.75.75 0 0 1 .75 0zm-6.924 5.3a2.14 2.14 0 0 0 0 3.7l5.8 3.35V2.8zm8.683 4.29V5.56a2.75 2.75 0 0 1 0 4.88"></path><path d="M11.5 13.614a5.752 5.752 0 0 0 0-11.228v1.55a4.252 4.252 0 0 1 0 8.127z"></path>`;
-    vi.setAttribute('aria-label', 'Volume élevé');
+    vi.setAttribute('aria-label', _t('aria-vol-high', 'Volume élevé'));
   }
 }
 
@@ -5331,7 +4673,7 @@ likeBtn?.addEventListener('click', () => {
   const track = tracks[currentIndex];
   if (track) { if (isLiked) likedTracks.add(track.id); else likedTracks.delete(track.id); }
   updateLikeButtons();
-  showToast(isLiked ? '♥ Ajouté aux titres likés' : '♡ Retiré des titres likés', isLiked ? 'success' : 'default');
+  showToast(isLiked ? _t('toast-added-liked', '♥ Ajouté aux titres likés') : _t('toast-removed-liked', '♡ Retiré des titres likés'), isLiked ? 'success' : 'default');
   
   // ── Firebase Sync : sauvegarder les titres likés ──
   if (window.FirebaseSync?.syncToFirestore) {
@@ -5341,7 +4683,7 @@ likeBtn?.addEventListener('click', () => {
 document.getElementById('miniEtc')?.addEventListener('click', (e) => {
   e.stopPropagation();
   const track = tracks[currentIndex];
-  if (!track) { showToast('Aucune piste en cours', 'info'); return; }
+  if (!track) { showToast(_t('toast-no-current-track', 'Aucune piste en cours'), 'info'); return; }
   showAddToPlaylistPopup(e, track);
 });
 
@@ -5372,7 +4714,7 @@ lyricsBtn.addEventListener('click', () => {
     // Forcer un scroll instantané vers la ligne en cours dès l'ouverture du panneau.
     // Évite l'affichage "décalé" (paroles au milieu alors que la musique débute,
     // ou dots intro visibles alors qu'on est déjà au refrain).
-    requestAnimationFrame(() => _forceLyricsSync());
+    requestAnimationFrame(() => window._forceLyricsSync?.());
   }
 });
 queueBtn.addEventListener('click', () => {
@@ -5457,7 +4799,7 @@ function _renderPanelQueue() {
   el.innerHTML = upcoming.map(idx => {
     const t = tracks[idx];
     return `<div class="panel-queue-item" data-idx="${idx}" data-id="${escapeHtml(t.id || '')}" draggable="true">
-      <span class="panel-queue-drag" data-tooltip="Glisser pour réorganiser">
+      <span class="panel-queue-drag" data-tooltip="${_t('tt-drag-reorder', 'Glisser pour réorganiser')}">
         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" viewBox="0 0 12 16" fill="currentColor"><circle cx="3" cy="2" r="1.4"/><circle cx="9" cy="2" r="1.4"/><circle cx="3" cy="8" r="1.4"/><circle cx="9" cy="8" r="1.4"/><circle cx="3" cy="14" r="1.4"/><circle cx="9" cy="14" r="1.4"/></svg>
       </span>
       <div class="panel-queue-art">${(t.imageUrlThumb || t.imageUrl) ? `<img src="${t.imageUrlThumb || t.imageUrl}" loading="lazy" decoding="async" alt="">` : ''}</div>
@@ -5556,7 +4898,7 @@ function _renderPanelRecent() {
   if (!el) return;
   const rp = (window.recentlyPlayed?.length ? window.recentlyPlayed : recentlyPlayed) || [];
   if (!rp.length) {
-    el.innerHTML = `<div style="padding:16px 8px;color:var(--text-subdued);font-size:0.8rem;text-align:center">Aucun titre écouté récemment</div>`;
+    el.innerHTML = `<div style="padding:16px 8px;color:var(--text-subdued);font-size:0.8rem;text-align:center">${_t('text-no-recent-tracks', 'Aucun titre écouté récemment')}</div>`;
     return;
   }
   el.innerHTML = rp.slice(0, 15).map((t, i) => {
@@ -5586,7 +4928,7 @@ async function _renderPanelArtistInfo(track) {
   el.innerHTML = `
     <div class="pai-loading">
       <div class="loading-spinner" style="width:16px;height:16px;border-width:2px"></div>
-      <span>Chargement…</span>
+      <span>${_t('text-loading', 'Chargement…')}</span>
     </div>`;
 
   try {
@@ -5605,6 +4947,13 @@ async function _renderPanelArtistInfo(track) {
     const listeners  = la?.stats?.listeners  ? formatBigNumber(parseInt(la.stats.listeners))  : null;
     const playcount  = la?.stats?.playcount   ? formatBigNumber(parseInt(la.stats.playcount))  : null;
     const bio        = la?.bio?.summary?.replace(/<a [^>]+>.*?<\/a>/g,'').replace(/<[^>]+>/g,'').trim() || '';
+    // Traduit la bio dans la langue d'interface (même mécanisme que
+    // showDetailView) — sans ça, seul le titre "À propos" était traduit,
+    // pas le texte lui-même.
+    const bioLang = window._interfaceLanguage || 'fr';
+    const bioTranslated = (bio && bioLang !== 'fr')
+      ? await _translateText(bio, bioLang).catch(() => bio)
+      : bio;
     const tags       = (la?.tags?.tag || []).slice(0, 5);
     const similar    = (la?.similar?.artist || []).slice(0, 5);
 
@@ -5613,8 +4962,8 @@ async function _renderPanelArtistInfo(track) {
     // Stats row
     if (listeners || playcount) {
       html += `<div class="pai-stats-row">`;
-      if (listeners) html += `<div class="pai-stat"><span class="pai-stat-val">${listeners}</span><span class="pai-stat-lbl">auditeurs / mois</span></div>`;
-      if (playcount) html += `<div class="pai-stat"><span class="pai-stat-val">${playcount}</span><span class="pai-stat-lbl">écoutes totales</span></div>`;
+      if (listeners) html += `<div class="pai-stat"><span class="pai-stat-val">${listeners}</span><span class="pai-stat-lbl">${_t('text-monthly-listeners', 'auditeurs / mois')}</span></div>`;
+      if (playcount) html += `<div class="pai-stat"><span class="pai-stat-val">${playcount}</span><span class="pai-stat-lbl">${_t('text-total-plays', 'écoutes totales')}</span></div>`;
       html += `</div>`;
     }
 
@@ -5626,8 +4975,8 @@ async function _renderPanelArtistInfo(track) {
     // Bio
     if (bio && bio.length > 20) {
       html += `
-        <div class="pai-section-title">À propos</div>
-        <div class="pai-bio pai-bio-full">${escapeHtml(bio)}</div>`;
+        <div class="pai-section-title">${_t('text-about', 'À propos')}</div>
+        <div class="pai-bio pai-bio-full">${escapeHtml(bioTranslated)}</div>`;
     }
 
     // ── Top Tracks from Last.fm (matched to local library) ────────
@@ -5643,7 +4992,7 @@ async function _renderPanelArtistInfo(track) {
       : localArtistTracks.slice(0, 5);
 
     if (topDisplay.length > 0) {
-      html += `<div class="pai-section-title">Titres populaires</div>
+      html += `<div class="pai-section-title">${_t('text-popular-tracks', 'Titres populaires')}</div>
         <div class="pai-top-tracks">`;
       topDisplay.forEach((t, i) => {
         const globalIdx = tracks.indexOf(t);
@@ -5668,7 +5017,7 @@ async function _renderPanelArtistInfo(track) {
 
 
 
-    if (!html) html = `<div class="pai-artist-name">${escapeHtml(track.artist)}</div><div style="color:var(--text-subdued);font-size:0.8rem;margin-top:8px">Aucune information disponible</div>`;
+    if (!html) html = `<div class="pai-artist-name">${escapeHtml(track.artist)}</div><div style="color:var(--text-subdued);font-size:0.8rem;margin-top:8px">${_t('text-no-info-available', 'Aucune information disponible')}</div>`;
 
     el.innerHTML = html;
 
@@ -5735,7 +5084,7 @@ async function _fetchMusicBrainzCredits(title, artist) {
     // Artist credits
     (rec['artist-credit'] || []).forEach(ac => {
       if (ac.artist?.name) {
-        credits.push({ role: 'Artiste', name: ac.artist.name });
+        credits.push({ role: _t('text-type-artist', 'Artiste'), name: ac.artist.name });
       }
     });
 
@@ -5745,15 +5094,15 @@ async function _fetchMusicBrainzCredits(title, artist) {
       const name = rel.artist?.name || rel.work?.title;
       if (!name) return;
       const roleMap = {
-        'composer': 'Compositeur',
-        'lyricist': 'Parolier',
-        'producer': 'Producteur',
-        'performer': 'Interprète',
+        'composer': _t('role-composer', 'Compositeur'),
+        'lyricist': _t('role-lyricist', 'Parolier'),
+        'producer': _t('role-producer', 'Producteur'),
+        'performer': _t('role-performer', 'Interprète'),
         'mix': 'Mix',
-        'recording': 'Enregistrement',
-        'engineer': 'Ingénieur du son',
-        'orchestrator': 'Orchestrateur',
-        'instrument': rel.attributes?.[0] || 'Instrument',
+        'recording': _t('role-recording', 'Enregistrement'),
+        'engineer': _t('role-engineer', 'Ingénieur du son'),
+        'orchestrator': _t('role-orchestrator', 'Orchestrateur'),
+        'instrument': rel.attributes?.[0] || _t('role-instrument', 'Instrument'),
       };
       const roleFr = roleMap[type] || type;
       if (roleFr && name && credits.length < 8) credits.push({ role: roleFr, name });
@@ -6041,7 +5390,7 @@ window.renderSidebarView = renderSidebarView;
 function showCreatePlaylistModal(initialTrack = null) {
   const user = window._firebaseUser || window._authUser;
   if (!user) {
-    showToast('Connectez-vous pour créer une playlist.', 'warning');
+    showToast(_t('toast-login-required-playlist', 'Connectez-vous pour créer une playlist.'), 'warning');
     return;
   }
 
@@ -6052,14 +5401,14 @@ function showCreatePlaylistModal(initialTrack = null) {
   modal.className = 'create-playlist-modal';
   modal.innerHTML = `
     <div class="create-playlist-box">
-      <button class="cpb-close" id="cpbClose" aria-label="Fermer">
+      <button class="cpb-close" id="cpbClose" aria-label="${_t('tt-close', 'Fermer')}">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
-      <div class="cpb-title">Créer une playlist</div>
+      <div class="cpb-title">${_t('tt-create-playlist', 'Créer une playlist')}</div>
 
       <!-- Cover image — optionnelle -->
       <div class="cpb-cover-section">
-        <label class="cpb-cover-wrap" for="cpbCoverInput" data-tooltip="Changer la couverture (optionnel)">
+        <label class="cpb-cover-wrap" for="cpbCoverInput" data-tooltip="${_t('tt-change-cover', 'Changer la couverture (optionnel)')}">
           <div class="cpb-cover" id="cpbCover">
             ${initialTrack?.imageUrl
               ? `<img src="${initialTrack.imageUrl}" alt="" id="cpbCoverImg">`
@@ -6067,29 +5416,29 @@ function showCreatePlaylistModal(initialTrack = null) {
           </div>
           <div class="cpb-cover-overlay">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
-            <span>Choisir</span>
+            <span>${_t('text-choose', 'Choisir')}</span>
           </div>
         </label>
         <input type="file" id="cpbCoverInput" accept="image/*" style="display:none">
-        <p class="cpb-cover-warning">En continuant, vous accordez à Beartify les droits de l'image que vous décidez d'importer. Vérifiez bien que vous avez le droit d'importer cette image.</p>
+        <p class="cpb-cover-warning">${_t('text-cover-warning', 'En continuant, vous accordez à Beartify les droits de l\'image que vous décidez d\'importer. Vérifiez bien que vous avez le droit d\'importer cette image.')}</p>
       </div>
 
-      <div class="cpb-field-label">Nom <span class="cpb-required">*</span></div>
-      <input class="cpb-input" id="cpbName" type="text" placeholder="Ma playlist" maxlength="60" autocomplete="off">
+      <div class="cpb-field-label">${_t('text-name-label', 'Nom')} <span class="cpb-required">*</span></div>
+      <input class="cpb-input" id="cpbName" type="text" placeholder="${_t('placeholder-my-playlist', 'Ma playlist')}" maxlength="60" autocomplete="off">
 
-      <div class="cpb-field-label">Description <span class="cpb-optional">(optionnel)</span></div>
-      <textarea class="cpb-input cpb-textarea" id="cpbDesc" placeholder="Description de la playlist…" maxlength="200"></textarea>
+      <div class="cpb-field-label">${_t('text-description-label', 'Description')} <span class="cpb-optional">${_t('text-optional', '(optionnel)')}</span></div>
+      <textarea class="cpb-input cpb-textarea" id="cpbDesc" placeholder="${_t('placeholder-playlist-description', 'Description de la playlist…')}" maxlength="200"></textarea>
 
       <!-- Rendre privée -->
       <button class="cpb-private-toggle" id="cpbPrivateToggle" type="button">
         <svg id="cpbPrivateIcon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <span id="cpbPrivateLabel">Rendre privée</span>
+        <span id="cpbPrivateLabel">${_t('text-make-private', 'Rendre privée')}</span>
         <div class="cpb-toggle-track" id="cpbToggleTrack"><div class="cpb-toggle-thumb"></div></div>
       </button>
 
       <div class="cpb-actions">
-        <button class="cpb-cancel" id="cpbCancel">Annuler</button>
-        <button class="cpb-create" id="cpbCreate">Créer</button>
+        <button class="cpb-cancel" id="cpbCancel">${_t('text-cancel', 'Annuler')}</button>
+        <button class="cpb-create" id="cpbCreate">${_t('text-create', 'Créer')}</button>
       </div>
     </div>
   `;
@@ -6115,7 +5464,9 @@ function showCreatePlaylistModal(initialTrack = null) {
   modal.querySelector('#cpbPrivateToggle')?.addEventListener('click', () => {
     _isPrivate = !_isPrivate;
     modal.querySelector('#cpbToggleTrack')?.classList.toggle('active', _isPrivate);
-    modal.querySelector('#cpbPrivateLabel').textContent = _isPrivate ? 'Playlist privée' : 'Rendre privée';
+    modal.querySelector('#cpbPrivateLabel').textContent = _isPrivate
+      ? _t('text-private-playlist', 'Playlist privée')
+      : _t('text-make-private', 'Rendre privée');
   });
 
   const closeModal = () => {
@@ -6138,7 +5489,7 @@ function showCreatePlaylistModal(initialTrack = null) {
     const desc = modal.querySelector('#cpbDesc')?.value?.trim() || '';
     const createBtn = modal.querySelector('#cpbCreate');
     createBtn.disabled = true;
-    createBtn.textContent = 'Création…';
+    createBtn.textContent = _t('text-creating', 'Création…');
 
     const playlistId = await window.FirebasePlaylists?.createPlaylist(name);
     if (playlistId) {
@@ -6151,13 +5502,13 @@ function showCreatePlaylistModal(initialTrack = null) {
       if (initialTrack && window.FirebasePlaylists?.addToPlaylist) {
         await window.FirebasePlaylists.addToPlaylist(playlistId, initialTrack);
       }
-      showToast(`Playlist "${escapeHtml(name)}" créée !`, 'success');
+      showToast(_t('toast-playlist-created', 'Playlist "{name}" créée !', {name: escapeHtml(name)}), 'success');
       closeModal();
       renderSidebarPlaylists();
     } else {
-      showToast('Erreur lors de la création. Connectez-vous et réessayez.', 'error');
+      showToast(_t('toast-error-creation-login', 'Erreur lors de la création. Connectez-vous et réessayez.'), 'error');
       createBtn.disabled = false;
-      createBtn.textContent = 'Créer';
+      createBtn.textContent = _t('text-create', 'Créer');
     }
   };
 
@@ -6172,20 +5523,20 @@ document.getElementById('createPlaylistBtnCompact')?.addEventListener('click', s
 const libSortBtn = document.querySelector('.lib-sort-btn');
 if (libSortBtn) {
   const _libSortOpts = [
-    { key: 'alpha',    label: 'Alphabétique',       albumOnly: false },
-    { key: 'artist',   label: 'Artiste',             albumOnly: true  },
-    { key: 'count',    label: 'Nombre de titres',    albumOnly: false },
-    { key: 'recent',   label: 'Récents',             albumOnly: false },
-    { key: 'favFirst', label: 'Favoris en premier',  albumOnly: false },
+    { key: 'alpha',    label: _t('text-alphabetical', 'Alphabétique'),       albumOnly: false },
+    { key: 'artist',   label: _t('text-type-artist', 'Artiste'),             albumOnly: true  },
+    { key: 'count',    label: _t('text-track-count', 'Nombre de titres'),    albumOnly: false },
+    { key: 'recent',   label: _t('text-recents', 'Récents'),             albumOnly: false },
+    { key: 'favFirst', label: _t('text-favorites-first', 'Favoris en premier'),  albumOnly: false },
   ];
 
   const _libSortLabels = {
-    alpha: 'A → Z', artist: 'Artiste', count: 'Titres', recent: 'Récents', favFirst: 'Favoris'
+    alpha: 'A → Z', artist: _t('text-type-artist', 'Artiste'), count: _t('text-titles', 'Titres'), recent: _t('text-recents', 'Récents'), favFirst: _t('text-favorites', 'Favoris')
   };
 
   function _updateLibSortLabel() {
     const span = libSortBtn.querySelector('span');
-    if (span) span.textContent = _libSortLabels[libSortKey] || 'Récents';
+    if (span) span.textContent = _libSortLabels[libSortKey] || _t('text-recents', 'Récents');
   }
 
   let _libSortPanel = null;
@@ -6338,7 +5689,7 @@ function initSearchDropdown() {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.34-4.34"/></svg>
           </div>
           <div class="sdrop-meta"><div class="sdrop-title">${escapeHtml(r)}</div></div>
-          <button class="sdrop-recent-remove" data-query="${escapeHtml(r)}" data-tooltip="Supprimer">
+          <button class="sdrop-recent-remove" data-query="${escapeHtml(r)}" data-tooltip="${_t('tt-remove', 'Supprimer')}">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>`).join('')}`;
@@ -6446,7 +5797,7 @@ function showDropdownResults(term) {
         // Rien trouvé côté serveur non plus : si on affichait "recherche en
         // cours", basculer maintenant vers le vrai "aucun résultat".
         if (dropdown.querySelector('.search-dropdown-empty')) {
-          dropdown.innerHTML = `<div class="search-dropdown-empty">Aucun résultat pour « ${escapeHtml(term)} »</div>`;
+          dropdown.innerHTML = `<div class="search-dropdown-empty">${_t('text-no-results-for', 'Aucun résultat pour « {query} »', {query: escapeHtml(term)})}</div>`;
         }
         return;
       }
@@ -6530,7 +5881,7 @@ function showDropdownResults(term) {
   dropdown.innerHTML = !hasResults
     ? (stillChecking
         ? `<div class="search-dropdown-empty"><div class="loading-spinner" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:8px"></div>Recherche en cours…</div>`
-        : `<div class="search-dropdown-empty">Aucun résultat pour « ${escapeHtml(term)} »</div>`)
+        : `<div class="search-dropdown-empty">${_t('text-no-results-for', 'Aucun résultat pour « {query} »', {query: escapeHtml(term)})}</div>`)
     : `<div class="search-dropdown-header">Résultats pour « ${escapeHtml(term)} »</div>
        ${artistsHtml}${albumsHtml}${tracksHtml}
        <div class="search-dropdown-seeall" data-query="${escapeHtml(term)}">
@@ -6573,7 +5924,7 @@ function showDropdownResults(term) {
       let r = JSON.parse(localStorage.getItem('beartify_search_recents') || '[]');
       r = [q, ...r.filter(x => x !== q)].slice(0, 8);
       localStorage.setItem('beartify_search_recents', JSON.stringify(r));
-    } catch {}
+    } catch (e) { console.warn('[Beartify] Sauvegarde des recherches récentes échouée :', e); }
     showSearchResultsPage(q);
   });
   dropdown.classList.add('visible');
@@ -6897,8 +6248,14 @@ function _generateRecommendations(count = 20) {
   const profile = _buildTasteProfile();
   const hasSignal = profile.artistScore.size > 0 || profile.genreScore.size > 0;
 
-  // Pas assez de données (nouvel utilisateur) → fallback aléatoire pondéré popularité bibliothèque
-  if (!hasSignal) return _fisherYates(tracks).slice(0, count);
+  // Pas assez de données (nouvel utilisateur, OU tout début de session
+  // avant que l'historique/les favoris ne soient restaurés depuis
+  // PocketBase) → fallback aléatoire. ⚠️ AVANT : _fisherYates(tracks) seul,
+  // sans AUCUN plafond par artiste — c'est précisément cette branche qui
+  // s'exécutait durant la brève fenêtre où seul un petit sous-ensemble de
+  // la bibliothèque était chargé (aperçu rapide), pouvant alors afficher
+  // presque exclusivement 2-3 artistes surreprésentés dans ce sous-ensemble.
+  if (!hasSignal) return _diversifyTrackList(_fisherYates(tracks), 3).slice(0, count);
 
   const scored = tracks.map(t => ({ track: t, score: _scoreTrack(t, profile) }));
   scored.sort((a, b) => b.score - a.score);
@@ -6910,72 +6267,62 @@ function _generateRecommendations(count = 20) {
   // composée que de ce seul artiste, sans aucune variété. On limite
   // maintenant explicitement le nombre de titres d'un même artiste
   // dans le résultat, quel que soit son score.
-  const MAX_PER_ARTIST = Math.max(1, Math.round(count * 0.2)); // ex: 4 sur 20
+  const MAX_PER_ARTIST = 3; // demande explicite : jamais plus de 3 titres du même artiste
 
   const rand        = _seededRandom(_dailySeed());
-  const exploitCount = Math.ceil(count * 0.85);
-  const exploreCount = count - exploitCount;
+  function _seededShuffle(arr, rnd) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(rnd() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
 
-  function pickDiverse(sortedPool, targetCount, maxPerArtist) {
+  // Prendre un pool plus large que nécessaire (5x) pour laisser assez
+  // de marge à la diversification par artiste.
+  const exploitCount = Math.ceil(count * 0.85);
+  const topPool = scored.slice(0, Math.min(exploitCount * 5, scored.length));
+
+  // ⚠️ CORRECTIF DE FOND : auparavant, on diversifiait le groupe "score
+  // élevé" TOUT SEUL (souvent 2-3 artistes très écoutés), puis on ajoutait
+  // les titres "découverte" APRÈS COUP, à la fin du tableau. Le tourniquet
+  // faisait donc bien alterner les 2 artistes du groupe "score élevé"
+  // entre eux (ex: Indila/Hoshi/Indila/Hoshi...), mais la vraie diversité
+  // (les autres artistes, en "découverte") n'arrivait qu'après ces
+  // premières cartes, hors champ visuel sans scroller. On fusionne
+  // maintenant "score élevé" ET "découverte" AVANT de diversifier, une
+  // seule fois sur l'ensemble — le tourniquet alterne alors dès la
+  // première carte entre TOUS les artistes disponibles, pas seulement
+  // les 2-3 les plus écoutés.
+  function capOnly(sortedPool, maxPerArtist) {
     const perArtistCount = new Map();
     const picked = [];
-    const skipped = [];
     for (const entry of sortedPool) {
-      if (picked.length >= targetCount) break;
       const artist = entry.track.artist || '';
       const n = perArtistCount.get(artist) || 0;
-      if (n >= maxPerArtist) { skipped.push(entry); continue; }
+      if (n >= maxPerArtist) continue;
       perArtistCount.set(artist, n + 1);
-      picked.push(entry);
-    }
-    // S'il manque des titres (catalogue avec peu d'artistes variés),
-    // on complète avec les meilleurs titres mis de côté, cap dépassé
-    // ou pas, plutôt que de rendre une liste incomplète.
-    if (picked.length < targetCount) {
-      picked.push(...skipped.slice(0, targetCount - picked.length));
+      picked.push(entry.track);
     }
     return picked;
   }
 
-  // Prendre un pool plus large que nécessaire (5x) pour laisser assez
-  // de marge à la diversification par artiste avant de mélanger.
-  const topPool = scored.slice(0, Math.min(exploitCount * 5, scored.length));
-  const diversePicks = pickDiverse(topPool, exploitCount, MAX_PER_ARTIST);
+  const exploitCandidates = capOnly(topPool, MAX_PER_ARTIST);
+  const exploitIds = new Set(exploitCandidates.map(t => t.id));
+  const explorationPool = _seededShuffle(tracks.filter(t => !exploitIds.has(t.id)), rand);
 
-  // Léger mélange (seed du jour) pour varier l'ordre d'affichage sans
-  // changer la sélection elle-même.
-  const shuffledTop = [...diversePicks];
-  for (let i = shuffledTop.length - 1; i > 0; i--) {
-    const j = Math.floor(rand() * (i + 1));
-    [shuffledTop[i], shuffledTop[j]] = [shuffledTop[j], shuffledTop[i]];
-  }
-  const picks = shuffledTop.map(s => s.track);
+  const combined = [...exploitCandidates, ...explorationPool];
+  let picks = _diversifyTrackList(combined, MAX_PER_ARTIST).slice(0, count);
 
-  // Exploration : titres au hasard PARMI ceux non déjà sélectionnés,
-  // avec le même plafond par artiste pour ne pas réintroduire le
-  // problème par la bande.
-  const pickedIds = new Set(picks.map(t => t.id));
-  const perArtistFinal = new Map();
-  picks.forEach(t => perArtistFinal.set(t.artist, (perArtistFinal.get(t.artist) || 0) + 1));
-
-  const explorationPool = tracks.filter(t => !pickedIds.has(t.id));
-  for (let i = explorationPool.length - 1; i > 0; i--) {
-    const j = Math.floor(rand() * (i + 1));
-    [explorationPool[i], explorationPool[j]] = [explorationPool[j], explorationPool[i]];
-  }
-  for (const t of explorationPool) {
-    if (picks.length >= count) break;
-    const n = perArtistFinal.get(t.artist) || 0;
-    if (n >= MAX_PER_ARTIST) continue;
-    perArtistFinal.set(t.artist, n + 1);
-    picks.push(t);
-  }
-  // Si le plafond a empêché d'atteindre `count` (petite bibliothèque),
-  // complète sans contrainte plutôt que de rendre une liste trop courte.
+  // Si le plafond a empêché d'atteindre `count` (petite bibliothèque avec
+  // peu d'artistes variés), complète sans contrainte plutôt que de rendre
+  // une liste trop courte.
   if (picks.length < count) {
-    for (const t of explorationPool) {
+    const pickedIds = new Set(picks.map(t => t.id));
+    for (const t of combined) {
       if (picks.length >= count) break;
-      if (!pickedIds.has(t.id) && !picks.includes(t)) picks.push(t);
+      if (!pickedIds.has(t.id)) { picks.push(t); pickedIds.add(t.id); }
     }
   }
 
@@ -6997,8 +6344,8 @@ function renderRecommendedSection() {
   if (subtitleEl) {
     const profile = _buildTasteProfile();
     subtitleEl.textContent = profile.artistScore.size > 0
-      ? 'Basé sur vos écoutes et vos favoris'
-      : 'Découvrez votre bibliothèque';
+      ? _t('text-based-on-listening', 'Basé sur vos écoutes et vos favoris')
+      : _t('text-discover-library', 'Découvrez votre bibliothèque');
   }
 
   document.getElementById('refreshSuggest')?.addEventListener('click', () => {
@@ -7076,82 +6423,109 @@ function renderDynamicCarousels() {
   if (!container || tracks.length === 0) return;
   container.innerHTML = '';
 
-  // ── Normalisation des genres ────────────────────────────────────
-  // Regroupe les variantes du même genre (ex: "Alternative Rock", "alt-rock", "Alt Rock" → "Rock")
-  const _normalizeGenre = g => {
-    if (!g) return null;
-    const s = g.trim().toLowerCase()
-      .replace(/[-_]/g, ' ')
-      .replace(/\s+/g, ' ');
-    // Grandes familles
-    if (/\brock\b|metal|punk|grunge|indie rock|hard rock|alt(ernative)?\s*rock/.test(s)) return 'Rock';
-    if (/\bpop\b|synth.?pop|dream.?pop|bubblegum|j.pop|k.pop/.test(s)) return 'Pop';
-    if (/hip.?hop|rap|trap|drill|grime/.test(s)) return 'Hip-Hop / Rap';
-    if (/r&b|rnb|soul|funk|neo soul|motown/.test(s)) return 'R&B / Soul';
-    if (/electro|electronic|edm|house|techno|trance|dubstep|drum.?n.?bass|dnb|ambient|synth/.test(s)) return 'Électronique';
-    if (/jazz|swing|blues|bossa|bebop/.test(s)) return 'Jazz & Blues';
-    if (/classical|orchestra|symphony|baroque|opera|chamber/.test(s)) return 'Classique';
-    if (/country|bluegrass|folk|americana|roots/.test(s)) return 'Folk / Country';
-    if (/reggae|ska|dub/.test(s)) return 'Reggae';
-    if (/latin|salsa|cumbia|bachata|reggaeton|bossa/.test(s)) return 'Latino';
-    if (/metal|heavy|death|black metal|doom/.test(s)) return 'Metal';
-    if (/punk|post.?punk|new wave/.test(s)) return 'Punk';
-    if (/indie|alternative/.test(s)) return 'Indie / Alternatif';
-    // Retour du genre original capitalisé si pas de correspondance
-    return g.trim().replace(/\b\w/g, c => c.toUpperCase());
-  };
-
   // 1 — Récemment ajoutés
-  const recentlyAdded = [...tracks]
-    .filter(t => t.dateCreated)
-    .sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated))
-    .slice(0, 20);
-  if (recentlyAdded.length >= 2) _appendCarousel(container, 'Récemment ajoutés', recentlyAdded);
+  const recentlyAdded = _capPerArtist(
+    [...tracks]
+      .filter(t => t.dateCreated)
+      .sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated)),
+    3
+  ).slice(0, 20);
+  if (recentlyAdded.length >= 2) _appendCarousel(container, _t('carousel-recently-added', 'Récemment ajoutés'), recentlyAdded);
 
   // 2 — Coups de cœur supprimé (inutile)
 
-  // 3 — Genres désactivés temporairement (normalisation en cours)
-  // Les carrousels genre seront réactivés une fois les métadonnées Jellyfin vérifiées
-  const byGenre = new Map(); // vide volontairement
-  const genreLists = [];     // vide volontairement
+  // 3 — Par genre (Rock, Pop, Hip-Hop/Rap, Électronique...)
+  // ⚠️ CORRECTIF : la décision précédente de tout miser sur
+  // loadGenreCarouselsFromLastFm() (qui ne vérifie que le TOP 5 artistes,
+  // via une petite liste de mots-clés) reposait sur un seul échantillon
+  // (l'historique PocketBase) qui n'était pas représentatif — la
+  // bibliothèque a en fait des métadonnées `genre` bien renseignées par
+  // piste. Résultat du "tout Last.fm" : seulement 2 catégories ("Pop &
+  // Rock") avec 3 titres chacune. On regroupe donc à nouveau directement
+  // depuis les métadonnées Jellyfin (bien plus riche, aucune limite de
+  // "top 5 artistes"), et on garde Last.fm en complément pour les
+  // quelques titres sans genre renseigné.
+  const _normalizeGenre = g => {
+    if (!g) return null;
+    const s = g.trim().toLowerCase().replace(/[-_]/g, ' ').replace(/\s+/g, ' ');
+    if (/\brock\b|grunge|indie rock|hard rock|alt(ernative)?\s*rock/.test(s)) return 'Rock';
+    if (/\bpop\b|synth.?pop|dream.?pop|bubblegum|j.pop|k.pop|variete|variété|chanson francaise|chanson française/.test(s)) return 'Pop';
+    if (/hip.?hop|rap|trap|drill|grime/.test(s)) return 'Hip-Hop / Rap';
+    if (/r&b|rnb|soul|funk|neo soul|motown/.test(s)) return 'R&B / Soul';
+    if (/electro|electronic|edm|house|techno|trance|dubstep|drum.?n.?bass|dnb|ambient|synth/.test(s)) return _t('genre-electronic', 'Électronique');
+    if (/jazz|swing|blues|bossa|bebop/.test(s)) return 'Jazz & Blues';
+    if (/classical|orchestra|symphony|baroque|opera|chamber|classique/.test(s)) return _t('genre-classical', 'Classique');
+    if (/country|bluegrass|folk|americana|roots/.test(s)) return 'Folk / Country';
+    if (/reggae|ska|dub/.test(s)) return 'Reggae';
+    if (/latin|salsa|cumbia|bachata|reggaeton/.test(s)) return 'Latino';
+    if (/metal|heavy|death|black metal|doom/.test(s)) return 'Metal';
+    if (/punk|post.?punk|new wave/.test(s)) return 'Punk';
+    if (/indie|alternative|alternatif/.test(s)) return 'Indie / Alternatif';
+    return g.trim().replace(/\b\w/g, c => c.toUpperCase());
+  };
 
-  // 5 — Par décennie
-  const byDecade = new Map();
+  const byGenre = new Map();
   tracks.forEach(t => {
-    if (!t.year) return;
-    const decade = Math.floor(t.year / 10) * 10;
-    if (!byDecade.has(decade)) byDecade.set(decade, []);
-    byDecade.get(decade).push(t);
+    const g = _normalizeGenre(t.genre);
+    if (!g) return;
+    if (!byGenre.has(g)) byGenre.set(g, []);
+    byGenre.get(g).push(t);
   });
-  [...byDecade.entries()]
-    .sort((a, b) => b[0] - a[0])
-    .slice(0, 4)
-    .forEach(([decade, list]) => {
-      if (list.length < 3) return;
-      _appendCarousel(container, `Années ${decade}`, list.slice(0, 20));
+  const metaGenreLabels = new Set();
+  [...byGenre.entries()]
+    .filter(([, list]) => list.length >= 3)
+    .sort((a, b) => b[1].length - a[1].length)
+    .slice(0, 8)
+    .forEach(([genre, list]) => {
+      metaGenreLabels.add(genre.toLowerCase());
+      _appendCarousel(container, genre, _diversifyTrackList(list, 3).slice(0, 20));
     });
 
-  // 6 — Artistes favoris
-  if (window.favoriteArtists?.size > 0) {
-    const favTracks = _fisherYates(
-      tracks.filter(t => [...window.favoriteArtists].some(a => a.toLowerCase() === t.artist?.toLowerCase()))
-    ).slice(0, 20);
-    if (favTracks.length >= 2) _appendCarousel(container, 'Vos artistes favoris ⭐', favTracks);
-  }
+  // En complément : genres déduits via Last.fm pour les artistes dont
+  // aucun titre n'a de `genre` renseigné côté Jellyfin (asynchrone, ne
+  // bloque pas le rendu des carrousels ci-dessus). On lui passe les
+  // genres déjà couverts par les métadonnées pour éviter un doublon
+  // (ex: deux carrousels "Pop" différents).
+  loadGenreCarouselsFromLastFm(container, metaGenreLabels);
 
-  // 7 — À découvrir (genres rares)
-  const rareGenres = genreLists.slice(10).filter(([, l]) => l.length >= 2);
-  if (rareGenres.length >= 2) {
-    const discovery = _fisherYates(rareGenres.flatMap(([, l]) => l)).slice(0, 20);
-    if (discovery.length >= 3) _appendCarousel(container, 'À découvrir dans votre bibliothèque', discovery);
+  // 6 — Artistes favoris
+  // ⚠️ Avant : affichait des TITRES (chansons) d'artistes favoris dans des
+  // cartes carrées classiques — visuellement indiscernable des autres
+  // carrousels de musique. On affiche maintenant les ARTISTES eux-mêmes
+  // (un par artiste, image ronde), pour bien distinguer "ceci concerne des
+  // artistes" du reste, cohérent avec le rond déjà utilisé dans "Mes favoris".
+  if (window.favoriteArtists?.size > 0) {
+    const favArtistsHome = [...window.favoriteArtists].map(name => {
+      const matching = tracks.filter(t => t.artist?.toLowerCase() === name.toLowerCase());
+      return {
+        name,
+        imageUrl: matching[0]?.imageUrl || null,
+        count: matching.length,
+      };
+    }).filter(a => a.count > 0);
+    const shuffledArtists = _fisherYates(favArtistsHome).slice(0, 20);
+    if (shuffledArtists.length >= 2) {
+      _appendCarousel(container, _t('carousel-favorite-artists', 'Vos artistes favoris'), shuffledArtists, {
+        renderItem: makeArtistHomeCard,
+        attachListeners: attachArtistHomeCardListeners,
+      });
+    }
   }
 
   // 8 — Populaires
-  const popular = _fisherYates(tracks).slice(0, 20);
-  _appendCarousel(container, 'Populaires dans votre bibliothèque', popular);
+  const popular = _diversifyTrackList(_fisherYates(tracks), 3).slice(0, 20);
+  _appendCarousel(container, _t('carousel-popular-library', 'Populaires dans votre bibliothèque'), popular);
+
+  // 9 — Recommandations personnalisées Last.fm (P2-7, asynchrone : ne bloque
+  //     pas le rendu des carrousels ci-dessus ; n'ajoute rien si la
+  //     fonctionnalité est désactivée ou si aucun compte Last.fm n'est lié)
+  loadPersonalizedCarouselsFromLastFm(container);
 }
 
-function _appendCarousel(container, title, trackList) {
+function _appendCarousel(container, title, trackList, opts = {}) {
+  const renderItem      = opts.renderItem      || makeHomeCard;
+  const attachListeners  = opts.attachListeners || attachHomeCardListeners;
+
   const section = document.createElement('div');
   section.className = 'home-section';
   const carouselId = 'carousel-' + Math.random().toString(36).slice(2, 8);
@@ -7164,15 +6538,15 @@ function _appendCarousel(container, title, trackList) {
       <h2>${title}</h2>
     </div>
     <div class="carousel-wrapper">
-      <button class="carousel-arrow arrow-prev" aria-label="Précédent">${chevronL}</button>
+      <button class="carousel-arrow arrow-prev" aria-label="${_t('text-previous', 'Précédent')}">${chevronL}</button>
       <div class="home-row-scroll" id="${carouselId}">
-        ${trackList.map((t,i) => makeHomeCard(t,i)).join('')}
+        ${trackList.map((t,i) => renderItem(t,i)).join('')}
       </div>
-      <button class="carousel-arrow arrow-next" aria-label="Suivant">${chevronR}</button>
+      <button class="carousel-arrow arrow-next" aria-label="${_t('tt-next', 'Suivant')}">${chevronR}</button>
     </div>
   `;
   container.appendChild(section);
-  attachHomeCardListeners(section.querySelector('.home-row-scroll'));
+  attachListeners(section.querySelector('.home-row-scroll'));
 
   const row = section.querySelector('.home-row-scroll');
   const prevArrow = section.querySelector('.arrow-prev');
@@ -7206,7 +6580,7 @@ function _appendCarousel(container, title, trackList) {
   requestAnimationFrame(() => requestAnimationFrame(updateArrows));
 }
 
-async function loadGenreCarouselsFromLastFm(container) {
+async function loadGenreCarouselsFromLastFm(container, existingGenres = new Set()) {
   if (!container) return;
 
   const artistMap = new Map();
@@ -7234,10 +6608,119 @@ async function loadGenreCarouselsFromLastFm(container) {
 
   for (const [genre, trackSet] of genreMap) {
     if (trackSet.size < 3) continue;
+    if (existingGenres.has(genre.toLowerCase())) continue;
     const label = genre.charAt(0).toUpperCase() + genre.slice(1);
-    _appendCarousel(container, label, [...trackSet].slice(0, 20));
+    _appendCarousel(container, label, _diversifyTrackList([...trackSet], 3).slice(0, 20));
   }
 }
+
+// ── Recommandations personnalisées Last.fm (P2-7) ────────────────────
+// Contrairement à loadGenreCarouselsFromLastFm (générique, par tags d'artiste),
+// cette fonction utilise le compte Last.fm personnel (Réglages → Activité →
+// Last.fm Scrobbling → "Recommandations personnalisées") pour construire des
+// carrousels basés sur l'historique réel de l'utilisateur — elle ferme la
+// boucle avec le scrobbling déjà implémenté (lastfmUser).
+async function loadPersonalizedCarouselsFromLastFm(container, { verbose = false } = {}) {
+  if (!container) return;
+  const user    = window.getSetting ? window.getSetting('lastfmUser') : null;
+  const enabled = window.getSetting ? window.getSetting('lastfmPersonalRecs') : false;
+  if (!enabled || !user) return;
+  let appendedAny = false;
+
+  // Index bibliothèque locale par artiste (clé en minuscules)
+  const libraryByArtist = new Map();
+  tracks.forEach(t => {
+    if (!t.artist) return;
+    const key = t.artist.toLowerCase();
+    if (!libraryByArtist.has(key)) libraryByArtist.set(key, []);
+    libraryByArtist.get(key).push(t);
+  });
+
+  let topArtists = null;
+  let fetchFailed = false;
+  try { topArtists = await fetchLastFmUserTopArtists(user, null, 'overall', 15); }
+  catch { topArtists = null; fetchFailed = true; }
+  if (!document.body.contains(container)) return; // page quittée entre-temps
+
+  // 1 — "D'après vos artistes Last.fm" : titres déjà présents dans la
+  //     bibliothèque locale dont l'artiste figure dans le top Last.fm réel.
+  if (topArtists?.length) {
+    const matched = [];
+    const seenIds = new Set();
+    for (const a of topArtists) {
+      const libTracks = libraryByArtist.get((a.name || '').toLowerCase());
+      if (!libTracks) continue;
+      for (const t of libTracks) {
+        if (seenIds.has(t.id)) continue;
+        seenIds.add(t.id);
+        matched.push(t);
+      }
+    }
+    if (matched.length >= 3) {
+      _appendCarousel(container, _t('carousel-based-on-lastfm', 'D\'après vos artistes Last.fm 🎧'), matched.slice(0, 20));
+      appendedAny = true;
+    }
+  } else if (!topArtists) {
+    fetchFailed = true;
+  }
+
+  // 2 — "Découvertes d'après vos écoutes Last.fm" : artistes similaires aux
+  //     titres récemment scrobblés (user.getRecentTracks → artist.getSimilar),
+  //     filtrés sur ce qui existe déjà dans la bibliothèque locale et hors
+  //     du top Last.fm (déjà couvert par le carrousel #1).
+  try {
+    const recent = await fetchLastFmUserRecentTracks(user, null, 20);
+    if (!document.body.contains(container)) return;
+    const recentArtists = [...new Set(
+      (recent || []).map(t => t.artist?.['#text'] || t.artist?.name).filter(Boolean)
+    )].slice(0, 5);
+    const topArtistNames = new Set((topArtists || []).map(a => (a.name || '').toLowerCase()));
+
+    const discovered = [];
+    const seenIds = new Set();
+    for (const artistName of recentArtists) {
+      try {
+        const r = await fetch(
+          lastfmUrl(`method=artist.getSimilar&artist=${encodeURIComponent(artistName)}&limit=10&autocorrect=1`),
+          { signal: AbortSignal.timeout(5000) }
+        );
+        if (!r.ok) continue;
+        const data = await r.json();
+        const similarArtists = data.similarartists?.artist || [];
+        for (const sa of similarArtists) {
+          const key = (sa.name || '').toLowerCase();
+          if (topArtistNames.has(key)) continue;
+          const libTracks = libraryByArtist.get(key);
+          if (!libTracks) continue;
+          for (const t of libTracks) {
+            if (seenIds.has(t.id)) continue;
+            seenIds.add(t.id);
+            discovered.push(t);
+          }
+        }
+      } catch { continue; }
+    }
+    if (discovered.length >= 3 && document.body.contains(container)) {
+      _appendCarousel(container, _t('carousel-lastfm-discoveries', 'Découvertes d\'après vos écoutes Last.fm 🔍'), _fisherYates(discovered).slice(0, 20));
+      appendedAny = true;
+    }
+  } catch { fetchFailed = true; /* ne doit jamais bloquer le reste de la page d'accueil */ }
+
+  // Retour explicite uniquement quand déclenché volontairement (toggle dans
+  // les Réglages) — jamais au chargement silencieux de la page d'accueil,
+  // pour ne pas relancer un toast à chaque visite.
+  if (verbose && typeof showToast === 'function') {
+    if (appendedAny) {
+      showToast(_t('toast-lastfm-recs-enabled', '🎧 Recommandations Last.fm personnalisées activées'), 'success');
+    } else if (fetchFailed) {
+      showToast(_t('toast-lastfm-fetch-error', "⚠️ Impossible de récupérer vos données Last.fm — vérifiez le pseudo et l'API côté serveur (voir Network → method=user.getTopArtists)"), 'error');
+    } else {
+      showToast(_t('toast-no-lastfm-match', "Aucune correspondance trouvée entre votre top Last.fm et votre bibliothèque locale pour l'instant"), 'info');
+    }
+  }
+}
+// Exposé pour un rafraîchissement immédiat depuis settings.js au moment du toggle
+window._loadPersonalizedLastfmCarousels = loadPersonalizedCarouselsFromLastFm;
 
 // ── Recently played ────────────────────────────────────────────────
 function addToRecently(track) {
@@ -7255,8 +6738,10 @@ function addToRecently(track) {
   if (recentlyPlayed.length > 20) recentlyPlayed.length = 20;
   window.recentlyPlayed = recentlyPlayed; // garder la référence window à jour
 
-  // Sauvegarder dans Firebase (saveHistory = anciennement saveRecentlyPlayed)
-  if (window.FirebaseSync?.saveHistory) {
+  // Sauvegarder (PocketBase en priorité, sinon Firebase natif)
+  if (window.PocketBaseConfig?.isAuthenticated?.() && window.PocketBaseSync?.saveHistory) {
+    window.PocketBaseSync.saveHistory(recentlyPlayed);
+  } else if (window.FirebaseSync?.saveHistory) {
     window.FirebaseSync.saveHistory();
   } else if (window.FirebaseSync?.saveRecentlyPlayed) {
     window.FirebaseSync.saveRecentlyPlayed();
@@ -7455,7 +6940,36 @@ function attachHomeCardListeners(container, fallbackList = null) {
   });
 }
 
-// ── Met à jour les icônes play/pause de toutes les home-cards ──────
+// ── Carte ronde pour un artiste (carrousel "Vos artistes favoris") ─────
+// Même structure/classe .home-card que les cartes de titres (pour garder
+// la largeur, l'espacement et l'animation d'entrée du carrousel identiques),
+// mais avec une pochette RONDE (.home-card-art-round) au lieu de carrée,
+// pour distinguer visuellement "ceci est un artiste" — même logique que
+// le rond utilisé pour les artistes dans "Mes favoris".
+function makeArtistHomeCard(artist, index = 0) {
+  const initial = escapeHtml((artist.name || '?').charAt(0).toUpperCase());
+  return `
+    <div class="home-card home-card-artist" data-artist="${escapeHtml(artist.name)}" style="animation-delay:${Math.min(index * 0.04, 0.4)}s">
+      <div class="home-card-art home-card-art-round">
+        ${artist.imageUrl
+          ? `<img src="${artist.imageUrl}" alt="" loading="lazy" decoding="async">`
+          : `<div class="home-card-art-placeholder home-card-art-placeholder-round" style="background:${artistGradient(artist.name)}">${initial}</div>`}
+      </div>
+      <div class="home-card-title">${escapeHtml(artist.name)}</div>
+      <div class="home-card-sub">${artist.count} titre${artist.count > 1 ? 's' : ''}</div>
+    </div>`;
+}
+
+// Écoute dédiée pour les cartes artiste — pas de bouton play (ce n'est pas
+// un titre unique), un simple clic emmène directement sur la page artiste.
+function attachArtistHomeCardListeners(container) {
+  container?.querySelectorAll('.home-card-artist').forEach(el => {
+    el.addEventListener('click', () => {
+      const name = el.dataset.artist;
+      if (name) showDetailView('artist', name);
+    });
+  });
+}
 function updateHomeCardPlayIcons() {
   const activeId = (currentIndex >= 0 && !audioPlayer.paused)
     ? tracks[currentIndex]?.id : null;
@@ -7487,6 +7001,84 @@ let detailType = null;
 // ══════════════════════════════════════════════════════════════════
 //  PLAYLIST EDIT MODAL
 // ══════════════════════════════════════════════════════════════════
+// ⚠️ AJOUT (P0-5) : câble le backend de collaboration déjà écrit dans
+// pocketbase-playlists.js (addCollaborator/removeCollaborator/isCollaborator)
+// à une vraie UI. Réutilise window.FirebaseSocial.searchUser (déjà utilisé
+// par friends-panel.js pour la recherche d'amis) plutôt que de demander un
+// docId brut (email/discordId interne) que personne ne connaît par cœur.
+function _openInviteCollaboratorModal(playlistId, pl) {
+  document.getElementById('collabInviteModal')?.remove();
+
+  const existing = Array.isArray(pl.collaborators) ? pl.collaborators : [];
+
+  const modal = document.createElement('div');
+  modal.id = 'collabInviteModal';
+  modal.className = 'modal-overlay';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:9999';
+  modal.innerHTML = `
+    <div style="background:var(--bg-elevated,#161616);border-radius:12px;padding:22px;width:360px;max-width:90vw">
+      <h3 style="margin:0 0 4px;font-size:1.05rem;color:var(--text-base,#fff)">Inviter des collaborateurs</h3>
+      <p style="margin:0 0 14px;font-size:.8rem;color:var(--text-subdued,#b3b3b3)">
+        Un collaborateur peut ajouter/retirer des titres sur « ${esc(pl.name || '')} ».
+      </p>
+      <input type="text" id="collabSearchInput" placeholder="Rechercher un utilisateur…"
+        style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.12);
+               background:var(--bg-base,#080808);color:#fff;font-family:inherit;font-size:.85rem;outline:none;margin-bottom:10px">
+      <div id="collabSearchResults" style="max-height:180px;overflow-y:auto;margin-bottom:10px"></div>
+      <div id="collabCurrentList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px">
+        ${existing.length ? '' : '<div style="font-size:.75rem;color:var(--text-subdued)">Aucun collaborateur pour le moment.</div>'}
+      </div>
+      <div style="display:flex;justify-content:flex-end">
+        <button id="collabCloseBtn" class="mkt-install-btn">Fermer</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+
+  modal.querySelector('#collabCloseBtn').addEventListener('click', () => modal.remove());
+  modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+
+  const input   = modal.querySelector('#collabSearchInput');
+  const results = modal.querySelector('#collabSearchResults');
+  let debounce  = null;
+
+  input.addEventListener('input', () => {
+    clearTimeout(debounce);
+    const q = input.value.trim();
+    if (q.length < 2) { results.innerHTML = ''; return; }
+    results.innerHTML = '<span class="fp-spinner" style="margin:6px auto;display:block"></span>';
+    debounce = setTimeout(async () => {
+      const users = (await window.FirebaseSocial?.searchUser?.(q)) || [];
+      if (!results.isConnected) return;
+      if (!users.length) {
+        results.innerHTML = `<div style="font-size:.75rem;color:var(--text-subdued);padding:6px 2px">${_t('text-no-results-for', 'Aucun résultat pour « {query} »', {query: esc(q)})}</div>`;
+        return;
+      }
+      results.innerHTML = users.map(u => `
+        <div class="collab-result-item" data-docid="${esc(u.docId)}"
+             style="display:flex;align-items:center;gap:10px;padding:6px 4px;cursor:pointer;border-radius:6px">
+          <span style="width:28px;height:28px;border-radius:50%;background:${u.picture ? `url('${esc(u.picture)}') center/cover` : 'rgba(255,255,255,.1)'};flex-shrink:0"></span>
+          <span style="font-size:.82rem;color:#fff">${esc(u.name || u.docId)}</span>
+        </div>
+      `).join('');
+      results.querySelectorAll('.collab-result-item').forEach(item => {
+        item.addEventListener('mouseenter', () => item.style.background = 'rgba(255,255,255,.06)');
+        item.addEventListener('mouseleave', () => item.style.background = '');
+        item.addEventListener('click', async () => {
+          const docId = item.dataset.docid;
+          const ok = await window.PocketBasePlaylists?.addCollaborator?.(playlistId, docId);
+          if (ok) {
+            showToast(_t('toast-collaborator-added', '✅ Collaborateur ajouté'), 'success');
+            pl.collaborators = [...(pl.collaborators || []), docId];
+            input.value = ''; results.innerHTML = '';
+          } else {
+            showToast('❌ Impossible d\'ajouter ce collaborateur (droits ou utilisateur introuvable)', 'error');
+          }
+        });
+      });
+    }, 400);
+  });
+}
+
 function _openPlaylistEditModal(playlistId, pl, plTracks) {
   const existing = document.getElementById('playlistEditModal');
   if (existing) existing.remove();
@@ -7503,34 +7095,34 @@ function _openPlaylistEditModal(playlistId, pl, plTracks) {
   modal.innerHTML = `
     <div class="pl-edit-modal">
       <div class="pl-edit-header">
-        <h2 class="pl-edit-title">Modifier les informations</h2>
-        <button class="pl-edit-close" id="plEditClose" data-tooltip="Fermer">
+        <h2 class="pl-edit-title">${_t('text-edit-info-title', 'Modifier les informations')}</h2>
+        <button class="pl-edit-close" id="plEditClose" data-tooltip="${_t('tt-close', 'Fermer')}">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
       <div class="pl-edit-body">
-        <label class="pl-edit-cover-wrap" id="plEditCoverWrap" title="Modifier la photo" style="cursor:pointer;display:block">
+        <label class="pl-edit-cover-wrap" id="plEditCoverWrap" title="${_t('tt-edit-photo', 'Modifier la photo')}" style="cursor:pointer;display:block">
           <div id="plEditCoverPreview" class="pl-edit-cover-preview">
             ${_makePlaylistCoverHtml(plTracks, 'lg', pl.coverUrl || null)}
           </div>
           <div class="pl-edit-cover-overlay">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pl-edit-cover-edit-icon"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
-            <span>Modifier la photo</span>
+            <span>${_t('tt-edit-photo', 'Modifier la photo')}</span>
           </div>
         </label>
         <input type="file" id="plEditFileInput" accept="image/*" style="display:none">
         <div class="pl-edit-fields">
-          <input type="text" id="plEditName" class="pl-edit-input" placeholder="Nom de la playlist" value="${escapeHtml(pl.name || '')}">
-          <textarea id="plEditDesc" class="pl-edit-textarea" placeholder="Ajoutez une description facultative">${escapeHtml(pl.description || '')}</textarea>
+          <input type="text" id="plEditName" class="pl-edit-input" placeholder="${_t('placeholder-playlist-name', 'Nom de la playlist')}" value="${escapeHtml(pl.name || '')}">
+          <textarea id="plEditDesc" class="pl-edit-textarea" placeholder="${_t('placeholder-optional-desc', 'Ajoutez une description facultative')}">${escapeHtml(pl.description || '')}</textarea>
           <button class="pl-edit-privacy-btn" id="plEditPrivacyBtn">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <span id="plEditPrivacyLabel">${pl.private ? 'Privée' : 'Rendre privée'}</span>
+            <span id="plEditPrivacyLabel">${pl.private ? _t('text-private', 'Privée') : _t('text-make-private', 'Rendre privée')}</span>
           </button>
         </div>
       </div>
       <div class="pl-edit-footer">
-        <p class="pl-edit-legal">En continuant, vous accordez à Beartify les droits de l'image que vous décidez d'importer. Vérifiez bien que vous avez le droit d'importer cette image.</p>
-        <button class="pl-edit-save-btn" id="plEditSave">Sauvegarder</button>
+        <p class="pl-edit-legal">${_t('text-cover-warning', 'En continuant, vous accordez à Beartify les droits de l\'image que vous décidez d\'importer. Vérifiez bien que vous avez le droit d\'importer cette image.')}</p>
+        <button class="pl-edit-save-btn" id="plEditSave">${_t('text-save', 'Sauvegarder')}</button>
       </div>
     </div>
   `;
@@ -7542,7 +7134,7 @@ function _openPlaylistEditModal(playlistId, pl, plTracks) {
   const privacyLabel = modal.querySelector('#plEditPrivacyLabel');
   privacyBtn.addEventListener('click', () => {
     isPrivate = !isPrivate;
-    privacyLabel.textContent = isPrivate ? 'Privée' : 'Rendre privée';
+    privacyLabel.textContent = isPrivate ? _t('text-private', 'Privée') : _t('text-make-private', 'Rendre privée');
     privacyBtn.classList.toggle('active', isPrivate);
   });
   if (isPrivate) privacyBtn.classList.add('active');
@@ -7602,7 +7194,7 @@ function _openPlaylistEditModal(playlistId, pl, plTracks) {
   modal.querySelector('#plEditSave').addEventListener('click', async () => {
     const newName = modal.querySelector('#plEditName').value.trim();
     const newDesc = modal.querySelector('#plEditDesc').value.trim();
-    if (!newName) { showToast('Le nom ne peut pas être vide.', 'error'); return; }
+    if (!newName) { showToast(_t('toast-name-empty', 'Le nom ne peut pas être vide.'), 'error'); return; }
 
     const updates = { name: newName, description: newDesc, private: isPrivate };
     if (newCoverFile) {
@@ -7626,7 +7218,7 @@ function _openPlaylistEditModal(playlistId, pl, plTracks) {
       const titleEl = document.getElementById('customPlaylistTitle');
       if (titleEl) titleEl.textContent = newName;
       const descEl = document.getElementById('customPlaylistDesc');
-      if (descEl) descEl.textContent = newDesc || 'Playlist personnelle';
+      if (descEl) descEl.textContent = newDesc || _t('text-personal-playlist', 'Playlist personnelle');
       if (updates.coverUrl) {
         // Mettre à jour la cover dans le header de la vue détail (remplace le HTML complet)
         const coverWrapEl = document.getElementById('playlistCoverWrap');
@@ -7641,10 +7233,10 @@ function _openPlaylistEditModal(playlistId, pl, plTracks) {
           if (oldCover) oldCover.outerHTML = _makePlaylistCoverHtml([], 'sm', updates.coverUrl);
         }
       }
-      showToast('Playlist mise à jour.', 'success');
+      showToast(_t('toast-playlist-updated', 'Playlist mise à jour.'), 'success');
       renderSidebarPlaylists?.();
     } else {
-      showToast('Erreur lors de la sauvegarde.', 'error');
+      showToast(_t('toast-error-save', 'Erreur lors de la sauvegarde.'), 'error');
     }
     closeModal();
   });
@@ -7657,7 +7249,7 @@ function _openPlaylistEditModal(playlistId, pl, plTracks) {
 // ── Vue playlist ami (namespace isolé, ne pollue pas customPlaylists) ──
 function _showFriendPlaylistView(tempId, pushHistory = true) {
   const pl = window._friendPlaylistCache?.[tempId];
-  if (!pl) { showToast('Playlist introuvable.', 'error'); return; }
+  if (!pl) { showToast(_t('toast-playlist-not-found', 'Playlist introuvable.'), 'error'); return; }
 
   if (pushHistory) pushNavState('friend_playlist', { tempId });
 
@@ -7680,7 +7272,7 @@ function _showFriendPlaylistView(tempId, pushHistory = true) {
   const totalSec = plTracks.reduce((s, t) => s + (t.duration || 0), 0);
   const totalMin = Math.floor(totalSec / 60);
   const totalH   = Math.floor(totalMin / 60);
-  const durationStr = totalH > 0 ? `${totalH} h ${totalMin % 60} min` : `${totalMin} min`;
+  const durationStr = totalH > 0 ? `${totalH} ${_t('text-hours-abbr', 'h')} ${totalMin % 60} ${_t('text-minutes-abbr', 'min')}` : `${totalMin} ${_t('text-minutes-abbr', 'min')}`;
 
   _cleanDetailView();
   detailView.innerHTML = `
@@ -7689,31 +7281,31 @@ function _showFriendPlaylistView(tempId, pushHistory = true) {
         ? `<img src="${escapeHtml(pl.coverUrl)}" alt="" class="detail-cover-img">`
         : _makePlaylistCoverHtml(plTracks, 'lg', null)}</div>
       <div class="detail-meta">
-        <div class="detail-type">Playlist</div>
+        <div class="detail-type">${_t('text-type-playlist', 'Playlist')}</div>
         <h1 class="detail-title">${escapeHtml(pl.name)}</h1>
         <div class="detail-subtitle">${escapeHtml(pl.createdBy || pl._ownerName || '')}</div>
-        <div class="detail-stats">${plTracks.length} titre${plTracks.length !== 1 ? 's' : ''} · ${durationStr}</div>
+        <div class="detail-stats">${plTracks.length} ${plTracks.length !== 1 ? _t('text-track-plural', 'titres') : _t('text-track-singular', 'titre')} · ${durationStr}</div>
       </div>
     </div>
     <div class="detail-controls-bar playlist-controls-bar">
       <div class="detail-controls-left">
-        <button class="playlist-play-circle" id="detailPlayBtn" data-tooltip="Lecture">
+        <button class="playlist-play-circle" id="detailPlayBtn" data-tooltip="${_t('tt-play', 'Lecture')}">
           <svg data-encore-id="icon" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" class="playlist-play-icon-img" id="detailPlayIcon"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288z"></path></svg>
           <svg data-encore-id="icon" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" class="playlist-play-icon-img" id="detailPauseIcon" style="display:none"><path d="M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7zm8 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7z"></path></svg>
         </button>
-        <button class="playlist-ctrl-btn" id="detailShuffleBtn" data-tooltip="Lecture aléatoire">
+        <button class="playlist-ctrl-btn" id="detailShuffleBtn" data-tooltip="${_t('tt-shuffle-play', 'Lecture aléatoire')}">
           <svg data-encore-id="icon" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" class="btn-icon"><path d="M13.151.922a.75.75 0 1 0-1.06 1.06L13.109 3H11.16a3.75 3.75 0 0 0-2.873 1.34l-6.173 7.356A2.25 2.25 0 0 1 .39 12.5H0V14h.391a3.75 3.75 0 0 0 2.873-1.34l6.173-7.356a2.25 2.25 0 0 1 1.724-.804h1.947l-1.017 1.018a.75.75 0 0 0 1.06 1.06L15.98 3.75z"></path><path d="m7.5 10.723.98-1.167.957 1.14a2.25 2.25 0 0 0 1.724.804h1.947l-1.017-1.018a.75.75 0 1 1 1.06-1.06l2.829 2.828-2.829 2.828a.75.75 0 1 1-1.06-1.06L13.109 13H11.16a3.75 3.75 0 0 1-2.873-1.34l-.787-.938z"></path><path d="M.391 3.5H0V2h.391c1.109 0 2.16.49 2.873 1.34L4.89 5.277l-.979 1.167-1.796-2.14A2.25 2.25 0 0 0 .39 3.5z"></path></svg>
         </button>
-        <button class="playlist-ctrl-btn detail-download-btn" id="detailDownloadBtn" data-tooltip="Télécharger (VIP)">
+        <button class="playlist-ctrl-btn detail-download-btn" id="detailDownloadBtn" data-tooltip="${_t('tt-download-vip', 'Télécharger (VIP)')}">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         </button>
       </div>
     </div>
     <div class="detail-tracks-header" id="detailTracksHeader">
       <span class="dth-num">#</span>
-      <span class="dth-title">Titre</span>
-      <span class="dth-album">Album</span>
-      <span class="dth-dateadded">Date d'ajout</span>
+      <span class="dth-title">${_t('text-column-title', 'Titre')}</span>
+      <span class="dth-album">${_t('text-type-album', 'Album')}</span>
+      <span class="dth-dateadded">${_t('text-column-date-added', 'Date d\'ajout')}</span>
       <span class="dth-dur"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="opacity:0.6"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
     </div>
     <div class="detail-tracks-list" id="detailTrackList"></div>
@@ -7779,7 +7371,7 @@ window.showPlaylistView = function(type, pushHistory = true) {
     const totalDuration = likedList.reduce((s, t) => s + (t.duration || 0), 0);
     const totalMin = Math.floor(totalDuration / 60);
     const totalH   = Math.floor(totalMin / 60);
-    const durationStr = totalH > 0 ? `${totalH} h ${totalMin % 60} min` : `${totalMin} min`;
+    const durationStr = totalH > 0 ? `${totalH} ${_t('text-hours-abbr', 'h')} ${totalMin % 60} ${_t('text-minutes-abbr', 'min')}` : `${totalMin} ${_t('text-minutes-abbr', 'min')}`;
 
     _cleanDetailView();
     detailView.innerHTML = `
@@ -7788,38 +7380,39 @@ window.showPlaylistView = function(type, pushHistory = true) {
           <img src="pictures/icon-heart.jpg" alt="" class="detail-cover-img" style="border-radius:8px;">
         </div>
         <div class="detail-meta">
-          <div class="detail-type">Playlist</div>
-          <h1 class="detail-title">Titres likés</h1>
-          <div class="detail-subtitle">Ta collection personnelle</div>
+          <div class="detail-type">${_t('text-type-playlist', 'Playlist')}</div>
+          <h1 class="detail-title">${_t('text-liked-songs', 'Titres likés')}</h1>
+          <div class="detail-subtitle">${_t('text-personal-collection', 'Ta collection personnelle')}</div>
           <div class="detail-stats">${likedList.length} titre${likedList.length !== 1 ? 's' : ''} · ${durationStr}</div>
         </div>
       </div>
-      <div class="detail-controls-bar">
+      <div class="detail-controls-bar playlist-controls-bar">
         <div class="detail-controls-left">
-          <button class="detail-play-btn" id="detailPlayBtn">
-            <span class="detail-play-icon"></span> Lecture
+          <button class="playlist-play-circle" id="detailPlayBtn" data-tooltip="${_t('tt-play', 'Lecture')}">
+            <svg data-encore-id="icon" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" class="playlist-play-icon-img" id="detailPlayIcon"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288z"></path></svg>
+            <svg data-encore-id="icon" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" class="playlist-play-icon-img" id="detailPauseIcon" style="display:none"><path d="M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7zm8 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7z"></path></svg>
           </button>
-          <button class="detail-shuffle-btn" id="detailShuffleBtn" data-tooltip="Lecture aléatoire">
+          <button class="playlist-ctrl-btn" id="detailShuffleBtn" data-tooltip="${_t('tt-shuffle-play', 'Lecture aléatoire')}">
             <svg data-encore-id="icon" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" class="btn-icon"><path d="M13.151.922a.75.75 0 1 0-1.06 1.06L13.109 3H11.16a3.75 3.75 0 0 0-2.873 1.34l-6.173 7.356A2.25 2.25 0 0 1 .39 12.5H0V14h.391a3.75 3.75 0 0 0 2.873-1.34l6.173-7.356a2.25 2.25 0 0 1 1.724-.804h1.947l-1.017 1.018a.75.75 0 0 0 1.06 1.06L15.98 3.75z"></path><path d="m7.5 10.723.98-1.167.957 1.14a2.25 2.25 0 0 0 1.724.804h1.947l-1.017-1.018a.75.75 0 1 1 1.06-1.06l2.829 2.828-2.829 2.828a.75.75 0 1 1-1.06-1.06L13.109 13H11.16a3.75 3.75 0 0 1-2.873-1.34l-.787-.938z"></path><path d="M.391 3.5H0V2h.391c1.109 0 2.16.49 2.873 1.34L4.89 5.277l-.979 1.167-1.796-2.14A2.25 2.25 0 0 0 .39 3.5z"></path></svg>
           </button>
-          <button class="detail-shuffle-btn detail-download-btn" id="detailDownloadBtn" data-tooltip="Télécharger (VIP)">
+          <button class="playlist-ctrl-btn detail-download-btn" id="detailDownloadBtn" data-tooltip="${_t('tt-download-vip', 'Télécharger (VIP)')}">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           </button>
           <div class="detail-search-wrap" id="detailSearchWrap">
-            <button class="detail-search-toggle" id="detailSearchToggle" data-tooltip="Rechercher">
+            <button class="detail-search-toggle" id="detailSearchToggle" data-tooltip="${_t('tt-search', 'Rechercher')}">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
             </button>
-            <input id="detailSearchInput" type="text" class="detail-search-input" placeholder="Rechercher…">
+            <input id="detailSearchInput" type="text" class="detail-search-input" placeholder="${_t('placeholder-search-dots', 'Rechercher…')}">
           </div>
-          <button class="detail-list-sort-btn" id="detailListSortBtn" data-tooltip="Trier">
+          <button class="detail-list-sort-btn" id="detailListSortBtn" data-tooltip="${_t('tt-sort', 'Trier')}">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M3 5h.01"/><path d="M3 12h.01"/><path d="M3 19h.01"/><path d="M8 5h13"/><path d="M8 12h13"/><path d="M8 19h13"/></svg>
           </button>
         </div>
       </div>
       <div class="detail-tracks-header" id="detailTracksHeader">
         <span class="dth-num">#</span>
-        <span class="dth-title dth-sortable" data-sort="title">Titre<span class="dth-sort-arrow">↕</span></span>
-        <span class="dth-album dth-sortable" data-sort="album">Album<span class="dth-sort-arrow">↕</span></span>
+        <span class="dth-title dth-sortable" data-sort="title">${_t('text-column-title', 'Titre')}<span class="dth-sort-arrow">↕</span></span>
+        <span class="dth-album dth-sortable" data-sort="album">${_t('text-type-album', 'Album')}<span class="dth-sort-arrow">↕</span></span>
         <span class="dth-dateadded dth-sortable" data-sort="year">Date d'ajout<span class="dth-sort-arrow">↕</span></span>
         <span class="dth-dur dth-sortable" data-sort="duration" style="cursor:pointer;user-select:none">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="opacity:0.6"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -7839,9 +7432,9 @@ window.showPlaylistView = function(type, pushHistory = true) {
       isShuffled = false;
       shuffleBtn.classList.remove('active');
       shuffleOrder = ctxIndices;
-      window._currentRpContextName = 'Titres likés';
+      window._currentRpContextName = _t('text-liked-songs', 'Titres likés');
       const _ctxEl = document.getElementById('rpContextName');
-      if (_ctxEl) _ctxEl.textContent = 'Titres likés';
+      if (_ctxEl) _ctxEl.textContent = _t('text-liked-songs', 'Titres likés');
       if (ctxIndices.length) { currentIndex = ctxIndices[0]; playCurrentTrack(); }
     });
     document.getElementById('detailShuffleBtn')?.addEventListener('click', () => {
@@ -7858,7 +7451,7 @@ window.showPlaylistView = function(type, pushHistory = true) {
       } else {
         shuffleOrder = _fisherYates(ctxIndices);
       }
-      if (shuffleOrder.length) { window._currentRpContextName = 'Titres likés'; const _ctxEl2 = document.getElementById('rpContextName'); if (_ctxEl2) _ctxEl2.textContent = 'Titres likés'; currentIndex = shuffleOrder[0]; playCurrentTrack(); }
+      if (shuffleOrder.length) { window._currentRpContextName = _t('text-liked-songs', 'Titres likés'); const _ctxEl2 = document.getElementById('rpContextName'); if (_ctxEl2) _ctxEl2.textContent = _t('text-liked-songs', 'Titres likés'); currentIndex = shuffleOrder[0]; playCurrentTrack(); }
     });
 
     // Recherche inline
@@ -7872,7 +7465,7 @@ window.showPlaylistView = function(type, pushHistory = true) {
 
     // Télécharger (VIP)
     document.getElementById('detailDownloadBtn')?.addEventListener('click', () => {
-      _downloadPlaylist(likedList, 'Titres likés');
+      _downloadPlaylist(likedList, _t('text-liked-songs', 'Titres likés'));
     });
 
     if (pushHistory) history.pushState({ view: 'playlist', type: 'liked' }, '');
@@ -7894,7 +7487,6 @@ window.showPlaylistView = function(type, pushHistory = true) {
     _hideAllMainPanels();
     detailView.style.display = 'flex';
     detailType = 'favorites';
-    detailContextTracks = [];
 
     const albumCards = favAlbumsList.map(a => `
       <div class="lib-album-item" data-album="${escapeHtml(a.name)}" style="cursor:pointer;">
@@ -7922,6 +7514,13 @@ window.showPlaylistView = function(type, pushHistory = true) {
     const favAlbumTracks = [...favoriteAlbums].flatMap(name =>
       tracks.filter(t => t.album === name)
     );
+    // ⚠️ CORRECTIF : detailContextTracks était figé à [] ici — la synchro
+    // play/pause générique (_syncDetailPlayIcon, basée sur detailContextTracks)
+    // ne pouvait donc jamais détecter que cette liste était en cours de
+    // lecture, et le bouton restait bloqué sur l'icône "lecture" même
+    // pendant que ça jouait. On l'assigne maintenant comme pour les autres
+    // vues (liked/custom_playlist).
+    detailContextTracks = [...favAlbumTracks];
 
     const total = favAlbumsList.length + favArtistsList.length;
     _cleanDetailView();
@@ -7931,19 +7530,20 @@ window.showPlaylistView = function(type, pushHistory = true) {
           <img src="pictures/icon-star.png"  alt="" class="detail-cover-img" style="border-radius:8px;">
         </div>
         <div class="detail-meta">
-          <div class="detail-type">Playlist</div>
+          <div class="detail-type">${_t('text-type-playlist', 'Playlist')}</div>
           <h1 class="detail-title">Mes favoris</h1>
           <div class="detail-subtitle">Albums et artistes favoris</div>
           <div class="detail-stats">${total} élément${total !== 1 ? 's' : ''} · ${favAlbumTracks.length} titre${favAlbumTracks.length !== 1 ? 's' : ''}</div>
         </div>
       </div>
       ${favAlbumTracks.length > 0 ? `
-      <div class="detail-controls-bar">
+      <div class="detail-controls-bar playlist-controls-bar">
         <div class="detail-controls-left">
-          <button class="detail-play-btn" id="favPlayBtn">
-            <span class="detail-play-icon"></span> Lecture
+          <button class="playlist-play-circle" id="detailPlayBtn" data-tooltip="${_t('tt-play', 'Lecture')}">
+            <svg data-encore-id="icon" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" class="playlist-play-icon-img" id="detailPlayIcon"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288z"></path></svg>
+            <svg data-encore-id="icon" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" class="playlist-play-icon-img" id="detailPauseIcon" style="display:none"><path d="M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7zm8 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7z"></path></svg>
           </button>
-          <button class="detail-shuffle-btn" id="favShuffleBtn" data-tooltip="Lecture aléatoire">
+          <button class="playlist-ctrl-btn" id="detailShuffleBtn" data-tooltip="${_t('tt-shuffle-play', 'Lecture aléatoire')}">
             <svg data-encore-id="icon" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" class="btn-icon"><path d="M13.151.922a.75.75 0 1 0-1.06 1.06L13.109 3H11.16a3.75 3.75 0 0 0-2.873 1.34l-6.173 7.356A2.25 2.25 0 0 1 .39 12.5H0V14h.391a3.75 3.75 0 0 0 2.873-1.34l6.173-7.356a2.25 2.25 0 0 1 1.724-.804h1.947l-1.017 1.018a.75.75 0 0 0 1.06 1.06L15.98 3.75z"></path><path d="m7.5 10.723.98-1.167.957 1.14a2.25 2.25 0 0 0 1.724.804h1.947l-1.017-1.018a.75.75 0 1 1 1.06-1.06l2.829 2.828-2.829 2.828a.75.75 0 1 1-1.06-1.06L13.109 13H11.16a3.75 3.75 0 0 1-2.873-1.34l-.787-.938z"></path><path d="M.391 3.5H0V2h.391c1.109 0 2.16.49 2.873 1.34L4.89 5.277l-.979 1.167-1.796-2.14A2.25 2.25 0 0 0 .39 3.5z"></path></svg>
           </button>
         </div>
@@ -7989,7 +7589,7 @@ window.showPlaylistView = function(type, pushHistory = true) {
       el.addEventListener('click', () => showDetailView('artist', el.dataset.artist)));
 
     // ── Boutons Lecture / Aléatoire - Mes favoris ───────────────────
-    document.getElementById('favPlayBtn')?.addEventListener('click', () => {
+    document.getElementById('detailPlayBtn')?.addEventListener('click', () => {
       if (!favAlbumTracks.length) return;
       const ctxIndices = favAlbumTracks.map(t => tracks.indexOf(t)).filter(i => i !== -1);
       _setPlayContext(ctxIndices.length ? ctxIndices.map(i => tracks[i]?.id).filter(Boolean) : null);
@@ -7998,7 +7598,7 @@ window.showPlaylistView = function(type, pushHistory = true) {
       shuffleOrder = ctxIndices;
       if (ctxIndices.length) { currentIndex = ctxIndices[0]; playCurrentTrack(); }
     });
-    document.getElementById('favShuffleBtn')?.addEventListener('click', () => {
+    document.getElementById('detailShuffleBtn')?.addEventListener('click', () => {
       if (!favAlbumTracks.length) return;
       const ctxIndices = favAlbumTracks.map(t => tracks.indexOf(t)).filter(i => i !== -1);
       _setPlayContext(ctxIndices.length ? ctxIndices.map(i => tracks[i]?.id).filter(Boolean) : null);
@@ -8024,7 +7624,7 @@ window.showPlaylistView = function(type, pushHistory = true) {
     const playlistId = type.slice(7);
     const pl = window.customPlaylists?.[playlistId];
     if (!pl) {
-      showToast('Playlist introuvable.', 'error');
+      showToast(_t('toast-playlist-not-found', 'Playlist introuvable.'), 'error');
       return;
     }
 
@@ -8052,7 +7652,7 @@ window.showPlaylistView = function(type, pushHistory = true) {
     const totalDuration = plTracks.reduce((s, t) => s + (t.duration || 0), 0);
     const totalMin = Math.floor(totalDuration / 60);
     const totalH   = Math.floor(totalMin / 60);
-    const durationStr = totalH > 0 ? `${totalH} h ${totalMin % 60} min` : `${totalMin} min`;
+    const durationStr = totalH > 0 ? `${totalH} ${_t('text-hours-abbr', 'h')} ${totalMin % 60} ${_t('text-minutes-abbr', 'min')}` : `${totalMin} ${_t('text-minutes-abbr', 'min')}`;
 
     _cleanDetailView();
     detailView.innerHTML = `
@@ -8061,11 +7661,11 @@ window.showPlaylistView = function(type, pushHistory = true) {
           ${_makePlaylistCoverHtml(plTracks, 'lg', pl.coverUrl || null)}
           <div class="playlist-cover-overlay">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="playlist-cover-edit-icon"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
-            <span class="playlist-cover-edit-label">Modifier les informations</span>
+            <span class="playlist-cover-edit-label">${_t('text-edit-info-title', 'Modifier les informations')}</span>
           </div>
         </div>
         <div class="detail-meta">
-          <div class="detail-type">Playlist</div>
+          <div class="detail-type">${_t('text-type-playlist', 'Playlist')}</div>
           <h1 class="detail-title" id="customPlaylistTitle">${escapeHtml(pl.name)}</h1>
           <div class="detail-subtitle" id="customPlaylistDesc">${escapeHtml(pl.createdBy || window._authUser?.displayName || window._authUser?.username || 'Vous')}</div>
           <div class="detail-stats">${plTracks.length} titre${plTracks.length !== 1 ? 's' : ''} · ${durationStr}</div>
@@ -8077,10 +7677,10 @@ window.showPlaylistView = function(type, pushHistory = true) {
             <svg data-encore-id="icon" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" class="playlist-play-icon-img" id="playlistPlayIcon"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288z"></path></svg>
             <svg data-encore-id="icon" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" class="playlist-play-icon-img" id="playlistPauseIcon" style="display:none"><path d="M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7zm8 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7z"></path></svg>
           </button>
-          <button class="playlist-ctrl-btn" id="detailShuffleBtn" data-tooltip="Lecture aléatoire">
+          <button class="playlist-ctrl-btn" id="detailShuffleBtn" data-tooltip="${_t('tt-shuffle-play', 'Lecture aléatoire')}">
             <svg data-encore-id="icon" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" class="btn-icon"><path d="M13.151.922a.75.75 0 1 0-1.06 1.06L13.109 3H11.16a3.75 3.75 0 0 0-2.873 1.34l-6.173 7.356A2.25 2.25 0 0 1 .39 12.5H0V14h.391a3.75 3.75 0 0 0 2.873-1.34l6.173-7.356a2.25 2.25 0 0 1 1.724-.804h1.947l-1.017 1.018a.75.75 0 0 0 1.06 1.06L15.98 3.75z"></path><path d="m7.5 10.723.98-1.167.957 1.14a2.25 2.25 0 0 0 1.724.804h1.947l-1.017-1.018a.75.75 0 1 1 1.06-1.06l2.829 2.828-2.829 2.828a.75.75 0 1 1-1.06-1.06L13.109 13H11.16a3.75 3.75 0 0 1-2.873-1.34l-.787-.938z"></path><path d="M.391 3.5H0V2h.391c1.109 0 2.16.49 2.873 1.34L4.89 5.277l-.979 1.167-1.796-2.14A2.25 2.25 0 0 0 .39 3.5z"></path></svg>
           </button>
-          <button class="playlist-ctrl-btn" id="detailDownloadBtn" data-tooltip="Télécharger">
+          <button class="playlist-ctrl-btn" id="detailDownloadBtn" data-tooltip="${_t('tt-download', 'Télécharger')}">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/></svg>
           </button>
           <button class="playlist-ctrl-btn" id="detailAddProfileBtn" data-tooltip="Ajouter au profil">
@@ -8092,20 +7692,20 @@ window.showPlaylistView = function(type, pushHistory = true) {
         </div>
         <div class="detail-controls-right">
           <div class="detail-search-wrap" id="detailSearchWrap">
-            <button class="detail-search-toggle" id="detailSearchToggle" data-tooltip="Rechercher">
+            <button class="detail-search-toggle" id="detailSearchToggle" data-tooltip="${_t('tt-search', 'Rechercher')}">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
             </button>
-            <input id="detailSearchInput" type="text" class="detail-search-input" placeholder="Rechercher…">
+            <input id="detailSearchInput" type="text" class="detail-search-input" placeholder="${_t('placeholder-search-dots', 'Rechercher…')}">
           </div>
-          <button class="detail-list-sort-btn" id="detailListSortBtn" data-tooltip="Trier">
+          <button class="detail-list-sort-btn" id="detailListSortBtn" data-tooltip="${_t('tt-sort', 'Trier')}">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M3 5h.01"/><path d="M3 12h.01"/><path d="M3 19h.01"/><path d="M8 5h13"/><path d="M8 12h13"/><path d="M8 19h13"/></svg>
           </button>
         </div>
       </div>
       <div class="detail-tracks-header" id="detailTracksHeader">
         <span class="dth-num">#</span>
-        <span class="dth-title dth-sortable" data-sort="title">Titre<span class="dth-sort-arrow">↕</span></span>
-        <span class="dth-album dth-sortable" data-sort="album">Album<span class="dth-sort-arrow">↕</span></span>
+        <span class="dth-title dth-sortable" data-sort="title">${_t('text-column-title', 'Titre')}<span class="dth-sort-arrow">↕</span></span>
+        <span class="dth-album dth-sortable" data-sort="album">${_t('text-type-album', 'Album')}<span class="dth-sort-arrow">↕</span></span>
         <span class="dth-dateadded dth-sortable" data-sort="year">Date d'ajout<span class="dth-sort-arrow">↕</span></span>
         <span class="dth-dur dth-sortable" data-sort="duration" style="cursor:pointer;user-select:none">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="opacity:0.6"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -8189,7 +7789,7 @@ window.showPlaylistView = function(type, pushHistory = true) {
         _setPlayContext(ctxIdx.length ? ctxIdx.map(i => tracks[i]?.id).filter(Boolean) : null);
         shuffleOrder = [...ctxIdx];
       }
-      showToast(isShuffled ? '⇄ Lecture aléatoire activée' : '⇄ Lecture aléatoire désactivée', isShuffled ? 'info' : 'default');
+      showToast(isShuffled ? _t('toast-shuffle-on', '⇄ Lecture aléatoire activée') : _t('toast-shuffle-off', '⇄ Lecture aléatoire désactivée'), isShuffled ? 'info' : 'default');
     });
     // ── Sync play/pause icon on the big circle button ─────────────────
     function _syncPlaylistPlayIcon() {
@@ -8244,9 +7844,9 @@ window.showPlaylistView = function(type, pushHistory = true) {
       menu.style.top  = (r.bottom + 6) + 'px';
       menu.style.left = r.left + 'px';
       menu.innerHTML = `
-        <div class="pctx-item" id="pctxQueue"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> Ajouter à la file d'attente</div>
-        <div class="pctx-item" id="pctxAddProfile"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Ajouter au profil</div>
-        <div class="pctx-item" id="pctxEdit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Modifier les informations</div>
+        <div class="pctx-item" id="pctxQueue"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> ${_t('text-add-to-queue-menu', 'Ajouter à la file d\'attente')}</div>
+        <div class="pctx-item" id="pctxAddProfile"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ${_t('text-add-to-profile', 'Ajouter au profil')}</div>
+        <div class="pctx-item" id="pctxEdit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> ${_t('text-edit-info-title', 'Modifier les informations')}</div>
         <div class="pctx-item pctx-danger" id="pctxDelete"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> Supprimer</div>
         <div class="pctx-item" id="pctxPrivate"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> ${pl.private ? 'Rendre publique' : 'Rendre privée'}</div>
         <div class="pctx-item" id="pctxCollaborators"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Inviter des collaborateurs</div>
@@ -8257,7 +7857,7 @@ window.showPlaylistView = function(type, pushHistory = true) {
       document.body.appendChild(menu);
 
       menu.querySelector('#pctxQueue')?.addEventListener('click', () => {
-        if (plTracks.length) { showToast('Ajouté à la file d\'attente.', 'success'); }
+        if (plTracks.length) { showToast(_t('toast-added-to-queue', 'Ajouté à la file d\'attente.'), 'success'); }
         menu.remove();
       });
       menu.querySelector('#pctxEdit')?.addEventListener('click', () => {
@@ -8266,16 +7866,16 @@ window.showPlaylistView = function(type, pushHistory = true) {
       });
       menu.querySelector('#pctxDelete')?.addEventListener('click', async () => {
         menu.remove();
-        if (!confirm(`Supprimer la playlist "${pl.name}" ?`)) return;
+        if (!confirm(_t('confirm-delete-playlist', 'Supprimer la playlist "{name}" ?', {name: pl.name}))) return;
         const ok = await window.FirebasePlaylists?.deletePlaylist(playlistId);
         if (ok) {
-          showToast('Playlist supprimée.', 'info');
+          showToast(_t('toast-playlist-deleted', 'Playlist supprimée.'), 'info');
           renderSidebarPlaylists();
           _hideAllMainPanels();
           welcomeContent.style.display = 'flex';
           pushNavState('home');
         } else {
-          showToast('Erreur lors de la suppression.', 'error');
+          showToast(_t('toast-error-delete', 'Erreur lors de la suppression.'), 'error');
         }
       });
       menu.querySelector('#pctxPrivate')?.addEventListener('click', async () => {
@@ -8284,12 +7884,23 @@ window.showPlaylistView = function(type, pushHistory = true) {
         const ok = await window.FirebasePlaylists?.updatePlaylist?.(playlistId, { private: newPrivate });
         if (ok !== false) {
           pl.private = newPrivate;
-          showToast(newPrivate ? 'Playlist rendue privée.' : 'Playlist rendue publique.', 'success');
+          showToast(newPrivate ? _t('toast-playlist-made-private', 'Playlist rendue privée.') : _t('toast-playlist-made-public', 'Playlist rendue publique.'), 'success');
         }
       });
       menu.querySelector('#pctxShare')?.addEventListener('click', () => {
         menu.remove();
-        navigator.clipboard?.writeText(window.location.href).then(() => showToast('Lien copié !', 'success'));
+        navigator.clipboard?.writeText(window.location.href).then(() => showToast(_t('toast-link-copied', 'Lien copié !'), 'success'));
+      });
+      // ⚠️ CORRECTIF (P0-5, révisé) : le champ "collaborators" et les
+      // fonctions addCollaborator/removeCollaborator existent réellement
+      // côté PocketBase (pocketbase-playlists.js) — le vrai bug était
+      // seulement l'absence de handler de clic ici. On ouvre une mini
+      // recherche d'utilisateur (même API que la recherche d'amis) plutôt
+      // qu'un simple prompt() texte, pour éviter les fautes de frappe sur
+      // un docId qu'on ne peut pas deviner (email/discordId interne).
+      menu.querySelector('#pctxCollaborators')?.addEventListener('click', () => {
+        menu.remove();
+        _openInviteCollaboratorModal(playlistId, pl);
       });
       menu.querySelector('#pctxAddOtherPlaylist')?.addEventListener('click', (ev) => {
         menu.remove();
@@ -8351,16 +7962,16 @@ window.showPlaylistView = function(type, pushHistory = true) {
         // Build sort panel (same as showDetailView)
         const rect = listSortBtn.getBoundingClientRect();
         const sortOpts = [
-          { key: '',          label: 'Tri personnalisé' },
-          { key: 'title',     label: 'Titre' },
-          { key: 'artist',    label: 'Artiste' },
-          { key: 'album',     label: 'Album' },
-          { key: 'year',      label: 'Ajouté récemment' },
-          { key: 'duration',  label: 'Durée' },
+          { key: '',          label: _t('text-custom-sort', 'Tri personnalisé') },
+          { key: 'title',     label: _t('text-column-title', 'Titre') },
+          { key: 'artist',    label: _t('text-type-artist', 'Artiste') },
+          { key: 'album',     label: _t('text-type-album', 'Album') },
+          { key: 'year',      label: _t('text-recently-added', 'Ajouté récemment') },
+          { key: 'duration',  label: _t('text-duration', 'Durée') },
         ];
         const viewOpts = [
           { key: 'compact', label: 'Compact', icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="5" x2="21" y2="5"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="13" x2="21" y2="13"/><line x1="3" y1="17" x2="21" y2="17"/></svg>` },
-          { key: 'list',    label: 'Liste',    icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>` },
+          { key: 'list',    label: _t('text-list-view', 'Liste'),    icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>` },
         ];
         const panel = document.createElement('div');
         panel.id = 'detailSortPanel';
@@ -8435,7 +8046,7 @@ function showDetailView(type, name, pushHistory = true) {
     // Sort by disc/track number if available, else original order
     contextTracks.sort((a, b) => (a.indexNumber || 0) - (b.indexNumber || 0) || a.title.localeCompare(b.title));
     coverUrl = contextTracks.find(t => t.imageUrl)?.imageUrl || null;
-    subtitle = `Album · ${contextTracks[0]?.artist || ''}${contextTracks[0]?.year ? ' · ' + contextTracks[0].year : ''}`;
+    subtitle = `${_t('text-type-album', 'Album')} · ${contextTracks[0]?.artist || ''}${contextTracks[0]?.year ? ' · ' + contextTracks[0].year : ''}`;
 
     // ── Complétion à la demande ────────────────────────────────────
     // Si la synchro complète n'est pas terminée, ce qu'on a localement
@@ -8455,7 +8066,7 @@ function showDetailView(type, name, pushHistory = true) {
   } else if (type === 'artist') {
     contextTracks = tracks.filter(t => t.artists?.includes(name) || t.artist === name);
     coverUrl = contextTracks.find(t => t.imageUrl)?.imageUrl || null;
-    subtitle = `Artiste · ${contextTracks.length} titre${contextTracks.length > 1 ? 's' : ''}`;
+    subtitle = `${_t('text-type-artist', 'Artiste')} · ${contextTracks.length} ${contextTracks.length > 1 ? _t('text-track-plural', 'titres') : _t('text-track-singular', 'titre')}`;
     // Bio will be loaded async after render
 
     // ── Complétion à la demande (discographie) ─────────────────────
@@ -8471,7 +8082,7 @@ function showDetailView(type, name, pushHistory = true) {
     contextTracks = tracks.filter(t => String(t.year) === String(name));
     contextTracks.sort((a, b) => a.title.localeCompare(b.title));
     coverUrl = contextTracks.find(t => t.imageUrl)?.imageUrl || null;
-    subtitle = `Année · ${contextTracks.length} titre${contextTracks.length > 1 ? 's' : ''}`;
+    subtitle = `${_t('text-type-year', 'Année')} · ${contextTracks.length} ${contextTracks.length > 1 ? _t('text-track-plural', 'titres') : _t('text-track-singular', 'titre')}`;
 
     // ── Complétion à la demande ────────────────────────────────────
     if (!window._librarySyncComplete) {
@@ -8484,7 +8095,7 @@ function showDetailView(type, name, pushHistory = true) {
     }
   } else {
     contextTracks = tracks;
-    subtitle = `${contextTracks.length} titres`;
+    subtitle = _t('text-tracks-count', '{count} titres', {count: contextTracks.length});
   }
 
   detailContextTracks = [...contextTracks];
@@ -8492,7 +8103,7 @@ function showDetailView(type, name, pushHistory = true) {
   const totalMin = Math.floor(totalDuration / 60);
   const totalH = Math.floor(totalMin / 60);
   const remainMin = totalMin % 60;
-  const durationStr = totalH > 0 ? `${totalH} h ${remainMin} min` : `${totalMin} min`;
+  const durationStr = totalH > 0 ? `${totalH} ${_t('text-hours-abbr', 'h')} ${remainMin} ${_t('text-minutes-abbr', 'min')}` : `${totalMin} ${_t('text-minutes-abbr', 'min')}`;
 
   const coverHtml = coverUrl
     ? `<img src="${coverUrl}" alt="${escapeHtml(name)}" class="detail-cover-img">`
@@ -8513,7 +8124,7 @@ function showDetailView(type, name, pushHistory = true) {
     const parts = [artistLink, yearLink].filter(Boolean);
     subtitleHtml = parts.join(' · ');
   } else if (type === 'year') {
-    subtitleHtml = `<span class="nav-link-inline detail-subtitle-link" data-nav="year" data-name="${escapeHtml(String(name))}">${contextTracks.length} titre${contextTracks.length > 1 ? 's' : ''}</span>`;
+    subtitleHtml = `<span class="nav-link-inline detail-subtitle-link" data-nav="year" data-name="${escapeHtml(String(name))}">${contextTracks.length} ${contextTracks.length > 1 ? _t('text-track-plural', 'titres') : _t('text-track-singular', 'titre')}</span>`;
   } else {
     subtitleHtml = `<span>${escapeHtml(subtitle)}</span>`;
   }
@@ -8524,27 +8135,27 @@ function showDetailView(type, name, pushHistory = true) {
     <div class="detail-header"${type === 'artist' ? ' style="align-items:stretch"' : ''}>
       <div class="detail-cover ${type === 'artist' ? 'detail-cover-round' : ''}" id="detailCoverWrap">${coverHtml}</div>
       <div class="detail-meta"${type === 'artist' ? ' style="display:flex;flex-direction:column;justify-content:flex-start"' : ''}>
-        <div class="detail-type">${type === 'artist' ? 'Artiste' : type === 'year' ? 'Année' : type === 'album' ? 'Album' : 'Playlist publique'}</div>
+        <div class="detail-type">${type === 'artist' ? _t('text-type-artist', 'Artiste') : type === 'year' ? _t('text-type-year', 'Année') : type === 'album' ? _t('text-type-album', 'Album') : _t('text-type-public-playlist', 'Playlist publique')}</div>
         <h1 class="detail-title">${escapeHtml(name)}</h1>
         ${type !== 'artist' ? `<div class="detail-subtitle">${subtitleHtml}</div>` : ''}
-        <div class="detail-stats">${contextTracks.length} titre${contextTracks.length > 1 ? 's' : ''} · ${durationStr}</div>
+        <div class="detail-stats">${contextTracks.length} ${contextTracks.length > 1 ? _t('text-track-plural', 'titres') : _t('text-track-singular', 'titre')} · ${durationStr}</div>
         ${type === 'artist' ? `<div class="detail-artist-bio" id="detailArtistBio" style="margin-top:10px;font-size:0.82rem;color:var(--text-subdued);line-height:1.6;display:none;flex:1;overflow:hidden"></div>` : ''}
       </div>
     </div>
 
     <div class="detail-controls-bar playlist-controls-bar">
       <div class="detail-controls-left">
-        <button class="playlist-play-circle" id="detailPlayBtn" data-tooltip="Lecture">
+        <button class="playlist-play-circle" id="detailPlayBtn" data-tooltip="${_t('tt-play', 'Lecture')}">
           <svg data-encore-id="icon" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" class="playlist-play-icon-img" id="detailPlayIcon"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288z"></path></svg>
           <svg data-encore-id="icon" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" class="playlist-play-icon-img" id="detailPauseIcon" style="display:none"><path d="M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7zm8 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7z"></path></svg>
         </button>
-        <button class="playlist-ctrl-btn" id="detailShuffleBtn" data-tooltip="Lecture aléatoire">
+        <button class="playlist-ctrl-btn" id="detailShuffleBtn" data-tooltip="${_t('tt-shuffle-play', 'Lecture aléatoire')}">
           <svg data-encore-id="icon" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" class="btn-icon"><path d="M13.151.922a.75.75 0 1 0-1.06 1.06L13.109 3H11.16a3.75 3.75 0 0 0-2.873 1.34l-6.173 7.356A2.25 2.25 0 0 1 .39 12.5H0V14h.391a3.75 3.75 0 0 0 2.873-1.34l6.173-7.356a2.25 2.25 0 0 1 1.724-.804h1.947l-1.017 1.018a.75.75 0 0 0 1.06 1.06L15.98 3.75z"></path><path d="m7.5 10.723.98-1.167.957 1.14a2.25 2.25 0 0 0 1.724.804h1.947l-1.017-1.018a.75.75 0 1 1 1.06-1.06l2.829 2.828-2.829 2.828a.75.75 0 1 1-1.06-1.06L13.109 13H11.16a3.75 3.75 0 0 1-2.873-1.34l-.787-.938z"></path><path d="M.391 3.5H0V2h.391c1.109 0 2.16.49 2.873 1.34L4.89 5.277l-.979 1.167-1.796-2.14A2.25 2.25 0 0 0 .39 3.5z"></path></svg>
         </button>
-        <button class="playlist-ctrl-btn" id="detailDownloadBtn" data-tooltip="Télécharger (VIP)">
+        <button class="playlist-ctrl-btn" id="detailDownloadBtn" data-tooltip="${_t('tt-download-vip', 'Télécharger (VIP)')}">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         </button>
-        <button class="detail-icon-btn ${type === 'album' || type === 'artist' ? (favoriteAlbums.has(name) || favoriteArtists.has(name) ? 'active liked' : '') : ''}" id="detailLikeBtn" data-tooltip="Ajouter aux favoris">
+        <button class="detail-icon-btn ${type === 'album' || type === 'artist' ? (favoriteAlbums.has(name) || favoriteArtists.has(name) ? 'active liked' : '') : ''}" id="detailLikeBtn" data-tooltip="${_t('tt-add-favorites', 'Ajouter aux favoris')}">
           <span class="detail-bookmark-icon">${type === 'album' || type === 'artist' ? (favoriteAlbums.has(name) || favoriteArtists.has(name) ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path fill-rule="evenodd" d="M6.32 2.577a49.255 49.255 0 0 1 11.36 0c1.497.174 2.57 1.46 2.57 2.93V21a.75.75 0 0 1-1.085.67L12 18.089l-7.165 3.583A.75.75 0 0 1 3.75 21V5.507c0-1.47 1.073-2.756 2.57-2.93Z" clip-rule="evenodd" /></svg>` : `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" /></svg>`) : `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" /></svg>`}</span>
         </button>
         <button class="detail-icon-btn" id="detailMoreBtn" data-tooltip="Plus d'options">
@@ -8553,12 +8164,12 @@ function showDetailView(type, name, pushHistory = true) {
       </div>
       <div class="detail-controls-right">
         <div class="detail-search-wrap" id="detailSearchWrap">
-          <button class="detail-search-toggle" id="detailSearchToggle" data-tooltip="Rechercher">
+          <button class="detail-search-toggle" id="detailSearchToggle" data-tooltip="${_t('tt-search', 'Rechercher')}">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
           </button>
-          <input id="detailSearchInput" type="text" class="detail-search-input" placeholder="Rechercher…">
+          <input id="detailSearchInput" type="text" class="detail-search-input" placeholder="${_t('placeholder-search-dots', 'Rechercher…')}">
         </div>
-        <button class="detail-list-sort-btn" id="detailListSortBtn" data-tooltip="Trier">
+        <button class="detail-list-sort-btn" id="detailListSortBtn" data-tooltip="${_t('tt-sort', 'Trier')}">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M3 5h.01"/><path d="M3 12h.01"/><path d="M3 19h.01"/><path d="M8 5h13"/><path d="M8 12h13"/><path d="M8 19h13"/></svg>
         </button>
       </div>
@@ -8566,9 +8177,9 @@ function showDetailView(type, name, pushHistory = true) {
 
     <div class="detail-tracks-header" id="detailTracksHeader">
       <span class="dth-num">#</span>
-      <span class="dth-title dth-sortable" data-sort="title">Titre<span class="dth-sort-arrow">↕</span></span>
-      ${type !== 'album' ? `<span class="dth-album dth-sortable" data-sort="album">Album<span class="dth-sort-arrow">↕</span></span>` : ''}
-      <span class="dth-dateadded dth-sortable" data-sort="year">Date de parution<span class="dth-sort-arrow">↕</span></span>
+      <span class="dth-title dth-sortable" data-sort="title">${_t('text-column-title', 'Titre')}<span class="dth-sort-arrow">↕</span></span>
+      ${type !== 'album' ? `<span class="dth-album dth-sortable" data-sort="album">${_t('text-type-album', 'Album')}<span class="dth-sort-arrow">↕</span></span>` : ''}
+      <span class="dth-dateadded dth-sortable" data-sort="year">${_t('text-column-release-date', 'Date de parution')}<span class="dth-sort-arrow">↕</span></span>
       <span class="dth-dur dth-sortable" data-sort="duration" style="cursor:pointer;user-select:none">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="opacity:0.6"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         <span class="dth-sort-arrow">↕</span>
@@ -8658,13 +8269,13 @@ function showDetailView(type, name, pushHistory = true) {
     // Pour les albums : masquer "Tri personnalisé", "Artiste", "Ajouté récemment"
     const isAlbumType = type === 'album';
     const sortOpts = [
-      { key: 'title',     label: 'Titre' },
-      ...(!isAlbumType ? [{ key: 'artist',    label: 'Artiste' }] : []),
-      ...(!isAlbumType ? [{ key: '',          label: 'Tri personnalisé' }] : []),
-      ...(!isAlbumType ? [{ key: 'album', label: 'Album' }] : []),
-      { key: 'year',      label: 'Date de parution' },
-      ...(!isAlbumType ? [{ key: 'dateAdded', label: 'Ajouté récemment' }] : []),
-      { key: 'duration',  label: 'Durée' },
+      { key: 'title',     label: _t('text-column-title', 'Titre') },
+      ...(!isAlbumType ? [{ key: 'artist',    label: _t('text-type-artist', 'Artiste') }] : []),
+      ...(!isAlbumType ? [{ key: '',          label: _t('text-custom-sort', 'Tri personnalisé') }] : []),
+      ...(!isAlbumType ? [{ key: 'album', label: _t('text-type-album', 'Album') }] : []),
+      { key: 'year',      label: _t('text-column-release-date', 'Date de parution') },
+      ...(!isAlbumType ? [{ key: 'dateAdded', label: _t('text-recently-added', 'Ajouté récemment') }] : []),
+      { key: 'duration',  label: _t('text-duration', 'Durée') },
     ];
 
     const panel = document.createElement('div');
@@ -8842,7 +8453,7 @@ function showDetailView(type, name, pushHistory = true) {
       if (adding) favoriteAlbums.add(name); else favoriteAlbums.delete(name);
       likeBtn2.classList.toggle('liked', favoriteAlbums.has(name));
       likeBtn2.querySelector('.detail-bookmark-icon').outerHTML = (favoriteAlbums.has(name) ? BOOKMARK_FILLED : BOOKMARK_EMPTY);
-      showToast(adding ? '♥ Album ajouté aux favoris' : '♡ Album retiré des favoris', adding ? 'success' : 'default');
+      showToast(adding ? _t('toast-album-liked', '♥ Album ajouté aux favoris') : _t('toast-album-unliked', '♡ Album retiré des favoris'), adding ? 'success' : 'default');
       // Mettre à jour le bouton dans le sidebar sans re-render complet
       const sidebarBtn = trackListDiv?.querySelector(`.lib-fav-btn[data-album="${CSS.escape(name)}"]`);
       if (sidebarBtn) { sidebarBtn.classList.toggle('active', adding); sidebarBtn.innerHTML = adding ? _BKMK_FILLED : _BKMK_EMPTY; }
@@ -8851,7 +8462,7 @@ function showDetailView(type, name, pushHistory = true) {
       if (adding) favoriteArtists.add(name); else favoriteArtists.delete(name);
       likeBtn2.classList.toggle('liked', favoriteArtists.has(name));
       likeBtn2.querySelector('.detail-bookmark-icon').outerHTML = (favoriteArtists.has(name) ? BOOKMARK_FILLED : BOOKMARK_EMPTY);
-      showToast(adding ? '♥ Artiste ajouté aux favoris' : '♡ Artiste retiré des favoris', adding ? 'success' : 'default');
+      showToast(adding ? _t('toast-artist-liked', '♥ Artiste ajouté aux favoris') : _t('toast-artist-unliked', '♡ Artiste retiré des favoris'), adding ? 'success' : 'default');
       const sidebarBtn = trackListDiv?.querySelector(`.lib-fav-btn[data-artist="${CSS.escape(name)}"]`);
       if (sidebarBtn) { sidebarBtn.classList.toggle('active', adding); sidebarBtn.innerHTML = adding ? _BKMK_FILLED : _BKMK_EMPTY; }
     } else if (type === 'custom_playlist') {
@@ -8861,7 +8472,7 @@ function showDetailView(type, name, pushHistory = true) {
       likeBtn2.classList.toggle('liked', favoritePlaylists.has(name));
       const iconSpan = likeBtn2.querySelector('.detail-bookmark-icon');
       if (iconSpan) iconSpan.outerHTML = (favoritePlaylists.has(name) ? BOOKMARK_FILLED : BOOKMARK_EMPTY);
-      showToast(adding ? '♥ Playlist ajoutée aux favoris' : '♡ Playlist retirée des favoris', adding ? 'success' : 'default');
+      showToast(adding ? _t('toast-playlist-liked', '♥ Playlist ajoutée aux favoris') : _t('toast-playlist-unliked', '♡ Playlist retirée des favoris'), adding ? 'success' : 'default');
       if (currentSidebarFilter === 'playlists') renderSidebarPlaylists();
     }
     if (window.FirebaseSync?.syncToFirestore) window.FirebaseSync.syncToFirestore();
@@ -8876,9 +8487,9 @@ function showDetailView(type, name, pushHistory = true) {
     menu.id = 'detailContextMenu';
     menu.style.cssText = `position:fixed;background:var(--bg-elevated);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:6px 0;z-index:9999;min-width:200px;box-shadow:0 8px 32px rgba(0,0,0,0.6)`;
     const menuItems = [
-      { label: 'Lire depuis le début', action: () => { const fi = tracks.findIndex(t => t.id === detailContextTracks[0]?.id); if (fi !== -1) { currentIndex = fi; playCurrentTrack(); } } },
-      { label: 'Ajouter à la file d\'attente', action: () => { /* queue functionality */ } },
-      { label: 'Copier le lien', action: () => navigator.clipboard?.writeText(window.location.href).catch(()=>{}) },
+      { label: _t('text-play-from-start', 'Lire depuis le début'), action: () => { const fi = tracks.findIndex(t => t.id === detailContextTracks[0]?.id); if (fi !== -1) { currentIndex = fi; playCurrentTrack(); } } },
+      { label: _t('text-add-to-queue-menu', 'Ajouter à la file d\'attente'), action: () => { /* queue functionality */ } },
+      { label: _t('text-copy-link', 'Copier le lien'), action: () => navigator.clipboard?.writeText(window.location.href).catch(()=>{}) },
     ];
     menuItems.forEach(item => {
       const btn = document.createElement('button');
@@ -8897,18 +8508,50 @@ function showDetailView(type, name, pushHistory = true) {
   });
 
   // ── Bio artiste dans le header (async Last.fm) ───────────────────
+  // P1-3 : la bio n'avait aucun état de chargement — elle apparaissait
+  // (ou pas) sans indication visuelle pendant le fetch Last.fm, contrairement
+  // aux carousels d'accueil qui ont déjà leur skeleton (`renderHomeSkeleton`).
+  // Réutilise `.quick-skeleton` (déjà utilisé pour l'accueil) plutôt que
+  // d'inventer une nouvelle classe CSS.
   if (type === 'artist') {
     const bioEl = document.getElementById('detailArtistBio');
     if (bioEl) {
-      fetchLastFmArtist(name, null).then(la => {
+      bioEl.style.display = '';
+      bioEl.innerHTML = `
+        <div class="quick-skeleton" style="height:12px;width:92%;margin-bottom:6px;border-radius:4px"></div>
+        <div class="quick-skeleton" style="height:12px;width:78%;margin-bottom:6px;border-radius:4px"></div>
+        <div class="quick-skeleton" style="height:12px;width:60%;border-radius:4px"></div>
+      `;
+      fetchLastFmArtist(name, null).then(async la => {
         const bio = la?.bio?.summary
           ?.replace(/<a [^>]+>.*?<\/a>/g, '')
           .replace(/<[^>]+>/g, '')
           .trim();
-        if (!bio || bio.length < 20) return;
+        if (!bio || bio.length < 20) { bioEl.style.display = 'none'; bioEl.innerHTML = ''; return; }
         bioEl.textContent = bio;
-        bioEl.style.display = '';
-      }).catch(() => {});
+        // Traduit la bio dans la langue d'interface choisie (Réglages), en
+        // réutilisant le même endpoint LibreTranslate que les paroles
+        // (_translateText) plutôt qu'un nouveau mécanisme séparé. Pas de
+        // traduction si l'app est en français ET que le texte semble déjà
+        // français (évite un aller-retour réseau inutile dans le cas le
+        // plus courant) — sinon, traduit toujours vers la langue courante.
+        const targetLang = window._interfaceLanguage || 'fr';
+        if (targetLang !== 'fr') {
+          try {
+            const translated = await _translateText(bio, targetLang);
+            // L'utilisateur peut avoir changé de vue (autre artiste) pendant
+            // l'appel réseau — vérifie que le conteneur affiche toujours CE
+            // texte original avant d'écraser avec la traduction.
+            if (bioEl.textContent === bio) bioEl.textContent = translated;
+          } catch (e) {
+            console.warn('[Detail] Traduction de la bio échouée, affichage en langue originale :', e);
+          }
+        }
+      }).catch((e) => {
+        bioEl.style.display = 'none';
+        bioEl.innerHTML = '';
+        console.warn('[Detail] Chargement de la bio artiste (Last.fm) échoué :', e);
+      });
     }
   }
 
@@ -8968,8 +8611,7 @@ async function _uploadAvatarToStorage(file, _docId) {
 
 async function showUserProfile(docId, initialData = {}, pushHistory = true) {
   if (!userProfileView) return;
-  const db   = window.FirebaseConfig?.getDB?.();
-  const myId = window.FirebaseSocial?.getMyDocId?.() || window.currentUser?.uid;
+  const myId = window.PocketBaseSocial?.getMyDocId?.() || window.FirebaseSocial?.getMyDocId?.() || window.currentUser?.uid;
   const uid  = docId || myId;
   if (!uid) return;
   const isOwn = uid === myId;
@@ -8989,9 +8631,43 @@ async function showUserProfile(docId, initialData = {}, pushHistory = true) {
       </div>
     </div>`;
 
-  // ── Chargement Firestore ──────────────────────────────────────────
+  // ── Chargement PocketBase ────────────────────────────────────────
+  // (remplace l'ancien chargement Firestore : db.collection('users').doc(uid).get()
+  // ne fonctionne plus, PocketBaseConfig n'expose pas de getDB() Firestore-like,
+  // donc `data` restait toujours {} — d'où les sections vides en profil.)
   let data = {};
-  try { const s=await db?.collection('users').doc(uid).get(); if(s?.exists)data=s.data(); } catch(e){}
+  const pbClient = window.PocketBaseConfig?.getClient?.();
+  let _userRec = null;
+  try {
+    if (pbClient) {
+      _userRec = await pbClient.collection('users').getFirstListItem(`externalId="${uid.replace(/"/g,'\\"')}"`);
+      data.publicProfile = { name: _userRec.displayName, picture: _userRec.avatarUrl, bannerUrl: _userRec.bannerUrl, bio: _userRec.bio };
+      data._pbId = _userRec.id;
+
+      // Playlists de cet utilisateur : uniquement les publiques (private=false).
+      try {
+        const pls = await pbClient.collection('playlists').getFullList({
+          filter: `user="${_userRec.id}" && private=false`,
+        });
+        data.playlists = {};
+        pls.forEach(pl => { data.playlists[pl.id] = pl; });
+      } catch (_) { data.playlists = {}; }
+    }
+  } catch (e) { /* utilisateur introuvable côté PocketBase */ }
+
+  // Historique d'écoute : maintenant persisté dans users.history (voir
+  // pocketbase-sync.js saveHistory / pocketbase-config.js applyHistoryFromRecord).
+  // Pour SON PROPRE profil, la mémoire locale (window.recentlyPlayed) est la
+  // source la plus à jour (elle inclut la piste en cours avant même le
+  // debounce de sauvegarde) ; pour un profil tiers, on lit le champ
+  // history du record PocketBase récupéré ci-dessus.
+  if (isOwn) {
+    data.history = window.recentlyPlayed || recentlyPlayed || [];
+    data.favoriteArtists = [...(window.favoriteArtists || favoriteArtists || [])];
+  } else if (_userRec) {
+    data.history = Array.isArray(_userRec.history) ? _userRec.history : [];
+    data.favoriteArtists = _userRec.favoriteArtists || [];
+  }
 
   // ── Résolution nom + photo (ordre de priorité corrigé) ────────────
   // Les données sont dans publicProfile.name / publicProfile.picture
@@ -9040,43 +8716,34 @@ async function showUserProfile(docId, initialData = {}, pushHistory = true) {
       _plSeen.add(pl.id);return true;
     });
 
-  // ── Abonnés / suivis — fetch profils réels depuis Firestore ───────
-  const rawFollowers = data.followers || [];
-  const rawFollowing = data.following || [];
-
-  async function _fetchProfiles(docIds) {
-    if (!docIds.length || !db) return docIds.map(id=>({docId:id,name:id,picture:''}));
-    const snaps = await Promise.allSettled(docIds.map(id=>db.collection('users').doc(id).get()));
-    return snaps.map((res,i)=>{
-      const id = docIds[i];
-      if (res.status!=='fulfilled'||!res.value.exists) return {docId:id,name:id,picture:''};
-      const d=res.value.data();
-      return {
-        docId:   id,
-        name:    d.publicProfile?.name    || d.profile?.name    || d.displayName || d.name || id,
-        picture: d.publicProfile?.picture || d.profile?.picture || d.photoURL    || ''
-      };
-    });
+  // ── Abonnés / suivis — PocketBase en priorité, repli Firestore ─────
+  // (même pattern que _startDiscordSync plus bas dans ce fichier : on
+  // tente PocketBase si actif, sinon on retombe sur l'ancien chemin
+  // Firestore natif, plutôt que de supposer l'un ou l'autre.)
+  let followers = [];
+  let following = [];
+  const pbActive = window.PocketBaseConfig?.isAuthenticated?.();
+  if (pbActive && window.PocketBaseSocial) {
+    try {
+      followers = isOwn
+        ? await window.PocketBaseSocial.getFollowers()
+        : await window.PocketBaseSocial.getFollowersOf(uid);
+    } catch (e) { console.warn('[Profil] Chargement des followers échoué :', e); }
+    try {
+      following = isOwn
+        ? await window.PocketBaseSocial.getFollowing()
+        : await window.PocketBaseSocial.getFollowingOf(uid);
+    } catch (e) { console.warn('[Profil] Chargement des following échoué :', e); }
+  } else if (isOwn && window.FirebaseSocial?.getFollowers) {
+    try { followers = await window.FirebaseSocial.getFollowers() || []; } catch (e) { console.warn('[Profil] Chargement des followers (Firebase) échoué :', e); }
+    try { following = await window.FirebaseSocial.getFollowing() || []; } catch (e) { console.warn('[Profil] Chargement des following (Firebase) échoué :', e); }
   }
-
-  // Fetch en parallèle (non bloquant pour le rendu initial — sera mis à jour après)
-  const [followerProfiles, followingProfiles] = await Promise.all([
-    _fetchProfiles(rawFollowers.filter(x=>typeof x==='string'||x?.docId).map(x=>typeof x==='string'?x:x.docId)),
-    _fetchProfiles(rawFollowing.filter(x=>typeof x==='string'||x?.docId).map(x=>typeof x==='string'?x:x.docId))
-  ]);
-
-  // Si déjà des objets avec name/picture, les utiliser
-  const followers = rawFollowers.map((f,i)=>{
-    if (typeof f==='object'&&f?.name) return f;
-    return followerProfiles[i] || {docId: typeof f==='string'?f:f?.docId||'', name:'?', picture:''};
-  });
-  const following = rawFollowing.map((f,i)=>{
-    if (typeof f==='object'&&f?.name) return f;
-    return followingProfiles[i] || {docId: typeof f==='string'?f:f?.docId||'', name:'?', picture:''};
-  });
+  const rawFollowers = followers || [];
+  const rawFollowing = following || [];
 
   let isFollowing=false;
-  if(!isOwn&&window.FirebaseSocial?.isFollowing){try{isFollowing=await window.FirebaseSocial.isFollowing(uid);}catch(_){}}
+  const _socialApi = pbActive ? window.PocketBaseSocial : window.FirebaseSocial;
+  if(!isOwn&&_socialApi?.isFollowing){try{isFollowing=await _socialApi.isFollowing(uid);}catch(e){console.warn('[Profil] Vérification isFollowing échouée :', e);}}
 
   // ── Helpers HTML ──────────────────────────────────────────────────
   const cL=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="18" height="18"><polyline points="15 18 9 12 15 6"/></svg>`;
@@ -9094,12 +8761,12 @@ async function showUserProfile(docId, initialData = {}, pushHistory = true) {
   function _ac(list){return list.map(a=>`<div class="home-card upv-artist-card" data-artist="${_e(a.name)}">
     <div class="home-card-art" style="border-radius:50%">${a.imageUrl?`<img src="${_e(a.imageUrl)}" alt="" loading="lazy" decoding="async" onerror="this.parentElement.style.background='${_g(a.name)}';this.remove()">`:`<div class="upv-initial" style="background:${_g(a.name)}">${_e(a.name.charAt(0).toUpperCase())}</div>`}
     <div class="home-card-hover-btn"><svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M8 5v14l11-7z"/></svg></div></div>
-    <div class="home-card-name">${_e(a.name)}</div><div class="home-card-sub">Artiste</div></div>`).join('');}
+    <div class="home-card-name">${_e(a.name)}</div><div class="home-card-sub">${_t('text-type-artist', 'Artiste')}</div></div>`).join('');}
   function _uc(u){const n=u.name||u.displayName||u.docId||'?',p=u.picture||u.photoURL||'',id=u.docId||u.uid||'';
     return`<div class="home-card upv-user-card" data-docid="${_e(id)}">
     <div class="home-card-art" style="border-radius:50%">${p?`<img src="${_e(p)}" alt="" loading="lazy" decoding="async" onerror="this.parentElement.style.background='${_g(n)}';this.remove()">`:`<div class="upv-initial" style="background:${_g(n)}">${_e(n.charAt(0).toUpperCase())}</div>`}
     <div class="home-card-hover-btn" style="background:var(--green,#1ed760)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div></div>
-    <div class="home-card-name">${_e(n)}</div><div class="home-card-sub">Utilisateur</div></div>`;}
+    <div class="home-card-name">${_e(n)}</div><div class="home-card-sub">${_t('text-user-label', 'Utilisateur')}</div></div>`;}
   function _pc(pl){const cn=(pl.name||'').replace(/\s*\(par [^)]+\)\s*$/,'').trim();
     return`<div class="home-card upv-pl-card" data-plid="${_e(pl.id)}">
     <div class="home-card-art">${_plCover(pl.tracks,pl.coverUrl)}<div class="home-card-hover-btn"><svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M8 5v14l11-7z"/></svg></div></div>
@@ -9108,7 +8775,7 @@ async function showUserProfile(docId, initialData = {}, pushHistory = true) {
     if(!cards.trim())return empty?`<div class="home-section upv-section"><div class="home-section-header"><h2 class="home-section-title">${title}</h2></div><p class="upv-empty-section">${empty}</p></div>`:'';
     return`<div class="home-section upv-section"><div class="home-section-header"><h2 class="home-section-title">${title}</h2></div><div class="carousel-wrapper"><button class="carousel-arrow arrow-prev">${cL}</button><div class="home-row-scroll" id="${id}">${cards}</div><button class="carousel-arrow arrow-next">${cR}</button></div></div>`;}
   function _tt(list){if(!list.length)return'';
-    return`<div class="home-section upv-section"><div class="home-section-header"><h2 class="home-section-title">Top titres du mois</h2></div><div class="upv-track-list">${list.map((t,i)=>{
+    return`<div class="home-section upv-section"><div class="home-section-header"><h2 class="home-section-title">${_t('text-top-tracks-month', 'Top titres du mois')}</h2></div><div class="upv-track-list">${list.map((t,i)=>{
       const r=tracks.find(lt=>String(lt.id)===String(t.id))||tracks.find(lt=>lt.title?.toLowerCase()===t.title?.toLowerCase()&&lt.artist?.toLowerCase()===t.artist?.toLowerCase());
       return`<div class="upv-track-row" data-trackid="${_e(t.id||'')}" data-title="${_e(t.title||'')}" data-artist="${_e(t.artist||'')}">
         <span class="upv-tr-num">${i+1}</span>${t.imageUrl?`<img src="${_e(t.imageUrl)}" class="upv-tr-cover" loading="lazy" decoding="async" alt="">`:`<div class="upv-tr-cover-ph">♪</div>`}
@@ -9133,10 +8800,10 @@ async function showUserProfile(docId, initialData = {}, pushHistory = true) {
             ${picture?`<img src="${_e(picture)}" alt="" class="upv-avatar-img" onerror="this.style.display='none';this.nextElementSibling&&(this.nextElementSibling.style.display='flex')">`:''}
             <span class="upv-avatar-letter" style="${picture?'display:none':''}">${_e(name.charAt(0).toUpperCase())}</span>
           </div>
-          ${isOwn?`<label class="upv-avatar-overlay" for="upvAvatarInput"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Sélectionnez une photo</span><input type="file" id="upvAvatarInput" accept="image/*" style="display:none"></label>`:''}
+          ${isOwn?`<label class="upv-avatar-overlay" for="upvAvatarInput"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>${_t('text-select-photo', 'Sélectionnez une photo')}</span><input type="file" id="upvAvatarInput" accept="image/*" style="display:none"></label>`:''}
         </div>
         <div class="upv-meta">
-          <div class="upv-type-label">PROFIL</div>
+          <div class="upv-type-label">${_t('text-profile-label', 'PROFIL')}</div>
           <h1 class="upv-name">${_e(name)}</h1>
           <div class="upv-stats">
             <span>${pubPls.length} playlist${pubPls.length!==1?'s':''} publique${pubPls.length!==1?'s':''}</span>
@@ -9144,21 +8811,21 @@ async function showUserProfile(docId, initialData = {}, pushHistory = true) {
             <span class="upv-stats-sep">·</span><span>${rawFollowing.length} abonnement${rawFollowing.length!==1?'s':''}</span>
           </div>
           <div class="upv-actions">
-            ${isOwn?`<button class="upv-btn upv-btn-outline" id="upvEditProfile">Modifier le profil</button>
-              <button class="upv-btn upv-btn-outline" id="upvShareProfile">Partager le profil</button>
-              <button class="upv-btn upv-btn-icon" id="upvSettings" data-tooltip="Paramètres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>`
-            :`<button class="upv-btn ${isFollowing?'upv-btn-following':'upv-btn-primary'}" id="upvFollowBtn" data-docid="${_e(uid)}">${isFollowing?'✓ Suivi':'+ Suivre'}</button>`}
+            ${isOwn?`<button class="upv-btn upv-btn-outline" id="upvEditProfile">${_t('text-edit-profile', 'Modifier le profil')}</button>
+              <button class="upv-btn upv-btn-outline" id="upvShareProfile">${_t('text-share-profile', 'Partager le profil')}</button>
+              <button class="upv-btn upv-btn-icon" id="upvSettings" data-tooltip="${_t('text-settings', 'Paramètres')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>`
+            :`<button class="upv-btn ${isFollowing?'upv-btn-following':'upv-btn-primary'}" id="upvFollowBtn" data-docid="${_e(uid)}">${isFollowing?_t('text-following-badge', '✓ Suivi'):_t('text-follow-btn', '+ Suivre')}</button>`}
           </div>
         </div>
       </div>
     </div>
     <div class="upv-body" id="upvBody">
-      ${_cr('upvPublicPls','Playlists publiques',pubPls.map(_pc).join(''),pubPls.length?'':'Aucune playlist publique')}
-      ${_cr('upvTopArtists','Top artistes du mois',_ac(topArtists),'Aucun artiste à afficher')}
+      ${_cr('upvPublicPls', _t('text-public-playlists', 'Playlists publiques'), pubPls.map(_pc).join(''), pubPls.length?'':_t('text-no-public-playlists', 'Aucune playlist publique'))}
+      ${_cr('upvTopArtists', _t('text-top-artists-month', 'Top artistes du mois'), _ac(topArtists), _t('text-no-artist-to-show', 'Aucun artiste à afficher'))}
       ${_tt(topTracks)}
-      ${_cr('upvRecentArtists','Artistes écoutés récemment',_ac(recentArtists),'')}
-      ${_cr('upvFollowers','Abonnés',followers.map(_uc).join(''),followers.length?'':'Aucun abonné')}
-      ${_cr('upvFollowing','Abonnements',following.map(_uc).join(''),following.length?'':'Aucun abonnement')}
+      ${_cr('upvRecentArtists', _t('text-recently-listened-artists', 'Artistes écoutés récemment'), _ac(recentArtists), '')}
+      ${_cr('upvFollowers', _t('text-followers', 'Abonnés'), followers.map(_uc).join(''), followers.length?'':_t('text-no-followers', 'Aucun abonné'))}
+      ${_cr('upvFollowing', _t('text-following-section', 'Abonnements'), following.map(_uc).join(''), following.length?'':_t('text-no-following', 'Aucun abonnement'))}
     </div>`;
 
   // ── Carousels ─────────────────────────────────────────────────────
@@ -9235,11 +8902,11 @@ async function showUserProfile(docId, initialData = {}, pushHistory = true) {
     try {
       const shareData = `${window.location.origin}?profile=${encodeURIComponent(uid)}`;
       if (navigator.clipboard?.writeText) {
-        navigator.clipboard.writeText(shareData).then(()=>_toast('Lien copié !')).catch(()=>{
-          const inp=document.createElement('input');inp.value=shareData;document.body.appendChild(inp);inp.select();document.execCommand('copy');inp.remove();_toast('Lien copié !');
+        navigator.clipboard.writeText(shareData).then(()=>_toast(_t('toast-link-copied', 'Lien copié !'))).catch(()=>{
+          const inp=document.createElement('input');inp.value=shareData;document.body.appendChild(inp);inp.select();document.execCommand('copy');inp.remove();_toast(_t('toast-link-copied', 'Lien copié !'));
         });
       } else {
-        const inp=document.createElement('input');inp.value=shareData;document.body.appendChild(inp);inp.select();document.execCommand('copy');inp.remove();_toast('Lien copié !');
+        const inp=document.createElement('input');inp.value=shareData;document.body.appendChild(inp);inp.select();document.execCommand('copy');inp.remove();_toast(_t('toast-link-copied', 'Lien copié !'));
       }
     } catch { _toast('Copie non disponible','error'); }
   });
@@ -9254,8 +8921,8 @@ async function showUserProfile(docId, initialData = {}, pushHistory = true) {
                  || window._authUser?.email
                  || window._authUser?.discordId
                  || uid;
-    if(!myDocId){ typeof showToast==='function'&&showToast('Non connecté','error'); return; }
-    typeof showToast==='function' && showToast('Upload en cours…');
+    if(!myDocId){ typeof showToast==='function'&&showToast(_t('toast-not-logged-in', 'Non connecté'),'error'); return; }
+    typeof showToast==='function' && showToast(_t('toast-upload-in-progress', 'Upload en cours…'));
     try {
       // Upload Nextcloud WebDAV via proxy Caddy → URL proxy /api/nextcloud/...
       const url = await _uploadAvatarToStorage(file, myDocId);
@@ -9274,7 +8941,7 @@ async function showUserProfile(docId, initialData = {}, pushHistory = true) {
       // Propager dans _authUser + toute l'UI
       if(window._authUser) window._authUser.picture = url;
       if(typeof window.applyUserToUI === 'function') window.applyUserToUI(window._authUser);
-      typeof showToast==='function' && showToast('Photo mise à jour ✓');
+      typeof showToast==='function' && showToast(_t('toast-photo-updated', 'Photo mise à jour ✓'));
     } catch(err) {
       console.error('[Avatar] Erreur upload:', err);
       typeof showToast==='function' && showToast('Erreur : ' + err.message, 'error');
@@ -9288,23 +8955,23 @@ function _openProfileEditModal(docId, profileData={}) {
   const modal=document.createElement('div');modal.id='profileEditModal';modal.className='pl-edit-overlay';
   const h=[...name].reduce((a,c)=>a+c.charCodeAt(0),0)%360;
   modal.innerHTML=`<div class="pl-edit-modal">
-    <div class="pl-edit-header"><h2 class="pl-edit-title">Modifier les informations</h2><button class="pl-edit-close" id="profEditClose">✕</button></div>
+    <div class="pl-edit-header"><h2 class="pl-edit-title">${_t('text-edit-info-title', 'Modifier les informations')}</h2><button class="pl-edit-close" id="profEditClose" aria-label="${_t('tt-close', 'Fermer')}">✕</button></div>
     <div class="pl-edit-body">
       <div class="pl-edit-cover-section"><label class="pl-edit-cover-wrap" for="profEditAvatarInput" style="cursor:pointer">
         <div class="pl-edit-cover" id="profEditCoverPreview" style="border-radius:50%;overflow:hidden">
           ${picture?`<img src="${escapeHtml(picture)}" alt="" style="width:100%;height:100%;object-fit:cover">`:`<div style="width:100%;height:100%;background:linear-gradient(135deg,hsl(${h},55%,35%),hsl(${(h+60)%360},55%,25%));display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:900;color:rgba(255,255,255,.85)">${escapeHtml(name.charAt(0).toUpperCase())}</div>`}
         </div>
-        <div class="pl-edit-cover-overlay"><span>Modifier la photo</span></div>
+        <div class="pl-edit-cover-overlay"><span>${_t('tt-edit-photo', 'Modifier la photo')}</span></div>
         <input type="file" id="profEditAvatarInput" accept="image/*" style="display:none">
       </label></div>
       <div class="pl-edit-fields">
-        <label class="pl-edit-field-label">Nom affiché</label>
-        <input type="text" id="profEditName" class="pl-edit-input" maxlength="40" value="${escapeHtml(name)}" placeholder="Ton pseudonyme">
-        <label class="pl-edit-field-label" style="margin-top:10px">Bio</label>
-        <textarea id="profEditBio" class="pl-edit-textarea" rows="3" maxlength="200" placeholder="Quelques mots sur toi…">${escapeHtml(bio)}</textarea>
+        <label class="pl-edit-field-label">${_t('text-display-name', 'Nom affiché')}</label>
+        <input type="text" id="profEditName" class="pl-edit-input" maxlength="40" value="${escapeHtml(name)}" placeholder="${_t('placeholder-your-nickname', 'Ton pseudonyme')}">
+        <label class="pl-edit-field-label" style="margin-top:10px">${_t('text-bio-label', 'Bio')}</label>
+        <textarea id="profEditBio" class="pl-edit-textarea" rows="3" maxlength="200" placeholder="${_t('placeholder-few-words', 'Quelques mots sur toi…')}">${escapeHtml(bio)}</textarea>
       </div>
     </div>
-    <div class="pl-edit-footer"><button class="pl-edit-cancel-btn" id="profEditCancel">Annuler</button><button class="pl-edit-save-btn" id="profEditSave">Sauvegarder</button></div>
+    <div class="pl-edit-footer"><button class="pl-edit-cancel-btn" id="profEditCancel">${_t('text-cancel', 'Annuler')}</button><button class="pl-edit-save-btn" id="profEditSave">${_t('text-save', 'Sauvegarder')}</button></div>
   </div>`;
   document.body.appendChild(modal);
   const close=()=>modal.remove();
@@ -9316,7 +8983,7 @@ function _openProfileEditModal(docId, profileData={}) {
     r.onload=()=>{const p=document.getElementById('profEditCoverPreview');if(p)p.innerHTML=`<img src="${r.result}" style="width:100%;height:100%;object-fit:cover">`;};r.readAsDataURL(f);
   });
   document.getElementById('profEditSave')?.addEventListener('click',async()=>{
-    const btn=document.getElementById('profEditSave');btn.disabled=true;btn.textContent='Sauvegarde…';
+    const btn=document.getElementById('profEditSave');btn.disabled=true;btn.textContent=_t('text-saving', 'Sauvegarde…');
     const newName=document.getElementById('profEditName')?.value.trim()||name;
     const newBio=document.getElementById('profEditBio')?.value.trim()||'';
     const f=document.getElementById('profEditAvatarInput')?.files?.[0];
@@ -9361,14 +9028,14 @@ function _openProfileEditModal(docId, profileData={}) {
           const status = audio?.paused ? 'paused' : 'playing';
           window.FirebaseSocial.updatePresenceWithProfile(status, window.currentTrack||null, Math.floor(audio?.currentTime||0));
         }
-        typeof showToast==='function' ? showToast('Profil mis à jour ✓') : alert('Profil mis à jour ✓');
+        typeof showToast==='function' ? showToast(_t('toast-profile-updated', 'Profil mis à jour ✓')) : alert(_t('toast-profile-updated', 'Profil mis à jour ✓'));
         close();
       }
     } catch(err){
       console.error('[Profile] save error:', err);
       typeof showToast==='function' ? showToast('Erreur de sauvegarde : '+err.message,'error') : alert('Erreur');
     }
-    btn.disabled=false;btn.textContent='Sauvegarder';
+    btn.disabled=false;btn.textContent=_t('text-save', 'Sauvegarder');
   });
 }
 
@@ -9432,7 +9099,7 @@ function _renderArtistTracksByAlbum(contextTracks, name) {
   let html = '';
 
   albums.forEach(al => {
-    const albumType = al.tracks.length === 1 ? 'Single' : 'Album';
+    const albumType = al.tracks.length === 1 ? _t('text-single', 'Single') : _t('text-type-album', 'Album');
     const trackCount = al.tracks.length;
     const yearStr = al.year ? String(al.year) : '';
     const metaParts = [albumType, yearStr, trackCount + ' titre' + (trackCount > 1 ? 's' : '')].filter(Boolean);
@@ -9474,7 +9141,7 @@ function _renderArtistTracksByAlbum(contextTracks, name) {
         <div class="dtr-dur">${formatTime(t.duration)}</div>
         <div class="dtr-actions">
           <button class="dtr-btn dtr-etc" data-tooltip="Plus d'options" data-id="${t.id}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
-          <button class="dtr-btn dtr-plus" data-tooltip="Ajouter à une playlist" data-id="${t.id}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+          <button class="dtr-btn dtr-plus" data-tooltip="${_t('text-add-to-playlist-menu', 'Ajouter à une playlist')}" data-id="${t.id}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
         </div>
       </div>`;
     });
@@ -9617,7 +9284,7 @@ function _renderDetailTracks(list, type, name = '') {
           <button class="dtr-btn dtr-etc" data-tooltip="Plus d'options" data-id="${t.id}">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
           </button>
-          <button class="dtr-btn dtr-plus" data-tooltip="Ajouter à une playlist" data-id="${t.id}">
+          <button class="dtr-btn dtr-plus" data-tooltip="${_t('text-add-to-playlist-menu', 'Ajouter à une playlist')}" data-id="${t.id}">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </button>
         </div>
@@ -9785,9 +9452,9 @@ function _renderArtistDiscography(container, artistName, artistTracks) {
   const section = document.createElement('div');
   section.className = 'artist-albums-section';
   section.innerHTML = `
-    <h2 class="artist-albums-title">Discographie</h2>
+    <h2 class="artist-albums-title">_t('text-discography', 'Discographie')</h2>
     <div class="carousel-wrapper at-start" id="discogCarouselWrapper">
-      <button class="carousel-arrow arrow-prev artist-carousel-prev" aria-label="Précédent">${chevronL}</button>
+      <button class="carousel-arrow arrow-prev artist-carousel-prev" aria-label="${_t('text-previous', 'Précédent')}">${chevronL}</button>
       <div class="home-row-scroll" id="discogCarouselRow">
         ${albums.map(al => `
           <div class="home-card" data-album="${escapeHtml(al.name)}">
@@ -9802,7 +9469,7 @@ function _renderArtistDiscography(container, artistName, artistTracks) {
           </div>
         `).join('')}
       </div>
-      <button class="carousel-arrow arrow-next artist-carousel-next" aria-label="Suivant">${chevronR}</button>
+      <button class="carousel-arrow arrow-next artist-carousel-next" aria-label="${_t('tt-next', 'Suivant')}">${chevronR}</button>
     </div>
   `;
 
@@ -9845,6 +9512,92 @@ function _renderArtistDiscography(container, artistName, artistTracks) {
 //  SEARCH RESULTS PAGE
 // ══════════════════════════════════════════════════════════════════
 
+// ── P2-4 : styles pour la barre de filtres avancés de la recherche ──
+function _injectSearchFilterStyles() {
+  if (document.getElementById('beartify-srp-filter-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'beartify-srp-filter-styles';
+  style.textContent = `
+    .srp-filters-bar { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 14px; }
+    .srp-filter-select {
+      background: var(--bg-tinted, #2a2a2a); color: var(--text-primary, #fff);
+      border: 1px solid var(--border-color, rgba(255,255,255,.12));
+      border-radius: 6px; padding: 6px 10px; font-size: 13px; cursor: pointer;
+    }
+    .srp-filter-select:hover { border-color: var(--border-color-hover, rgba(255,255,255,.25)); }
+    .srp-filter-reset {
+      background: transparent; color: var(--accent-color, #1db954);
+      border: 1px solid var(--accent-color, #1db954); border-radius: 6px;
+      padding: 6px 12px; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center;
+    }
+    .srp-filter-reset:hover { background: var(--accent-color, #1db954); color: #000; }
+  `;
+  document.head.appendChild(style);
+}
+_injectSearchFilterStyles();
+
+// ── P2-4 : Filtres de recherche avancés (genre / durée / date d'ajout) ──
+let _srpFilters = { genre: '', duration: '', releaseYear: '' };
+
+function _srpTrackRowHtml(t, i, lc) {
+  return `
+    <div class="srp-track-row" data-id="${t.id}" data-idx="${tracks.indexOf(t)}">
+      <span class="srp-tr-num">${i + 1}</span>
+      <div class="srp-tr-art">
+        ${t.imageUrl ? `<img src="${t.imageUrl}" loading="lazy" decoding="async" alt="">` : `<div class="srp-art-mini">🎵</div>`}
+        <div class="srp-tr-play-overlay"></div>
+      </div>
+      <div class="srp-tr-meta">
+        <div class="srp-tr-title">${highlightMatch(t.title, lc)}</div>
+        <div class="srp-tr-artist"><span class="nav-link" data-nav="artist" data-name="${escapeHtml(t.artist)}">${(t.artists && t.artists.length > 1 ? t.artists.map(a => highlightMatch(a, lc)).join(', ') : highlightMatch(t.artist, lc))}</span></div>
+      </div>
+      <div class="srp-tr-album"><span class="nav-link" data-nav="album" data-name="${escapeHtml(t.album)}">${highlightMatch(t.album, lc)}</span></div>
+      <div class="srp-tr-dur">${formatTime(t.duration)}</div>
+    </div>`;
+}
+function _srpTracksListHtml(list, lc) {
+  return list.map((t, i) => _srpTrackRowHtml(t, i, lc)).join('');
+}
+// Filtre un titre selon l'état courant de _srpFilters. Renvoie true si le
+// titre passe TOUS les filtres actifs (les filtres vides sont ignorés).
+function _srpMatchesFilters(t) {
+  if (_srpFilters.genre) {
+    const genres = Array.isArray(t.genres) && t.genres.length ? t.genres : (t.genre ? [t.genre] : []);
+    if (!genres.some(g => g === _srpFilters.genre)) return false;
+  }
+  if (_srpFilters.duration) {
+    const d = t.duration || 0;
+    if (_srpFilters.duration === 'short'  && !(d < 180)) return false;
+    if (_srpFilters.duration === 'medium' && !(d >= 180 && d <= 300)) return false;
+    if (_srpFilters.duration === 'long'   && !(d > 300)) return false;
+  }
+  if (_srpFilters.releaseYear) {
+    // t.year vient de item.ProductionYear (Jellyfin) — c'est la date de
+    // PUBLICATION du morceau, pas la date d'ajout à la bibliothèque.
+    // Bien plus fiable que PremiereDate (souvent absent en musique) : on
+    // s'appuie donc sur l'année plutôt qu'une date complète.
+    const y = parseInt(t.year, 10);
+    if (!y) return false;
+    const now = new Date().getFullYear();
+    if (_srpFilters.releaseYear === 'recent'  && !(y >= now - 2)) return false;
+    if (_srpFilters.releaseYear === '2010s'   && !(y >= 2010 && y <= 2019)) return false;
+    if (_srpFilters.releaseYear === '2000s'   && !(y >= 2000 && y <= 2009)) return false;
+    if (_srpFilters.releaseYear === 'older'   && !(y < 2000)) return false;
+  }
+  return true;
+}
+function _srpAttachTrackRowListeners(scopeEl) {
+  scopeEl?.querySelectorAll('.srp-track-row').forEach(el => {
+    el.addEventListener('click', (e) => {
+      const link = e.target.closest('.nav-link');
+      if (link) { e.stopPropagation(); showDetailView(link.dataset.nav, link.dataset.name); return; }
+      const trackId = el.dataset.id;
+      const idx = trackId ? tracks.findIndex(t => t.id === trackId) : -1;
+      if (idx !== -1) { playTrackAt(idx); }
+    });
+  });
+}
+
 async function showSearchResultsPage(query, pushHistory = true) {
   if (!query || !query.trim()) return;
   const q = query.trim();
@@ -9871,6 +9624,16 @@ async function showSearchResultsPage(query, pushHistory = true) {
     (Array.isArray(t.genres) && t.genres.some(g => g.toLowerCase().includes(lc)))
   );
 
+  // P2-4 : réinitialiser les filtres avancés à chaque nouvelle recherche
+  _srpFilters = { genre: '', duration: '', releaseYear: '' };
+  // Construit sur TOUTE la bibliothèque (tracks), pas sur finalMatched :
+  // un sous-ensemble de résultats de recherche peut n'avoir aucun genre
+  // renseigné alors que la bibliothèque en a — la liste ne doit pas
+  // dépendre de la requête tapée.
+  const _srpGenreOptions = [...new Set(
+    tracks.flatMap(t => Array.isArray(t.genres) && t.genres.length ? t.genres : (t.genre ? [t.genre] : []))
+  )].filter(Boolean).sort((a, b) => a.localeCompare(b));
+
   // Group results
   const artistMap = new Map();
   const albumMap  = new Map();
@@ -9886,15 +9649,50 @@ async function showSearchResultsPage(query, pushHistory = true) {
   const artists = [...artistMap.values()].slice(0, 6);
   const albums  = [...albumMap.values()].slice(0, 6);
 
-  // ── Recherche Firestore async (utilisateurs + playlists publiques) ──
+  // ── Recherche utilisateurs + playlists publiques (PocketBase / Firestore) ──
   let usersResults    = [];
   let publicPlaylists = [];
   try {
     if (window.FirebaseSocial?.searchUser) {
       usersResults = (await window.FirebaseSocial.searchUser(q)) || [];
     }
-    // Charger les playlists publiques de chaque utilisateur trouvé
-    const db = window.FirebaseConfig?.getDB();
+    const pbActive = window.PocketBaseConfig?.isAuthenticated?.();
+    const pbClient = window.PocketBaseConfig?.getClient?.();
+    if (pbActive && pbClient && usersResults.length) {
+      // usersResults vient de PocketBaseSocial.searchUser → chaque résultat
+      // porte déjà _pbId (voir normalizeUser dans pocketbase-social.js),
+      // pas besoin de re-résoudre docId → id interne.
+      await Promise.all(usersResults.map(async (u) => {
+        if (!u._pbId) return;
+        try {
+          const pls = await pbClient.collection('playlists').getFullList({
+            filter: `user="${u._pbId}" && private=false`,
+          });
+          pls.forEach(pl => {
+            const nameClean = (pl.name || '').replace(/\s*\(par [^)]+\)\s*$/, '').trim();
+            if (nameClean.toLowerCase().includes(lc) || u.name?.toLowerCase().includes(lc)) {
+              publicPlaylists.push({
+                id: pl.id,
+                name: nameClean,
+                trackCount: pl.tracks?.length || 0,
+                coverUrl: pl.tracks?.find?.(t => t.imageUrl)?.imageUrl || null,
+                ownerName: u.name || '',
+                ownerDocId: u.docId || '',
+                ownerPicture: u.picture || '',
+                tracks: pl.tracks || []
+              });
+            }
+          });
+        } catch (e) { console.warn('[Playlists] Résolution d\'une playlist partagée échouée :', e); }
+      }));
+      // NOTE : le concept "sharedPlaylists" (playlists partagées par lien,
+      // indépendantes d'un profil) n'a jamais eu d'équivalent créé côté
+      // PocketBase — ce bloc de recherche ne couvre donc que les playlists
+      // publiques attachées à un utilisateur, pas les anciens partages
+      // Firestore de la collection sharedPlaylists.
+    } else {
+    // ── Repli Firestore natif ───────────────────────────────────────
+    const db = window.FirebaseConfig?.getDB?.();
     if (db && usersResults.length) {
       const userDocs = await Promise.allSettled(
         usersResults.map(u => db.collection('users').doc(u.docId).get())
@@ -9946,6 +9744,7 @@ async function showSearchResultsPage(query, pushHistory = true) {
         });
       } catch(_) {}
     }
+    } // fin repli Firestore natif
   } catch(e) { console.warn('[Search] Firebase error:', e); }
 
   // ── HTML des sections utilisateurs ──
@@ -9955,7 +9754,7 @@ async function showSearchResultsPage(query, pushHistory = true) {
   }
   const usersHtml = usersResults.length ? `
     <div class="srp-section">
-      <h2 class="srp-section-title">Utilisateurs <span class="srp-badge">${usersResults.length}</span></h2>
+      <h2 class="srp-section-title">${_t('text-users-label', 'Utilisateurs')} <span class="srp-badge">${usersResults.length}</span></h2>
       <div class="srp-users-grid">
         ${usersResults.map(u => `
           <div class="srp-user-card" data-docid="${escapeHtml(u.docId)}">
@@ -9963,7 +9762,7 @@ async function showSearchResultsPage(query, pushHistory = true) {
               ${u.picture ? `<img src="${escapeHtml(u.picture)}" loading="lazy" decoding="async" alt="">` : `<span class="srp-user-letter">${escapeHtml((u.name||'?')[0].toUpperCase())}</span>`}
             </div>
             <div class="srp-user-name">${highlightMatch(u.name||'', lc)}</div>
-            <div class="srp-user-sub">Utilisateur Beartify</div>
+            <div class="srp-user-sub">${_t('text-beartify-user', 'Utilisateur Beartify')}</div>
           </div>`).join('')}
       </div>
     </div>` : '';
@@ -9979,7 +9778,7 @@ async function showSearchResultsPage(query, pushHistory = true) {
   }
   const publicPlHtml = publicPlaylists.length ? `
     <div class="srp-section">
-      <h2 class="srp-section-title">Playlists <span class="srp-badge">${publicPlaylists.length}</span></h2>
+      <h2 class="srp-section-title">${_t('text-playlists-label', 'Playlists')} <span class="srp-badge">${publicPlaylists.length}</span></h2>
       <div class="home-row" style="display:flex;flex-wrap:wrap;gap:12px;padding:4px 0">
         ${publicPlaylists.slice(0,12).map(pl => `
           <div class="home-card srp-playlist-card" data-plid="${escapeHtml(pl.id)}" data-owner="${escapeHtml(pl.ownerDocId)}" style="cursor:pointer">
@@ -9997,7 +9796,7 @@ async function showSearchResultsPage(query, pushHistory = true) {
 
   searchResultsPage.innerHTML = `
     <div class="srp-header">
-      <h1 class="srp-title">Résultats pour <span class="srp-query">« ${escapeHtml(q)} »</span></h1>
+      <h1 class="srp-title">${_t('text-results-for', 'Résultats pour')} <span class="srp-query">« ${escapeHtml(q)} »</span></h1>
       <div class="srp-count">
         ${finalMatched.length} titre${finalMatched.length !== 1 ? 's' : ''}
         · ${artists.length} artiste${artists.length !== 1 ? 's' : ''}
@@ -10011,7 +9810,7 @@ async function showSearchResultsPage(query, pushHistory = true) {
 
     ${artists.length ? `
     <div class="srp-section">
-      <h2 class="srp-section-title">Artistes</h2>
+      <h2 class="srp-section-title">${_t('text-artists-label', 'Artistes')}</h2>
       <div class="srp-artists-grid">
         ${artists.map(a => `
           <div class="srp-artist-card" data-artist="${escapeHtml(a.name)}">
@@ -10026,7 +9825,7 @@ async function showSearchResultsPage(query, pushHistory = true) {
 
     ${albums.length ? `
     <div class="srp-section">
-      <h2 class="srp-section-title">Albums</h2>
+      <h2 class="srp-section-title">${_t('text-albums-label', 'Albums')}</h2>
       <div class="srp-albums-grid">
         ${albums.map(al => `
           <div class="srp-album-card" data-album="${escapeHtml(al.name)}">
@@ -10043,30 +9842,37 @@ async function showSearchResultsPage(query, pushHistory = true) {
     ${publicPlHtml}
 
     <div class="srp-section">
-      <h2 class="srp-section-title">Titres <span class="srp-badge">${trackResults.length}${finalMatched.length > 50 ? '+' : ''}</span></h2>
+      <h2 class="srp-section-title">Titres <span class="srp-badge" id="srpTrackBadge">${trackResults.length}${finalMatched.length > 50 ? '+' : ''}</span></h2>
+      <div class="srp-filters-bar" id="srpFiltersBar">
+        <select class="srp-filter-select" id="srpFilterGenre">
+          <option value="">Tous les genres</option>
+          ${_srpGenreOptions.map(g => `<option value="${escapeHtml(g)}">${escapeHtml(g)}</option>`).join('')}
+        </select>
+        <select class="srp-filter-select" id="srpFilterDuration">
+          <option value="">Toutes durées</option>
+          <option value="short">&lt; 3 min</option>
+          <option value="medium">3–5 min</option>
+          <option value="long">&gt; 5 min</option>
+        </select>
+        <select class="srp-filter-select" id="srpFilterReleaseYear">
+          <option value="">${_t('text-release-date-any', 'Date de sortie : peu importe')}</option>
+          <option value="recent">${_t('text-last-2-years', '2 dernières années')}</option>
+          <option value="2010s">${_t('text-2010s', 'Années 2010')}</option>
+          <option value="2000s">${_t('text-2000s', 'Années 2000')}</option>
+          <option value="older">${_t('text-before-2000', 'Avant 2000')}</option>
+        </select>
+        <button class="srp-filter-reset" id="srpFilterReset" style="display:none">${_t('text-reset', 'Réinitialiser')}</button>
+      </div>
       <div class="srp-tracks-header">
         <span class="srp-th-num">#</span>
-        <span class="srp-th-title">Titre</span>
-        <span class="srp-th-album">Album</span>
+        <span class="srp-th-title">${_t('text-column-title', 'Titre')}</span>
+        <span class="srp-th-album">${_t('text-type-album', 'Album')}</span>
         <span class="srp-th-dur">
           <svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor" style="opacity:0.5;flex-shrink:0"><path d="M15 15H1v-1.5h14zm0-4.5H1V9h14zm-14-7A2.5 2.5 0 0 1 3.5 1h9a2.5 2.5 0 0 1 0 5h-9A2.5 2.5 0 0 1 1 3.5m2.5-1a1 1 0 0 0 0 2h9a1 1 0 1 0 0-2z"/></svg>
         </span>
       </div>
-      <div class="srp-tracks-list">
-        ${trackResults.map((t, i) => `
-          <div class="srp-track-row" data-id="${t.id}" data-idx="${tracks.indexOf(t)}">
-            <span class="srp-tr-num">${i + 1}</span>
-            <div class="srp-tr-art">
-              ${t.imageUrl ? `<img src="${t.imageUrl}" loading="lazy" decoding="async" alt="">` : `<div class="srp-art-mini">🎵</div>`}
-              <div class="srp-tr-play-overlay"></div>
-            </div>
-            <div class="srp-tr-meta">
-              <div class="srp-tr-title">${highlightMatch(t.title, lc)}</div>
-              <div class="srp-tr-artist"><span class="nav-link" data-nav="artist" data-name="${escapeHtml(t.artist)}">${(t.artists && t.artists.length > 1 ? t.artists.map(a => highlightMatch(a, lc)).join(', ') : highlightMatch(t.artist, lc))}</span></div>
-            </div>
-            <div class="srp-tr-album"><span class="nav-link" data-nav="album" data-name="${escapeHtml(t.album)}">${highlightMatch(t.album, lc)}</span></div>
-            <div class="srp-tr-dur">${formatTime(t.duration)}</div>
-          </div>`).join('')}
+      <div class="srp-tracks-list" id="srpTracksList">
+        ${_srpTracksListHtml(trackResults, lc)}
       </div>
     </div>
   `;
@@ -10108,7 +9914,7 @@ async function showSearchResultsPage(query, pushHistory = true) {
           if (fp && !fp.classList.contains('open')) window._showFriendsActivity();
           setTimeout(() => window._openFriendProfile?.({ docId: pl.ownerDocId, name: pl.ownerName, picture: pl.ownerPicture, presence: null }), 100);
         }
-        showToast('Aucun titre de cette playlist dans votre bibliothèque.', 'info');
+        showToast(_t('toast-no-track-in-library', 'Aucun titre de cette playlist dans votre bibliothèque.'), 'info');
         return;
       }
       // Construire un contexte de lecture temporaire (indices dans tracks[])
@@ -10117,7 +9923,7 @@ async function showSearchResultsPage(query, pushHistory = true) {
       _setPlayContext(ctxIndices, pl.name);
       currentIndex = ctxIndices[0];
       playCurrentTrack();
-      showToast(`▶ ${pl.name} (${matched.length} titre${matched.length > 1 ? 's' : ''})`, 'info');
+      showToast(`▶ ${pl.name} (${matched.length} ${matched.length > 1 ? _t('text-track-plural', 'titres') : _t('text-track-singular', 'titre')})`, 'info');
     });
   });
 
@@ -10130,15 +9936,41 @@ async function showSearchResultsPage(query, pushHistory = true) {
     el.addEventListener('click', () => showDetailView('album', el.dataset.album));
   });
   // Track rows — FIX: resolve fresh index from stable data-id at click time (data-idx is stale)
-  searchResultsPage.querySelectorAll('.srp-track-row').forEach(el => {
-    el.addEventListener('click', (e) => {
-      const link = e.target.closest('.nav-link');
-      if (link) { e.stopPropagation(); showDetailView(link.dataset.nav, link.dataset.name); return; }
-      const trackId = el.dataset.id;
-      const idx = trackId ? tracks.findIndex(t => t.id === trackId) : -1;
-      if (idx !== -1) { playTrackAt(idx); }
+  _srpAttachTrackRowListeners(searchResultsPage);
+
+  // ── P2-4 : Filtres de recherche avancés ────────────────────────
+  // Re-filtre finalMatched côté client (pas de nouvelle requête réseau) et
+  // ne redessine que la liste de titres — le reste de la page (artistes,
+  // albums, utilisateurs, playlists) n'est pas concerné par ces filtres.
+  (() => {
+    const genreSel    = searchResultsPage.querySelector('#srpFilterGenre');
+    const durationSel = searchResultsPage.querySelector('#srpFilterDuration');
+    const yearSel      = searchResultsPage.querySelector('#srpFilterReleaseYear');
+    const resetBtn     = searchResultsPage.querySelector('#srpFilterReset');
+    const listEl        = searchResultsPage.querySelector('#srpTracksList');
+    const badgeEl       = searchResultsPage.querySelector('#srpTrackBadge');
+
+    function _rerender() {
+      const filtered = finalMatched.filter(_srpMatchesFilters);
+      const slice = filtered.slice(0, 50);
+      if (listEl) listEl.innerHTML = _srpTracksListHtml(slice, lc);
+      if (badgeEl) badgeEl.textContent = `${slice.length}${filtered.length > 50 ? '+' : ''}`;
+      _srpAttachTrackRowListeners(listEl);
+      const anyActive = _srpFilters.genre || _srpFilters.duration || _srpFilters.releaseYear;
+      if (resetBtn) resetBtn.style.display = anyActive ? 'inline-flex' : 'none';
+    }
+
+    genreSel?.addEventListener('change', e => { _srpFilters.genre = e.target.value; _rerender(); });
+    durationSel?.addEventListener('change', e => { _srpFilters.duration = e.target.value; _rerender(); });
+    yearSel?.addEventListener('change', e => { _srpFilters.releaseYear = e.target.value; _rerender(); });
+    resetBtn?.addEventListener('click', () => {
+      _srpFilters = { genre: '', duration: '', releaseYear: '' };
+      if (genreSel) genreSel.value = '';
+      if (durationSel) durationSel.value = '';
+      if (yearSel) yearSel.value = '';
+      _rerender();
     });
-  });
+  })();
 
   searchResultsPage.scrollTop = 0;
   if (pushHistory) pushNavState('search', { query: q });
@@ -10149,7 +9981,7 @@ async function fetchExtendedInfo(track) {
   extendedInfoAbort = new AbortController();
   const signal = extendedInfoAbort.signal;
 
-  extendedInfoEl.innerHTML = `<div class="track-info-section"><div class="info-loading"><div class="loading-spinner" style="width:16px;height:16px;border-width:1.5px"></div><span>Chargement…</span></div></div>`;
+  extendedInfoEl.innerHTML = `<div class="track-info-section"><div class="info-loading"><div class="loading-spinner" style="width:16px;height:16px;border-width:1.5px"></div><span>${_t('text-loading', 'Chargement…')}</span></div></div>`;
 
   try {
     const [lfmTrack, lfmArtist] = await Promise.allSettled([
@@ -10165,12 +9997,18 @@ async function fetchExtendedInfo(track) {
       const listeners = lt.listeners ? formatBigNumber(parseInt(lt.listeners)) : null;
       const tags      = lt.toptags?.tag?.slice(0, 6) || [];
       const summary   = lt.wiki?.summary?.replace(/<a [^>]+>.*?<\/a>/g,'').replace(/<[^>]+>/g,'').trim();
+      // Traduit AVANT de tronquer, pour que le "Lire plus" révèle aussi du
+      // texte traduit plutôt que de revenir à l'original en français.
+      const extLang = window._interfaceLanguage || 'fr';
+      const summaryT = (summary && extLang !== 'fr')
+        ? await _translateText(summary, extLang).catch(() => summary)
+        : summary;
       if (plays || listeners || tags.length) {
-        html += `<div class="track-info-section"><div class="info-section-title">📊 Statistiques</div>`;
+        html += `<div class="track-info-section"><div class="info-section-title">📊 ${_t('text-statistics', 'Statistiques')}</div>`;
         if (plays || listeners) {
           html += `<div class="info-stat-row">
-            ${plays ? `<div class="info-stat"><div class="info-stat-value">${plays}</div><div class="info-stat-label">Écoutes</div></div>` : ''}
-            ${listeners ? `<div class="info-stat"><div class="info-stat-value">${listeners}</div><div class="info-stat-label">Auditeurs</div></div>` : ''}
+            ${plays ? `<div class="info-stat"><div class="info-stat-value">${plays}</div><div class="info-stat-label">${_t('text-plays', 'Écoutes')}</div></div>` : ''}
+            ${listeners ? `<div class="info-stat"><div class="info-stat-value">${listeners}</div><div class="info-stat-label">${_t('text-listeners', 'Auditeurs')}</div></div>` : ''}
           </div>`;
           if (plays) {
             const pct = Math.min(100, Math.round(parseInt(lt.playcount) / 5_000_000 * 100));
@@ -10183,31 +10021,39 @@ async function fetchExtendedInfo(track) {
       }
       if (summary && summary.length > 30) {
         const id = 'bio-' + Date.now();
-        html += `<div class="track-info-section"><div class="info-section-title">📖 À propos</div>
-          <div class="info-bio" id="${id}">${escapeHtml(summary.slice(0, 350))}${summary.length > 350 ? '…' : ''}</div>
-          ${summary.length > 350 ? `<span class="info-bio-toggle" data-target="${id}" data-full="${escapeHtml(summary)}">Lire plus ↓</span>` : ''}</div>`;
+        html += `<div class="track-info-section"><div class="info-section-title">📖 ${_t('text-about', 'À propos')}</div>
+          <div class="info-bio" id="${id}">${escapeHtml(summaryT.slice(0, 350))}${summaryT.length > 350 ? '…' : ''}</div>
+          ${summaryT.length > 350 ? `<span class="info-bio-toggle" data-target="${id}" data-full="${escapeHtml(summaryT)}">${_t('text-read-more', 'Lire plus ↓')}</span>` : ''}</div>`;
       }
     }
     const la = lfmArtist.value;
     if (la) {
       const similar = la.similar?.artist?.slice(0, 4) || [];
       const bio = la.bio?.summary?.replace(/<a [^>]+>.*?<\/a>/g,'').replace(/<[^>]+>/g,'').trim();
+      // 🐛 FIX : `extLang` était déclaré en `const` à l'intérieur du bloc
+      // `if (lt) { ... }` plus haut, donc hors de portée ici si `lfmTrack`
+      // avait échoué (lt falsy) — d'où le "ReferenceError: extLang is not
+      // defined" observé en pratique. On le redéclare localement.
+      const extLangArtist = window._interfaceLanguage || 'fr';
+      const bioT = (bio && extLangArtist !== 'fr')
+        ? await _translateText(bio, extLangArtist).catch(() => bio)
+        : bio;
       const artListeners = la.stats?.listeners ? formatBigNumber(parseInt(la.stats.listeners)) : null;
       if (artListeners || bio || similar.length) {
-        html += `<div class="track-info-section"><div class="info-section-title">🎤 Artiste${artListeners ? ` · ${artListeners} auditeurs` : ''}</div>`;
+        html += `<div class="track-info-section"><div class="info-section-title">🎤 ${_t('text-artist-label', 'Artiste')}${artListeners ? ` · ${artListeners} ${_t('text-listeners-suffix', 'auditeurs')}` : ''}</div>`;
         if (bio && bio.length > 30) {
           const id2 = 'abio-' + Date.now();
-          html += `<div class="info-bio" id="${id2}">${escapeHtml(bio.slice(0, 280))}…</div>
-            <span class="info-bio-toggle" data-target="${id2}" data-full="${escapeHtml(bio)}">Lire plus ↓</span>`;
+          html += `<div class="info-bio" id="${id2}">${escapeHtml(bioT.slice(0, 280))}…</div>
+            <span class="info-bio-toggle" data-target="${id2}" data-full="${escapeHtml(bioT)}">${_t('text-read-more', 'Lire plus ↓')}</span>`;
         }
         if (similar.length) {
-          html += `<div style="margin-top:10px;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-subdued);margin-bottom:6px">Artistes similaires</div>
+          html += `<div style="margin-top:10px;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-subdued);margin-bottom:6px">${_t('text-similar-artists', 'Artistes similaires')}</div>
             <div class="info-tags">${similar.map((a,i)=>`<span class="info-tag" style="animation-delay:${i*0.06}s">${escapeHtml(a.name)}</span>`).join('')}</div>`;
         }
         html += `</div>`;
         const simTracks = await fetchLastFmSimilar(track.title, track.artist, signal);
         if (!signal.aborted && simTracks?.length) {
-          html += `<div class="track-info-section"><div class="info-section-title">🎵 Titres similaires</div>
+          html += `<div class="track-info-section"><div class="info-section-title">🎵 ${_t('text-similar-tracks', 'Titres similaires')}</div>
             <div class="info-similar-tracks">
               ${simTracks.slice(0,4).map((st,i) => {
                 const localMatch = tracks.find(t => t.title.toLowerCase().includes(st.name.toLowerCase().slice(0,8)) && t.artist.toLowerCase().includes(st.artist?.name?.toLowerCase()?.slice(0,5)||''));
@@ -10233,7 +10079,7 @@ async function fetchExtendedInfo(track) {
           const full = btn.dataset.full;
           if (!target) return;
           if (target.classList.contains('expanded')) { target.classList.remove('expanded'); target.textContent = escapeHtml(full.slice(0, 280)) + '…'; btn.textContent = 'Lire plus ↓'; }
-          else { target.classList.add('expanded'); target.textContent = full; btn.textContent = 'Réduire ↑'; }
+          else { target.classList.add('expanded'); target.textContent = full; btn.textContent = _t('text-collapse', 'Réduire ↑'); }
         });
       });
       extendedInfoEl.querySelectorAll('.info-similar-item[data-play="1"]').forEach(el => {
@@ -10267,6 +10113,36 @@ async function fetchLastFmSimilar(title, artist, signal) {
     const r = await fetch(lastfmUrl(`method=track.getSimilar&artist=${encodeURIComponent(artist)}&track=${encodeURIComponent(title)}&limit=6&autocorrect=1`), { signal });
     if (!r.ok) return null;
     return (await r.json()).similartracks?.track || null;
+  } catch { return null; }
+}
+
+// ── Recommandations personnalisées (user.getTopArtists / user.getRecentTracks) ──
+// Contrairement à fetchLastFmArtist/fetchLastFmSimilar/loadGenreCarouselsFromLastFm
+// (données génériques par artiste), ces deux appels utilisent le compte Last.fm
+// personnel de l'utilisateur (s.lastfmUser, réglé dans les Réglages) pour fermer
+// la boucle avec le scrobbling déjà en place.
+async function fetchLastFmUserTopArtists(user, signal, period = 'overall', limit = 12) {
+  if (!user) return null;
+  try {
+    const r = await fetch(
+      lastfmUrl(`method=user.getTopArtists&user=${encodeURIComponent(user)}&period=${period}&limit=${limit}`),
+      { signal: signal || AbortSignal.timeout(6000) }
+    );
+    if (!r.ok) return null;
+    const data = await r.json();
+    return data.topartists?.artist || null;
+  } catch { return null; }
+}
+async function fetchLastFmUserRecentTracks(user, signal, limit = 20) {
+  if (!user) return null;
+  try {
+    const r = await fetch(
+      lastfmUrl(`method=user.getRecentTracks&user=${encodeURIComponent(user)}&limit=${limit}`),
+      { signal: signal || AbortSignal.timeout(6000) }
+    );
+    if (!r.ok) return null;
+    const data = await r.json();
+    return data.recenttracks?.track || null;
   } catch { return null; }
 }
 function formatBigNumber(n) {
@@ -10379,9 +10255,9 @@ function _openCoverZoom(src, alt) {
     <div class="cover-zoom-backdrop"></div>
     <div class="cover-zoom-content">
       <img src="${src}" alt="${escapeHtml(alt)}" class="cover-zoom-img" decoding="async">
-      <button class="cover-zoom-close" data-tooltip="Fermer">
+      <button class="cover-zoom-close" data-tooltip="${_t('tt-close', 'Fermer')}">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        Fermer
+        ${_t('tt-close', 'Fermer')}
       </button>
     </div>
   `;
@@ -10420,9 +10296,9 @@ function _keyLabel(code) {
 
 const _SHORTCUTS = [
   // Lecture
-  { section: 'Lecture',  label: 'Lecture / Pause',         code: 'Space',      display: [['Espace']] },
-  { section: 'Lecture',  label: 'Piste suivante',           code: 'KeyN',       display: [[_keyLabel('KeyN')]] },
-  { section: 'Lecture',  label: 'Piste précédente',         code: 'KeyB',       display: [[_keyLabel('KeyB')]] },
+  { section: 'Lecture',  label: _t('sc2-play-pause', 'Lecture / Pause'),         code: 'Space',      display: [['Espace']] },
+  { section: 'Lecture',  label: _t('cp-next-track', 'Piste suivante'),           code: 'KeyN',       display: [[_keyLabel('KeyN')]] },
+  { section: 'Lecture',  label: _t('cp-prev-track', 'Piste précédente'),         code: 'KeyB',       display: [[_keyLabel('KeyB')]] },
   { section: 'Lecture',  label: 'Avancer de 5 secondes',    code: 'ArrowRight', display: [['→']] },
   { section: 'Lecture',  label: 'Reculer de 5 secondes',    code: 'ArrowLeft',  display: [['←']] },
   { section: 'Lecture',  label: 'Aléatoire',                code: 'KeyS',       display: [[_keyLabel('KeyS')]] },
@@ -10430,7 +10306,7 @@ const _SHORTCUTS = [
   // Volume
   { section: 'Volume',   label: 'Volume +5%',               code: 'ArrowUp',    display: [['↑']] },
   { section: 'Volume',   label: 'Volume -5%',               code: 'ArrowDown',  display: [['↓']] },
-  { section: 'Volume',   label: 'Muet / Son',               code: 'KeyM',       display: [[_keyLabel('KeyM')]] },
+  { section: 'Volume',   label: _t('cp-mute-sound', 'Muet / Son'),               code: 'KeyM',       display: [[_keyLabel('KeyM')]] },
   // Interface
   { section: 'Interface',label: 'Paroles',                  code: 'KeyL',       display: [[_keyLabel('KeyL')]] },
   { section: 'Interface',label: 'File d\'attente',          code: 'KeyQ',       display: [[_keyLabel('KeyQ')]] },
@@ -10490,13 +10366,13 @@ document.addEventListener('keydown', e => {
   if (code === 'ArrowRight' && e.altKey) {
     e.preventDefault();
     window._lyricsTimeOffset = (window._lyricsTimeOffset || 0) + 0.25;
-    if (typeof showToast === 'function') showToast(`⏩ Paroles +${window._lyricsTimeOffset.toFixed(2)}s`, 'info', 1200);
+    if (typeof showToast === 'function') showToast(_t('toast-lyrics-offset-plus', '⏩ Paroles +{value}s', {value: window._lyricsTimeOffset.toFixed(2)}), 'info', 1200);
     return;
   }
   if (code === 'ArrowLeft' && e.altKey) {
     e.preventDefault();
     window._lyricsTimeOffset = (window._lyricsTimeOffset || 0) - 0.25;
-    if (typeof showToast === 'function') showToast(`⏪ Paroles ${window._lyricsTimeOffset.toFixed(2)}s`, 'info', 1200);
+    if (typeof showToast === 'function') showToast(_t('toast-lyrics-offset-minus', '⏪ Paroles {value}s', {value: window._lyricsTimeOffset.toFixed(2)}), 'info', 1200);
     return;
   }
   if (code === 'ArrowUp') {
@@ -10645,15 +10521,17 @@ window._openShortcuts = function() {
     sections[sc.section].push(sc);
   });
 
+  const _scLabelKeys = {'Space':'sc-label-space','KeyN':'sc-label-keyn','KeyB':'sc-label-keyb','ArrowRight':'sc-label-right','ArrowLeft':'sc-label-left','KeyS':'sc-label-keys','KeyR':'sc-label-keyr','ArrowUp':'sc-label-volup','ArrowDown':'sc-label-voldown','KeyM':'sc-label-keym','KeyL':'sc-label-keyl','KeyQ':'sc-label-keyq','KeyF':'sc-label-keyf','KeyH':'sc-label-keyh','KeyP':'sc-label-keyp','Slash':'sc-label-slash','KeyK':'sc-label-keyk','KeyC':'sc-label-keyc','ShiftL':'sc-label-shiftl','ShiftP':'sc-label-shiftl','KeyI':'sc-label-keyi','KeyJ':'sc-label-keyj','KeyK2':'sc-label-keyk2','Digit1':'sc-label-digit1','Digit2':'sc-label-digit2','Digit3':'sc-label-digit3','Digit4':'sc-label-digit4','Digit5':'sc-label-digit5','AltRight':'sc-label-altright','AltLeft':'sc-label-altleft','KeyV':'sc-label-keyv'};
+  const _scSectionKeys = {'Lecture':'sc-section-lecture','Volume':'sc-section-volume','Interface':'sc-section-interface','Power User':'sc-section-poweruser','Paroles':'sc-section-paroles'};
   const sectionsHtml = Object.entries(sections).map(([title, items]) => `
     <div class="sc-section">
-      <div class="sc-section-title">${title}</div>
+      <div class="sc-section-title">${_t(_scSectionKeys[title] || '', title)}</div>
       ${items.map(sc => `
         <div class="sc-row">
-          <div class="sc-label">${sc.label}</div>
+          <div class="sc-label">${_t(_scLabelKeys[sc.code] || '', sc.label)}</div>
           <div class="sc-keys">
             ${sc.display.map((combo, ki) => `
-              ${ki > 0 ? '<span class="sc-sep">ou</span>' : ''}
+              ${ki > 0 ? `<span class="sc-sep">${_t('sc-or', 'ou')}</span>` : ''}
               ${combo.map(k => `<kbd class="sc-key">${k}</kbd>`).join('<span class="sc-sep">+</span>')}
             `).join('')}
           </div>
@@ -10663,14 +10541,14 @@ window._openShortcuts = function() {
   `).join('');
 
   const layoutNote = _IS_AZERTY
-    ? '<div style="font-size:.75rem;color:rgba(255,255,255,0.4);margin-bottom:12px">Disposition détectée : <strong>AZERTY</strong></div>'
-    : '<div style="font-size:.75rem;color:rgba(255,255,255,0.4);margin-bottom:12px">Disposition détectée : <strong>QWERTY</strong></div>';
+    ? `<div style="font-size:.75rem;color:rgba(255,255,255,0.4);margin-bottom:12px">${_t('text-layout-detected', 'Disposition détectée :')} <strong>AZERTY</strong></div>`
+    : `<div style="font-size:.75rem;color:rgba(255,255,255,0.4);margin-bottom:12px">${_t('text-layout-detected', 'Disposition détectée :')} <strong>QWERTY</strong></div>`;
 
   overlay.innerHTML = `
-    <div class="shortcuts-modal" role="dialog" aria-label="Raccourcis clavier" aria-modal="true">
+    <div class="shortcuts-modal" role="dialog" aria-label="${_t('text-keyboard-shortcuts', 'Raccourcis clavier')}" aria-modal="true">
       <div class="sc-header">
-        <div class="sc-title">⌨️ Raccourcis clavier</div>
-        <button class="sc-close" id="scClose" aria-label="Fermer">✕</button>
+        <div class="sc-title">⌨️ ${_t('text-keyboard-shortcuts', 'Raccourcis clavier')}</div>
+        <button class="sc-close" id="scClose" aria-label="${_t('tt-close', 'Fermer')}">✕</button>
       </div>
       <div class="sc-body">${layoutNote}${sectionsHtml}</div>
     </div>
@@ -10706,15 +10584,15 @@ window._openCommandPalette = function() {
     { type: 'action', icon: '▶',  label: 'Lecture / Pause',         fn: () => document.getElementById('playPauseBtn')?.click() },
     { type: 'action', icon: '⏭',  label: 'Piste suivante',           fn: () => typeof goNext === 'function' && goNext() },
     { type: 'action', icon: '⏮',  label: 'Piste précédente',         fn: () => typeof goPrev === 'function' && goPrev() },
-    { type: 'action', icon: '⇄',  label: 'Activer / désactiver aléatoire', fn: () => document.getElementById('shuffleBtn')?.click() },
-    { type: 'action', icon: '↻',  label: 'Changer mode répétition',  fn: () => document.getElementById('repeatBtn')?.click() },
-    { type: 'action', icon: '➕', label: 'Ajouter à une playlist',    fn: () => document.getElementById('miniEtc')?.click() },
-    { type: 'action', icon: '☰',  label: 'Ouvrir la file d\'attente',fn: () => document.getElementById('queueBtn')?.click() },
-    { type: 'action', icon: '♫',  label: 'Afficher les paroles',     fn: () => document.getElementById('lyricsBtn')?.click() },
-    { type: 'action', icon: '⛶',  label: 'Mode immersif / Plein écran', fn: () => window._openImmersive?.() },
-    { type: 'action', icon: '⚙',  label: 'Paramètres',              fn: () => window._openSettings?.() },
-    { type: 'action', icon: '🏠', label: 'Accueil',                  fn: () => document.getElementById('btnHome')?.click() },
-    { type: 'action', icon: '⌨',  label: 'Raccourcis clavier',       fn: () => window._openShortcuts?.() },
+    { type: 'action', icon: '⇄',  label: _t('cp-toggle-shuffle', 'Activer / désactiver aléatoire'), fn: () => document.getElementById('shuffleBtn')?.click() },
+    { type: 'action', icon: '↻',  label: _t('cp-change-repeat', 'Changer mode répétition'),  fn: () => document.getElementById('repeatBtn')?.click() },
+    { type: 'action', icon: '➕', label: _t('text-add-to-playlist-menu', 'Ajouter à une playlist'),    fn: () => document.getElementById('miniEtc')?.click() },
+    { type: 'action', icon: '☰',  label: _t('cp-open-queue', 'Ouvrir la file d\'attente'),fn: () => document.getElementById('queueBtn')?.click() },
+    { type: 'action', icon: '♫',  label: _t('cp-show-lyrics', 'Afficher les paroles'),     fn: () => document.getElementById('lyricsBtn')?.click() },
+    { type: 'action', icon: '⛶',  label: _t('cp-immersive-fullscreen', 'Mode immersif / Plein écran'), fn: () => window._openImmersive?.() },
+    { type: 'action', icon: '⚙',  label: _t('text-settings', 'Paramètres'),              fn: () => window._openSettings?.() },
+    { type: 'action', icon: '🏠', label: _t('tt-home', 'Accueil'),                  fn: () => document.getElementById('btnHome')?.click() },
+    { type: 'action', icon: '⌨',  label: _t('text-keyboard-shortcuts', 'Raccourcis clavier'),       fn: () => window._openShortcuts?.() },
     { type: 'action', icon: '🔇', label: 'Muet / Son',               fn: () => document.getElementById('muteBtn')?.click() },
   ];
 
@@ -10756,7 +10634,7 @@ window._openCommandPalette = function() {
     if (!currentResults.length) {
       list.innerHTML = stillChecking
         ? `<div class="cp-empty"><div class="loading-spinner" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:8px"></div>Recherche en cours…</div>`
-        : `<div class="cp-empty">Aucun résultat pour « ${escapeHtml(query)} »</div>`;
+        : `<div class="cp-empty">${_t('text-no-results-for', 'Aucun résultat pour « {query} »', {query: escapeHtml(query)})}</div>`;
       if (!stillChecking) return;
       // On continue quand même vers la vérification serveur ci-dessous
       // (currentResults vide ne doit pas empêcher de chercher côté Jellyfin)
@@ -10768,7 +10646,7 @@ window._openCommandPalette = function() {
             <span class="cp-item-label">${escapeHtml(r.label)}</span>
             ${r.sub ? `<span class="cp-item-sub">${escapeHtml(r.sub)}</span>` : ''}
           </span>
-          <span class="cp-item-type">${r.type === 'action' ? 'Action' : r.type === 'track' ? 'Piste' : 'Playlist'}</span>
+          <span class="cp-item-type">${r.type === 'action' ? _t('text-action', 'Action') : r.type === 'track' ? _t('text-track-type', 'Piste') : _t('text-playlists-label', 'Playlist')}</span>
         </div>
       `).join('');
       list.querySelectorAll('.cp-item').forEach((el, i) => {
@@ -10786,7 +10664,7 @@ window._openCommandPalette = function() {
           // Rien trouvé côté serveur non plus : afficher le vrai "aucun résultat"
           // maintenant qu'on est sûr, au lieu de laisser le spinner tourner.
           if (!currentResults.length) {
-            list.innerHTML = `<div class="cp-empty">Aucun résultat pour « ${escapeHtml(query)} »</div>`;
+            list.innerHTML = `${_t('text-no-results-for', 'Aucun résultat pour « {query} »', {query: escapeHtml(query)})}`;
           }
           return;
         }
@@ -10873,6 +10751,73 @@ if (_expandImg) _expandImg.src = 'pictures/icon-arrow-right.png';
 
 renderHomeSkeleton();
 fetchTracks();
+window.fetchTracks = fetchTracks;
+
+// ── Rechargement de la bibliothèque au changement de source ───────────
+// ⚠️ CORRECTIF : jusqu'ici, rien n'écoutait 'beartify:musicSourceChanged'.
+// Le panneau Réglages mettait bien à jour musicServerType/profiles (et,
+// depuis le correctif window.getSetting, les requêtes routent bien vers
+// la bonne source), mais la bibliothèque déjà chargée en mémoire/cache
+// n'était jamais réactualisée : il fallait recharger la page à la main
+// pour voir les morceaux du nouveau serveur. Le cache IndexedDB local
+// (_readCacheTracks) n'est en outre marqué que par un label statique
+// ('beartify-v2'), pas par la source réelle — donc sans invalidation
+// explicite ici, un changement de source pouvait continuer à afficher
+// les titres de l'ancienne source jusqu'à un futur refresh de fond.
+// ⚠️ AJOUTÉ — API dédiée et sûre pour l'injection de pistes locales
+// (local-library.js). Avant, l'injection se faisait via
+// `window.tracks.push(...)`, qui reposait sur le fait que window.tracks
+// pointe TOUJOURS vers le même tableau que la variable module `tracks` —
+// ce qui n'était pas garanti (`tracks` est réassigné, pas muté, à
+// plusieurs endroits de fetchTracks/_refreshTracksFromServer). Cette
+// fonction pousse directement dans la vraie variable `tracks` et
+// resynchronise window.tracks dans la foulée, donc aucune dérive
+// possible même si d'autres reassignations sont ajoutées plus tard.
+window.addLocalTracks = function (newTracks) {
+  if (!Array.isArray(newTracks) || !newTracks.length) return;
+  tracks.push(...newTracks);
+  window.tracks = tracks;
+  document.dispatchEvent(new CustomEvent('beartify:libraryChanged'));
+};
+
+document.addEventListener('beartify:libraryChanged', () => {
+  try {
+    // Le tableau `tracks` est le même objet que window.tracks (référence
+    // partagée), donc local-library.js l'a déjà mutable en place via
+    // .push(...) — pas besoin de le réassigner ici, juste de forcer un
+    // nouveau rendu des vues qui en dépendent.
+    _invalidateLibCache();
+    renderSidebarView(currentSidebarFilter || 'playlists');
+    renderQueueList();
+    renderHomePage();
+  } catch (e) {
+    console.warn('[Beartify] rendu après ajout de la bibliothèque locale a échoué :', e);
+  }
+});
+
+document.addEventListener('beartify:musicSourceChanged', async (e) => {
+  try {
+    if (typeof _invalidateLibCache === 'function') _invalidateLibCache();
+    // Purge le cache IndexedDB pour forcer un chargement complet propre
+    // depuis la nouvelle source, au lieu d'un delta-sync qui mélangerait
+    // les deux bibliothèques.
+    try {
+      const db = await _openCacheDB();
+      if (db) {
+        const tx = db.transaction(CACHE_META_STORE, 'readwrite');
+        tx.objectStore(CACHE_META_STORE).put(null, 'server');
+      }
+    } catch (_) {}
+    tracks = [];
+    window.tracks = tracks;
+    if (typeof showToast === 'function' && !e.detail?.unchanged) {
+      showToast(_t('toast-library-reloading', '🔄 Rechargement de la bibliothèque…'), 'info', 2500);
+    }
+    await fetchTracks();
+  } catch (err) {
+    console.warn('[Beartify] rechargement après changement de source échoué :', err);
+  }
+});
 initSearchDropdown();
 spicyAnimationLoop(); // Start SpicyLyrics animation loop
 initSpicyBackground(); // Initialise le fond global SpicyLyrics
@@ -10890,7 +10835,7 @@ const DISCORD_CLIENT_ID = '1475132757188280471';
 
 // ── Sauvegarde locale (session Discord ou fallback) ──
 function saveUserLocally(user) {
-  try { localStorage.setItem('beartify_user', JSON.stringify(user)); } catch {}
+  try { localStorage.setItem('beartify_user', JSON.stringify(user)); } catch (e) { console.warn('[Auth] Sauvegarde locale de session échouée :', e); }
 }
 
 // ── Appliquer l'utilisateur connecté à l'UI ──
@@ -10901,7 +10846,7 @@ function applyUserToUI(user) {
   const nameEl   = document.getElementById('topProfileName');
   const avatarEl = document.getElementById('topProfileAvatar');
   const btnProf  = document.getElementById('btnProfile');
-  if (nameEl) nameEl.textContent = user.name || 'Profil';
+  if (nameEl) nameEl.textContent = user.name || _t('text-profile-fallback', 'Profil');
   if (avatarEl) {
     avatarEl.classList.add('connected');       // ← active le style CSS de l'état connecté
     avatarEl.innerHTML = user.picture
@@ -10927,6 +10872,71 @@ function applyUserToUI(user) {
   saveUserLocally(user);
   window._authCloseModal?.();
   _refreshVipUI();
+
+  // ── Sessions actives + reprise cross-device ──────────────────────
+  // Démarre le heartbeat "cet appareil est connecté" (liste dans les
+  // paramètres), et vérifie s'il existe une position plus récente sur
+  // un autre appareil pour proposer une reprise. applyUserToUI() est
+  // appelé aussi bien à la connexion qu'à la restauration de session
+  // (Discord ET Google), donc un seul point d'accroche suffit.
+  window.PocketBaseSync?.enableDeviceHeartbeat?.();
+  _checkCrossDeviceResume();
+}
+
+// ── Vérifie s'il existe une lecture plus récente sur un autre appareil ─
+// et propose de reprendre dessus. Ne bloque rien : simple prompt dismissible.
+let _crossDeviceResumeChecked = false;
+async function _checkCrossDeviceResume() {
+  if (_crossDeviceResumeChecked) return; // une seule vérification par session
+  _crossDeviceResumeChecked = true;
+  if (!window.PocketBaseSync?.getLastPositionElsewhere) return;
+
+  try {
+    const remote = await window.PocketBaseSync.getLastPositionElsewhere();
+    if (!remote || !remote.track || !remote.position || remote.position < 15) return; // trop court pour valoir une reprise
+
+    const overlay = document.createElement('div');
+    overlay.id = 'crossDeviceResumePrompt';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;align-items:flex-end;justify-content:center;padding:24px;background:rgba(0,0,0,0.35);font-family:inherit;';
+    overlay.innerHTML = `
+      <div role="dialog" aria-modal="true" aria-labelledby="cdResumeTitle" style="background:#181818;border:1px solid rgba(255,255,255,0.1);
+        border-radius:14px;padding:22px 24px;max-width:420px;width:100%;color:#fff;box-shadow:0 20px 60px rgba(0,0,0,.6)">
+        <div id="cdResumeTitle" style="font-size:.95rem;font-weight:700;margin-bottom:4px">_t('text-resume-playback', 'Reprendre la lecture ?')</div>
+        <div style="font-size:.82rem;color:#b3b3b3;margin-bottom:16px;line-height:1.5">
+          "${(remote.track.title || _t('text-unknown-title', 'Titre inconnu'))}" ${_t('text-resume-was-playing-on', 'était en cours sur')} ${remote.deviceLabel || _t('text-another-device', 'un autre appareil')},
+          ${_t('text-resume-at', 'à')} ${formatTime(remote.position)}.
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end">
+          <button id="cdResumeDismiss" style="padding:8px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#fff;cursor:pointer;font-size:.82rem">Ignorer</button>
+          <button id="cdResumeAccept" style="padding:8px 16px;border-radius:20px;border:none;background:#1ed760;color:#000;font-weight:700;cursor:pointer;font-size:.82rem">Reprendre</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('#cdResumeDismiss').onclick = () => overlay.remove();
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+    document.addEventListener('keydown', function _esc(e) {
+      if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', _esc); }
+    });
+
+    overlay.querySelector('#cdResumeAccept').onclick = async () => {
+      overlay.remove();
+      const idx = _ensureTrackInLibrary(remote.track);
+      if (idx === -1) return;
+      currentIndex = idx;
+      _setPlayContext([remote.track.id]);
+      // Seek une fois la lecture réellement démarrée (le flux doit être
+      // prêt — écrire currentTime trop tôt est ignoré par certains navigateurs).
+      const _seekOnce = () => {
+        audioPlayer.removeEventListener('playing', _seekOnce);
+        if (window.currentTrack?.id === remote.track.id) audioPlayer.currentTime = remote.position;
+      };
+      audioPlayer.addEventListener('playing', _seekOnce);
+      await playCurrentTrack();
+    };
+  } catch (e) {
+    console.warn('[CrossDeviceResume] Vérification impossible:', e);
+  }
 }
 
 // ── Met à jour tous les éléments UI liés au statut VIP ──────────────
@@ -11131,9 +11141,32 @@ async function handleDiscordToken(token) {
       console.warn('[Auth] ⚠️ Session PocketBase non ouverte pour Discord (mode secours actif) :', e.message || e);
     }
 
-    // ── Firebase Sync Discord : attendre que Firebase soit prêt puis sync ──
+    // ── Sync Discord : PocketBase si nominal, sinon fallback Firestore ──
+    // ⚠️ CORRECTIF : l'appel getDB() plantait ici (TypeError: not a function)
+    // faute du double optional-chaining (?.getDB?.() partout ailleurs dans
+    // ce fichier, mais ?.getDB() ici) — l'exception non rattrapée coupait
+    // court à _startDiscordSync AVANT tout chargement de données. De plus,
+    // cette fonction ne connaissait que Firestore : en mode PocketBase
+    // nominal (cf. fallback-router.js), getDB() ne renvoie rien d'utile et
+    // la boucle setTimeout tournait indéfiniment sans jamais charger quoi
+    // que ce soit. On tente PocketBase en priorité s'il est disponible.
     const _startDiscordSync = async () => {
-      const db = window.FirebaseConfig?.getDB();
+      if (window.PocketBaseConfig?.isAuthenticated?.()) {
+        try {
+          await window.PocketBasePlaylists?.loadMyPlaylists?.();
+          await _checkBanStatus();
+          window.PocketBaseSync?.enablePresenceSync?.();
+          if (typeof window.renderSidebarView === 'function') {
+            window.renderSidebarView(window.currentSidebarFilter || 'playlists');
+          }
+          console.log('[Auth] ✅ Données PocketBase chargées après login Discord');
+        } catch (e) {
+          console.error('[Auth] ❌ Erreur chargement PocketBase post-login:', e);
+        }
+        return;
+      }
+
+      const db = window.FirebaseConfig?.getDB?.();
       if (!db || !window.FirebaseSync?.syncToFirestore) {
         setTimeout(_startDiscordSync, 300);
         return;
@@ -11150,10 +11183,10 @@ async function handleDiscordToken(token) {
     _startDiscordSync();
 
     history.replaceState(null, '', window.location.pathname + window.location.search);
-    showToast(`Bienvenue, ${user.name} !`, 'success');
+    showToast(_t('toast-welcome-user', 'Bienvenue, {name} !', {name: user.name}), 'success');
   } catch (err) {
     console.error('[Auth] Discord login error:', err);
-    showToast('Erreur lors de la connexion Discord.', 'error');
+    showToast(_t('toast-error-discord-connection', 'Erreur lors de la connexion Discord.'), 'error');
   }
 }
 
@@ -11170,11 +11203,12 @@ function checkDiscordCallback() {
 // ── Déconnexion ──
 async function logout() {
   window._authCloseDropdown?.();
+  window.PocketBaseSync?.disableDeviceHeartbeat?.();
   // Déconnexion Firebase (Google) + nettoyage session locale (Discord)
   await window.firebaseSignOut?.();
-  try { localStorage.removeItem('beartify_user'); } catch {}
+  try { localStorage.removeItem('beartify_user'); } catch (e) { console.warn('[Auth] Nettoyage de session locale échoué :', e); }
   resetAuthUI();
-  showToast('Déconnecté.', 'info');
+  showToast(_t('toast-logged-out', 'Déconnecté.'), 'info');
 }
 
 // ── Restauration de session au chargement ──
@@ -11188,9 +11222,25 @@ function restoreSessionFromCache() {
       // Ne restaurer que les sessions Discord (Google est géré par Firebase onAuthStateChanged)
       if (user?.name && user?.provider === 'discord') {
         applyUserToUI(user);
-        // ── Déclencher le sync Firestore une fois Firebase prêt ──
+        // ── Déclencher le sync (PocketBase si nominal, sinon Firestore) ──
+        // ⚠️ CORRECTIF : même bug que _startDiscordSync (getDB() sans le
+        // second ?. plantait), et même angle mort : ce chemin (exécuté à
+        // CHAQUE rechargement de page pour les sessions Discord) ne
+        // tentait jamais PocketBase, alors que le SDK PocketBase peut très
+        // bien avoir déjà restauré une session valide depuis son propre
+        // localStorage à ce stade (cf. pocketbase-config.js).
         const _tryDiscordSync = () => {
-          if (window.FirebaseConfig?.getDB() && window.FirebaseSync?.syncFromFirestore) {
+          if (window.PocketBaseConfig?.isAuthenticated?.()) {
+            window.PocketBasePlaylists?.loadMyPlaylists?.().then(() => {
+              _checkBanStatus?.();
+              if (typeof window.renderSidebarView === 'function') {
+                window.renderSidebarView(window.currentSidebarFilter || 'playlists');
+              }
+            });
+            window.PocketBaseSync?.enablePresenceSync?.();
+            return;
+          }
+          if (window.FirebaseConfig?.getDB?.() && window.FirebaseSync?.syncFromFirestore) {
             window.FirebaseSync.syncFromFirestore().then(() => _checkBanStatus?.());
             window.FirebaseSync.enableAutoSync();
             window.FirebaseSync.enablePresenceSync();
@@ -11201,7 +11251,7 @@ function restoreSessionFromCache() {
         setTimeout(_tryDiscordSync, 300);
       }
     }
-  } catch {}
+  } catch (e) { console.warn('[Auth] Restauration de session au chargement échouée :', e); }
 }
 
 // ── Initialisation ──
@@ -11304,7 +11354,7 @@ function restoreSessionFromCache() {
         .catch((e) => {
           console.error('[Auth] shell:open Discord failed :', e);
           if (btn) btn.classList.remove('loading');
-          showToast("Impossible d'ouvrir le navigateur.", 'error');
+          showToast(_t('toast-error-open-browser', "Impossible d'ouvrir le navigateur."), 'error');
         });
 
       // Timeout de sécurité : retirer le spinner si l'utilisateur abandonne
@@ -11373,25 +11423,25 @@ function _openReportModal() {
   m.innerHTML = `
     <div class="pl-edit-modal" style="max-width:480px">
       <div class="pl-edit-header">
-        <h2 class="pl-edit-title">Signaler un problème</h2>
+        <h2 class="pl-edit-title">${_t('text-report-problem-title', 'Signaler un problème')}</h2>
         <button class="pl-edit-close" id="reportModalClose">✕</button>
       </div>
       <div class="pl-edit-body" style="flex-direction:column;gap:12px">
         <div class="report-type-grid">
           ${[
-            { v:'bug',         l:'🐛 Bug / Crash'           },
-            { v:'ui',          l:'🎨 Problème d\'affichage' },
-            { v:'performance', l:'⚡ Lenteur / Performance'  },
-            { v:'audio',       l:'🔊 Problème audio'         },
-            { v:'sync',        l:'☁️ Synchronisation'        },
-            { v:'autre',       l:'💬 Autre'                  },
+            { v:'bug',         l:_t('text-report-bug', '🐛 Bug / Crash') },
+            { v:'ui',          l:_t('text-report-ui', '🎨 Problème d\'affichage') },
+            { v:'performance', l:_t('text-report-perf', '⚡ Lenteur / Performance') },
+            { v:'audio',       l:_t('text-report-audio', '🔊 Problème audio') },
+            { v:'sync',        l:_t('text-report-sync', '☁️ Synchronisation') },
+            { v:'autre',       l:_t('text-report-other', '💬 Autre') },
           ].map(o => `<label class="report-type-chip"><input type="radio" name="rtype" value="${o.v}"><span>${o.l}</span></label>`).join('')}
         </div>
-        <textarea id="reportDesc" class="pl-edit-textarea" placeholder="Décrivez le problème en détail…" rows="5" style="resize:vertical;min-height:100px"></textarea>
-        <p style="font-size:0.72rem;color:rgba(255,255,255,0.35);margin:0">Des informations techniques (navigateur, version, plateforme) seront jointes automatiquement.</p>
+        <textarea id="reportDesc" class="pl-edit-textarea" placeholder="${_t('placeholder-describe-issue', 'Décrivez le problème en détail…')}" rows="5" style="resize:vertical;min-height:100px"></textarea>
+        <p style="font-size:0.72rem;color:rgba(255,255,255,0.35);margin:0">${_t('text-report-tech-info', 'Des informations techniques (navigateur, version, plateforme) seront jointes automatiquement.')}</p>
       </div>
       <div class="pl-edit-footer">
-        <button class="pl-edit-save-btn" id="reportSubmit">Envoyer le rapport</button>
+        <button class="pl-edit-save-btn" id="reportSubmit">${_t('text-send-report', 'Envoyer le rapport')}</button>
       </div>
     </div>`;
   document.body.appendChild(m);
@@ -11400,13 +11450,13 @@ function _openReportModal() {
   m.querySelector('#reportSubmit').addEventListener('click', async () => {
     const type = m.querySelector('input[name="rtype"]:checked')?.value;
     const desc = m.querySelector('#reportDesc').value.trim();
-    if (!type) { showToast('Sélectionnez un type de problème.', 'error'); return; }
-    if (desc.length < 10) { showToast('Description trop courte (min. 10 caractères).', 'error'); return; }
+    if (!type) { showToast(_t('toast-select-problem-type', 'Sélectionnez un type de problème.'), 'error'); return; }
+    if (desc.length < 10) { showToast(_t('toast-description-too-short', 'Description trop courte (min. 10 caractères).'), 'error'); return; }
     const btn = m.querySelector('#reportSubmit');
-    btn.disabled = true; btn.textContent = 'Envoi…';
+    btn.disabled = true; btn.textContent = _t('text-sending', 'Envoi…');
     const ok = await window.FirebaseReports?.submitReport({ type, category: type, description: desc });
-    if (ok) { showToast('Rapport envoyé, merci ! 🙏', 'success'); m.remove(); }
-    else    { showToast('Erreur lors de l\'envoi.', 'error'); btn.disabled = false; btn.textContent = 'Envoyer le rapport'; }
+    if (ok) { showToast(_t('toast-report-sent', 'Rapport envoyé, merci ! 🙏'), 'success'); m.remove(); }
+    else    { showToast(_t('toast-error-sending', "Erreur lors de l'envoi."), 'error'); btn.disabled = false; btn.textContent = _t('text-send-report', 'Envoyer le rapport'); }
   });
 }
 
@@ -11421,22 +11471,22 @@ function _openRequestModal() {
   m.innerHTML = `
     <div class="pl-edit-modal" style="max-width:520px">
       <div class="pl-edit-header">
-        <h2 class="pl-edit-title">Demande d'ajout</h2>
+        <h2 class="pl-edit-title">${_t('text-add-request-title', 'Demande d\'ajout')}</h2>
         <button class="pl-edit-close" id="requestModalClose">✕</button>
       </div>
       <div class="pl-edit-body" style="flex-direction:column;gap:12px">
         <div class="report-type-grid">
           ${[
-            { v:'album',   l:'💿 Album'   },
-            { v:'artiste', l:'🎤 Artiste' },
-            { v:'titre',   l:'🎵 Titre'   },
+            { v:'album',   l:_t('text-req-album', '💿 Album') },
+            { v:'artiste', l:_t('text-req-artist', '🎤 Artiste') },
+            { v:'titre',   l:_t('text-req-track', '🎵 Titre') },
           ].map(o => `<label class="report-type-chip"><input type="radio" name="reqtype" value="${o.v}"><span>${o.l}</span></label>`).join('')}
         </div>
 
         <!-- Recherche iTunes pour s'aiguiller -->
         <div class="req-search-wrap">
           <div style="display:flex;gap:8px">
-            <input type="text" id="reqSearch" class="pl-edit-input" placeholder="🔍  Rechercher sur iTunes pour s'aiguiller…" style="flex:1">
+            <input type="text" id="reqSearch" class="pl-edit-input" placeholder="${_t('placeholder-itunes-search', '🔍  Rechercher sur iTunes pour s\'aiguiller…')}" style="flex:1">
             <button class="pl-edit-save-btn" id="reqSearchBtn" style="flex-shrink:0;padding:0 14px;font-size:0.8rem">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.34-4.34"/></svg>
             </button>
@@ -11444,12 +11494,12 @@ function _openRequestModal() {
           <div id="reqSearchResults" style="display:none"></div>
         </div>
 
-        <input type="text" id="reqName"   class="pl-edit-input" placeholder="Nom de l'album / artiste / titre *">
-        <input type="text" id="reqArtist" class="pl-edit-input" placeholder="Artiste (si album ou titre)">
-        <textarea id="reqInfo" class="pl-edit-textarea" placeholder="Informations supplémentaires, liens…" rows="3" style="resize:vertical"></textarea>
+        <input type="text" id="reqName"   class="pl-edit-input" placeholder="${_t('placeholder-req-name', 'Nom de l\'album / artiste / titre *')}">
+        <input type="text" id="reqArtist" class="pl-edit-input" placeholder="${_t('placeholder-req-artist', 'Artiste (si album ou titre)')}">
+        <textarea id="reqInfo" class="pl-edit-textarea" placeholder="${_t('placeholder-extra-info', 'Informations supplémentaires, liens…')}" rows="3" style="resize:vertical"></textarea>
       </div>
       <div class="pl-edit-footer">
-        <button class="pl-edit-save-btn" id="requestSubmit">Envoyer la demande</button>
+        <button class="pl-edit-save-btn" id="requestSubmit">${_t('text-send-request', 'Envoyer la demande')}</button>
       </div>
     </div>`;
   document.body.appendChild(m);
@@ -11469,14 +11519,14 @@ function _openRequestModal() {
     reqSearchBtn.disabled = true;
     reqSearchBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin .7s linear infinite;vertical-align:middle"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.23-4.17"/></svg>';
     reqSearchResults.style.display = 'block';
-    reqSearchResults.innerHTML = '<div style="padding:12px;text-align:center;color:rgba(255,255,255,.4);font-size:.8rem">Recherche…</div>';
+    reqSearchResults.innerHTML = `<div style="padding:12px;text-align:center;color:rgba(255,255,255,.4);font-size:.8rem">${_t('text-searching', 'Recherche…')}</div>`;
     try {
       const url = `https://itunes.apple.com/search?term=${encodeURIComponent(q)}&media=music&limit=8&country=fr`;
       const res = await fetch(url);
       const data = await res.json();
       const items = data.results || [];
       if (!items.length) {
-        reqSearchResults.innerHTML = '<div style="padding:12px;text-align:center;color:rgba(255,255,255,.4);font-size:.8rem">Aucun résultat</div>';
+        reqSearchResults.innerHTML = `<div style="padding:12px;text-align:center;color:rgba(255,255,255,.4);font-size:.8rem">${_t('text-no-results', 'Aucun résultat')}</div>`;
       } else {
         reqSearchResults.innerHTML = items.map((it, i) => `
           <div class="req-itunes-item" data-idx="${i}"
@@ -11506,7 +11556,7 @@ function _openRequestModal() {
         });
       }
     } catch(e) {
-      reqSearchResults.innerHTML = '<div style="padding:12px;text-align:center;color:rgba(255,255,255,.4);font-size:.8rem">Erreur de connexion iTunes</div>';
+      reqSearchResults.innerHTML = `<div style="padding:12px;text-align:center;color:rgba(255,255,255,.4);font-size:.8rem">${_t('text-itunes-error', 'Erreur de connexion iTunes')}</div>`;
     }
     reqSearchBtn.disabled = false;
     reqSearchBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.34-4.34"/></svg>';
@@ -11521,15 +11571,15 @@ function _openRequestModal() {
     const name   = reqName.value.trim();
     const artist = reqArtist.value.trim();
     const info   = m.querySelector('#reqInfo').value.trim();
-    if (!type)           { showToast('Sélectionnez un type.', 'error'); return; }
-    if (name.length < 2) { showToast('Nom requis.', 'error'); return; }
+    if (!type)           { showToast(_t('toast-select-type', 'Sélectionnez un type.'), 'error'); return; }
+    if (name.length < 2) { showToast(_t('toast-name-required', 'Nom requis.'), 'error'); return; }
     const btn = m.querySelector('#requestSubmit');
-    btn.disabled = true; btn.textContent = 'Envoi…';
+    btn.disabled = true; btn.textContent = _t('text-sending', 'Envoi…');
     const result = await window.FirebaseReports?.submitRequest({ type, name, artist, info });
-    if (result === 'created')            { showToast('Demande envoyée ! 🎶', 'success'); m.remove(); }
-    else if (result === 'voted')         { showToast('Vote ajouté à la demande existante ✓', 'success'); m.remove(); }
-    else if (result === 'already_voted') { showToast('Vous avez déjà voté pour cette demande.', 'default'); m.remove(); }
-    else { showToast('Erreur lors de l\'envoi.', 'error'); btn.disabled = false; btn.textContent = 'Envoyer la demande'; }
+    if (result === 'created')            { showToast(_t('toast-request-sent', 'Demande envoyée ! 🎶'), 'success'); m.remove(); }
+    else if (result === 'voted')         { showToast(_t('toast-vote-added', 'Vote ajouté à la demande existante ✓'), 'success'); m.remove(); }
+    else if (result === 'already_voted') { showToast(_t('toast-already-voted', 'Vous avez déjà voté pour cette demande.'), 'default'); m.remove(); }
+    else { showToast(_t('toast-error-sending', "Erreur lors de l'envoi."), 'error'); btn.disabled = false; btn.textContent = _t('text-send-request', 'Envoyer la demande'); }
   });
 }
 
@@ -11568,12 +11618,12 @@ async function _renderNotificationsPage() {
   page.innerHTML = `
     <div style="max-width:720px;margin:0 auto">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px">
-        <h1 style="font-size:1.6rem;font-weight:800">Notifications</h1>
+        <h1 style="font-size:1.6rem;font-weight:800">${_t('tt-notifications', 'Notifications')}</h1>
         <button id="notifMarkAllRead" style="background:none;border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.5);padding:6px 14px;border-radius:8px;cursor:pointer;font-size:0.78rem;font-family:inherit;transition:all .15s">
-          Tout marquer comme lu
+          ${_t('text-mark-all-read', 'Tout marquer comme lu')}
         </button>
       </div>
-      <div id="notifContent"><div style="text-align:center;padding:60px;color:rgba(255,255,255,0.35)"><div style="font-size:2rem;margin-bottom:12px">🔔</div>Chargement…</div></div>
+      <div id="notifContent"><div style="text-align:center;padding:60px;color:rgba(255,255,255,0.35)"><div style="font-size:2rem;margin-bottom:12px">🔔</div>${_t('text-loading', 'Chargement…')}</div></div>
     </div>`;
 
   document.getElementById('notifMarkAllRead')?.addEventListener('click', () => {
@@ -11600,8 +11650,12 @@ async function _renderNotificationsPage() {
           notifs.push({
             ts,
             icon:  d.type === 'album' ? '💿' : d.type === 'artiste' ? '🎤' : '🎵',
-            title: `Demande approuvée — ${d.name}`,
-            sub:   `La demande d'ajout ${d.type === 'album' ? 'de l\'album' : d.type === 'artiste' ? 'de l\'artiste' : 'du titre'} <strong>${_escHtml(d.name)}</strong>${d.artist ? ` par ${_escHtml(d.artist)}` : ''} a été approuvée.`,
+            title: _t('text-request-approved', 'Demande approuvée — {name}', {name: d.name}),
+            sub:   _t('text-request-approved-detail', 'Demande d\'ajout approuvée : {type} « <strong>{name}</strong> »{artist}.', {
+              type: d.type === 'album' ? _t('text-type-album', 'Album') : d.type === 'artiste' ? _t('text-type-artist', 'Artiste') : _t('text-column-title', 'Titre'),
+              name: _escHtml(d.name),
+              artist: d.artist ? _t('text-by-artist', ' par {artist}', {artist: _escHtml(d.artist)}) : '',
+            }),
             tag:   'approved',
           });
         });
@@ -11615,8 +11669,8 @@ async function _renderNotificationsPage() {
         notifs.push({
           ts:    f.followedAt || 0,
           icon:  '👤',
-          title: 'Nouvel abonné',
-          sub:   `<strong>${_escHtml(f.name)}</strong> a commencé à vous suivre.`,
+          title: _t('text-new-follower', 'Nouvel abonné'),
+          sub:   _t('text-started-following', '<strong>{name}</strong> a commencé à vous suivre.', {name: _escHtml(f.name)}),
           tag:   'follow',
         });
       });
@@ -11632,7 +11686,7 @@ async function _renderNotificationsPage() {
     const sysNotifs = (window._APP_CHANGELOG || []).map(entry => ({
       ts:     entry.ts || 0,
       icon:   entry.icon || '✨',
-      title:  entry.title || 'Nouvelle fonctionnalité',
+      title:  entry.title || _t('text-new-feature', 'Nouvelle fonctionnalité'),
       sub:    entry.body  || '',
       tag:    entry.tag || 'feature',
       action: typeof entry.action === 'function' ? entry.action : null,
@@ -11644,13 +11698,13 @@ async function _renderNotificationsPage() {
     if (!all.length) {
       content.innerHTML = `<div style="text-align:center;padding:60px;color:rgba(255,255,255,0.35)">
         <div style="font-size:2.5rem;margin-bottom:16px">🔔</div>
-        <div style="font-size:1rem;font-weight:600;margin-bottom:6px">Aucune notification</div>
-        <div style="font-size:0.82rem">Vous êtes à jour !</div>
+        <div style="font-size:1rem;font-weight:600;margin-bottom:6px">${_t('text-no-notifications', 'Aucune notification')}</div>
+        <div style="font-size:0.82rem">${_t('text-up-to-date', 'Vous êtes à jour !')}</div>
       </div>`;
       return;
     }
 
-    const tagLabels = { approved:'Approuvé', resolved:'Résolu', feature:'Nouveauté', info:'Info', follow:'Abonné', wrap:'Récap' };
+    const tagLabels = { approved:_t('tag-approved','Approuvé'), resolved:_t('tag-resolved','Résolu'), feature:_t('tag-feature','Nouveauté'), info:_t('tag-info','Info'), follow:_t('tag-follow','Abonné'), wrap:_t('tag-wrap','Récap') };
     const tagColors = {
       approved:'rgba(29,185,84,.15);color:#1db954',
       resolved:'rgba(52,152,219,.15);color:#3498db',
@@ -11669,7 +11723,8 @@ async function _renderNotificationsPage() {
       const isUnread = n.ts > lastRead;
       if (isUnread) unreadCount++;
       const tagStyle = tagColors[n.tag] || tagColors.info;
-      const dateStr  = n.ts ? new Date(n.ts).toLocaleDateString('fr-FR',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}) : '';
+      const _localeMap = { fr: 'fr-FR', en: 'en-US', es: 'es-ES', de: 'de-DE', it: 'it-IT' };
+      const dateStr  = n.ts ? new Date(n.ts).toLocaleDateString(_localeMap[window._interfaceLanguage] || 'fr-FR',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}) : '';
       const el = document.createElement('div');
       el.className = `notif-item${isUnread ? ' unread' : ''}`;
       if (n.action) el.style.cursor = 'pointer';
@@ -11699,7 +11754,7 @@ async function _renderNotificationsPage() {
     }
 
   } catch (e) {
-    content.innerHTML = `<div style="padding:40px;text-align:center;color:rgba(255,255,255,.35)">Impossible de charger les notifications.<br><small>${e.message}</small></div>`;
+    content.innerHTML = `<div style="padding:40px;text-align:center;color:rgba(255,255,255,.35)">${_t('text-notifs-load-failed', 'Impossible de charger les notifications.')}<br><small>${e.message}</small></div>`;
   }
 }
 
@@ -11727,12 +11782,12 @@ async function _loadNotifBadge() {
         return ts > lastRead;
       }).length;
     }
-  } catch {}
+  } catch (e) { console.warn('[Notifications] Comptage des non-lues (PocketBase) échoué :', e); }
 
   try {
     const followers = await window.FirebaseSocial?.getFollowers?.();
     count += (followers || []).filter(f => (f.followedAt || 0) > lastRead).length;
-  } catch {}
+  } catch (e) { console.warn('[Notifications] Comptage des non-lues (Firebase) échoué :', e); }
 
   const badge = document.getElementById('notifBadge');
   if (badge && count > 0) {
@@ -11746,6 +11801,13 @@ setTimeout(_loadNotifBadge, 4000);
 //  SYSTÈME DE BANNISSEMENT
 // ════════════════════════════════════════════════════════════════════
 async function _checkBanStatus() {
+  // ── PocketBase en priorité ─────────────────────────────────────────
+  if (window.PocketBaseConfig?.isAuthenticated?.()) {
+    const { banned, reason } = window.PocketBaseConfig.getBanStatus?.() || {};
+    if (banned) _showBanScreen(reason);
+    return;
+  }
+  // ── Repli Firestore natif ───────────────────────────────────────────
   const db    = window.FirebaseConfig?.getDB?.();
   const docId = window._authUser?.discordId || window._firebaseUser?.email;
   if (!db || !docId) return;
@@ -11845,26 +11907,30 @@ function _showBanScreen(reason) {
       const btn = document.getElementById('contestSendBtn');
       btn.disabled = true; btn.textContent = 'Envoi…';
       try {
-        const db    = window.FirebaseConfig?.getDB?.();
-        const docId = window._authUser?.discordId || window._firebaseUser?.email || 'unknown';
-        if (db) {
-          await db.collection('banContests').doc(`${docId}_${Date.now()}`).set({
-            userId:    docId,
-            userName:  window._authUser?.displayName || window._authUser?.username || docId,
-            message:   msg,
-            createdAt: Date.now(),
-            status:    'pending',
-          });
+        if (window.PocketBaseConfig?.isAuthenticated?.() && window.PocketBaseReports?.submitBanAppeal) {
+          await window.PocketBaseReports.submitBanAppeal(msg);
+        } else {
+          const db    = window.FirebaseConfig?.getDB?.();
+          const docId = window._authUser?.discordId || window._firebaseUser?.email || 'unknown';
+          if (db) {
+            await db.collection('banContests').doc(`${docId}_${Date.now()}`).set({
+              userId:    docId,
+              userName:  window._authUser?.displayName || window._authUser?.username || docId,
+              message:   msg,
+              createdAt: Date.now(),
+              status:    'pending',
+            });
+          }
         }
         form.innerHTML = `<div style="background:#18181c;border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:40px;text-align:center">
           <div style="font-size:2rem;margin-bottom:12px">📬</div>
           <div style="font-weight:700;margin-bottom:6px">Contestation envoyée</div>
           <div style="color:rgba(255,255,255,.45);font-size:.82rem;margin-bottom:18px">Un administrateur examinera votre demande.</div>
-          <button onclick="document.getElementById('banContestForm').remove()" style="padding:8px 18px;border-radius:8px;border:none;background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-family:inherit">Fermer</button>
+          <button onclick="document.getElementById('banContestForm').remove()" style="padding:8px 18px;border-radius:8px;border:none;background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-family:inherit">${_t('tt-close', 'Fermer')}</button>
         </div>`;
       } catch(e) {
-        alert('Erreur lors de l\'envoi : ' + e.message);
-        btn.disabled = false; btn.textContent = 'Envoyer';
+        alert(_t('text-sending-error-prefix', 'Erreur lors de l\'envoi : ') + e.message);
+        btn.disabled = false; btn.textContent = _t('text-send', 'Envoyer');
       }
     });
   });
@@ -11920,7 +11986,7 @@ function _handleBeartifyDeepLink(url) {
         document.getElementById('authDiscordBtn')?.classList.remove('loading');
       } else {
         console.warn('[DeepLink] beartify://auth reçu sans access_token');
-        showToast('Erreur : token Discord manquant.', 'error');
+        showToast(_t('toast-error-discord-token-missing', 'Erreur : token Discord manquant.'), 'error');
         document.getElementById('authDiscordBtn')?.classList.remove('loading');
       }
       return;
@@ -11938,7 +12004,7 @@ function _handleBeartifyDeepLink(url) {
 
       if (error) {
         console.warn('[DeepLink] Google OAuth annulé :', error);
-        showToast('Connexion Google annulée.', 'info');
+        showToast(_t('toast-google-cancelled', 'Connexion Google annulée.'), 'info');
         document.getElementById('authGoogleBtn')?.classList.remove('loading');
         return;
       }
@@ -11950,12 +12016,12 @@ function _handleBeartifyDeepLink(url) {
           })
           .catch((e) => {
             console.error('[DeepLink] Google PKCE exchange échoué :', e);
-            showToast('Erreur de connexion Google.', 'error');
+            showToast(_t('toast-error-google-connection', 'Erreur de connexion Google.'), 'error');
             document.getElementById('authGoogleBtn')?.classList.remove('loading');
           });
       } else {
         console.warn('[DeepLink] beartify://google-auth reçu sans code');
-        showToast('Erreur : code Google manquant.', 'error');
+        showToast(_t('toast-error-google-code-missing', 'Erreur : code Google manquant.'), 'error');
         document.getElementById('authGoogleBtn')?.classList.remove('loading');
       }
       return;
@@ -12045,30 +12111,30 @@ function showTrackContextMenu(e, track) {
   menu.innerHTML = `
     <div class="ctx-menu-item" id="ctxPlayNow">
       <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288z"/></svg>
-      Lire maintenant
+      ${_t('text-play-now', 'Lire maintenant')}
     </div>
     <div class="ctx-menu-item" id="ctxAddLike">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="${isLikedTrack ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-      ${isLikedTrack ? 'Retirer des titres likés' : 'Ajouter aux titres likés'}
+      ${isLikedTrack ? _t('text-remove-liked', 'Retirer des titres likés') : _t('text-add-liked', 'Ajouter aux titres likés')}
     </div>
     <div class="ctx-menu-item" id="ctxAddPlaylist">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Ajouter à une playlist
+      ${_t('text-add-to-playlist-menu', 'Ajouter à une playlist')}
       <span class="ctx-menu-submenu-arrow">›</span>
     </div>
     <div class="ctx-menu-divider"></div>
     <div class="ctx-menu-item" id="ctxGoArtist">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      Accéder à l'artiste
+      ${_t('text-go-to-artist', 'Accéder à l\'artiste')}
     </div>
     <div class="ctx-menu-item" id="ctxGoAlbum">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-      Accéder à l'album
+      ${_t('text-go-to-album', 'Accéder à l\'album')}
     </div>
     <div class="ctx-menu-divider"></div>
     <div class="ctx-menu-item" id="ctxAddQueue">
       <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M15 15H1v-1.5h14zm0-4.5H1V9h14zm-14-7A2.5 2.5 0 0 1 3.5 1h9a2.5 2.5 0 0 1 0 5h-9A2.5 2.5 0 0 1 1 3.5m2.5-1a1 1 0 0 0 0 2h9a1 1 0 1 0 0-2z"/></svg>
-      Ajouter à la file d'attente
+      ${_t('text-add-to-queue-menu', 'Ajouter à la file d\'attente')}
     </div>
   `;
 
@@ -12094,7 +12160,7 @@ function showTrackContextMenu(e, track) {
       updateLikeButtons();
     }
     if (window.FirebaseSync?.syncToFirestore) window.FirebaseSync.syncToFirestore();
-    showToast(isNowLiked ? '♡ Retiré des titres likés' : '♥ Ajouté aux titres likés', isNowLiked ? 'default' : 'success');
+    showToast(isNowLiked ? _t('toast-removed-liked', '♡ Retiré des titres likés') : _t('toast-added-liked', '♥ Ajouté aux titres likés'), isNowLiked ? 'default' : 'success');
     closeAllPopups();
   });
 
@@ -12115,7 +12181,7 @@ function showTrackContextMenu(e, track) {
 
   menu.querySelector('#ctxAddQueue')?.addEventListener('click', () => {
     // Ajouter après la piste en cours dans le contexte
-    showToast(`📌 "${escapeHtml(track.title)}" ajouté à la file`, 'success');
+    showToast(_t('toast-track-added-to-queue-named', '📌 "{title}" ajouté à la file', {title: escapeHtml(track.title)}), 'success');
     closeAllPopups();
   });
 
@@ -12171,13 +12237,13 @@ function showAddToPlaylistPopup(e, track) {
 
     // Titres likés
     let html = '';
-    if (!q || 'titres likés'.includes(q)) {
+    if (!q || _t('text-liked-songs', 'Titres likés').toLowerCase().includes(q) || 'titres likés'.includes(q)) {
       html += `
         <div class="atp-item ${isLikedAlready ? 'atp-checked' : ''}" data-id="liked" role="option" aria-selected="${isLikedAlready}">
           <div class="atp-item-art atp-item-art--heart">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="${isLikedAlready ? 'var(--green,#1db954)' : 'currentColor'}" stroke="${isLikedAlready ? 'none' : 'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
           </div>
-          <span class="atp-item-name">Titres likés</span>
+          <span class="atp-item-name">${_t('text-liked-songs', 'Titres likés')}</span>
           <div class="atp-item-tick ${isLikedAlready ? 'atp-item-tick--on' : ''}">
             <svg viewBox="0 0 16 16" width="10" height="10" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06l2.72 2.72 6.72-6.72a.75.75 0 0 1 1.06 0z"/></svg>
           </div>
@@ -12198,24 +12264,24 @@ function showAddToPlaylistPopup(e, track) {
         </div>`;
     });
 
-    if (!html) html = `<div class="atp-empty">Aucun résultat</div>`;
+    if (!html) html = `<div class="atp-empty">${_t('text-no-results', 'Aucun résultat')}</div>`;
     return html;
   }
 
   popup.innerHTML = `
     <div class="atp-header">
-      <span class="atp-title">Enregistrer dans une playlist</span>
+      <span class="atp-title">${_t('text-save-to-playlist', 'Enregistrer dans une playlist')}</span>
     </div>
     <div class="atp-search-wrap">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="atp-search-icon"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
-      <input type="text" class="atp-search-input" placeholder="Rechercher…" id="atpSearch" autocomplete="off" spellcheck="false">
+      <input type="text" class="atp-search-input" placeholder="${_t('placeholder-search-dots', 'Rechercher…')}" id="atpSearch" autocomplete="off" spellcheck="false">
     </div>
     <div class="atp-list" id="atpList" role="listbox">${buildItems()}</div>
     <div class="atp-divider"></div>
     <div class="atp-footer">
       <button class="atp-new-btn" id="atpNewBtn">
         <svg viewBox="0 0 16 16" width="15" height="15" fill="currentColor"><path d="M15.25 8a.75.75 0 0 1-.75.75H8.75v5.75a.75.75 0 0 1-1.5 0V8.75H1.5a.75.75 0 0 1 0-1.5h5.75V1.5a.75.75 0 0 1 1.5 0v5.75h5.75a.75.75 0 0 1 .75.75z"/></svg>
-        Créer une playlist
+        ${_t('tt-create-playlist', 'Créer une playlist')}
       </button>
     </div>
   `;
@@ -12248,7 +12314,7 @@ function showAddToPlaylistPopup(e, track) {
           }
           if (track.id === tracks[currentIndex]?.id) { isLiked = !was; updateLikeButtons(); }
           if (window.FirebaseSync?.syncToFirestore) window.FirebaseSync.syncToFirestore();
-          showToast(was ? '♡ Retiré des titres likés' : '♥ Ajouté aux titres likés', was ? 'default' : 'success');
+          showToast(was ? _t('toast-removed-liked', '♡ Retiré des titres likés') : _t('toast-added-liked', '♥ Ajouté aux titres likés'), was ? 'default' : 'success');
 
         } else {
           const cpls  = window.customPlaylists || {};
@@ -12262,14 +12328,14 @@ function showAddToPlaylistPopup(e, track) {
             // Le cache local est mis à jour par removeFromPlaylist — pas besoin de toucher pl.tracks ici
             item.classList.remove('atp-checked');
             item.querySelector('.atp-item-tick')?.classList.remove('atp-item-tick--on');
-            showToast(`Retiré de « ${escapeHtml(pl.name)} »`, 'default');
+            showToast(_t('toast-removed-from-playlist', 'Retiré de « {name} »', {name: escapeHtml(pl.name)}), 'default');
           } else {
             if (window.FirebasePlaylists?.addToPlaylist)
               await window.FirebasePlaylists.addToPlaylist(plId, track);
             // Le cache local est mis à jour par addToPlaylist — pas besoin de push ici
             item.classList.add('atp-checked');
             item.querySelector('.atp-item-tick')?.classList.add('atp-item-tick--on');
-            showToast(`Ajouté à « ${escapeHtml(pl.name)} »`, 'success');
+            showToast(_t('toast-added-to-playlist', 'Ajouté à « {name} »', {name: escapeHtml(pl.name)}), 'success');
           }
         }
       });
@@ -12326,11 +12392,11 @@ function showAddToPlaylistPopup(e, track) {
       <div class="etc-popup-section">
         <div class="etc-popup-item" id="etcShortcuts">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
-          Voir les raccourcis
+          ${_t('text-view-shortcuts', 'Voir les raccourcis')}
         </div>
         <div class="etc-popup-item" id="etcSettings">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          Paramètres
+          ${_t('text-settings', 'Paramètres')}
         </div>
       </div>
     `;
@@ -12378,7 +12444,7 @@ function showAddToPlaylistPopup(e, track) {
   function togglePanel() {
     panel.classList.toggle('rp-collapsed');
     const isCollapsed = panel.classList.contains('rp-collapsed');
-    strip.title = isCollapsed ? 'Agrandir' : 'Réduire';
+    strip.title = isCollapsed ? _t('text-expand', 'Agrandir') : _t('text-collapse-simple', 'Réduire');
   }
 
   strip.addEventListener('click', togglePanel);
@@ -12580,7 +12646,7 @@ window._applyPrivateSession = function(enabled) {
   if (enabled && !badge) {
     badge = Object.assign(document.createElement('div'), {
       id: 'privateSessionBadge',
-      textContent: '🔒 Session privée',
+      textContent: _t('text-private-session', '🔒 Session privée'),
     });
     badge.style.cssText = 'position:fixed;top:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);border:1px solid var(--green);color:var(--green);font-size:.72rem;font-weight:600;padding:4px 12px;border-radius:20px;z-index:8100;pointer-events:none';
     document.body.appendChild(badge);
@@ -12673,6 +12739,54 @@ window._applyMediaOverlay = function(enabled) {
 })();
 
 // ══════════════════════════════════════════════════════════════════════
+//  P2-3 : Service Worker / PWA (web uniquement — jamais en Tauri, qui a
+//  déjà son propre packaging natif et où un SW n'a pas de sens).
+//  Respecte les réglages "Cache activé" (cacheEnabled) et "Mode hors-ligne"
+//  (offlineMode) déjà présents dans les Réglages → Application, jusqu'ici
+//  sans effet réel : c'est cette fonctionnalité qui leur donne un sens.
+// ══════════════════════════════════════════════════════════════════════
+function _registerServiceWorker() {
+  if (window._IS_TAURI) return; // packaging natif Tauri : pas de SW
+  if (!('serviceWorker' in navigator)) return;
+
+  navigator.serviceWorker.register('/sw.js').then(reg => {
+    window._swRegistration = reg;
+    _syncServiceWorkerConfig();
+    reg.addEventListener('updatefound', () => {
+      const installing = reg.installing;
+      installing?.addEventListener('statechange', () => {
+        if (installing.state === 'activated' && navigator.serviceWorker.controller) {
+          // Nouvelle version prête : pas de reload forcé (pourrait interrompre
+          // une lecture en cours) — la prochaine navigation la prendra.
+          if (typeof showToast === 'function') showToast(_t('toast-update-available', '🔄 Mise à jour disponible au prochain lancement'), 'info');
+        }
+      });
+    });
+  }).catch(err => console.warn('[SW] Enregistrement échoué :', err));
+}
+
+// Transmet au Service Worker l'état actuel des réglages "Cache activé" et
+// "Mode hors-ligne" (source de vérité : window.getSetting, exposé par
+// settings.js). Appelé à l'enregistrement puis à chaque changement de
+// l'un de ces deux réglages via l'event beartify:settingChanged.
+function _syncServiceWorkerConfig() {
+  const ctrl = navigator.serviceWorker?.controller;
+  if (!ctrl) return;
+  const cacheEnabled = window.getSetting ? window.getSetting('cacheEnabled') !== false : true;
+  const offlineMode  = window.getSetting ? !!window.getSetting('offlineMode') : false;
+  ctrl.postMessage({ type: 'BEARTIFY_CONFIG', config: { cacheEnabled, offlineMode } });
+}
+window._syncServiceWorkerConfig = _syncServiceWorkerConfig;
+
+// Enregistrement différé après le chargement complet pour ne jamais
+// retarder le premier rendu de l'app.
+if (document.readyState === 'complete') {
+  _registerServiceWorker();
+} else {
+  window.addEventListener('load', _registerServiceWorker, { once: true });
+}
+
+// ══════════════════════════════════════════════════════════════════════
 //  INIT - applique les paramètres sauvegardés (sans AudioContext)
 // ══════════════════════════════════════════════════════════════════════
 function _applyAllSettingsBridge() {
@@ -12692,6 +12806,7 @@ function _applyAllSettingsBridge() {
   window._settingsCrossfade        = s.crossfadeDuration ?? 0;
   window._settingsNormalize        = s.normalizeVolume ?? false;
   window._settingsGapless          = s.gaplessPlayback  ?? false;
+  window._settingsDualPlayer       = s.crossfadeDualPlayer ?? false;
   window._settingsAutoplay         = s.autoplay          ?? true;
   window._settingsBroadcast        = s.broadcastListening ?? true;
   window._settingsSaveHistory      = s.saveHistory ?? true;
@@ -12725,9 +12840,12 @@ document.addEventListener('beartify:settingChanged', ({ detail: { key, value } =
     crossfadeDuration:   () => { window._settingsCrossfade = value; },
     normalizeVolume:     () => { window._settingsNormalize = value; window._applyNormalization(value); },
     gaplessPlayback:     () => { window._settingsGapless = value; },
+    crossfadeDualPlayer: () => { window._settingsDualPlayer = value; },
     autoplay:            () => { window._settingsAutoplay = value; },
     broadcastListening:  () => { window._settingsBroadcast = value; },
     saveHistory:         () => { window._settingsSaveHistory = value; },
+    cacheEnabled:        () => window._syncServiceWorkerConfig?.(),
+    offlineMode:         () => window._syncServiceWorkerConfig?.(),
     language:            () => window._applyLanguage?.(value),
     lyricsSimpleMode:    () => typeof toggleSimpleLyricsMode === 'function' && toggleSimpleLyricsMode(value),
     playlistsVisible:    () => window.FirebaseSync?.updateProfileVisibility?.('playlistsVisible', value),
