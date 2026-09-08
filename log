@@ -1,7 +1,7 @@
 [Log] [Firebase] Stub gapi installé (origine Tauri détectée via location : tauri://localhost) (localhost, line 78)
 [Info] Successfully preconnected to https://www.gstatic.com/
-[Info] Successfully preconnected to https://fonts.googleapis.com/
 [Info] Successfully preconnected to https://cdn.jsdelivr.net/
+[Info] Successfully preconnected to https://fonts.googleapis.com/
 [Info] Successfully preconnected to https://lrclib.net/
 [Log] [DevTools] – "DevTools actifs↵  F12 / Ctrl+Shift+I → Ouvrir/fermer DevTools↵  Ctrl+Shift+R       → Recharger la WebView↵  Ctrl+Shift+D       → Pannea…" (tauri-devtools.js, line 181)
 "DevTools actifs
@@ -29,78 +29,19 @@
 [Log] [BeartifyI18n] Fichier i18n.js atteint et en cours d'exécution… (tauri-devtools.js, line 181)
 [Log] [BeartifyI18n] Module chargé ✅ (périmètre : navigation + titres de section des Réglages). Diagnostic disponible via window.debugI18n() dans la console. (tauri-devtools.js, line 181)
 [Log] [FallbackRouter] ✅ PocketBase disponible — mode nominal (tauri-devtools.js, line 181)
-[Log] [PocketBaseConfig] 🔄 Session rafraîchie (tauri-devtools.js, line 181)
 [Log] [FriendsPanel] ✅ Présence audio patchée (5s interval + événements immédiats) (tauri-devtools.js, line 181)
 [Log] [FriendsPanel] ✅ Panel initialisé (tauri-devtools.js, line 181)
 [Error] Failed to load resource: the server responded with a status of 404 (Not Found) (certified, line 0)
 [Error] Failed to load resource: the server responded with a status of 404 (Not Found) (config, line 0)
 [Error] Failed to load resource: the server responded with a status of 401 (Unauthorized) (search, line 0)
 [Warning] [Marketplace] GitHub search "beartify-extensions" → HTTP 401 (tauri-devtools.js, line 181)
+[Error] Failed to load resource: the server responded with a status of 401 (Unauthorized) (search, line 0)
+[Warning] [Marketplace] GitHub search "beartify-themes" → HTTP 401 (tauri-devtools.js, line 181)
 [Log] [Beartify] 64875 titres chargés depuis le cache - actualisation en arrière-plan… (tauri-devtools.js, line 181)
 [Log] [Firebase] Persistance Auth forcée en SESSION (diagnostic freeze) (tauri-devtools.js, line 181)
 [Log] ✅ Firebase initialisé avec succès (Tauri: – true – "/ Android:" – false – ")" (tauri-devtools.js, line 181)
 [Log] ℹ️ Aucun utilisateur connecté (tauri-devtools.js, line 181)
 [Log] ✅ Firebase prêt (tauri-devtools.js, line 181)
-[Error] Failed to load resource: the server responded with a status of 401 (Unauthorized) (search, line 0)
-[Warning] [Marketplace] GitHub search "beartify-themes" → HTTP 401 (tauri-devtools.js, line 181)
-[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:39225" (tauri-devtools.js, line 181)
-[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
-[Warning] [Firebase] oauth|cancel : – "Connexion refusée (os error 111)" (tauri-devtools.js, line 181)
-[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:39225/?iss=https://accounts.google.com&code=4/0ATsMZqD3qmSTAmcTjVDS7YGu28rU9UINIWRTiumRFKAdjYon0qXodoJYFuKspbOovDr6pA&scope…" (tauri-devtools.js, line 181)
-"http://127.0.0.1:39225/?iss=https://accounts.google.com&code=4/0ATsMZqD3qmSTAmcTjVDS7YGu28rU9UINIWRTiumRFKAdjYon0qXodoJYFuKspbOovDr6pA&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
-[Log] [Firebase] Échange du code Google contre les tokens... (tauri-devtools.js, line 181)
-[Log] [Firebase] refresh_token reçu de Google : – "oui" (tauri-devtools.js, line 181)
-[Log] [Firebase] État gapi avant signInWithCredential : – Object (tauri-devtools.js, line 181)
-Object
-[Log] [Firebase] Appel signInWithCredential... (tauri-devtools.js, line 181)
-[Log] [Beartify] Delta sync : 0 titre(s) mis à jour depuis 2026-09-08T11:24:18.936Z (tauri-devtools.js, line 181)
-[Log] ✅ Utilisateur connecté : – "papaourslinuxserver@gmail.com" (tauri-devtools.js, line 181)
-[Log] [Sync] ✅ Présence activée (interval unique, 30s) (tauri-devtools.js, line 181)
-[Log] ✅ Connexion Google Tauri (PKCE + loopback) réussie : – "papaourslinuxserver@gmail.com" (tauri-devtools.js, line 181)
-[Log] [AuthBridge] ✅ Session PocketBase ouverte pour – "Linux Server" (tauri-devtools.js, line 181)
-[Log] [Auth] ✅ Données PocketBase chargées après login Google (tauri-devtools.js, line 181)
-[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:44231" (tauri-devtools.js, line 181)
-[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
-[Warning] [Firebase] oauth|cancel : – "Connexion refusée (os error 111)" (tauri-devtools.js, line 181)
-[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:44231/?iss=https://accounts.google.com&code=4/0ATsMZqAAciEp31V-KYJJlgroYtPtaG1WQ6AqFOvSSCBD5wyvsapb6iGmyYE6xDatfdE9sA&scope…" (tauri-devtools.js, line 181)
-"http://127.0.0.1:44231/?iss=https://accounts.google.com&code=4/0ATsMZqAAciEp31V-KYJJlgroYtPtaG1WQ6AqFOvSSCBD5wyvsapb6iGmyYE6xDatfdE9sA&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
-[Log] [Firebase] Échange du code Google contre les tokens... (tauri-devtools.js, line 181)
-[Log] [Firebase] refresh_token reçu de Google : – "oui" (tauri-devtools.js, line 181)
-[Log] [Firebase] État gapi avant signInWithCredential : – Object (tauri-devtools.js, line 181)
-Object
-[Log] [Firebase] Appel signInWithCredential... (tauri-devtools.js, line 181)
-[Log] ✅ Connexion Google Tauri (PKCE + loopback) réussie : – "papaourslinuxserver@gmail.com" (tauri-devtools.js, line 181)
-[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:32839" (tauri-devtools.js, line 181)
-[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
-[Warning] [Firebase] oauth|cancel : – "Connexion refusée (os error 111)" (tauri-devtools.js, line 181)
-[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:32839/?iss=https://accounts.google.com&code=4/0ATsMZqD0rD4vGU3Kotr1eJ16U42YfutsoUofZUObDzZDZ3Fe0-kXDfEMnItdDsGgN2Cb0g&scope…" (tauri-devtools.js, line 181)
-"http://127.0.0.1:32839/?iss=https://accounts.google.com&code=4/0ATsMZqD0rD4vGU3Kotr1eJ16U42YfutsoUofZUObDzZDZ3Fe0-kXDfEMnItdDsGgN2Cb0g&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
-[Log] [Firebase] Échange du code Google contre les tokens... (tauri-devtools.js, line 181)
-[Log] [Firebase] refresh_token reçu de Google : – "oui" (tauri-devtools.js, line 181)
-[Log] [Firebase] État gapi avant signInWithCredential : – Object (tauri-devtools.js, line 181)
-Object
-[Log] [Firebase] Appel signInWithCredential... (tauri-devtools.js, line 181)
-[Log] ✅ Connexion Google Tauri (PKCE + loopback) réussie : – "papaourslinuxserver@gmail.com" (tauri-devtools.js, line 181)
-[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:35883" (tauri-devtools.js, line 181)
-[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
-[Warning] [Firebase] oauth|cancel : – "Connexion refusée (os error 111)" (tauri-devtools.js, line 181)
-[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:35883/?iss=https://accounts.google.com&code=4/0ATsMZqBJkqLbByjUaO46RPvNy7gGG79l3RtpFNZlmDkffViNIsJPT9Eph2wpwTodmEbXtg&scope…" (tauri-devtools.js, line 181)
-"http://127.0.0.1:35883/?iss=https://accounts.google.com&code=4/0ATsMZqBJkqLbByjUaO46RPvNy7gGG79l3RtpFNZlmDkffViNIsJPT9Eph2wpwTodmEbXtg&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
-[Log] [Firebase] Échange du code Google contre les tokens... (tauri-devtools.js, line 181)
-[Log] [Firebase] refresh_token reçu de Google : – "oui" (tauri-devtools.js, line 181)
-[Log] [Firebase] État gapi avant signInWithCredential : – Object (tauri-devtools.js, line 181)
-Object
-[Log] [Firebase] Appel signInWithCredential... (tauri-devtools.js, line 181)
-[Log] ✅ Connexion Google Tauri (PKCE + loopback) réussie : – "papaourslinuxserver@gmail.com" (tauri-devtools.js, line 181)
-[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:37873" (tauri-devtools.js, line 181)
-[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
 > Selected Element
-< <div class="auth-overlay open" id="authOverlay">…</div>
-[Warning] [Firebase] oauth|cancel : – "Connexion refusée (os error 111)" (tauri-devtools.js, line 181)
-[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:37873/?iss=https://accounts.google.com&code=4/0ATsMZqBiRDOAiVqoqz3b84nPiI7sJFu8z8k1DxhtxH-dmxcieNUoajE89n95Vn_Sl-dQ4Q&scope…" (tauri-devtools.js, line 181)
-"http://127.0.0.1:37873/?iss=https://accounts.google.com&code=4/0ATsMZqBiRDOAiVqoqz3b84nPiI7sJFu8z8k1DxhtxH-dmxcieNUoajE89n95Vn_Sl-dQ4Q&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
-[Log] [Firebase] Échange du code Google contre les tokens... (tauri-devtools.js, line 181)
-[Log] [Firebase] refresh_token reçu de Google : – "oui" (tauri-devtools.js, line 181)
-[Log] [Firebase] État gapi avant signInWithCredential : – {gapiDefined: true, gapiIframesDefined: true} (tauri-devtools.js, line 181)
-[Log] [Firebase] Appel signInWithCredential... (tauri-devtools.js, line 181)
-[Log] ✅ Connexion Google Tauri (PKCE + loopback) réussie : – "papaourslinuxserver@gmail.com" (tauri-devtools.js, line 181)
+< <div class="home-row-scroll" id="suggestGrid">…</div>
+[Log] [Beartify] Delta sync : 0 titre(s) mis à jour depuis 2026-09-08T14:02:29.004Z (tauri-devtools.js, line 181)
