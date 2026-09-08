@@ -1,7 +1,8 @@
-[Info] Successfully preconnected to https://lrclib.net/
-[Info] Successfully preconnected to https://www.gstatic.com/
-[Info] Successfully preconnected to https://fonts.googleapis.com/
+[Log] [Firebase] Stub gapi installé (origine Tauri détectée via location : tauri://localhost) (localhost, line 78)
 [Info] Successfully preconnected to https://cdn.jsdelivr.net/
+[Info] Successfully preconnected to https://fonts.googleapis.com/
+[Info] Successfully preconnected to https://www.gstatic.com/
+[Info] Successfully preconnected to https://lrclib.net/
 [Log] [DevTools] – "DevTools actifs↵  F12 / Ctrl+Shift+I → Ouvrir/fermer DevTools↵  Ctrl+Shift+R       → Recharger la WebView↵  Ctrl+Shift+D       → Pannea…" (tauri-devtools.js, line 181)
 "DevTools actifs
   F12 / Ctrl+Shift+I → Ouvrir/fermer DevTools
@@ -36,38 +37,33 @@
 [Warning] [Marketplace] GitHub search "beartify-extensions" → HTTP 401 (tauri-devtools.js, line 181)
 [Error] Failed to load resource: the server responded with a status of 401 (Unauthorized) (search, line 0)
 [Warning] [Marketplace] GitHub search "beartify-themes" → HTTP 401 (tauri-devtools.js, line 181)
-[Error] TypeError: undefined is not an object (evaluating 'gapi.iframes.getContext')
-	callback (firebase-auth-compat.js:1:101841)
-	(anonymous function) (api.js:23:491)
-	ja (api.js:16:704)
-	B (api.js:23:475)
-	(anonymous function) (api.js:24)
-	(anonymous function) (api.js:24:130)
-	Global Code (cb=gapi.loaded_0:1)
-[Error] Error: t`tauri
-	(anonymous function) (api.js:24:616)
-	(anonymous function) (api.js:23:491)
-	ja (api.js:16:704)
-	B (api.js:23:475)
-	(anonymous function) (api.js:24)
-	(anonymous function) (api.js:24:130)
-	Global Code (cb=gapi.loaded_1:1)
 [Log] [Beartify] 64875 titres chargés depuis le cache - actualisation en arrière-plan… (tauri-devtools.js, line 181)
-[Error] Cross-origin redirection to http://developers.google.com/ denied by Cross-Origin Resource Sharing policy: Origin tauri://localhost is not allowed by Access-Control-Allow-Origin. Status code: 301
-[Error] XMLHttpRequest cannot load https://apis.google.com/_/jserror?script=https%3A%2F%2Fapis.google.com%2F_%2Fscs%2Fabc-static%2F_%2Fjs%2Fk%3Dgapi.lb.fr.u1YzuBbBpqg.O%2Fm%3Dgapi_iframes%2Frt%3Dj%2Fsv%3D1%2Fd%3D1%2Fed%3D1%2Frs%3DAHpOoo8duhQcXZMuEcPyUghpXlpXTVvDfA%2Fcb%3Dgapi.loaded_0&error=t%60tauri&line=156 due to access control checks.
-[Error] Failed to load resource: Cross-origin redirection to http://developers.google.com/ denied by Cross-Origin Resource Sharing policy: Origin tauri://localhost is not allowed by Access-Control-Allow-Origin. Status code: 301 (jserror, line 0)
-[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:42067" (tauri-devtools.js, line 181)
-[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
+[Log] [Firebase] Persistance Auth forcée en SESSION (diagnostic freeze) (tauri-devtools.js, line 181)
+[Log] ✅ Firebase initialisé avec succès (Tauri: – true – "/ Android:" – false – ")" (tauri-devtools.js, line 181)
+[Log] ℹ️ Aucun utilisateur connecté (tauri-devtools.js, line 181)
+[Log] ✅ Firebase prêt (tauri-devtools.js, line 181)
 > Selected Element
 < <div class="auth-overlay open" id="authOverlay">…</div>
-[Log] [Beartify] Delta sync : 0 titre(s) mis à jour depuis 2026-09-08T07:24:31.430Z (tauri-devtools.js, line 181)
+[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:46405" (tauri-devtools.js, line 181)
+[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
+[Log] [Beartify] Delta sync : 0 titre(s) mis à jour depuis 2026-09-08T08:24:19.054Z (tauri-devtools.js, line 181)
 [Warning] [Firebase] oauth|cancel : – "Connexion refusée (os error 111)" (tauri-devtools.js, line 181)
-[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:42067/?iss=https://accounts.google.com&code=4/0ATsMZqCcb-ytCTsLnnr1x9KNByvocP_UkBNaSJLVLh8KEEgtgEPtNHAfszNLaEo15DIpHQ&scope…" (tauri-devtools.js, line 181)
-"http://127.0.0.1:42067/?iss=https://accounts.google.com&code=4/0ATsMZqCcb-ytCTsLnnr1x9KNByvocP_UkBNaSJLVLh8KEEgtgEPtNHAfszNLaEo15DIpHQ&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
+[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:46405/?iss=https://accounts.google.com&code=4/0ATsMZqCIKyJzDF9o-vwZeloQD6_75NzOhWsOkx2n0viBRcv1D5qXlPCS4c5ql7c8XAVFeQ&scope…" (tauri-devtools.js, line 181)
+"http://127.0.0.1:46405/?iss=https://accounts.google.com&code=4/0ATsMZqCIKyJzDF9o-vwZeloQD6_75NzOhWsOkx2n0viBRcv1D5qXlPCS4c5ql7c8XAVFeQ&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
 [Log] [Firebase] Échange du code Google contre les tokens... (tauri-devtools.js, line 181)
-[Log] [Firebase] État gapi avant signInWithCredential : – {gapiDefined: true, gapiIframesDefined: false} (tauri-devtools.js, line 181)
+[Log] [Firebase] État gapi avant signInWithCredential : – {gapiDefined: true, gapiIframesDefined: true} (tauri-devtools.js, line 181)
 [Log] [Firebase] Appel signInWithCredential... (tauri-devtools.js, line 181)
-[Error] ❌ Erreur firebaseHandleGoogleCode : – Error: signInWithCredential : timeout 15s — probable blocage gapi/iframe sous tauri:// — firebase-config.js:435
-Error: signInWithCredential : timeout 15s — probable blocage gapi/iframe sous tauri:// — firebase-config.js:435
-	(anonymous function) (tauri-devtools.js:181)
-	(anonymous function) (firebase-config.js:443)
+[Log] ✅ Utilisateur connecté : – "papaourslinuxserver@gmail.com" (tauri-devtools.js, line 181)
+[Log] ✅ Connexion Google Tauri (PKCE + loopback) réussie : – "papaourslinuxserver@gmail.com" (tauri-devtools.js, line 181)
+[Log] [Sync] ✅ Présence activée (interval unique, 30s) (tauri-devtools.js, line 181)
+[Log] [AuthBridge] ✅ Session PocketBase ouverte pour – "Linux Server" (tauri-devtools.js, line 181)
+[Log] [Auth] ✅ Données PocketBase chargées après login Google (tauri-devtools.js, line 181)
+[Log] [Firebase] Serveur OAuth local démarré sur – "http://127.0.0.1:37169" (tauri-devtools.js, line 181)
+[Log] [Firebase] Ouverture Google OAuth dans le navigateur système... (tauri-devtools.js, line 181)
+[Warning] [Firebase] oauth|cancel : – "Connexion refusée (os error 111)" (tauri-devtools.js, line 181)
+[Log] [Firebase] Callback OAuth reçu : – "http://127.0.0.1:37169/?iss=https://accounts.google.com&code=4/0ATsMZqCnT5qoYpEMpZLYZE5lI74AfhnmHQxx8JfH3h-y6UQf8hj0MDgE2j1ppiMfhk9QsQ&scope…" (tauri-devtools.js, line 181)
+"http://127.0.0.1:37169/?iss=https://accounts.google.com&code=4/0ATsMZqCnT5qoYpEMpZLYZE5lI74AfhnmHQxx8JfH3h-y6UQf8hj0MDgE2j1ppiMfhk9QsQ&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent"
+[Log] [Firebase] Échange du code Google contre les tokens... (tauri-devtools.js, line 181)
+[Log] [Firebase] État gapi avant signInWithCredential : – {gapiDefined: true, gapiIframesDefined: true} (tauri-devtools.js, line 181)
+[Log] [Firebase] Appel signInWithCredential... (tauri-devtools.js, line 181)
+[Log] ✅ Connexion Google Tauri (PKCE + loopback) réussie : – "papaourslinuxserver@gmail.com" (tauri-devtools.js, line 181)
