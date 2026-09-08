@@ -1,1434 +1,450 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <!-- Classe is-mobile sur <html> avant tout rendu (évite le flash desktop) -->
-    <script>if(window.innerWidth<=768)document.documentElement.classList.add('is-mobile');</script>
-    <title>Beartify</title>
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#121212">
-    <!-- pictures/icon-logo.png sert déjà d'icône ailleurs dans l'app ; en
-         l'absence des jeux d'icônes 192/512 dédiés référencés par
-         manifest.json (voir /icons/), on la réutilise comme repli minimal
-         pour l'icône d'onglet/marque-page. Les icônes d'installation PWA
-         (écran d'accueil) restent à fournir séparément. -->
-    <link rel="icon" href="pictures/icon-logo.png">
-    <link rel="apple-touch-icon" href="pictures/icon-logo.png">
-    <link rel="stylesheet" href="style.css?v=3">
-    <!-- Nouveau moteur de rendu des paroles (port fidèle de l'extension
-         Spicetify "spicy-lyrics"), isolé dans Lyrics/ : voir Lyrics/README.md.
-         Chargé après style.css pour le surcharger par simple cascade CSS,
-         sans jamais modifier style.css. Pour revenir à l'ancien rendu,
-         renommez le dossier "Lyrics" : ce <link> échouera en 404 et
-         style.css reprendra seul la main. -->
-    <link rel="stylesheet" href="lyrics/spicy-lyrics.css">
-    <link rel="stylesheet" href="friends-panel.css">
-    <link rel="stylesheet" href="background.css?v=2">
-    <link rel="stylesheet" href="mini-player.css">
-    <link rel="stylesheet" href="blindtest.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Préconnexions : démarre DNS+TCP+TLS pendant le parsing du <head>,
-         au lieu d'attendre que le parseur atteigne chaque <script src>.
-         Ciblé sur les origines externes réellement sur le chemin critique
-         (Firebase/gstatic + PocketBase SDK, chargés avant le 1er paint) et
-         lrclib.net (fallback paroles, fréquemment sollicité). Le proxy
-         Jellyfin n'a pas besoin d'entrée ici : il passe par le même
-         domaine que la page (Caddy), donc déjà connecté. -->
-    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-    <link rel="preconnect" href="https://lrclib.net" crossorigin>
-    <!-- Firebase SDK (compat) - gère l'auth Google nativement via popup -->
-    <!-- ⚠️ CONSERVÉ EN ENTIER : le fallback Firebase Native (firestore-compat
-         inclus) doit rester pleinement fonctionnel en secours de PocketBase -->
-    <!-- ⚠️ FIX : sous l'origine custom tauri:// (WebKitGTK/Linux), le vrai
-         script gapi (apis.google.com/js/api.js, chargé dynamiquement par
-         firebase-auth-compat.js pour son infra popup/redirect interne)
-         échoue à initialiser gapi.iframes (sondage cross-domain vers
-         developers.google.com rejeté par CORS sous cette origine). L'
-         exception qui en résulte est levée dans un callback brut, pas dans
-         une promesse — elle ne rejette rien, elle bloque juste pour
-         toujours. Résultat : TOUTE méthode d'auth du SDK (pas seulement
-         signInWithPopup/Redirect) reste bloquée indéfiniment, y compris
-         signInWithCredential utilisé par le flow PKCE Tauri qui n'a
-         pourtant besoin d'aucune infra popup.
-         On bloque donc ici le chargement du vrai script gapi (retiré de
-         script-src dans tauri.conf.json) et on le remplace par un stub
-         minimal qui répond immédiatement à gapi.load(), pour que l'init
-         interne de Firebase se termine sans jamais bloquer — même si
-         cette infra popup n'est de toute façon jamais utilisée sur Tauri. -->
-    <script>
-      // Détection via location plutôt que window.__TAURI__ : ce dernier n'est
-      // pas garanti injecté à ce stade sur WebKitGTK (même piège que le bug
-      // _fbIsTauri corrigé précédemment dans firebase-config.js). location.*
-      // est disponible immédiatement, sans dépendre d'un timing d'injection.
-      //   - Linux (WebKitGTK)         : location.protocol === 'tauri:'
-      //   - Windows/Android (WebView2): location.hostname === 'tauri.localhost'
-      var _looksLikeTauri = location.protocol === 'tauri:' || location.hostname === 'tauri.localhost';
-      if (_looksLikeTauri) {
-        window.gapi = {
-          load: function (_libs, callback) {
-            var onload = (callback && callback.callback) || callback;
-            if (typeof onload === 'function') setTimeout(onload, 0);
-          },
-          iframes: {
-            getContext: function () { return null; },
-            CROSS_ORIGIN_IFRAMES_FILTER: function () { return false; },
-          },
-        };
-        console.log('[Firebase] Stub gapi installé (origine Tauri détectée via location : ' + location.protocol + '//' + location.hostname + ')');
-      }
-    </script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
-    <!-- SDK PocketBase (backend nominal) -->
-    <script src="https://cdn.jsdelivr.net/npm/pocketbase@0.25.0/dist/pocketbase.umd.js"></script>
-</head>
-
-<body>
-
-  <!-- ══════════════ FOND DYNAMIQUE GLOBAL ══════════════ -->
-  <!-- Port de @spikerko/tools/DynamicBackground - 3 couches CSS animées (Back/Center/Front) -->
-  <!-- Identique à #SpicyLyricsPage .spicy-dynamic-bg dans spicy-dynamic-bg.css -->
-  <div id="spicyGlobalBg" aria-hidden="true">
-    <div class="spicy-bg-layer Back"></div>
-    <div class="spicy-bg-layer Center"></div>
-    <div class="spicy-bg-layer Front"></div>
-  </div>
-
-  <!-- ══════════════ AUTH MODAL ══════════════ -->
-  <div class="auth-overlay" id="authOverlay">
-    <div class="auth-modal" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
-      <button class="auth-modal-close" id="authModalClose" aria-label="Fermer" data-i18n-attr="aria-label:tt-close">✕</button>
-
-      <div class="auth-modal-logo">
-        <img src="pictures/icon-logo.png" alt="Beartify" width="36" height="36" onerror="this.style.display='none'">
-        <span class="auth-modal-brand" id="authModalTitle">Beartify</span>
-      </div>
-
-      <p class="auth-modal-sub" data-i18n="text-auth-subtitle">Connectez-vous pour accéder à votre profil, vos playlists et vos favoris.</p>
-
-      <button class="auth-provider-btn discord" id="authDiscordBtn">
-        <svg class="provider-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M18.8944 4.34399C17.5184 3.71467 16.057 3.256 14.5317 3C14.3397 3.33067 14.1263 3.77866 13.977 4.13067C12.3546 3.89599 10.7439 3.89599 9.14394 4.13067C8.9946 3.77866 8.77059 3.33067 8.58925 3C7.05328 3.256 5.59194 3.71467 4.22555 4.34399C1.46289 8.41865 0.716219 12.3973 1.08955 16.3226C2.92421 17.6559 4.6949 18.4666 6.43463 19C6.86129 18.424 7.2453 17.8053 7.57597 17.1546C6.94663 16.92 6.3493 16.632 5.7733 16.2906C5.92263 16.184 6.07197 16.0667 6.21064 15.9493C9.68796 17.5387 13.4544 17.5387 16.889 15.9493C17.0383 16.0667 17.177 16.184 17.3263 16.2906C16.7503 16.632 16.153 16.92 15.5237 17.1546C15.8543 17.8053 16.2384 18.424 16.665 19C18.4037 18.4666 20.185 17.6559 22.0101 16.3226C22.4687 11.7787 21.2837 7.83202 18.8944 4.34399ZM8.05596 13.9013C7.01061 13.9013 6.15728 12.952 6.15728 11.7893C6.15728 10.6267 6.98928 9.67731 8.05596 9.67731C9.11194 9.67731 9.97591 10.6267 9.95457 11.7893C9.95457 12.952 9.11194 13.9013 8.05596 13.9013ZM15.065 13.9013C14.0197 13.9013 13.1653 12.952 13.1653 11.7893C13.1653 10.6267 13.9983 9.67731 15.065 9.67731C16.121 9.67731 16.985 10.6267 16.9637 11.7893C16.9637 12.952 16.1317 13.9013 15.065 13.9013Z" fill="currentColor"/>
-        </svg>
-        <span data-i18n="text-login-discord">Se connecter avec Discord</span>
-      </button>
-
-      <button class="auth-provider-btn google" id="authGoogleBtn">
-        <svg class="provider-icon" width="20" height="20" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none">
-          <path fill="#4285F4" d="M14.9 8.161c0-.476-.039-.954-.121-1.422h-6.64v2.695h3.802a3.24 3.24 0 01-1.407 2.127v1.75h2.269c1.332-1.22 2.097-3.02 2.097-5.15z"/>
-          <path fill="#34A853" d="M8.14 15c1.898 0 3.499-.62 4.665-1.69l-2.268-1.749c-.631.427-1.446.669-2.395.669-1.836 0-3.393-1.232-3.952-2.888H1.85v1.803A7.044 7.044 0 008.14 15z"/>
-          <path fill="#FBBC04" d="M4.187 9.342a4.17 4.17 0 010-2.68V4.859H1.849a6.97 6.97 0 000 6.286l2.338-1.803z"/>
-          <path fill="#EA4335" d="M8.14 3.77a3.837 3.837 0 012.7 1.05l2.01-1.999a6.786 6.786 0 00-4.71-1.82 7.042 7.042 0 00-6.29 3.858L4.186 6.66c.556-1.658 2.116-2.89 3.952-2.89z"/>
-        </svg>
-        <span data-i18n="text-login-google">Se connecter avec Google</span>
-      </button>
-
-      <p class="auth-modal-terms"><span data-i18n="text-terms-intro">En continuant, vous acceptez les</span> <a href="#" id="authTermsLink" data-i18n="text-terms-link">conditions d'utilisation</a>.</p>
-    </div>
-  </div>
-
-  <!-- ══════════════ MODAL CONDITIONS D'UTILISATION ══════════════ -->
-  <div class="auth-overlay terms-overlay" id="termsOverlay" style="display:none">
-    <div class="auth-modal terms-modal" id="termsModal" role="dialog" aria-modal="true" aria-labelledby="termsModalTitle" style="max-width:540px;max-height:80vh;overflow-y:auto">
-      <button class="auth-modal-close" id="termsModalClose" aria-label="Fermer">✕</button>
-      <div class="auth-modal-logo">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-        <span class="auth-modal-brand" id="termsModalTitle" data-i18n="text-terms-title">Conditions d'utilisation</span>
-      </div>
-      <div style="font-size:0.82rem;line-height:1.7;color:var(--text-subdued,#aaa);text-align:left">
-        <p style="font-size:0.92rem;font-weight:600;color:var(--text-primary,#fff);margin-bottom:12px" data-i18n="text-welcome-beartify">Bienvenue sur Beartify</p>
-        <p>En accédant à Beartify et en utilisant ses services, vous acceptez les présentes conditions. Veuillez les lire attentivement.</p>
-
-        <p style="font-weight:600;color:var(--text-primary,#fff);margin-top:16px;margin-bottom:4px">1. Nature du service</p>
-        <p>Beartify est un projet open-source à but non lucratif, développé et maintenu bénévolement. Ce service est fourni «&nbsp;tel quel&nbsp;», sans garantie d'aucune sorte, expresse ou implicite.</p>
-
-        <p style="font-weight:600;color:var(--text-primary,#fff);margin-top:16px;margin-bottom:4px">2. Contenu musical</p>
-        <p>Les fichiers audio accessibles via Beartify sont hébergés sur des serveurs tiers indépendants. <strong style="color:var(--text-primary,#fff)">Beartify décline toute responsabilité quant à la nature, la légalité ou le contenu des fichiers audio présents sur ces serveurs.</strong> L'utilisateur reconnaît accéder à ces contenus sous sa propre responsabilité et en conformité avec les lois en vigueur dans son pays.</p>
-
-        <p style="font-weight:600;color:var(--text-primary,#fff);margin-top:16px;margin-bottom:4px">3. Projet open-source — Absence de poursuite</p>
-        <p><span data-i18n="text-terms-p3a">Beartify est un projet communautaire et open-source. En continuant,</span> <strong style="color:var(--text-primary,#fff)" data-i18n="text-terms-p3b">vous acceptez expressément de ne pas intenter d'action en justice, de ne pas réclamer de dommages et intérêts, et de ne pas engager de procédure légale à l'encontre des développeurs, contributeurs ou hébergeurs de ce projet</strong><span data-i18n="text-terms-p3c">, pour quelque motif que ce soit lié à l'utilisation du service.</span></p>
-
-        <p style="font-weight:600;color:var(--text-primary,#fff);margin-top:16px;margin-bottom:4px">4. Données personnelles</p>
-        <p>Beartify collecte uniquement les informations nécessaires au bon fonctionnement du service (identifiant de connexion, préférences d'écoute). Ces données ne sont ni vendues ni partagées avec des tiers à des fins commerciales.</p>
-
-        <p style="font-weight:600;color:var(--text-primary,#fff);margin-top:16px;margin-bottom:4px">5. Comportement de l'utilisateur</p>
-        <p>Tout usage abusif, tentative d'accès non autorisé ou comportement nuisant à la communauté peut entraîner la suspension immédiate du compte, sans préavis.</p>
-
-        <p style="font-weight:600;color:var(--text-primary,#fff);margin-top:16px;margin-bottom:4px">6. Modifications</p>
-        <p>Ces conditions peuvent être modifiées à tout moment. L'utilisation continue du service après modification vaut acceptation des nouvelles conditions.</p>
-
-        <p style="margin-top:20px;font-style:italic">Dernière mise à jour : Juin 2025</p>
-      </div>
-      <button id="termsAcceptBtn" style="margin-top:20px;width:100%;padding:12px;background:var(--accent,#1db954);color:#fff;border:none;border-radius:8px;font-size:0.9rem;font-weight:600;cursor:pointer;border-radius:500px">J'accepte et je continue</button>
-    </div>
-  </div>
-
-  <!-- ══════════════ MODAL VIP ══════════════ -->
-  <div class="auth-overlay vip-overlay" id="vipOverlay" style="display:none">
-    <div class="auth-modal vip-modal" id="vipModal" role="dialog" aria-modal="true" aria-labelledby="vipModalTitle" style="max-width:440px">
-      <button class="auth-modal-close" id="vipModalClose" aria-label="Fermer">✕</button>
-      <div class="auth-modal-logo">
-        <svg width="28" height="28" viewBox="0 0 246.989 246.989" fill="currentColor"><path d="M246.038,83.955l-39.424-70.664c-1.325-2.374-3.831-3.846-6.55-3.846H46.93c-2.719,0-5.225,1.471-6.55,3.846L0.951,83.955c-1.497,2.683-1.206,6.008,0.734,8.391l116.002,142.432c0.037,0.046,0.08,0.085,0.118,0.13c0.12,0.141,0.244,0.278,0.375,0.41c0.015,0.015,0.028,0.033,0.043,0.048c0.034,0.033,0.069,0.064,0.104,0.096c0.012,0.012,0.025,0.021,0.037,0.033c0.133,0.125,0.27,0.245,0.412,0.361c0.065,0.053,0.131,0.106,0.198,0.157c0.145,0.11,0.295,0.213,0.448,0.313c0.072,0.047,0.143,0.094,0.216,0.139c0.129,0.077,0.263,0.148,0.397,0.219c0.055,0.028,0.108,0.059,0.164,0.086c0.051,0.025,0.101,0.05,0.152,0.074c0.149,0.069,0.303,0.128,0.459,0.188c0.097,0.038,0.192,0.079,0.291,0.113c0.019,0.006,0.035,0.015,0.054,0.021c0.007,0.002,0.014,0.003,0.021,0.005c0.066,0.022,0.137,0.034,0.205,0.054c0.253,0.075,0.51,0.136,0.77,0.184c0.108,0.02,0.215,0.04,0.324,0.055c0.309,0.043,0.622,0.07,0.938,0.074c0.029,0,0.058,0.007,0.088,0.007h0.001h0.001c0.03,0,0.059-0.007,0.088-0.007c0.317-0.004,0.63-0.031,0.939-0.074c0.108-0.015,0.214-0.035,0.321-0.054c0.263-0.048,0.522-0.11,0.776-0.186c0.065-0.019,0.133-0.031,0.198-0.052c0.008-0.003,0.016-0.003,0.023-0.006c0.02-0.006,0.036-0.015,0.055-0.022c0.098-0.033,0.191-0.074,0.287-0.11c0.156-0.06,0.312-0.12,0.462-0.189c0.052-0.024,0.104-0.05,0.155-0.075c0.053-0.026,0.104-0.056,0.155-0.082c0.136-0.071,0.271-0.143,0.401-0.221c0.074-0.045,0.146-0.093,0.22-0.141c0.152-0.099,0.302-0.202,0.444-0.311c0.068-0.051,0.134-0.104,0.199-0.158c0.144-0.116,0.281-0.237,0.414-0.362c0.013-0.013,0.027-0.023,0.04-0.035c0.03-0.029,0.062-0.056,0.092-0.086c0.017-0.017,0.032-0.036,0.049-0.053c0.134-0.135,0.261-0.276,0.383-0.42c0.036-0.042,0.076-0.079,0.111-0.122L245.304,92.346C247.244,89.963,247.535,86.638,246.038,83.955z M138.3,24.446l21.242,55.664H87.457l21.249-55.664H138.3z M160.065,95.11l-36.563,110.967L86.935,95.11H160.065z M71.142,95.11l32.524,98.699L23.282,95.11H71.142z M175.858,95.11h47.851l-80.37,98.696L175.858,95.11z M226.715,80.11h-51.118l-21.242-55.664h41.306L226.715,80.11z M51.333,24.446h41.317L71.402,80.11H20.274L51.333,24.446z"/></svg>
-        <span class="auth-modal-brand" id="vipModalTitle" data-i18n="text-vip-status">Statut VIP</span>
-      </div>
-      <div style="background:linear-gradient(135deg,rgba(255,200,0,0.08),rgba(255,150,0,0.05));border:1px solid rgba(255,200,0,0.2);border-radius:12px;padding:14px 16px;margin-bottom:18px">
-        <p style="font-size:0.8rem;font-weight:600;color:rgba(255,200,0,0.9);margin-bottom:8px;letter-spacing:0.04em">✦ AVANTAGES VIP</p>
-        <ul style="font-size:0.78rem;color:var(--text-subdued,#aaa);line-height:1.8;list-style:none;padding:0;margin:0">
-          <li>⬡ Badge VIP exclusif sur votre profil</li>
-          <li>⬡ Accès anticipé aux nouvelles fonctionnalités</li>
-          <li>⬡ Téléchargement de titres en haute qualité</li>
-          <li>⬡ Catalogue étendu en avant-première</li>
-          <li>⬡ Support prioritaire</li>
-        </ul>
-      </div>
-      <p style="font-size:0.78rem;color:var(--text-subdued,#aaa);margin-bottom:14px;text-align:center">Le code VIP à 16 caractères est distribué par les administrateurs de Beartify via Discord ou les événements communautaires.</p>
-      <label style="font-size:0.8rem;color:var(--text-primary,#fff);display:block;margin-bottom:6px" data-i18n="text-activation-code">Code d'activation</label>
-      <input id="vipCodeInput" type="text" maxlength="16" placeholder="XXXXXXXXXXXXXXXX" autocomplete="off" spellcheck="false"
-        style="width:100%;box-sizing:border-box;padding:11px 14px;background:var(--bg-elevated,#2a2a2a);border:1px solid var(--border,#3a3a3a);border-radius:8px;color:var(--text-primary,#fff);font-size:0.95rem;letter-spacing:0.12em;text-align:center;outline:none;font-family:monospace">
-      <p id="vipCodeError" style="font-size:0.75rem;color:#e74c3c;margin-top:6px;display:none"></p>
-      <button id="vipActivateBtn" style="margin-top:14px;width:100%;padding:12px;background:linear-gradient(135deg,#f5a623,#e08a00);color:#fff;border:none;border-radius:500px;font-size:0.9rem;font-weight:600;cursor:pointer" data-i18n="text-activate-vip">Activer le statut VIP</button>
-    </div>
-  </div>
-
-  <!-- ══════════════ PROFILE DROPDOWN ══════════════ -->
-  <div class="profile-dropdown" id="profileDropdown">
-    <div class="pd-user-info">
-      <div class="pd-avatar" id="pdAvatar"></div>
-      <div class="pd-user-meta">
-        <span class="pd-name"    id="pdName">-</span>
-        <span class="pd-email"   id="pdEmail">-</span>
-        <span class="pd-provider" id="pdProvider">-</span>
-      </div>
-    </div>
-    <div class="pd-divider"></div>
-    <button class="pd-item" id="pdProfile">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;opacity:.7"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>
-      Mon profil
-    </button>
-    <button class="pd-item" id="pdSettings">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;opacity:.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      Paramètres
-    </button>
-    <button class="pd-item" id="pdVipBtn">
-      <svg width="16" height="16" viewBox="0 0 246.989 246.989" fill="currentColor" style="flex-shrink:0;opacity:.7"><path d="M246.038,83.955l-39.424-70.664c-1.325-2.374-3.831-3.846-6.55-3.846H46.93c-2.719,0-5.225,1.471-6.55,3.846L0.951,83.955c-1.497,2.683-1.206,6.008,0.734,8.391l116.002,142.432c0.037,0.046,0.08,0.085,0.118,0.13c0.12,0.141,0.244,0.278,0.375,0.41c0.015,0.015,0.028,0.033,0.043,0.048c0.034,0.033,0.069,0.064,0.104,0.096c0.012,0.012,0.025,0.021,0.037,0.033c0.133,0.125,0.27,0.245,0.412,0.361c0.065,0.053,0.131,0.106,0.198,0.157c0.145,0.11,0.295,0.213,0.448,0.313c0.072,0.047,0.143,0.094,0.216,0.139c0.129,0.077,0.263,0.148,0.397,0.219c0.055,0.028,0.108,0.059,0.164,0.086c0.051,0.025,0.101,0.05,0.152,0.074c0.149,0.069,0.303,0.128,0.459,0.188c0.097,0.038,0.192,0.079,0.291,0.113c0.019,0.006,0.035,0.015,0.054,0.021c0.007,0.002,0.014,0.003,0.021,0.005c0.066,0.022,0.137,0.034,0.205,0.054c0.253,0.075,0.51,0.136,0.77,0.184c0.108,0.02,0.215,0.04,0.324,0.055c0.309,0.043,0.622,0.07,0.938,0.074c0.029,0,0.058,0.007,0.088,0.007h0.001h0.001c0.03,0,0.059-0.007,0.088-0.007c0.317-0.004,0.63-0.031,0.939-0.074c0.108-0.015,0.214-0.035,0.321-0.054c0.263-0.048,0.522-0.11,0.776-0.186c0.065-0.019,0.133-0.031,0.198-0.052c0.008-0.003,0.016-0.003,0.023-0.006c0.02-0.006,0.036-0.015,0.055-0.022c0.098-0.033,0.191-0.074,0.287-0.11c0.156-0.06,0.312-0.12,0.462-0.189c0.052-0.024,0.104-0.05,0.155-0.075c0.053-0.026,0.104-0.056,0.155-0.082c0.136-0.071,0.271-0.143,0.401-0.221c0.074-0.045,0.146-0.093,0.22-0.141c0.152-0.099,0.302-0.202,0.444-0.311c0.068-0.051,0.134-0.104,0.199-0.158c0.144-0.116,0.281-0.237,0.414-0.362c0.013-0.013,0.027-0.023,0.04-0.035c0.03-0.029,0.062-0.056,0.092-0.086c0.017-0.017,0.032-0.036,0.049-0.053c0.134-0.135,0.261-0.276,0.383-0.42c0.036-0.042,0.076-0.079,0.111-0.122L245.304,92.346C247.244,89.963,247.535,86.638,246.038,83.955z M138.3,24.446l21.242,55.664H87.457l21.249-55.664H138.3z M160.065,95.11l-36.563,110.967L86.935,95.11H160.065z M71.142,95.11l32.524,98.699L23.282,95.11H71.142z M175.858,95.11h47.851l-80.37,98.696L175.858,95.11z M226.715,80.11h-51.118l-21.242-55.664h41.306L226.715,80.11z M51.333,24.446h41.317L71.402,80.11H20.274L51.333,24.446z"/></svg>
-      Devenir VIP
-    </button>
-    <div class="pd-divider"></div>
-    <button class="pd-item" id="pdReportBtn">
-      <svg width="16" height="16" viewBox="0 0 36 36" fill="currentColor" style="flex-shrink:0;opacity:.7"><path d="M18,21.32a1.3,1.3,0,0,0,1.3-1.3V14a1.3,1.3,0,1,0-2.6,0v6A1.3,1.3,0,0,0,18,21.32Z"/><circle cx="17.95" cy="24.27" r="1.5"/><path d="M30.33,25.54,20.59,7.6a3,3,0,0,0-5.27,0L5.57,25.54A3,3,0,0,0,8.21,30H27.69a3,3,0,0,0,2.64-4.43Zm-1.78,1.94a1,1,0,0,1-.86.49H8.21a1,1,0,0,1-.88-1.48L17.07,8.55a1,1,0,0,1,1.76,0l9.74,17.94A1,1,0,0,1,28.55,27.48Z"/></svg>
-      Signaler un problème
-    </button>
-    <button class="pd-item" id="pdRequestBtn">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="flex-shrink:0;opacity:.7"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Demande d'ajout
-    </button>
-    <div class="pd-divider"></div>
-    <button class="pd-item danger" id="pdSignOut">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;opacity:.7"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Se déconnecter
-    </button>
-  </div>
-
-  <!-- ══════════════ TOP BAR ══════════════ -->
-  <div class="top-bar" id="topBar">
-    <div class="top-bar-left">
-      <button class="top-btn icon-only" id="btnEtc" data-tooltip="Plus d'options" aria-label="Plus d'options" data-i18n-attr="data-tooltip:tt-more-options;aria-label:tt-more-options">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-      </button>
-      <button class="top-btn icon-only" id="btnBack" data-tooltip="Retour" aria-label="Retour" data-i18n-attr="data-tooltip:tt-back;aria-label:tt-back">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-      </button>
-      <button class="top-btn icon-only" id="btnForward" data-tooltip="Avant" aria-label="Avant" data-i18n-attr="data-tooltip:tt-forward;aria-label:tt-forward">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-      </button>
-    </div>
-
-    <div class="top-bar-center">
-      <button class="top-btn icon-only" id="btnHome" data-tooltip="Accueil" aria-label="Accueil" data-i18n-attr="data-tooltip:tt-home;aria-label:tt-home">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      </button>
-      <button class="top-btn icon-only blindtest-btn" id="btnBlindtest" data-tooltip="Blindtest" aria-label="Blindtest" data-i18n-attr="data-tooltip:tt-blindtest;aria-label:tt-blindtest">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-      </button>
-      <button class="top-btn icon-only marketplace-btn" id="btnMarketstore" data-tooltip="Marketplace" aria-label="Marketplace" data-i18n-attr="data-tooltip:tt-marketplace;aria-label:tt-marketplace">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 76.465 68.262" fill="currentColor"><path d="M151.909 72.923v6.5h10.097l8.663 44.567h48.968v-6.5h-43.61l-1.2-6.172h42.974l10.35-33.91h-59.915l-.872-4.485H151.91zm17.59 10.984h49.867l-6.393 20.91h-39.409l-4.064-20.91zm5.626 44.11a6.5 6.5 0 0 0-6.5 6.5 6.5 6.5 0 0 0 6.5 6.501 6.5 6.5 0 0 0 6.5-6.5 6.5 6.5 0 0 0-6.5-6.5zm38.274 0a6.5 6.5 0 0 0-6.5 6.5 6.5 6.5 0 0 0 6.5 6.501 6.5 6.5 0 0 0 6.5-6.5 6.5 6.5 0 0 0-6.5-6.5z" transform="translate(-151.909 -72.923)"/></svg>
-      </button>
-      <div class="top-search-container">
-        <div class="top-search-wrap">
-          <svg class="search-icon-svg" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
-          <input type="text" id="topSearchInput" placeholder="Que souhaitez-vous écouter ?" data-i18n-attr="placeholder:placeholder-what-listen" autocomplete="off" spellcheck="false">
-          <button class="search-clear-btn" id="searchClearBtn" data-tooltip="Effacer" style="display:none" aria-label="Effacer" data-i18n-attr="data-tooltip:tt-clear;aria-label:tt-clear">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
-        </div>
-        <div id="searchDropdown"></div>
-      </div>
-    </div>
-
-    <div class="top-bar-right">
-      <button class="top-btn icon-only notif-btn" id="btnNotifications" data-tooltip="Notifications" aria-label="Notifications" data-i18n-attr="data-tooltip:tt-notifications;aria-label:tt-notifications">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        <span class="notif-badge" id="notifBadge" style="display:none" role="status" aria-live="polite" aria-label="Notifications non lues">0</span>
-      </button>
-      <button class="top-btn icon-only" id="btnFriends" data-tooltip="Activité des amis" aria-label="Activité des amis" data-i18n-attr="data-tooltip:tt-friends-activity;aria-label:tt-friends-activity">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="22.83" cy="22.57" r="7.51"/><path d="M38,49.94a15.2,15.2,0,0,0-15.21-15.2h0a15.2,15.2,0,0,0-15.2,15.2Z"/><circle cx="44.13" cy="27.22" r="6.05"/><path d="M42.4,49.94h14A12.24,12.24,0,0,0,44.13,37.7h0a12.21,12.21,0,0,0-5.75,1.43"/></svg>
-      </button>
-      <button class="top-btn profile-btn" id="btnProfile">
-        <div class="profile-avatar" id="topProfileAvatar">
-          <svg id="topProfileChevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>
-        </div>
-        <span id="topProfileName" data-i18n="text-login">Connexion</span>
-      </button>
-    </div>
-  </div>
-
-
-  <!-- ══════════════ APP BODY ══════════════ -->
-  <div class="app-body">
-
-    <!-- ══ LEFT SIDEBAR ══ -->
-    <aside class="sidebar" id="sidebar" role="complementary" aria-label="Bibliothèque">
-      <div class="sidebar-inner">
-
-        <div class="lib-header">
-          <button class="lib-header-btn" id="libToggleBtn" data-tooltip="Ouvrir/Fermer la bibliothèque" aria-label="Ouvrir/Fermer la bibliothèque" data-i18n-attr="data-tooltip:tt-toggle-library;aria-label:tt-toggle-library">
-            <div class="lib-icon-wrap">
-              <!-- SVG état normal (bibliothèque) — visible par défaut -->
-              <svg class="lib-icon-svg lib-icon-default" data-encore-id="icon" role="img" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M14.5 2.134a1 1 0 0 1 1 0l6 3.464a1 1 0 0 1 .5.866V21a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1V3a1 1 0 0 1 .5-.866M16 4.732V20h4V7.041zM3 22a1 1 0 0 1-1-1V3a1 1 0 0 1 2 0v18a1 1 0 0 1-1 1m6 0a1 1 0 0 1-1-1V3a1 1 0 0 1 2 0v18a1 1 0 0 1-1 1"></path>
-              </svg>
-              <!-- SVG hover quand sidebar OUVERTE → fermer (panel-left-close lucide) -->
-              <svg class="lib-icon-svg lib-icon-hover lib-icon-hover-open" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect width="18" height="18" x="3" y="3" rx="2"/>
-                <path d="M9 3v18"/>
-                <path d="m16 15-3-3 3-3"/>
-              </svg>
-              <!-- SVG hover quand sidebar CONTRACTÉE → ouvrir (Encore flèche droite) -->
-              <svg class="lib-icon-svg lib-icon-hover lib-icon-hover-collapsed" data-encore-id="icon" role="img" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M14.457 15.207a1 1 0 0 1-1.414-1.414L14.836 12l-1.793-1.793a1 1 0 0 1 1.414-1.414l2.5 2.5a1 1 0 0 1 0 1.414z"></path>
-                <path d="M20 22a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2zM4 20V4h4v16zm16 0H10V4h10z"></path>
-              </svg>
-            </div>
-            <span class="lib-label" data-i18n="text-my-library">Ma bibliothèque</span>
-          </button>
-          <div class="lib-header-actions">
-            <button class="icon-btn-sm" id="createPlaylistBtn" data-tooltip="Créer une playlist" aria-label="Créer une playlist" data-i18n-attr="data-tooltip:tt-create-playlist;aria-label:tt-create-playlist">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            </button>
-
-          </div>
-        </div>
-
-        <div class="lib-search-row" id="libSearchRow">
-          <div class="lib-search-box">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="btn-icon tiny"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
-            <input type="text" id="searchInput" placeholder="Rechercher dans la bibliothèque" role="searchbox" aria-label="Rechercher dans la bibliothèque" data-i18n-attr="placeholder:placeholder-search-library;aria-label:placeholder-search-library">
-          </div>
-          <button class="lib-sort-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon tiny"><path d="M3 5h.01"/><path d="M3 12h.01"/><path d="M3 19h.01"/><path d="M8 5h13"/><path d="M8 12h13"/><path d="M8 19h13"/></svg>
-            <span data-i18n="text-recents">Récents</span>
-          </button>
-        </div>
-
-        <div class="lib-static-items">
-          <!-- Bouton "Créer une playlist" visible uniquement en mode compact -->
-          <button class="icon-btn-sm collapsed-create-btn" id="createPlaylistBtnCompact" data-tooltip="Créer une playlist" style="display:none;width:44px;height:44px;margin:0 auto 4px;" aria-label="Créer une playlist" data-i18n-attr="data-tooltip:tt-create-playlist;aria-label:tt-create-playlist">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </button>
-          <!-- Les "Titres likés" et "Favoris" sont maintenant gérés dynamiquement dans renderSidebarPlaylists() -->
-        </div>
-
-        <div class="lib-items" id="trackList">
-          <div class="loading-state">
-            <div class="loading-spinner"></div>
-            <span data-i18n="text-loading">Chargement…</span>
-          </div>
-        </div>
-
-      </div>
-    </aside>
-
-    <!-- ══ MAIN CONTENT ══ -->
-    <main class="main-content" id="mainContent">
-
-      <!-- Welcome / Home -->
-      <div class="welcome-content" id="welcomeContent">
-
-        <!-- Quick-access tiles -->
-        <div class="home-quick-grid" id="homeQuickGrid">
-          <div class="quick-skeleton"></div>
-          <div class="quick-skeleton"></div>
-          <div class="quick-skeleton"></div>
-          <div class="quick-skeleton"></div>
-          <div class="quick-skeleton"></div>
-          <div class="quick-skeleton"></div>
-        </div>
-
-        <!-- Recently played -->
-        <div class="home-section" id="recentlySection" style="display:none">
-          <div class="home-section-header">
-            <h2 data-i18n="text-recently-played">Récemment joués</h2>
-          </div>
-          <div class="carousel-wrapper">
-            <button class="carousel-arrow arrow-prev recently-carousel-prev" aria-label="Précédent" data-i18n-attr="aria-label:text-previous">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="22" height="22"><path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-            <div class="home-row-scroll" id="recentlyGrid"></div>
-            <button class="carousel-arrow arrow-next recently-carousel-next" aria-label="Suivant" data-i18n-attr="aria-label:tt-next">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="22" height="22"><path d="M9 18l6-6-6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-          </div>
-        </div>
-
-        <!-- Recommended (based on listening) -->
-        <div class="home-section" id="suggestSection" style="display:none">
-          <div class="home-section-header">
-            <h2 data-i18n="text-recommended-for-you">Recommandés pour vous</h2>
-            <button class="home-see-all" id="refreshSuggest" data-i18n="text-refresh">Actualiser</button>
-          </div>
-          <div class="carousel-wrapper">
-            <button class="carousel-arrow arrow-prev suggest-carousel-prev" aria-label="Précédent" data-i18n-attr="aria-label:text-previous">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="22" height="22"><path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-            <div class="home-row-scroll" id="suggestGrid"></div>
-            <button class="carousel-arrow arrow-next suggest-carousel-next" aria-label="Suivant" data-i18n-attr="aria-label:tt-next">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="22" height="22"><path d="M9 18l6-6-6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-          </div>
-        </div>
-
-        <!-- Artists -->
-        <div class="home-section" id="artistSection" style="display:none">
-          <div class="home-section-header">
-            <h2 data-i18n="text-your-favorite-artists">Vos artistes préférés</h2>
-          </div>
-          <div class="carousel-wrapper">
-            <button class="carousel-arrow artist-carousel-prev" aria-label="Précédent" data-i18n-attr="aria-label:text-previous">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="22" height="22"><path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-            <div class="home-row-scroll" id="artistGrid"></div>
-            <button class="carousel-arrow artist-carousel-next" aria-label="Suivant" data-i18n-attr="aria-label:tt-next">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="22" height="22"><path d="M9 18l6-6-6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-          </div>
-        </div>
-
-        <!-- Dynamic genre + artist carousels -->
-        <div id="genreCarouselsContainer"></div>
-
-      </div>
-
-      <!-- Lyrics panel -->
-      <div class="lyrics-panel" id="lyricsPanel" style="display:none;position:relative">
-        <!-- Bouton manquant jusqu'ici : script.js cherchait #lyricsTranslateBtn
-             mais il n'existait nulle part dans le HTML, donc aucun clic n'était
-             jamais possible (voir explication dans le chat). -->
-        <button id="lyricsTranslateBtn" data-mode="" style="display:none;position:absolute;top:16px;right:16px;z-index:5;
-          padding:6px 16px;border-radius:20px;border:1px solid var(--border);
-          background:var(--bg-elevated);color:var(--text-primary);
-          font:600 13px/1 'DM Sans',sans-serif;cursor:pointer;
-          transition:opacity .15s,border-color .15s"
-          onmouseover="this.style.borderColor='var(--accent)'"
-          onmouseout="this.style.borderColor='var(--border)'" data-i18n="text-translate">Traduire</button>
-        <div id="lyricsDisplay" class="sl2-lyrics-display"></div>
-      </div>
-
-      <!-- Queue panel - affiché dans le panneau de droite, pas ici -->
-
-      <!-- Detail view (album / artist / playlist) -->
-      <div class="detail-view" id="detailView" style="display:none"></div>
-
-      <!-- Playlist view (liked songs / favorites) -->
-      <div class="playlist-view" id="playlistView" style="display:none"></div>
-
-      <!-- Search results page -->
-      <div class="search-results-page" id="searchResultsPage" style="display:none"></div>
-      <div class="user-profile-view" id="userProfileView" style="display:none"></div>
-
-      <!-- Notifications page -->
-      <div id="notificationsPage" style="display:none;width:100%;height:100%;overflow-y:auto;padding:28px 32px;box-sizing:border-box"></div>
-
-      <!-- ══ SETTINGS PANEL ══ -->
-      <div class="settings-panel" id="settingsPanel" style="display:none"></div>
-
-      <!-- ══════════════ BLINDTEST (fidèle aux captures fournies) ══════════════
-           Vue intégrée à #mainContent, au même niveau que playlistView /
-           searchResultsPage — pas une pop-up. Solo, 6 extraits progressifs
-           TOUJOURS identiques (0.01s → 15s) quelle que soit la difficulté —
-           la difficulté ne change QUE le morceau tiré (via son quintile de
-           popularité personnelle, cf. blindtest.js), jamais la durée des
-           extraits. Résultat sauvegardé dans PocketBase (collection
-           blindtest_results), histogramme agrégé de tous les joueurs affiché
-           en fin de manche. -->
-      <div class="blindtest-view" id="blindtestView" style="display:none">
-        <div class="bt-topbar">
-          <button class="bt-back-btn" id="btBackBtn" aria-label="Retour">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-            Retour
-          </button>
-          <div class="bt-wordmark">blindtest</div>
-        </div>
-
-        <!-- Podium des meilleurs joueurs (toutes manches confondues) -->
-        <div class="bt-leaderboard" id="btLeaderboard" style="display:none">
-          <div class="bt-leaderboard-header">
-            <div class="bt-leaderboard-title">🏆 Classement des joueurs</div>
-            <div class="bt-leaderboard-header-actions">
-              <button class="bt-leaderboard-all-btn" id="btMyHistoryBtn" type="button" data-i18n="bt-lbl-my-history">Mon historique</button>
-              <button class="bt-leaderboard-all-btn" id="btLeaderboardAllBtn" type="button" data-i18n="bt-lbl-full-leaderboard">Tout le classement</button>
-            </div>
-          </div>
-          <div class="bt-podium" id="btPodium"></div>
-          <div class="bt-podium-rest" id="btPodiumRest"></div>
-        </div>
-
-        <div class="bt-layout">
-
-          <!-- Colonne centrale : difficulté, genre, jeu, recherche ──── -->
-          <div class="bt-main-col">
-            <div class="bt-difficulty-row" id="btDifficultyRow"></div>
-
-            <div class="bt-genre-row" id="btGenreRow" style="display:none">
-              <label for="btGenreSelect">Genre</label>
-              <select id="btGenreSelect"><option value="" data-i18n="bt-opt-all-genres">Tous les genres</option></select>
-            </div>
-
-            <div class="bt-artist-row" id="btArtistRow" style="display:none">
-              <label>Artiste</label>
-              <div class="bt-artist-picker" id="btArtistPicker">
-                <div class="bt-autocomplete-wrap">
-                  <svg class="bt-search-icon" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                  <input type="text" id="btArtistSearchInput" placeholder="Chercher un artiste…" autocomplete="off">
-                  <div class="bt-dropdown" id="btArtistDropdown" style="display:none"></div>
-                </div>
-              </div>
-              <div class="bt-artist-selected" id="btArtistSelected" style="display:none">
-                <span id="btArtistSelectedName"></span>
-                <button type="button" id="btArtistClearBtn" aria-label="Changer d'artiste">✕</button>
-              </div>
-            </div>
-
-            <!-- Écran 1 : intro -->
-            <div class="bt-screen bt-screen-intro" id="btScreenIntro">
-              <p class="bt-sub" id="btIntroSub" data-i18n="bt-intro-track-selection">Un morceau tiré selon la difficulté choisie : plus le niveau est élevé, moins le morceau est censé t'être familier (basé sur ton nombre d'écoutes réelles dans ta bibliothèque). Les extraits, eux, suivent toujours la même progression — de 0.01s à 15s — peu importe la difficulté.</p>
-              <button class="bt-start-btn" id="btStartBtn" data-i18n="bt-btn-start-track">Lancer un morceau</button>
-              <p class="bt-hint" id="btHint"></p>
-              <div id="btCoopLobby" style="display:none"></div>
-            </div>
-
-            <!-- Écran 2 : jeu -->
-            <div class="bt-screen bt-screen-game" id="btScreenGame" style="display:none">
-              <div class="bt-chrono-bar" id="btChronoBar" style="display:none">
-                <span id="btChronoTime">60s</span>
-                <span id="btChronoScore">0 pts · 0 morceaux</span>
-              </div>
-              <div class="bt-progress-track" id="btProgressTrack">
-                <div class="bt-progress-fill" id="btProgressFill"></div>
-                <div class="bt-progress-ticks" id="btProgressTicks"></div>
-              </div>
-
-              <div class="bt-play-row">
-                <button class="bt-play-btn" id="btPlayBtn" aria-label="Jouer l'extrait">
-                  <svg id="btPlayIcon" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                </button>
-                <div class="bt-stage-label" id="btWaveLabel">0.01s</div>
-              </div>
-
-              <form class="bt-guess-form" id="btGuessForm" autocomplete="off">
-                <div class="bt-autocomplete-wrap">
-                  <svg class="bt-search-icon" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                  <input type="text" id="btGuessInput" placeholder="Search songs…" autocomplete="off">
-                  <div class="bt-dropdown" id="btDropdown" style="display:none"></div>
-                </div>
-                <button type="button" id="btSkipBtn" class="bt-skip-btn">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M5 4l10 8-10 8V4zM17 4h2v16h-2z"/></svg>
-                  Skip
-                </button>
-              </form>
-
-              <div class="bt-round-recap" id="btRoundRecapLive"></div>
-            </div>
-
-            <!-- Écran 2bis : mode "Compléter les paroles" — texte peuplé
-                 dynamiquement en JS à partir du pipeline de paroles déjà
-                 utilisé ailleurs dans l'app (GrizzLyrics / lrclib.net) ;
-                 rien n'est écrit en dur ici. -->
-            <div class="bt-screen bt-screen-lyrics" id="btScreenLyrics" style="display:none">
-              <div class="bt-lyrics-track-info" id="btLyricsTrackInfo"></div>
-              <div class="bt-play-row">
-                <button class="bt-play-btn" id="btLyricsPlayBtn" aria-label="Écouter le morceau" data-i18n-attr="aria-label:bt-title-listen-track">
-                  <svg id="btLyricsPlayIcon" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                </button>
-                <div class="bt-hint" style="margin:0" data-i18n="bt-lyrics-complete-hint">Écoute le morceau et complète les mots manquants ci-dessous.</div>
-              </div>
-
-              <div class="bt-lyrics-blanks" id="btLyricsBlanks"></div>
-
-              <div class="bt-results-actions">
-                <button class="bt-start-btn" id="btLyricsCheckBtn">Vérifier</button>
-                <button class="bt-skip-btn" id="btLyricsSkipBtn" type="button" data-i18n="bt-btn-skip">Passer</button>
-              </div>
-              <p class="bt-hint" id="btLyricsHint"></p>
-            </div>
-
-            <!-- Écran mode "À l'envers" -->
-            <div class="bt-screen bt-screen-reverse" id="btScreenReverse" style="display:none">
-              <div class="bt-reverse-target" id="btReverseTarget"></div>
-              <div class="bt-reverse-choices" id="btReverseChoices"></div>
-            </div>
-
-            <!-- Écran mode Coopératif -->
-            <div class="bt-screen bt-screen-coop" id="btScreenCoop" style="display:none">
-              <div id="btCoopRoom"></div>
-            </div>
-
-            <!-- Écran 3 : résultat de la manche -->
-            <div class="bt-screen bt-screen-results" id="btScreenResults" style="display:none">
-              <img id="btRevealCover" class="bt-reveal-cover" src="" alt="" onerror="this.onerror=null;this.src='pictures/default-cover.png';this.classList.add('bt-cover-fallback')">
-              <div class="bt-reveal-eyebrow">IT WAS_</div>
-              <div class="bt-reveal-title" id="btRevealTitle"></div>
-              <div class="bt-reveal-artist" id="btRevealArtist"></div>
-              <div class="bt-outcome-pill" id="btOutcomePill"></div>
-
-              <div class="bt-results-actions">
-                <button class="bt-copy-btn" id="btCopyBtn">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
-                  Copier le résultat
-                </button>
-                <button class="bt-next-btn" id="btReplayBtn" data-i18n="tt-next">Next</button>
-              </div>
-              <p class="bt-save-note" id="btSaveNote"></p>
-
-              <div class="bt-round-recap" id="btRoundRecap"></div>
-
-              <h3 class="bt-stats-title" data-i18n="bt-lbl-leaderboard-subtitle">Combien de joueurs ont trouvé, et à quel extrait</h3>
-              <div class="bt-histogram" id="btHistogram"></div>
-            </div>
-          </div>
-
-          <!-- Colonne de droite : réglages, toujours visible ────────── -->
-          <div class="bt-settings-col">
-            <div class="bt-settings-section">
-              <div class="bt-settings-label">🎮 Mode</div>
-              <div class="bt-mode-row">
-                <button class="bt-mode-pill active" data-mode="random" id="btModeRandom">🎲 Aléatoire</button>
-                <button class="bt-mode-pill" data-mode="daily" id="btModeDaily">📅 Défi du jour</button>
-                <button class="bt-mode-pill" data-mode="lyrics" id="btModeLyrics">📝 Paroles</button>
-                <button class="bt-mode-pill" data-mode="chrono" id="btModeChrono">⏱️ Chrono</button>
-                <button class="bt-mode-pill" data-mode="reverse" id="btModeReverse">🔀 À l'envers</button>
-                <button class="bt-mode-pill" data-mode="liked" id="btModeLiked">❤️ Mes titres</button>
-                <button class="bt-mode-pill" data-mode="artist" id="btModeArtist">🎤 Par artiste</button>
-                <button class="bt-mode-pill" data-mode="coop" id="btModeCoop">🤝 Coopératif</button>
-              </div>
-            </div>
-
-            <div class="bt-settings-section">
-              <div class="bt-settings-label">🕐 Stages</div>
-              <div class="bt-stage-row" id="btStageRow"></div>
-            </div>
-
-            <div class="bt-settings-section">
-              <div class="bt-settings-label">🔊 Volume</div>
-              <div class="bt-volume-wrap">
-                <input type="range" id="btVolumeSlider" min="0" max="100" value="80">
-              </div>
-            </div>
-
-            <button class="bt-reroll-btn" id="btRerollBtn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-              Reroll all
-            </button>
-          </div>
-
-        </div>
-
-        <!-- Confirmation d'interruption si un morceau est en cours d'écoute -->
-        <div class="bt-interrupt-overlay" id="btInterruptOverlay" style="display:none">
-          <div class="bt-interrupt-card">
-            <p data-i18n="bt-interrupt-playback-confirm">Un morceau est en cours d'écoute. Veux-tu l'interrompre pour jouer au Blindtest ?</p>
-            <div class="bt-interrupt-actions">
-              <button class="bt-next-btn" id="btInterruptCancel" data-i18n="text-cancel">Annuler</button>
-              <button class="bt-start-btn" id="btInterruptConfirm" data-i18n="bt-btn-interrupt-play">Interrompre et jouer</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Classement complet -->
-        <div class="bt-interrupt-overlay" id="btFullLeaderboardOverlay" style="display:none">
-          <div class="bt-full-leaderboard-card">
-            <div class="bt-full-lb-header">
-              <h3 data-i18n="bt-lbl-full-leaderboard">Classement complet</h3>
-              <button class="bt-close-x" id="btFullLeaderboardClose" aria-label="Fermer" data-i18n-attr="aria-label:tt-close">✕</button>
-            </div>
-
-            <div class="bt-full-lb-controls">
-              <div class="bt-autocomplete-wrap" style="flex:1">
-                <svg class="bt-search-icon" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <input type="text" id="btFullLbSearch" placeholder="Rechercher un joueur…" autocomplete="off" data-i18n-attr="placeholder:bt-ph-search-player">
-              </div>
-              <div class="bt-full-lb-filter">
-                <button class="bt-difficulty-pill active" data-scope="all" id="btScopeAll" data-i18n="bt-lbl-everyone-scope">Tout le monde</button>
-                <button class="bt-difficulty-pill" data-scope="friends" id="btScopeFriends" data-i18n="bt-lbl-friends-scope">Mes amis</button>
-              </div>
-            </div>
-
-            <div class="bt-full-lb-table-wrap">
-              <table class="bt-full-lb-table">
-                <thead><tr><th>#</th><th></th><th data-i18n="bt-lbl-player-column">Joueur</th><th data-i18n="bt-lbl-score-column">Score</th></tr></thead>
-                <tbody id="btFullLbBody"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- Mon historique -->
-        <div class="bt-interrupt-overlay" id="btHistoryOverlay" style="display:none">
-          <div class="bt-full-leaderboard-card">
-            <div class="bt-full-lb-header">
-              <h3 data-i18n="bt-lbl-my-history">Mon historique</h3>
-              <button class="bt-close-x" id="btHistoryClose" aria-label="Fermer" data-i18n-attr="aria-label:tt-close">✕</button>
-            </div>
-
-            <div class="bt-history-summary" id="btHistorySummary"></div>
-
-            <div class="bt-full-lb-table-wrap">
-              <table class="bt-full-lb-table">
-                <thead><tr><th></th><th data-i18n="bt-lbl-track-column">Morceau</th><th data-i18n="bt-lbl-mode-column">Mode</th><th data-i18n="bt-lbl-result-column">Résultat</th><th data-i18n="bt-lbl-clip-column">Extrait</th></tr></thead>
-                <tbody id="btHistoryBody"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </main>
-
-    <!-- ══ RIGHT PANEL (Now Playing) ══ -->
-    <div class="right-panel" id="rightPanel">
-      <div class="now-playing-panel">
-
-        <!-- ── Strip contexte playlist (remplace rp-toggle-strip quand ouvert) ── -->
-        <div class="rp-context-strip" id="rpContextStrip" title="Réduire le panneau" data-i18n-attr="title:tt-collapse-panel">
-          <svg class="rp-ctx-icon" data-encore-id="icon" role="img" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M14.457 15.207a1 1 0 0 1-1.414-1.414L14.836 12l-1.793-1.793a1 1 0 0 1 1.414-1.414l2.5 2.5a1 1 0 0 1 0 1.414z"></path>
-            <path d="M20 22a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2zM4 20V4h4v16zm16 0H10V4h10z"></path>
-          </svg>
-          <span class="rp-ctx-name" id="rpContextName">-</span>
-        </div>
-
-        <div class="album-art-large">
-          <div class="album-art-placeholder" id="albumArtLarge">
-            <img src="pictures/default-cover.png" alt="" class="default-art">
-          </div>
-        </div>
-        <div class="panel-track-info">
-          <div class="panel-title" id="panelTitleWrap">
-            <span class="marquee-inner" id="panelTitle">-</span>
-          </div>
-          <div class="panel-artist" id="panelArtistWrap">
-            <span class="marquee-inner" id="panelArtist">-</span>
-          </div>
-          <div class="panel-album" id="panelAlbumWrap">
-            <span class="marquee-inner" id="panelAlbum">-</span>
-          </div>
-        </div>
-
-        <!-- Bottom section: onglets file d'attente (activés par queueBtn) OU artist info -->
-        <div class="panel-bottom-section" id="panelBottomSection">
-
-          <!-- Onglets File d'attente / Récemment écoutés -->
-          <div class="panel-tabs" id="panelQueueTabs" style="display:none">
-            <button class="panel-tab active" data-tab="queue">File d'attente</button>
-            <button class="panel-tab" data-tab="recent" data-i18n="text-recently-listened">Récemment écoutés</button>
-          </div>
-          <div class="panel-tab-content" id="panelQueueContent" style="display:none"></div>
-          <div class="panel-tab-content" id="panelRecentContent" style="display:none"></div>
-
-          <!-- Infos artiste (affiché quand la file d'attente est désactivée) -->
-          <div id="panelArtistInfoSection" class="panel-artist-info" style="display:none"></div>
-
-        </div>
-
-        <div id="extendedInfo" style="display:none"></div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- ══════════════ BOTTOM PLAYER BAR ══════════════ -->
-  <div class="player-bar">
-    <div class="player-left">
-      <div class="player-album-thumb" id="playerThumb">
-        <img src="pictures/default-cover.png" alt="" class="default-thumb">
-      </div>
-      <div class="player-track-meta">
-        <div class="player-track-name" id="currentTitleWrap">
-          <span class="marquee-inner" id="currentTitle">-</span>
-        </div>
-        <div class="player-track-artist" id="currentArtistWrap">
-          <span class="marquee-inner" id="currentArtist">-</span>
-        </div>
-      </div>
-      <button class="icon-btn mini-add" id="miniEtc" data-tooltip="Ajouter à une playlist" aria-label="Ajouter à une playlist" data-i18n-attr="data-tooltip:tt-add-to-playlist;aria-label:tt-add-to-playlist">
-        <svg data-encore-id="icon" role="img" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
-          <path d="M15.25 8a.75.75 0 0 1-.75.75H8.75v5.75a.75.75 0 0 1-1.5 0V8.75H1.5a.75.75 0 0 1 0-1.5h5.75V1.5a.75.75 0 0 1 1.5 0v5.75h5.75a.75.75 0 0 1 .75.75z"></path>
-        </svg>
-      </button>
-    </div>
-
-    <div class="player-center">
-      <div class="controls-row">
-        <button class="ctrl-btn" id="shuffleBtn">
-          <svg data-encore-id="icon" role="img" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
-            <path d="M13.151.922a.75.75 0 1 0-1.06 1.06L13.109 3H11.16a3.75 3.75 0 0 0-2.873 1.34l-6.173 7.356A2.25 2.25 0 0 1 .39 12.5H0V14h.391a3.75 3.75 0 0 0 2.873-1.34l6.173-7.356a2.25 2.25 0 0 1 1.724-.804h1.947l-1.017 1.018a.75.75 0 0 0 1.06 1.06L15.98 3.75z"></path>
-            <path d="m7.5 10.723.98-1.167.957 1.14a2.25 2.25 0 0 0 1.724.804h1.947l-1.017-1.018a.75.75 0 1 1 1.06-1.06l2.829 2.828-2.829 2.828a.75.75 0 1 1-1.06-1.06L13.109 13H11.16a3.75 3.75 0 0 1-2.873-1.34l-.787-.938z"></path>
-            <path d="M.391 3.5H0V2h.391c1.109 0 2.16.49 2.873 1.34L4.89 5.277l-.979 1.167-1.796-2.14A2.25 2.25 0 0 0 .39 3.5z"></path>
-          </svg>
-        </button>
-        <button class="ctrl-btn" id="prevBtn">
-          <svg data-encore-id="icon" role="img" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
-            <path d="M3.3 1a.7.7 0 0 1 .7.7v5.15l9.95-5.744a.7.7 0 0 1 1.05.606v12.575a.7.7 0 0 1-1.05.607L4 9.149V14.3a.7.7 0 0 1-.7.7H1.7a.7.7 0 0 1-.7-.7V1.7a.7.7 0 0 1 .7-.7z"></path>
-          </svg>
-        </button>
-        <button class="play-pause-btn" id="playPauseBtn">
-          <svg data-encore-id="icon" role="img" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" id="playIconImg">
-            <path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288z"></path>
-          </svg>
-          <svg data-encore-id="icon" role="img" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" id="pauseIconImg" style="display:none">
-            <path d="M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7zm8 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7z"></path>
-          </svg>
-        </button>
-        <button class="ctrl-btn" id="nextBtn">
-          <svg data-encore-id="icon" role="img" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
-            <path d="M12.7 1a.7.7 0 0 0-.7.7v5.15L2.05 1.107A.7.7 0 0 0 1 1.712v12.575a.7.7 0 0 0 1.05.607L12 9.149V14.3a.7.7 0 0 0 .7.7h1.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7z"></path>
-          </svg>
-        </button>
-        <button class="ctrl-btn" id="repeatBtn">
-          <svg data-encore-id="icon" role="img" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" id="repeatIcon">
-            <path d="M0 4.75A3.75 3.75 0 0 1 3.75 1h8.5A3.75 3.75 0 0 1 16 4.75v5a3.75 3.75 0 0 1-3.75 3.75H9.81l1.018 1.018a.75.75 0 1 1-1.06 1.06L6.939 12.75l2.829-2.828a.75.75 0 1 1 1.06 1.06L9.811 12h2.439a2.25 2.25 0 0 0 2.25-2.25v-5a2.25 2.25 0 0 0-2.25-2.25h-8.5A2.25 2.25 0 0 0 1.5 4.75v5A2.25 2.25 0 0 0 3.75 12H5v1.5H3.75A3.75 3.75 0 0 1 0 9.75z"></path>
-          </svg>
-        </button>
-      </div>
-      <div class="progress-row">
-        <span class="time-label" id="currentTime">0:00</span>
-        <div class="progress-bar-container" id="progressContainer">
-          <div class="progress-bar-bg">
-            <div class="progress-bar-fill" id="progressFill"></div>
-            <div class="progress-thumb" id="progressThumb"></div>
-          </div>
-        </div>
-        <span class="time-label" id="totalTime">0:00</span>
-      </div>
-    </div>
-
-    <div class="player-right">
-      <button class="ctrl-btn" id="lyricsBtn" data-tooltip="Paroles" aria-label="Paroles" data-i18n-attr="data-tooltip:tt-lyrics;aria-label:tt-lyrics">
-        <svg data-encore-id="icon" role="img" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
-          <path d="M13.426 2.574a2.831 2.831 0 0 0-4.797 1.55l3.247 3.247a2.831 2.831 0 0 0 1.55-4.797M10.5 8.118l-2.619-2.62L4.74 9.075 2.065 12.12a1.287 1.287 0 0 0 1.816 1.816l3.06-2.688 3.56-3.129zM7.12 4.094a4.331 4.331 0 1 1 4.786 4.786l-3.974 3.493-3.06 2.689a2.787 2.787 0 0 1-3.933-3.933l2.676-3.045z"></path>
-        </svg>
-      </button>
-      <button class="ctrl-btn" id="queueBtn" data-tooltip="File d'attente" aria-label="File d'attente" data-i18n-attr="data-tooltip:tt-queue;aria-label:tt-queue">
-        <svg data-encore-id="icon" role="img" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
-          <path d="M15 15H1v-1.5h14zm0-4.5H1V9h14zm-14-7A2.5 2.5 0 0 1 3.5 1h9a2.5 2.5 0 0 1 0 5h-9A2.5 2.5 0 0 1 1 3.5m2.5-1a1 1 0 0 0 0 2h9a1 1 0 1 0 0-2z"></path>
-        </svg>
-      </button>
-      <button class="ctrl-btn" id="nowPlayingBtn" data-tooltip="Ouvrir le lecteur réduit" aria-label="Ouvrir le lecteur réduit" data-i18n-attr="data-tooltip:tt-open-mini-player;aria-label:tt-open-mini-player">
-        <svg data-encore-id="icon" role="img" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
-          <path d="M16 2.45c0-.8-.65-1.45-1.45-1.45H1.45C.65 1 0 1.65 0 2.45v11.1C0 14.35.65 15 1.45 15h5.557v-1.5H1.5v-11h13V7H16z"></path>
-          <path d="M15.25 9.007a.75.75 0 0 1 .75.75v4.493a.75.75 0 0 1-.75.75H9.325a.75.75 0 0 1-.75-.75V9.757a.75.75 0 0 1 .75-.75z"></path>
-        </svg>
-      </button>
-      <button class="ctrl-btn" id="muteBtn" data-tooltip="Muet" aria-label="Muet" data-i18n-attr="data-tooltip:tt-mute;aria-label:tt-mute">
-        <svg data-encore-id="icon" role="presentation" aria-label="Volume moyen" aria-hidden="false" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" id="volIconImg">
-          <path d="M9.741.85a.75.75 0 0 1 .375.65v13a.75.75 0 0 1-1.125.65l-6.925-4a3.64 3.64 0 0 1-1.33-4.967 3.64 3.64 0 0 1 1.33-1.332l6.925-4a.75.75 0 0 1 .75 0zm-6.924 5.3a2.14 2.14 0 0 0 0 3.7l5.8 3.35V2.8zm8.683 6.087a4.502 4.502 0 0 0 0-8.474v1.65a3 3 0 0 1 0 5.175z"></path>
-        </svg>
-      </button>
-      <div class="volume-slider-container">
-        <div class="progress-bar-bg">
-          <div class="progress-bar-fill" id="volumeFill" style="width:70%"></div>
-          <div class="progress-thumb" id="volumeThumb" style="left:70%"></div>
-        </div>
-        <input type="range" id="volumeSlider" min="0" max="100" value="70" class="volume-slider-input">
-      </div>
-      <button class="ctrl-btn" id="fullscreenBtn" data-tooltip="Plein écran" onclick="window._openImmersive && window._openImmersive()" aria-label="Plein écran" data-i18n-attr="data-tooltip:tt-fullscreen;aria-label:tt-fullscreen">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
-      </button>
-    </div>
-  </div>
-
-  <!-- lyricsMiniContent kept hidden for internal JS SpicyLyrics sync -->
-  <div id="lyricsMini" style="display:none">
-    <div id="lyricsMiniContent" class="lyrics-mini-content"></div>
-  </div>
-  <!-- ══ BOTTOM NAV MOBILE - 3 onglets Spotify ══ -->
-  <nav id="mob-nav" style="display:none" aria-label="Navigation principale">
-    <button class="mob-tab active" data-tab="home" aria-label="Accueil">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-      </svg>
-      <span class="mob-tab-label" data-i18n="text-home">Accueil</span>
-    </button>
-    <button class="mob-tab" data-tab="search" aria-label="Rechercher">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-      </svg>
-      <span class="mob-tab-label" data-i18n="text-search">Rechercher</span>
-    </button>
-    <button class="mob-tab" data-tab="library" aria-label="Bibliothèque">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M14.5 2.134a1 1 0 0 1 1 0l6 3.464A1 1 0 0 1 22 6.464V21a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1V3a1 1 0 0 1 .5-.866M16 4.732V20h4V7.041zM3 22a1 1 0 0 1-1-1V3a1 1 0 0 1 2 0v18a1 1 0 0 1-1 1m6 0a1 1 0 0 1-1-1V3a1 1 0 0 1 2 0v18a1 1 0 0 1-1 1"/>
-      </svg>
-      <span class="mob-tab-label" data-i18n="text-library">Bibliothèque</span>
-    </button>
-  </nav>
-
-  <audio id="audioPlayer" preload="metadata"></audio>
-  <!-- dynamicBackground.js supprimé car fichier manquant -->
-  <!-- ✅ Tauri V2 DevTools : F12 / Ctrl+Shift+I / Ctrl+Shift+D -->
-  <script src="tauri-devtools.js"></script>
-
-  <!-- ══ Firebase Native (fallback) — inchangés, déplacés dans firebase/ ══ -->
-  <script src="firebase/firebase-config.js"></script>
-  <script src="firebase/firebase-sync.js"></script>
-  <script src="firebase/firebase-playlists.js"></script>
-  <script src="firebase/firebase-reports.js"></script>
-  <script src="firebase/firebase-social.js"></script>
-
-  <!-- ══ PocketBase (nominal) — nouveaux, dans pocketbase/ ══ -->
-  <script src="pocketbase/pocketbase-config.js"></script>
-  <script src="pocketbase/pocketbase-auth-bridge.js"></script>
-  <script src="pocketbase/pocketbase-sync.js"></script>
-  <!-- ⚠️ CORRECTIF (P0-4) : pocketbase-party.js existait déjà, complet et
-       fonctionnel (createParty/joinParty/leaveParty/addToQueue avec vraies
-       requêtes PocketBase), mais n'était tout simplement jamais chargé ici.
-       friends-panel.js appelait donc window.PocketBaseParty sur un objet
-       toujours undefined — pas un problème de logique métier, un oubli de
-       balise <script>. Doit charger APRÈS pocketbase-sync.js (dépendance
-       déclarée dans l'en-tête du fichier) et AVANT script.js/friends-panel.js. -->
-  <script src="pocketbase/pocketbase-party.js"></script>
-  <script src="pocketbase/pocketbase-playlists.js"></script>
-  <script src="pocketbase/pocketbase-reports.js"></script>
-  <script src="pocketbase/pocketbase-social.js"></script>
-  <script src="pocketbase/pocketbase-avatar.js"></script>
-
-  <!-- ══ Routeur de fallback — DOIT charger après les deux blocs ci-dessus
-       et avant script.js / friends-panel.js qui appellent window.FirebaseXxx ══ -->
-  <script src="fallback-router.js"></script>
-
-  <script src="background.js"></script>
-  <!-- ⚠️ AJOUT (découpage v1) : core/state.js déclare AppState et les
-       variables partagées (tracks, currentIndex, likedTracks, etc.) que
-       script.js et les fichiers suivants consomment par identifiant nu.
-       Doit charger APRÈS le bloc pocketbase-*.js/fallback-router.js
-       ci-dessus (qui restaurent déjà window.recentlyPlayed/likedTracks/
-       favoriteAlbums/favoriteArtists depuis la session persistée) et
-       AVANT script.js. Voir les commentaires en tête de core/state.js
-       pour le détail de cet ordre. -->
-  <script src="core/state.js"></script>
-
-  <!-- ⚠️⚠️ AJOUT CRITIQUE (découpage v1) : core/proxy-urls.js DOIT charger
-       ici, juste après core/state.js et AVANT tout le reste (y compris
-       audio/hls-drm.js et script.js) — voir l'en-tête de ce fichier pour
-       les deux raisons impératives (IIFE _patchFetch/_patchXHR encore
-       dans script.js qui dépendent immédiatement de _rewriteToProxy(),
-       et _t() utilisée par des IIFE immédiates de script.js). -->
-  <script src="core/proxy-urls.js"></script>
-  <!-- ✅ FAIT — doit charger ici, juste après proxy-urls.js et avant
-       script.js (voir en-tête du fichier : intercepteurs fetch/XHR/img
-       immédiats, dépendent de _rewriteToProxy()). -->
-  <script src="core/network-patches.js"></script>
-  <!-- ✅ FAIT — placé tôt par prudence (escapeHtml() très utilisée),
-       aucune dépendance à l'état partagé. -->
-  <script src="utils/formatters.js"></script>
-  <!-- ✅ FAIT — placé tôt par prudence (showToast() très utilisée),
-       aucune dépendance à l'état partagé. -->
-  <script src="ui/toast.js"></script>
-
-  <!-- ══════════════════════════════════════════════════════════════
-       DÉCOUPAGE DE script.js — PLAN COMPLET PRÉ-CÂBLÉ
-       ══════════════════════════════════════════════════════════════
-       Tous les modules prévus sont listés ici en un seul bloc, dans
-       leur ordre final. Les fichiers déjà extraits fonctionnent dès
-       maintenant ; les fichiers pas encore créés déclenchent un 404
-       silencieux qui n'interrompt rien (un <script> qui échoue à
-       charger n'empêche pas les suivants de s'exécuter) — même
-       principe déjà utilisé pour Lyrics/spicy-lyrics-engine.js plus
-       bas. Au fur et à mesure de l'extraction, chaque fichier prend
-       vie sans qu'il soit nécessaire de retoucher ce fichier.
-
-       État au moment de l'écriture de ce bloc :
-         ✅ FAIT       — extrait et vérifié (node --check)
-         ⏳ À VENIR    — pas encore créé, 404 sans impact en attendant
-       ══════════════════════════════════════════════════════════════ -->
-
-  <!-- ✅ FAIT — dépend de _resolveProxyUrl()/audioPlayer (script.js) et
-       playCurrentTrack() (callback de récupération HLS uniquement). -->
-  <script src="audio/hls-drm.js"></script>
-
-  <script src="script.js"></script>
-
-  <!-- ✅ FAIT (post-script.js) — état partagé avec Lyrics/spicy-lyrics-engine.js,
-       palette couleur, fond dynamique. Contient les auto-invocations
-       spicyAnimationLoop()/initSpicyBackground() (correctif appliqué). -->
-  <script src="ui/background-visuals.js"></script>
-
-  <!-- ✅ FAIT — détection AZERTY, table des raccourcis, modale de
-       raccourcis (écrase la version legacy restée dans script.js),
-       palette de commandes. Dépend de utils/formatters.js, ui/toast.js. -->
-  <script src="ui/shortcuts.js"></script>
-
-  <!-- ✅ FAIT — aucune dépendance à l'état partagé. -->
-  <script src="downloads/download-and-vip.js"></script>
-
-  <!-- ✅ FAIT — lyrics-translate.js dépend de lyricsData/lyricsDisplay
-       (déclarés dans script.js, visibles par scope partagé). -->
-  <script src="lyrics/lyrics-parser.js"></script>
-  <script src="lyrics/lyrics-translate.js"></script>
-
-  <!-- ⏳ À VENIR — moteur de lecture : playCurrentTrack, goNext/goPrev,
-       crossfade/gapless, seek, volume. Dépend de _hlsLoadGen/_hlsPlayers
-       (déclarés dans audio/hls-drm.js) et de l'état partagé
-       (core/state.js). -->
-  <script src="audio/playback-engine.js"></script>
-  <!-- ✅ FAIT — rassemble deux blocs non contigus de script.js
-       (_initAudioGraph + _rebuildAudioChain) en un seul domaine
-       cohérent. Dépend de window._getSettings() (settings.js). -->
-  <script src="audio/audio-graph.js"></script>
-  <!-- ✅ FAIT — panneau queue/récents/info artiste (Last.fm + MusicBrainz).
-       Renommé depuis "media-session.js" : l'API MediaSession OS avait déjà
-       été extraite avec playCurrentTrack() dans playback-engine.js. -->
-  <script src="audio/panel-info.js"></script>
-
-  <!-- ✅ FAIT — page d'accueil, squelette de chargement, recommandations
-       locales, carrousels. ⚠️ ORDRE CRITIQUE : doit charger AVANT
-       library/track-data.js — renderHomeSkeleton() (fin de ce fichier)
-       doit s'exécuter avant fetchTracks() (fin de track-data.js) pour
-       que le squelette s'affiche avant les vraies données, pas après. -->
-  <script src="home/home-page.js"></script>
-
-  <!-- ✅ FAIT — rassemble deux blocs non contigus de script.js (contexte
-       de lecture + chargeur bibliothèque). Dépend de tracks/currentIndex
-       (core/state.js), jellyfinUrl(). Export window.fetchTracks déplacé
-       avec sa fonction (était à ~600 lignes de distance dans l'original).
-       Doit charger APRÈS home/home-page.js (voir note ci-dessus). -->
-  <script src="library/track-data.js"></script>
-  <!-- ✅ FAIT — dépend de favoritePlaylists/playlistOrder/customPlaylists
-       (core/state.js). Export window.renderSidebarView déplacé avec sa
-       fonction. -->
-  <script src="library/sidebar-render.js"></script>
-  <!-- ✅ FAIT — dépend de favoriteAlbums/favoriteArtists (core/state.js). -->
-  <script src="library/favorites.js"></script>
-  <!-- ✅ FAIT — rassemble deux blocs non contigus de script.js (cover/
-       création + édition/collaborateurs/vue amie). Dépend de
-       core/state.js et library/sidebar-render.js. -->
-  <script src="playlists/playlist-ui.js"></script>
-  <!-- ✅ FAIT — dépend de playlists/playlist-ui.js (appels différés,
-       sans risque quel que soit l'ordre relatif). -->
-  <script src="playlists/context-menus.js"></script>
-
-  <!-- ✅ FAIT — extrait après-coup de playlists/playlist-ui.js où il
-       s'était retrouvé par accident (voir en-tête du fichier). Dépend
-       de views/detail-view.js et views/profile-view.js (appels
-       différés, sans risque). -->
-  <script src="navigation/nav-state.js"></script>
-
-  <!-- ✅ FAIT — rassemble deux blocs non contigus de script.js (dropdown
-       rapide + page de résultats complète). Dépend de core/state.js,
-       library/track-data.js, audio/playback-engine.js. Export de l'appel
-       initSearchDropdown() déplacé avec sa définition. -->
-  <script src="search/search-ui.js"></script>
-
-  <!-- ✅ FAIT — rassemble deux blocs non contigus de script.js (vue
-       playlist/détail + tri/discographie), séparés par profile-view.js.
-       Dépend de core/state.js, audio/playback-engine.js,
-       playlists/playlist-ui.js, downloads/download-and-vip.js. -->
-  <script src="views/detail-view.js"></script>
-  <!-- ✅ FAIT — dépend de window.FirebaseSocial/PocketBaseSocial. -->
-  <script src="views/profile-view.js"></script>
-  <!-- ✅ FAIT — panneau d'info étendue (bio artiste, morceaux
-       similaires). Dépend de lastfm/lastfm-api.js, utils/formatters.js. -->
-  <script src="views/extended-info.js"></script>
-
-  <!-- ✅ FAIT — sauvegarde locale, reprise cross-device, connexion Google/
-       Discord, callback, déconnexion, restauration de session. Contient
-       l'IIFE initAuth() (déjà auditée, aucune dépendance à un nom
-       déplacé). Dépend de library/sidebar-render.js, views/profile-view.js
-       (appels différés). -->
-  <script src="account/auth-flow.js"></script>
-
-  <!-- ✅ FAIT — page notifications, résolution id utilisateur, badge
-       temps réel (démarrage différé inclus). Dépend de
-       window.FirebaseSocial (déjà chargé avant). -->
-  <script src="social/notifications.js"></script>
-  <!-- ✅ FAIT — vérification bannissement (PocketBase + Firestore),
-       écran de bannissement + contestation. Dépend de
-       window.PocketBaseReports (déjà chargé avant). -->
-  <script src="social/ban-screen.js"></script>
-  <!-- ✅ FAIT — modales signalement bug / demande d'ajout (recherche
-       iTunes, votes). Dépend de utils/formatters.js. -->
-  <script src="social/reports-modals.js"></script>
-  <!-- ✅ FAIT — liens profonds beartify:// (callback Discord/Google).
-       Dépend de account/auth-flow.js (appels différés). -->
-  <script src="social/deep-link.js"></script>
-
-  <!-- ✅ FAIT — appels API Last.fm. Dépend de core/proxy-urls.js. -->
-  <script src="lastfm/lastfm-api.js"></script>
-
-  <!-- ✅ FAIT — Service Worker, sync config, application groupée des
-       réglages + réaction individuelle (beartify:settingChanged).
-       Dépend de core/state.js, audio/audio-graph.js, audio/playback-engine.js
-       (appels différés via setTimeout/DOMContentLoaded, sans risque). -->
-  <script src="core/bootstrap.js"></script>
-
-  <!-- Nouveau moteur de rendu/animation des paroles (port fidèle et sans
-       TypeScript de l'extension Spicetify "spicy-lyrics"). Chargé après
-       script.js : il ne le modifie pas, il surcharge seulement au runtime
-       les fonctions renderSpicyLyrics/spicyAnimateLyrics/toggleSimpleLyricsMode/
-       _forceLyricsSync. Fallback : renommez le dossier "Lyrics" pour
-       désactiver ce <script> (404 silencieux) et revenir instantanément à
-       l'ancien moteur intact de script.js. Voir Lyrics/README.md. -->
-  <script src="lyrics/spicy-lyrics-engine.js"></script>
-  <script src="onboarding.js"></script>
-  <script src="friends-panel.js"></script>
-  <script src="mini-player.js"></script>
-  <script src="i18n.js"></script>
-  <script src="settings.js"></script>
-  <script src="marketplace.js"></script>
-  <!-- Discord Rich Presence : doit charger après script.js (window._IS_TAURI,
-       window.currentTrack, beartify:trackChanged) et settings.js
-       (window._discordRpcEnabled, beartify:discordRpcChanged) -->
-  <script src="discord-rpc.js"></script>
-  <script src="lastfm-scrobble.js"></script>
-  <script src="local-library.js"></script>
-  <!-- Interface hors-ligne autonome (voir local-library.js) : doit charger
-       après local-library.js, dont elle consomme l'API window.LocalLibrary. -->
-  <script src="offline.js"></script>
-
-  <!-- ══ Firebase initialization ══ -->
-  <script>
-    // Initialiser Firebase après le chargement complet
-    window.addEventListener('load', async () => {
-      console.log('[MARQUEUR_INDEX_HTML_v2] listener load déclenché');
-      const initialized = await window.initFirebase();
-      if (initialized) {
-        console.log('✅ Firebase prêt');
-        // ⚠️ FIX : firebaseTryRestoreGoogleSession() existait déjà (refresh_token
-        // stocké en localStorage) mais n'était appelée nulle part dans le code —
-        // aucune restauration de session ne se produisait jamais au relancement
-        // de l'app, obligeant à se reconnecter à chaque démarrage sur Tauri.
-        if (window.FirebaseConfig?.isTauri?.() && window.firebaseTryRestoreGoogleSession) {
-          const restoredUser = await window.firebaseTryRestoreGoogleSession();
-          if (restoredUser) console.log('✅ Session Google restaurée :', restoredUser.email);
-        }
-      } else {
-        console.warn('⚠️ Firebase non disponible, utilisation en mode local uniquement');
-      }
-    });
-  </script>
-
-  <!-- ══ Auth bootstrap - APRÈS tout le DOM ══ -->
-  <script>
-    (function () {
-      // _t() ne peut jamais lever d'exception : si BeartifyI18n n'est pas
-      // encore prêt, il retombe silencieusement sur le texte français fourni.
-      function _t(key, fallback, params) {
-        try {
-          if (window.BeartifyI18n) return window.BeartifyI18n.t(key, fallback, params);
-        } catch (e) { /* ne jamais laisser un souci de traduction casser l'app */ }
-        return fallback;
-      }
-
-      var overlay  = document.getElementById('authOverlay');
-      var dropdown = document.getElementById('profileDropdown');
-      var btnProf  = document.getElementById('btnProfile');
-
-      function openModal() {
-        overlay.classList.add('open');
-        document.body.classList.add('modal-open');
-      }
-      function closeModal() {
-        overlay.classList.remove('open');
-        document.body.classList.remove('modal-open');
-      }
-      function openDropdown() {
-        var rect = btnProf.getBoundingClientRect();
-        dropdown.style.top   = (rect.bottom + 8) + 'px';
-        dropdown.style.right = (window.innerWidth - rect.right) + 'px';
-        dropdown.classList.add('open');
-      }
-      function closeDropdown() {
-        dropdown.classList.remove('open');
-      }
-
-      window._authOpenModal     = openModal;
-      window._authCloseModal    = closeModal;
-      window._authOpenDropdown  = openDropdown;
-      window._authCloseDropdown = closeDropdown;
-
-      btnProf.addEventListener('click', function (e) {
-        e.stopPropagation();
-        if (window._authUser) {
-          dropdown.classList.contains('open') ? closeDropdown() : openDropdown();
-        } else {
-          openModal();
-        }
-      });
-
-      document.getElementById('authModalClose').addEventListener('click', closeModal);
-      overlay.addEventListener('click', function (e) {
-        if (e.target === overlay) closeModal();
-      });
-
-      document.addEventListener('click', function (e) {
-        if (!dropdown.contains(e.target) && e.target !== btnProf) {
-          closeDropdown();
-        }
-      });
-
-      document.getElementById('authDiscordBtn').addEventListener('click', function () {
-        if (window._authDiscord) window._authDiscord();
-      });
-      document.getElementById('authGoogleBtn').addEventListener('click', function () {
-        if (window._authGoogle) window._authGoogle();
-      });
-      document.getElementById('authSettingsBtn')?.addEventListener('click', function () {
-        closeModal();
-        if (window._openSettings) window._openSettings();
-      });
-      document.getElementById('authVipBtn')?.addEventListener('click', function () {
-        closeModal();
-      });
-
-      // ── Conditions d'utilisation ───────────────────────────────
-      var termsOverlay = document.getElementById('termsOverlay');
-      document.getElementById('authTermsLink').addEventListener('click', function(e) {
-        e.preventDefault();
-        termsOverlay.style.display = 'flex';
-        termsOverlay.style.alignItems = 'center';
-        termsOverlay.style.justifyContent = 'center';
-        termsOverlay.classList.add('open');
-      });
-      document.getElementById('termsModalClose').addEventListener('click', function() {
-        termsOverlay.classList.remove('open');
-        setTimeout(function(){ termsOverlay.style.display='none'; }, 200);
-      });
-      document.getElementById('termsAcceptBtn').addEventListener('click', function() {
-        termsOverlay.classList.remove('open');
-        setTimeout(function(){ termsOverlay.style.display='none'; }, 200);
-      });
-      termsOverlay.addEventListener('click', function(e) {
-        if (e.target === termsOverlay) {
-          termsOverlay.classList.remove('open');
-          setTimeout(function(){ termsOverlay.style.display='none'; }, 200);
-        }
-      });
-
-      // ── VIP ────────────────────────────────────────────────────
-      var vipOverlay = document.getElementById('vipOverlay');
-      function openVipModal() {
-        closeDropdown();
-        vipOverlay.style.display = 'flex';
-        vipOverlay.style.alignItems = 'center';
-        vipOverlay.style.justifyContent = 'center';
-        vipOverlay.classList.add('open');
-        document.getElementById('vipCodeError').style.display = 'none';
-        document.getElementById('vipCodeInput').value = '';
-      }
-      function closeVipModal() {
-        vipOverlay.classList.remove('open');
-        setTimeout(function(){ vipOverlay.style.display='none'; }, 200);
-      }
-      document.getElementById('pdVipBtn').addEventListener('click', openVipModal);
-      document.getElementById('vipModalClose').addEventListener('click', closeVipModal);
-      vipOverlay.addEventListener('click', function(e) {
-        if (e.target === vipOverlay) closeVipModal();
-      });
-      document.getElementById('vipActivateBtn').addEventListener('click', function() {
-        var code = document.getElementById('vipCodeInput').value.trim().replace(/[-\s]/g,'');
-        var errEl = document.getElementById('vipCodeError');
-        if (code.length !== 16) {
-          errEl.textContent = _t('text-code-length', 'Le code doit contenir exactement 16 caractères.');
-          errEl.style.display = 'block';
-          return;
-        }
-        // Validation simple côté client — la vraie vérification se fait côté Firebase
-        if (window.FirebaseSync && window.FirebaseSync.activateVip) {
-          window.FirebaseSync.activateVip(code).then(function(ok) {
-            if (ok) {
-              closeVipModal();
-              if (window._showNotification) window._showNotification(_t('vip-activated-success', '✦ Statut VIP activé avec succès !'), 'success');
-            } else {
-              errEl.textContent = _t('vip-code-invalid', 'Code invalide ou déjà utilisé.');
-              errEl.style.display = 'block';
+// Beartify — Tauri v2
+
+use tauri::Manager;
+use tauri::Emitter;
+use discord_rich_presence::{activity, activity::ActivityType, DiscordIpc, DiscordIpcClient};
+use std::sync::Mutex;
+use std::time::{SystemTime, UNIX_EPOCH};
+
+// ══════════════════════════════════════════════════════════════════
+//  Désactive le Tracking Prevention de WebView2 pour CETTE fenêtre.
+//
+//  Contexte : les covers Jellyfin (beartify.duckdns.org, un domaine
+//  DuckDNS chargé en cross-origin depuis http://tauri.localhost) sont
+//  bloquées côté WebView2 avant même réception de la réponse (Network
+//  tab : aucun Response Header, statut vide) alors que le serveur
+//  répond correctement (vérifié via curl). Tracking Prevention classe
+//  parfois ce type de domaine dynamique comme traqueur tiers et bloque
+//  la requête en amont — d'où un message "CORS" trompeur dans la
+//  console (Chromium réutilise ce message générique même quand la
+//  vraie cause est ailleurs).
+//
+//  ⚠️ Ceci désactive Tracking Prevention pour TOUTE la fenêtre (donc
+//  tous les domaines chargés dedans), pas seulement beartify.duckdns.org
+//  — WebView2 ne permet pas un scope par domaine sur ce réglage. Pour
+//  une app qui ne navigue que vers des domaines de confiance (comme
+//  Beartify), c'est un compromis raisonnable ; à revoir si vous chargez
+//  un jour du contenu tiers non maîtrisé dans cette même fenêtre.
+//
+//  ⚠️ Non testable de mon côté (interop COM Windows) — teste la
+//  compilation avant de faire confiance à ce patch. Si `cargo build`
+//  signale une incompatibilité de type sur les interfaces COM, c'est
+//  probablement un désaccord de version entre `webview2-com` (ajouté
+//  explicitement dans Cargo.toml) et celle utilisée en interne par
+//  `tauri = "2"` — ajuste la version dans Cargo.toml en conséquence.
+// ══════════════════════════════════════════════════════════════════
+#[cfg(windows)]
+fn disable_tracking_prevention(window: &tauri::WebviewWindow) {
+    use webview2_com::Microsoft::Web::WebView2::Win32::{
+        ICoreWebView2_13, ICoreWebView2Profile3, ICoreWebView2Settings8,
+        COREWEBVIEW2_TRACKING_PREVENTION_LEVEL_NONE,
+    };
+    use windows::core::Interface;
+
+    let result = window.with_webview(|webview| {
+        unsafe {
+            let core = match webview.controller().CoreWebView2() {
+                Ok(c) => c,
+                                     Err(e) => { eprintln!("[TrackingPrevention] CoreWebView2() a échoué: {e}"); return; }
+            };
+
+            // ── 1. Tracking Prevention (déjà en place, laissé tel quel) ──
+            let core13: ICoreWebView2_13 = match core.cast() {
+                Ok(c) => c,
+                                     Err(e) => { eprintln!("[TrackingPrevention] cast ICoreWebView2_13 a échoué: {e}"); return; }
+            };
+            let profile = match core13.Profile() {
+                Ok(p) => p,
+                                     Err(e) => { eprintln!("[TrackingPrevention] Profile() a échoué: {e}"); return; }
+            };
+            let profile3: ICoreWebView2Profile3 = match profile.cast() {
+                Ok(p) => p,
+                                     Err(e) => { eprintln!("[TrackingPrevention] cast ICoreWebView2Profile3 a échoué: {e}"); return; }
+            };
+            match profile3.SetPreferredTrackingPreventionLevel(COREWEBVIEW2_TRACKING_PREVENTION_LEVEL_NONE) {
+                Ok(_)  => println!("[TrackingPrevention] ✅ Désactivé pour cette fenêtre"),
+                                     Err(e) => eprintln!("[TrackingPrevention] SetPreferredTrackingPreventionLevel a échoué: {e}"),
             }
-          });
-        } else {
-          errEl.textContent = _t('vip-service-unavailable', 'Service indisponible. Réessayez plus tard.');
-          errEl.style.display = 'block';
-        }
-      });
-    })();
-  </script>
-  <!-- ══════════════════════════════════════════════════════════
-       MOBILE INIT v5 - Interface Spotify Android (Définitive)
-       · Tap mini-player → window._openImmersive() (mode immersif)
-       · body.mob-lib → bibliothèque plein-écran
-       · 3 onglets fixes : Accueil / Rechercher / Bibliothèque
-       · body.imv-open → #mob-nav caché (background.js gère ça)
-  ══════════════════════════════════════════════════════════ -->
-  <script>
-  (function () {
-    'use strict';
-    var BP = 768;
-    function isMob() { return window.innerWidth <= BP; }
 
-    /* ── 1. Classe is-mobile sync ─────────────────────────── */
-    function syncMob() { document.documentElement.classList.toggle('is-mobile', isMob()); }
-    syncMob();
-    window.addEventListener('resize', function () {
-      syncMob();
-      if (!isMob()) {
-        document.body.classList.remove('mob-lib');
-        setTab('home');
-        if (nav) nav.style.display = 'none';
-      } else {
-        if (nav) nav.style.display = 'flex';
-      }
+            // ── 2. SmartScreen / vérification de réputation (NOUVEAU) ──
+            // Couche distincte de Tracking Prevention : vérifie la réputation
+            // d'un domaine AVANT d'autoriser la requête. Un domaine DuckDNS
+            // (DNS dynamique) est un candidat typique aux faux positifs de
+            // ce genre d'heuristique. Contrairement à Tracking Prevention,
+            // ce réglage est partagé par TOUTES les WebView2 utilisant le
+            // même user data folder — désactivé une fois, ça reste désactivé
+            // pour les navigations suivantes de cette fenêtre.
+            let settings = match core.Settings() {
+                Ok(s) => s,
+                                     Err(e) => { eprintln!("[SmartScreen] Settings() a échoué: {e}"); return; }
+            };
+            let settings8: ICoreWebView2Settings8 = match settings.cast() {
+                Ok(s) => s,
+                                     Err(e) => { eprintln!("[SmartScreen] cast ICoreWebView2Settings8 a échoué: {e}"); return; }
+            };
+            match settings8.SetIsReputationCheckingRequired(false) {
+                Ok(_)  => println!("[SmartScreen] ✅ Vérification de réputation désactivée"),
+                                     Err(e) => eprintln!("[SmartScreen] SetIsReputationCheckingRequired a échoué: {e}"),
+            }
+        }
     });
+    if let Err(e) = result {
+        eprintln!("[TrackingPrevention] with_webview a échoué: {e}");
+    }
+}
 
-    /* ── 2. Références DOM ────────────────────────────────── */
-    var nav          = document.getElementById('mob-nav');
-    var sidebar      = document.getElementById('sidebar');
-    var playerBar    = document.querySelector('.player-bar');
-    var progressFill = document.getElementById('progressFill');
+#[cfg(not(windows))]
+fn disable_tracking_prevention(_window: &tauri::WebviewWindow) {
+    // No-op sur macOS/Linux — Tracking Prevention est une fonctionnalité
+    // spécifique à WebView2 (Edge/Chromium sous Windows), le bug d'origine
+    // n'a d'ailleurs été observé que là.
+}
 
-    if (nav) nav.style.display = isMob() ? 'flex' : 'none';
+// ══════════════════════════════════════════════════════════════════
+//  Relay événement JS fenêtre → fenêtre via le backend Rust
+// ══════════════════════════════════════════════════════════════════
+#[tauri::command]
+fn relay_event(
+    app: tauri::AppHandle,
+    target: String,
+    event: String,
+    payload: serde_json::Value,
+) -> Result<(), String> {
+    app.emit_to(target.as_str(), &event, payload)
+    .map_err(|e| e.to_string())
+}
 
-    /* ── 3. Onglet actif ──────────────────────────────────── */
-    var curTab = 'home';
-    function setTab(t) {
-      curTab = t;
-      if (!nav) return;
-      nav.querySelectorAll('.mob-tab').forEach(function (b) {
-        b.classList.toggle('active', b.dataset.tab === t);
-      });
+// ══════════════════════════════════════════════════════════════════
+//  Mise à jour MediaSession Android (notification persistante)
+// ══════════════════════════════════════════════════════════════════
+#[tauri::command]
+fn update_media_session(
+    app: tauri::AppHandle,
+    title: String,
+    artist: String,
+    _album: String,
+    _art_url: Option<String>,
+    is_playing: bool,
+) -> Result<(), String> {
+    eprintln!("[Beartify] update_media_session appelé: title={} artist={} is_playing={}", title, artist, is_playing);
+
+    // ⚠️ CORRECTIF : sur Android, MediaPlaybackService (foreground service
+    // Kotlin, voir onMediaSessionUpdate côté JS) poste déjà la vraie
+    // notification MediaStyle avec contrôles/pochette/couleur dynamique.
+    // Poster aussi cette notification "fallback" ici faisait apparaître
+    // une seconde notification basique et redondante ("notif test") en
+    // plus de la vraie. Cette fonction ne reste donc active que sur
+    // desktop, où il n'existe pas de foreground service équivalent.
+    #[cfg(target_os = "android")]
+    {
+        return Ok(());
     }
 
-    /* ── 4. Navigation ────────────────────────────────────── */
-    /* Ferme le mode immersif avant toute navigation mobile   */
-    function closeImmersive() {
-      if (window._closeImmersive) window._closeImmersive();
-    }
+    #[cfg(not(target_os = "android"))]
+    {
+        use tauri_plugin_notification::NotificationExt;
 
-    function goHome() {
-      closeImmersive();
-      document.body.classList.remove('mob-lib');
-      var bh = document.getElementById('btnHome');
-      if (bh) bh.click();
-      setTab('home');
-    }
-    function goSearch() {
-      closeImmersive();
-      document.body.classList.remove('mob-lib');
-      setTab('search');
-      var inp = document.getElementById('topSearchInput');
-      if (inp) setTimeout(function () { inp.focus(); }, 50);
-    }
-    function goLibrary() {
-      closeImmersive();
-      if (curTab === 'library') { goHome(); return; }
-      if (sidebar) sidebar.classList.remove('collapsed');
-      document.body.classList.add('mob-lib');
-      setTab('library');
-    }
+        let play_pause = if is_playing { "⏸" } else { "▶" };
+        let body = if artist.is_empty() {
+            "Beartify Player".to_string()
+        } else {
+            artist
+        };
 
-    /* ── 5. Bottom nav ────────────────────────────────────── */
-    if (nav) {
-      nav.addEventListener('click', function (e) {
-        if (!isMob()) return;
-        var btn = e.target.closest('.mob-tab');
-        if (!btn) return;
-        ({ home: goHome, search: goSearch, library: goLibrary }
-          [btn.dataset.tab] || goHome)();
-      });
-    }
+        let result = app.notification()
+        .builder()
+        .title(format!("{} {}", play_pause, title))
+        .body(body)
+        .id(1) // ID fixe → mise à jour de la même notif à chaque piste
+        .show() // Correction Tauri v2
+        .map_err(|e| e.to_string());
 
-    /* ── 6. Mini-player tap → mode immersif ──────────────── */
-    if (playerBar) {
-      playerBar.addEventListener('click', function (e) {
-        if (!isMob()) return;
-        if (e.target.closest(
-          '#playPauseBtn,#nextBtn,#prevBtn,#shuffleBtn,#repeatBtn,.mini-like,.mini-etc'
-        )) return;
-        /* _openImmersive défini par background.js (déjà mobile-ready) */
-        if (window._openImmersive) window._openImmersive();
-      });
-    }
-
-    /* ── 7. Bibliothèque : navigation explicite par type d'item ── */
-    var trackList = document.getElementById('trackList');
-    if (trackList) {
-      trackList.addEventListener('click', function (e) {
-        if (!isMob()) return;
-
-        /* TOUS les items de sidebar utilisent .sidebar-playlist-hint
-           (pas .lib-item) - c'est la vraie classe parente               */
-        var item = e.target.closest('.sidebar-playlist-hint');
-        if (!item) return;
-
-        var navigated = false;
-
-        if (item.classList.contains('lib-liked-songs-row')) {
-          window.showPlaylistView?.('liked');
-          navigated = true;
-        } else if (item.classList.contains('lib-favorites-row')) {
-          window.showPlaylistView?.('favorites');
-          navigated = true;
-        } else if (item.classList.contains('lib-custom-playlist-row')) {
-          var pid = item.dataset.playlistId;
-          if (pid) { window.showPlaylistView?.('custom:' + pid); navigated = true; }
-        } else if (item.classList.contains('lib-fav-album-row')) {
-          var al = item.dataset.album;
-          if (al) { window.showDetailView?.('album', al); navigated = true; }
-        } else if (item.classList.contains('lib-fav-artist-row')) {
-          var ar = item.dataset.artist;
-          if (ar) { window.showDetailView?.('artist', ar); navigated = true; }
-        } else if (item.classList.contains('lib-album-item')) {
-          var alb = item.dataset.album;
-          if (alb) { window.showDetailView?.('album', alb); navigated = true; }
+        match &result {
+            Ok(_) => eprintln!("[Beartify] update_media_session: .show() OK"),
+            Err(e) => eprintln!("[Beartify] update_media_session: .show() ECHEC: {}", e),
         }
 
-        if (navigated) {
-          document.body.classList.remove('mob-lib');
-          setTab('home');
+        result
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  Demande explicite des permissions de notification
+// ══════════════════════════════════════════════════════════════════
+#[tauri::command]
+fn request_notification_permission(app: tauri::AppHandle) -> Result<bool, String> {
+    use tauri_plugin_notification::NotificationExt;
+
+    eprintln!("[Beartify] request_notification_permission appelé");
+
+    let current = app.notification().permission_state().map_err(|e| {
+        eprintln!("[Beartify] permission_state() ECHEC: {}", e);
+        e.to_string()
+    })?;
+    eprintln!("[Beartify] permission_state() actuel = {:?}", current);
+
+    if current == tauri_plugin_notification::PermissionState::Granted {
+        return Ok(true);
+    }
+
+    // C'est cet appel qui déclenche réellement le popup système Android
+    // (POST_NOTIFICATIONS, API 33+) — `permission_state()` seul ne fait que
+    // lire l'état existant, il ne demande jamais rien.
+    let requested = app.notification().request_permission().map_err(|e| {
+        eprintln!("[Beartify] request_permission() ECHEC: {}", e);
+        e.to_string()
+    })?;
+    eprintln!("[Beartify] request_permission() résultat = {:?}", requested);
+    Ok(requested == tauri_plugin_notification::PermissionState::Granted)
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  Échange de tokens Google (OAuth PKCE + refresh) — fait côté Rust.
+//
+//  Pourquoi : le fetch() natif du WebView (et même window.__TAURI__.http,
+//  dont l'espace de noms JS n'est apparemment pas exposé dans ce build
+//  sans bundler) vers https://oauth2.googleapis.com/token échouait
+//  silencieusement sur Linux (WebKitGTK) — CORS bloqué, sans erreur
+//  visible côté JS. Faire la requête ici, côté Rust, élimine le problème :
+//  aucun CORS ne s'applique à une requête HTTP faite par le processus
+//  natif, seulement aux requêtes émises depuis le contexte du WebView.
+//
+//  `params` est directement le corps x-www-form-urlencoded déjà construit
+//  côté JS (mêmes clés que celles envoyées à Google : client_id, code,
+//  code_verifier, grant_type, redirect_uri, client_secret, ou bien
+//  refresh_token pour le flux de restauration silencieuse).
+// ══════════════════════════════════════════════════════════════════
+#[tauri::command]
+async fn google_token_exchange(params: std::collections::HashMap<String, String>) -> Result<serde_json::Value, String> {
+    eprintln!("[MARQUEUR_BUILD_UNIQUE_84729] google_token_exchange invoquée");
+    eprintln!("[DEBUG google_token_exchange] Commande invoquée, params reçus : {} clés", params.len());
+
+    let client = reqwest::Client::builder()
+    .timeout(std::time::Duration::from_secs(15))
+    .build()
+    .map_err(|e| { eprintln!("[DEBUG google_token_exchange] Échec build client : {e}"); format!("Impossible de créer le client HTTP : {e}") })?;
+
+    eprintln!("[DEBUG google_token_exchange] Client HTTP créé, envoi de la requête POST vers Google...");
+
+    let res = client
+    .post("https://oauth2.googleapis.com/token")
+    .form(&params)
+    .send()
+    .await
+    .map_err(|e| { eprintln!("[DEBUG google_token_exchange] Échec de send().await : {e}"); format!("Requête vers Google échouée : {e}") })?;
+
+    eprintln!("[DEBUG google_token_exchange] Réponse reçue de Google, status = {}", res.status());
+
+    let status = res.status();
+    let body: serde_json::Value = res
+    .json()
+    .await
+    .map_err(|e| format!("Réponse Google illisible (status {status}) : {e}"))?;
+
+    if !status.is_success() {
+        return Err(format!("Google a répondu {status} : {body}"));
+    }
+
+    Ok(body)
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  Discord Rich Presence
+//
+//  Le client IPC vit derrière un Mutex géré par Tauri (.manage) car il
+//  doit survivre entre plusieurs appels de commande (connect une fois,
+//  puis set_activity à chaque changement de piste). Toutes les erreurs
+//  sont retournées en String pour rester cohérent avec le reste du fichier.
+// ══════════════════════════════════════════════════════════════════
+struct DiscordState(Mutex<Option<DiscordIpcClient>>);
+
+#[tauri::command]
+fn discord_connect(state: tauri::State<DiscordState>, client_id: String) -> Result<(), String> {
+    let mut guard = state.0.lock().map_err(|e| e.to_string())?;
+
+    // Ferme proprement une éventuelle connexion précédente avant d'en rouvrir une.
+    if let Some(mut old_client) = guard.take() {
+        let _ = old_client.close();
+    }
+
+    let mut client = DiscordIpcClient::new(client_id.as_str());
+    client.connect().map_err(|e| e.to_string())?;
+    *guard = Some(client);
+    Ok(())
+}
+
+#[tauri::command]
+fn discord_set_activity(
+    state: tauri::State<DiscordState>,
+    details: String,
+    state_text: String,
+    large_image: Option<String>,
+    large_text: Option<String>,
+    position: Option<i64>,
+    duration: Option<i64>,
+) -> Result<(), String> {
+    let mut guard = state.0.lock().map_err(|e| e.to_string())?;
+    let client = guard.as_mut().ok_or("Discord non connecté — appelez discord_connect d'abord")?;
+
+    let now = SystemTime::now()
+    .duration_since(UNIX_EPOCH)
+    .map(|d| d.as_secs() as i64)
+    .unwrap_or(0);
+
+    // start = maintenant moins la position déjà écoulée dans le titre, pour
+    // que Discord recalcule lui-même l'écoulé/restant en continu (pas besoin
+    // de renvoyer la position à chaque seconde). Si on fournit aussi `end`
+    // (start + durée totale), Discord affiche une vraie barre de progression
+    // façon Spotify plutôt qu'un simple compteur qui monte.
+    let pos = position.unwrap_or(0).max(0);
+    let start_ts = now - pos;
+
+    let mut timestamps = activity::Timestamps::new().start(start_ts);
+    if let Some(dur) = duration {
+        if dur > 0 {
+            timestamps = timestamps.end(start_ts + dur);
         }
-      });
     }
 
-    /* ── 8. Barre de progression 2px dans mini-player ─────── */
-    if (playerBar) {
-      var pg = document.createElement('div'); pg.className = 'mob-mini-progress';
-      var pf = document.createElement('div'); pf.className = 'mob-mini-fill';
-      pg.appendChild(pf); playerBar.appendChild(pg);
-      if (progressFill) {
-        new MutationObserver(function () {
-          pf.style.width = progressFill.style.width || '0%';
-        }).observe(progressFill, { attributes: true, attributeFilter: ['style'] });
-      }
+    let mut act = activity::Activity::new()
+    .details(details.as_str())
+    .state(state_text.as_str())
+    .activity_type(ActivityType::Listening)
+    .timestamps(timestamps);
+
+    // La pochette n'est fournie que si l'appelant en a une (Option) — on
+    // n'attache le bloc "assets" que dans ce cas plutôt que d'envoyer des
+    // champs vides à Discord.
+    if let (Some(img), Some(txt)) = (large_image.as_deref(), large_text.as_deref()) {
+        act = act.assets(activity::Assets::new().large_image(img).large_text(txt));
     }
 
-    /* ── 9. API publique ──────────────────────────────────── */
-    window._mob = { goHome: goHome, goLibrary: goLibrary, isMob: isMob };
-  })();
-  </script>
+    client.set_activity(act).map_err(|e| e.to_string())
+}
 
-  <audio id="btAudio" preload="none"></audio>
-  <script src="blindtest.js"></script>
 
-</body>
-</html>
+#[tauri::command]
+fn discord_clear_activity(state: tauri::State<DiscordState>) -> Result<(), String> {
+    let mut guard = state.0.lock().map_err(|e| e.to_string())?;
+    if let Some(client) = guard.as_mut() {
+        client.clear_activity().map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
+
+#[tauri::command]
+fn discord_disconnect(state: tauri::State<DiscordState>) -> Result<(), String> {
+    let mut guard = state.0.lock().map_err(|e| e.to_string())?;
+    if let Some(mut client) = guard.take() {
+        client.close().map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  Point d'entrée principal de la bibliothèque
+// ══════════════════════════════════════════════════════════════════
+#[cfg_attr(mobile, tauri::mobile_entry_point)]
+pub fn run() {
+    // CORRECTION GRAPHIQUE LINUX : Force la désactivation de DMABUF avant le rendu
+    #[cfg(target_os = "linux")]
+    {
+        std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
+    }
+
+    let mut builder = tauri::Builder::default();
+
+    // Enregistrement des plugins standards
+    builder = builder
+    .plugin(tauri_plugin_shell::init())
+    .plugin(tauri_plugin_opener::init()) // <-- AJOUTÉ : requis par plugin:opener|open_url (Google/Discord sur Android)
+    .plugin(tauri_plugin_http::init())
+    .plugin(tauri_plugin_oauth::init())
+    .plugin(tauri_plugin_deep_link::init())
+    .plugin(tauri_plugin_notification::init())
+    .plugin(tauri_plugin_fs::init()) // <-- Ligne ajoutée pour le plugin fs
+    // ⚠️ AJOUTÉ : manquait entièrement — c'est la cause de l'erreur
+    // "Command plugin:dialog|open not allowed by ACL". Un plugin absent
+    // du binaire renvoie toujours cette erreur, même avec la permission
+    // correspondante dans default.json (celle-ci vient d'être ajoutée
+    // aussi, voir default.json — les deux étaient nécessaires).
+    // Nécessite la dépendance dans Cargo.toml : tauri-plugin-dialog = "2"
+    .plugin(tauri_plugin_dialog::init())
+    // ⚠️ AJOUTÉ : requis par le nouveau bouton "Quitter" du pop-up
+    // hors-ligne (local-library.js appelle plugin:process|exit).
+    // Nécessite la dépendance dans Cargo.toml : tauri-plugin-process = "2"
+    .plugin(tauri_plugin_process::init());
+
+    // Single Instance : activé uniquement sur ordinateur (Desktop)
+    #[cfg(desktop)]
+    {
+        builder = builder.plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
+            if let Some(win) = app.get_webview_window("main") {
+                let _ = win.show();
+                let _ = win.unminimize();
+                let _ = win.set_focus();
+            }
+        }));
+    }
+
+    builder = builder.manage(DiscordState(Mutex::new(None)));
+
+    builder
+    .setup(|app| {
+        #[cfg(desktop)]
+        {
+            use tauri_plugin_deep_link::DeepLinkExt;
+            if let Err(e) = app.deep_link().register("beartify") {
+                eprintln!("Erreur enregistrement deep-link: {}", e);
+            }
+        }
+        #[cfg(debug_assertions)]
+        {
+            if let Some(win) = app.get_webview_window("main") {
+                win.open_devtools();
+            }
+        }
+        if let Some(win) = app.get_webview_window("main") {
+            disable_tracking_prevention(&win);
+        }
+        Ok(())
+    })
+    .invoke_handler(tauri::generate_handler![
+        relay_event,
+        update_media_session,
+        request_notification_permission,
+        google_token_exchange,
+        discord_connect,
+        discord_set_activity,
+        discord_clear_activity,
+        discord_disconnect,
+    ])
+    // ── Fermeture de l'application ────────────────────────────────
+    .on_window_event(|window, event| {
+        if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+            if window.label() == "main" {
+                // ⚠️ FIX : std::process::exit(0) tuait le processus
+                // instantanément, sans laisser à WebKitGTK le temps de
+                // vider sur disque son cache d'écriture localStorage
+                // (asynchrone en interne). Résultat : le refresh_token
+                // Google sauvegardé juste avant la fermeture (voir
+                // firebase-config.js) ne survivait quasiment jamais à un
+                // vrai redémarrage de l'app, alors qu'il survivait très
+                // bien à un simple rechargement de page (le processus,
+                // lui, restait vivant). On cache la fenêtre immédiatement
+                // pour une fermeture perçue comme instantanée côté
+                // utilisateur, mais on laisse le processus vivre 400ms de
+                // plus en arrière-plan pour laisser WebKit flusher avant
+                // l'exit réel.
+                api.prevent_close();
+                let _ = window.hide();
+                std::thread::spawn(move || {
+                    std::thread::sleep(std::time::Duration::from_millis(400));
+                    std::process::exit(0);
+                });
+            }
+        }
+    })
+    .run(tauri::generate_context!())
+    .expect("Erreur au lancement de Beartify");
+}
