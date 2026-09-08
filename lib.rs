@@ -421,9 +421,27 @@ pub fn run() {
     ])
     // ── Fermeture de l'application ────────────────────────────────
     .on_window_event(|window, event| {
-        if let tauri::WindowEvent::CloseRequested { .. } = event {
+        if let tauri::WindowEvent::CloseRequested { api, .. } = event {
             if window.label() == "main" {
-                std::process::exit(0);
+                // ⚠️ FIX : std::process::exit(0) tuait le processus
+                // instantanément, sans laisser à WebKitGTK le temps de
+                // vider sur disque son cache d'écriture localStorage
+                // (asynchrone en interne). Résultat : le refresh_token
+                // Google sauvegardé juste avant la fermeture (voir
+                // firebase-config.js) ne survivait quasiment jamais à un
+                // vrai redémarrage de l'app, alors qu'il survivait très
+                // bien à un simple rechargement de page (le processus,
+                // lui, restait vivant). On cache la fenêtre immédiatement
+                // pour une fermeture perçue comme instantanée côté
+                // utilisateur, mais on laisse le processus vivre 400ms de
+                // plus en arrière-plan pour laisser WebKit flusher avant
+                // l'exit réel.
+                api.prevent_close();
+                let _ = window.hide();
+                std::thread::spawn(move || {
+                    std::thread::sleep(std::time::Duration::from_millis(400));
+                    std::process::exit(0);
+                });
             }
         }
     })
