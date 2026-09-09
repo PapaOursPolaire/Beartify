@@ -1,31 +1,9 @@
-papaours@PapaOurs:~/Projets informatique/Sites/Beartify/Tauri$ adb logcat -s Beartify
---------- beginning of main
-09-09 20:20:49.031 13181 13181 E Beartify: onWebViewCreate() appelé — bridge en cours d'installation
-09-09 20:20:49.035 13181 13181 E Beartify: armWatchdog() — délai=8000ms (premier lancement=false)
-09-09 20:20:49.035 13181 13181 E Beartify: Permission POST_NOTIFICATIONS déjà accordée
-09-09 20:20:49.731 13181 13272 E Beartify: signalAppReady() reçu — annulation du watchdog
-09-09 20:58:41.110 21850 21850 E Beartify: onWebViewCreate() appelé — bridge en cours d'installation
-09-09 20:58:41.111 21850 21850 E Beartify: armWatchdog() — délai=8000ms (premier lancement=false)
-09-09 20:58:41.112 21850 21850 E Beartify: Permission POST_NOTIFICATIONS déjà accordée
-09-09 20:58:41.763 21850 21943 E Beartify: signalAppReady() reçu — annulation du watchdog
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Applying inline style violates the following Content Security Policy directive 'style-src 'self' 'unsafe-inline' <URL> 'nonce-9783401380022317728''. Note that 'unsafe-inline' is ignored if either a hash or nonce value is present in the source list. The action has been blocked.
+spicy-lyrics-engine.js:1996 [Lyrics] spicy-lyrics-engine.js — beta-22 chargé.
+spicy-lyrics-engine.js:2000 [Lyrics] Diagnostic : window.__spicyLyricsDebug.getState() dans la console pour l'état live.
+Warning: Don’t paste code into the DevTools Console that you don’t understand or haven’t reviewed yourself. This could allow attackers to steal your identity or take control of your computer. Type "allow pasting" below and press Enter to allow pasting.
+allow pastibg
+VM22291:1 Uncaught SyntaxError: Unexpected identifier 'pastibg' (at VM22291:1:7)
+allow pasting
+window.__spicyLyricsDebug.getState()
+{version: 'beta-22', type: 'None', lineCount: 0, processedPos: 44352.698, containerFound: true, …}containerClientHeight: 0containerFound: truecontainerScrollHeight: 0containerScrollTop: 0lastActiveLineIndex: -1lineCount: 0lines: []processedPos: 44352.698scrollDebouncePending: falsetype: "None"version: "beta-22"[[Prototype]]: Object
