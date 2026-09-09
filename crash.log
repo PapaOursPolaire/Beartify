@@ -1,0 +1,1291 @@
+--------- beginning of main
+09-09 13:50:17.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954617
+09-09 13:50:17.478  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:17.478  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:17.478  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:18.478  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954618
+09-09 13:50:18.479  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:18.480  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:18.480  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:18.591  2050  2218 E FromGoneTransitionInteractor: Ignoring startTransition: This interactor asked to transition from GONE -> LOCKSCREEN, but we last transitioned to DOZING, not GONE. This should never happen - check currentTransitionInfoInternal or use filterRelevantKeyguardState before starting transitions.
+09-09 13:50:18.729  2050  2343 E engmode_client_list: Cannot find client
+09-09 13:50:18.729  2050  2343 E engmode_hidl_client_service: Client error
+09-09 13:50:18.782  1133  3051 E NativeCustomFrequencyManager: [NativeCFMS] BpCustomFrequencyManager::acquire()
+09-09 13:50:18.787   986 12287 E engmode_world: Unknown token(00/00/00)
+09-09 13:50:18.789   763   763 E engmode_hidl_service: error to server(0xd0060012)
+09-09 13:50:18.796   986 12287 E engmode_world: Unknown token(00/00/00)
+09-09 13:50:18.796   763   763 E engmode_hidl_service: error to server(0xd0060012)
+09-09 13:50:18.990  2050  2050 E SystemUITextView: set Background Drawable!!
+09-09 13:50:19.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954619
+09-09 13:50:19.476  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:19.476  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:19.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:20.477  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954620
+09-09 13:50:20.478  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:20.478  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:20.478  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:21.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954621
+09-09 13:50:21.478  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:21.478  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:21.478  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+--------- beginning of system
+09-09 13:50:21.997 29875 14565 E ActivityThread: Failed to find provider info for gmail-ofls
+09-09 13:50:22.477  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954622
+09-09 13:50:22.479  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:22.479  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:22.480  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:23.010 29875 14565 E Icing   : Failed to remove thing with error code :error uri not found
+09-09 13:50:23.246 29875 14565 E ActivityThread: Failed to find provider info for gmail-ofls
+09-09 13:50:23.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954623
+09-09 13:50:23.478  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:23.478  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:23.478  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:23.650  3378  3378 E wpa_sslib: diag_event:11	diag_buf:[11:50:23.617335][ROAM] SCAN_START reason=9 rssi=-78 cu=82 full_scan=0 rssi_thres=-82 [vdev_id=0 fw_time=3968751]
+09-09 13:50:23.654  3378  3378 E wpa_sslib: diag_event:12	diag_buf:[11:50:23.617686][ROAM] SCAN_DONE btcoex=0 ap_count=0 freq[5]=2412 2437 2462 5180 5500 [vdev_id=0 fw_time=3968751]
+09-09 13:50:23.654  3378  3378 E wpa_sslib: diag_event:13	diag_buf:[11:50:23.617983][ROAM] SCORE_CUR_AP bssid=f8:d0:0e:cb:c5:d8 freq=2437 rssi=-78 cu=9 score=53.20 [vdev_id=0 fw_time=3968751]
+09-09 13:50:23.654  3378  3378 E wpa_sslib: diag_event:15	diag_buf:[11:50:23.617995][ROAM] RESULT NO_ROAM bssid=f8:d0:0e:cb:c5:d8 [vdev_id=0 fw_time=3969038]
+09-09 13:50:24.114  1015  1107 E BatteryDump: !@new_battery_dump : 4147,318,475,550,90,365,344,383,365,0,369,392,0,Charging,NO_CHARGING,Normal,Good,USB,1,Normal,0,0,9599,0x0,0x20000,0x0,0,0,0000,0000,00000000,0,0,0,0,1064,4116,8917,990,0,
+09-09 13:50:24.385 29875 14566 E ActivityThread: Failed to find provider info for gmail-ofls
+09-09 13:50:24.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954624
+09-09 13:50:24.477  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:24.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:24.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:25.213  1019  1019 E Sensors : inject_scontext_data: New ssp_data_injection_fd(45)
+09-09 13:50:25.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954625
+09-09 13:50:25.477  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:25.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:25.478  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:25.582 29875 14566 E ActivityThread: Failed to find provider info for gmail-ofls
+09-09 13:50:26.477  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954626
+09-09 13:50:26.478  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:26.479  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:26.479  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:26.897 29875 14566 E ActivityThread: Failed to find provider info for gmail-ofls
+09-09 13:50:26.927 29875 14566 E ActivityThread: Failed to find provider info for gmail-ofls
+09-09 13:50:27.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954627
+09-09 13:50:27.477  1109  1130 E HeatmapThread: !@Entered the read from path function
+09-09 13:50:27.478  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/extended_heatmap', errno = 13
+09-09 13:50:27.478  1109  1130 E HeatmapThread: !@Extended_heatmap efs Forced Reset
+09-09 13:50:27.478  1109  1130 E HeatmapThread: !@Read Extended_heatmap from efs is: 
+09-09 13:50:27.479  1109  1130 E HeatmapThread: !@Write Extended Heatmap to efs is: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+09-09 13:50:27.479  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/extended_heatmap', errno = 13
+09-09 13:50:27.480  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:27.480  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:27.480  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:28.135 29875 14164 E ActivityThread: Failed to find provider info for gmail-ofls
+09-09 13:50:28.146 29875 14164 E ActivityThread: Failed to find provider info for gmail-ofls
+09-09 13:50:28.478  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954628
+09-09 13:50:28.480  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:28.480  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:28.480  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:29.263 29875 14164 E Icing   : Failed to remove thing with error code :error uri not found
+09-09 13:50:29.263 29875 14164 E Icing   : Failed to remove thing with error code :error uri not found
+09-09 13:50:29.264 29875 14164 E Icing   : Failed to remove thing with error code :error uri not found
+09-09 13:50:29.478  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954629
+09-09 13:50:29.482  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:29.482  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:29.482  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:30.477  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954630
+09-09 13:50:30.479  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:30.479  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:30.479  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:31.062  1423  1565 E Watchdog: !@Sync: 43472 heap(MB): 246 / 256 FD: 1471 [2026-09-09 13:50:31.060]
+09-09 13:50:31.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954631
+09-09 13:50:31.478  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:31.478  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:31.478  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:32.477  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954632
+09-09 13:50:32.479  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:32.480  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:32.481  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:33.478  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954633
+09-09 13:50:33.480  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:33.480  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:33.480  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:34.334  1015  1107 E BatteryDump: !@new_battery_dump : 4158,377,475,550,90,364,344,373,364,0,369,386,0,Charging,NO_CHARGING,Normal,Good,USB,1,Normal,0,0,9599,0x0,0x20000,0x0,0,0,0000,0000,00000000,0,0,0,0,1064,4116,8919,990,0,
+09-09 13:50:34.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954634
+09-09 13:50:34.478  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:34.478  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:34.478  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:35.477  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954635
+09-09 13:50:35.479  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:35.479  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:35.479  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:36.477  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954636
+09-09 13:50:36.478  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:36.479  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:36.479  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:37.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954637
+09-09 13:50:37.478  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:37.478  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:37.478  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:38.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954638
+09-09 13:50:38.477  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:38.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:38.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:39.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954639
+09-09 13:50:39.477  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:39.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:39.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:40.477  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954640
+09-09 13:50:40.479  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:40.479  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:40.479  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:41.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954641
+09-09 13:50:41.478  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:41.478  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:41.478  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:42.478  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954642
+09-09 13:50:42.480  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:42.480  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:42.480  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:43.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954643
+09-09 13:50:43.477  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:43.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:43.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:43.604 14750 14763 E flipped : init succeeded.
+09-09 13:50:43.608 14750 14764 E flipped : Attach current thread 0
+09-09 13:50:43.608 14750 14764 E flipped : Detach current thread 0
+09-09 13:50:43.616 14750 14767 E flipped : Attach current thread 0
+09-09 13:50:43.616 14750 14767 E flipped : Detach current thread 0
+09-09 13:50:43.694 14750 14765 E ttmio   : <0x0,JNI_OnLoad,MIOJniBase.cpp:11>MIOCore JNI_OnLoad begin
+09-09 13:50:43.694 14750 14765 E ttmio   : <0x0,JNI_OnLoad,MIOJniBase.cpp:14>call vod_JNI_OnLoad
+09-09 13:50:43.694 14750 14765 E ttmio   : <0x0,JNI_OnLoad,MIOJniBase.cpp:16>vod_JNI_OnLoad end, result = 65540
+09-09 13:50:43.694 14750 14765 E ttmio   : <0x0,JNI_OnLoad,MIOJniBase.cpp:18>call vod_JNI_OnLoad
+09-09 13:50:43.694 14750 14765 E ttmio   : <0x0,vod_JNI_OnLoad,MDLJniBase.cpp:49>-----compiled native library  Aug 21 2026 04:09:25 (1.1.298.7)-----
+09-09 13:50:43.698 14750 14765 E ttmio   : <0x0,vod_JNI_OnLoad,MDLJniBase.cpp:59><vod_JNI_OnLoad,59> JNI_OnLoad (result=65540)
+09-09 13:50:43.698 14750 14765 E ttmio   : <0x0,JNI_OnLoad,MIOJniBase.cpp:20>vod_JNI_OnLoad end, result = 65540
+09-09 13:50:43.698 14750 14765 E ttmio   : <0x0,JNI_OnLoad,MIOJniBase.cpp:22>call live_JNI_OnLoad
+09-09 13:50:43.698 14750 14765 E ttmio   : <0x0,live_JNI_OnLoad,JNIFns.cpp:132>MIOLiveIO JNI_OnLoad begin
+09-09 13:50:43.705 14750 14765 E ttmio   : <0x0,live_JNI_OnLoad,JNIFns.cpp:221>MIOLiveIO JNI_OnLoad end:0
+09-09 13:50:43.705 14750 14765 E ttmio   : <0x0,JNI_OnLoad,MIOJniBase.cpp:24>live_JNI_OnLoad end, result = 65540
+09-09 13:50:43.705 14750 14765 E ttmio   : <0x0,JNI_OnLoad,MIOJniBase.cpp:26>MIOCore JNI_OnLoad end, result = 65540
+09-09 13:50:43.795 14750 14776 E flipped : Attach current thread 0
+09-09 13:50:43.795 14750 14776 E flipped : Detach current thread 0
+09-09 13:50:43.796 14750 14777 E flipped : Attach current thread 0
+09-09 13:50:43.796 14750 14777 E flipped : Detach current thread 0
+09-09 13:50:43.917 14750 14781 E ashmem  : Pinning is deprecated since Android Q. Please use trim or other methods.
+09-09 13:50:44.009 14750 14788 E art_sym : not found symbol for class_linker_vtable
+09-09 13:50:44.014 14750 14788 E art_sym : art ThreadListInstance index: 146
+09-09 13:50:44.067 14750 14783 E jato    : setJitCompilerOptions no-generate-debug-info failed
+09-09 13:50:44.167 14750 14772 E shadowhook_tag: shadowhook version 2.0.1-rc.15: shadowhook init(default_mode: SHARED, debuggable: false), init-errno: 0, real-init: yes
+09-09 13:50:44.168 14750 14774 E shadowhook_tag: shadowhook version 2.0.1-rc.15: shadowhook init(default_mode: SHARED, debuggable: false), init-errno: 0, real-init: no
+09-09 13:50:44.283 14750 14774 E art_sym : not found symbol for space_free_list_space_vtable
+09-09 13:50:44.284 14750 14774 E art_sym : not found symbol for space_large_object_map_space_vtable
+09-09 13:50:44.323 14750 14772 E bytehook_tag: bytehook version 1.1.2-rc.3: bytehook init(mode: AUTOMATIC, debuggable: false), return: 0, real-init: yes
+09-09 13:50:44.325 14750 14782 E shadowhook_tag: shadowhook version 2.0.1-rc.15: shadowhook init(default_mode: SHARED, debuggable: false), init-errno: 0, real-init: no
+09-09 13:50:44.379  1019  1019 E Sensors : inject_scontext_data: New ssp_data_injection_fd(45)
+09-09 13:50:44.408  1133  3051 E NativeCustomFrequencyManager: [NativeCFMS] BpCustomFrequencyManager::acquire()
+09-09 13:50:44.416 14750 14844 E shadowhook_tag: shadowhook version 2.0.1-rc.15: shadowhook init(default_mode: SHARED, debuggable: false), init-errno: 0, real-init: no
+09-09 13:50:44.435 14750 14850 E ActivityThread: Failed to find provider info for com.zhiliaoapp.musically.apm
+09-09 13:50:44.437 14750 14850 E ActivityThread: Failed to find provider info for com.zhiliaoapp.musically.apm
+09-09 13:50:44.448 14750 14850 E ActivityThread: Failed to find provider info for com.zhiliaoapp.musically.apm
+09-09 13:50:44.465  1015  1107 E BatteryDump: !@new_battery_dump : 4104,-517,475,550,90,363,343,369,363,0,366,380,0,Charging,NO_CHARGING,Normal,Good,USB,1,Normal,0,0,9593,0x0,0x20000,0x0,0,0,0000,0000,00000000,0,0,0,0,1064,4116,8923,990,0,
+09-09 13:50:44.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954644
+09-09 13:50:44.476  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:44.476  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:44.476  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:44.602 14750 14892 E flipped : Attach current thread 0
+09-09 13:50:44.603 14750 14892 E flipped : Detach current thread 0
+09-09 13:50:44.603 14750 14893 E flipped : Attach current thread 0
+09-09 13:50:44.603 14750 14893 E flipped : Detach current thread 0
+09-09 13:50:44.720 14750 14788 E JitDebugInfoOptimizer: dlopen libart-compiler.so failed
+09-09 13:50:44.720 14750 14788 E JitDebugInfoOptimizer: find symbol failed,system version:36
+09-09 13:50:44.736 14891 14918 E ashmem  : Pinning is deprecated since Android Q. Please use trim or other methods.
+09-09 13:50:44.909 14750 14788 E shadowhook_tag: shadowhook version 2.0.1-rc.15: shadowhook init(default_mode: SHARED, debuggable: false), init-errno: 0, real-init: no
+09-09 13:50:44.909 14750 14788 E jato    : large object remove init 1, 1, 0
+09-09 13:50:44.940 14750 14788 E offset_utils: Error get TaskProcessor vtable
+09-09 13:50:44.968 14750 14791 E shadowhook_tag: shadowhook version 2.0.1-rc.15: shadowhook init(default_mode: SHARED, debuggable: false), init-errno: 0, real-init: no
+09-09 13:50:44.972 14940 14957 E ashmem  : Pinning is deprecated since Android Q. Please use trim or other methods.
+09-09 13:50:45.366  1423  1423 E PocketModeEvent: PocketModeSetting is off 
+09-09 13:50:45.377  1019  1019 E Sensors : inject_scontext_data: New ssp_data_injection_fd(45)
+09-09 13:50:45.387  1019  1019 E Sensors : inject_scontext_data: New ssp_data_injection_fd(45)
+09-09 13:50:45.395  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:45.396  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:45.396  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:45.396  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:45.396  2050  2050 E NowBarCardViewModel: updateExpandedClickPanelVisibility screen on = true expanded false isTopCardSettingViewOpened = false
+09-09 13:50:45.396  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:45.411  2050  2050 E AbsSettings: refreshInner: refreshedSettingsDBItem key enabled_complication_widgets_id_list val = com.sec.android.daemonapp/com.sec.android.daemonapp.complication.receiver.ComplicationWeatherDetailReceiver;10;2;1;0~0,null~null-com.sec.android.app.voicenote/com.sec.android.app.voicenote.ui.remote.VoiceRecorderBriefWidgetReceiver;22;1;1;2~0,null~null-com.sec.android.daemonapp/com.sec.android.daemonapp.complication.receiver.ComplicationPrecipitationReceiver;24;1;1;3~0,null~null
+09-09 13:50:45.448  2050 15054 E BufferQueueProducer: [Wallpaper#2(BLAST Consumer)2](id:80200000002,api:0,p:-1,c:2050) disconnect: not connected (req=3)
+09-09 13:50:45.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954645
+09-09 13:50:45.476  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:45.476  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:45.476  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:45.501  1019  1019 E Sensors : inject_scontext_data: New ssp_data_injection_fd(45)
+09-09 13:50:45.519  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:45.519  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:45.520  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:45.520  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:45.520  2050  2050 E NowBarCardViewModel: updateExpandedClickPanelVisibility screen on = true expanded false isTopCardSettingViewOpened = false
+09-09 13:50:45.520  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:45.525 29875 14719 E LoadedApk: Exception : java.lang.NullPointerException: Attempt to invoke virtual method 'boolean android.os.Looper.isPerfLogEnable()' on a null object reference
+09-09 13:50:45.526  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:45.530  2050  2050 E AbsSettings: refreshInner: refreshedSettingsDBItem key enabled_complication_widgets_id_list val = com.sec.android.daemonapp/com.sec.android.daemonapp.complication.receiver.ComplicationWeatherDetailReceiver;10;2;1;0~0,null~null-com.sec.android.app.voicenote/com.sec.android.app.voicenote.ui.remote.VoiceRecorderBriefWidgetReceiver;22;1;1;2~0,null~null-com.sec.android.daemonapp/com.sec.android.daemonapp.complication.receiver.ComplicationPrecipitationReceiver;24;1;1;3~0,null~null
+09-09 13:50:45.531  2050  2050 E AbsSettings: refreshInner: refreshedSettingsDBItem key SELECTED_THEME_CLOCK_TYPE val = 0
+09-09 13:50:45.537  2050 15054 E MediaCodec: Media Quality Service not found.
+09-09 13:50:45.540 29875 14715 E LoadedApk: Exception : java.lang.NullPointerException: Attempt to invoke virtual method 'boolean android.os.Looper.isPerfLogEnable()' on a null object reference
+09-09 13:50:45.547 29875 14715 E LoadedApk: Exception : java.lang.NullPointerException: Attempt to invoke virtual method 'boolean android.os.Looper.isPerfLogEnable()' on a null object reference
+09-09 13:50:45.548  2050 15061 E ndroid.systemui: Failed to query component interface for required system resources: 6
+09-09 13:50:45.587  1423  1423 E DEVROOT#CIF:  Response buffer size is 0
+09-09 13:50:45.602  1019  1019 E Sensors : inject_scontext_data: New ssp_data_injection_fd(45)
+09-09 13:50:45.618  2050  2050 E AOD_CONFIG@AODConfigurationController: Skipping unregisterMonitor MONITOR_SEMCONTEXT - no registered monitor
+09-09 13:50:45.618  2050  2050 E AOD_CONFIG@AODConfigurationController: Skipping unregisterMonitor MONITOR_BROADCAST_PSM - no registered monitor
+09-09 13:50:45.618  2050  2050 E AOD_CONFIG@AODConfigurationController: Skipping unregisterMonitor MONITOR_BROADCAST_WALLPAPER - no registered monitor
+09-09 13:50:45.618  2050  2050 E AOD_CONFIG@AODConfigurationController: Skipping unregisterMonitor MONITOR_FOLD_STATE - no registered monitor
+09-09 13:50:45.618  2050  2050 E AOD_CONFIG@AODConfigurationController: Skipping unregisterMonitor MONITOR_BROADCAST_ROAMING - no registered monitor
+09-09 13:50:45.618  2050  2050 E AOD_CONFIG@AODConfigurationController: Skipping unregisterMonitor MONITOR_WEATHER_INFO_ENABLED - no registered monitor
+09-09 13:50:45.618  2050  2050 E AOD_CONFIG@AODConfigurationController: Skipping unregisterMonitor MONITOR_BROADCAST_OMC - no registered monitor
+09-09 13:50:45.642  2050  2050 E MODManager: hideSubUIChargingInfo skip because mAODChargingInfoSubUiPresenter is null
+09-09 13:50:45.649 31481 30864 E LoadedApk: Exception : java.lang.NullPointerException: Attempt to invoke virtual method 'boolean android.os.Looper.isPerfLogEnable()' on a null object reference
+09-09 13:50:45.649 16151 16265 E ScanManager: [GSIM LOG]: gsimLogHandler, msg: MESSAGE_SCAN_START, appName: com.google.android.gms, scannerId: 1, reportDelayMillis=0
+09-09 13:50:45.649  2026  2026 E SatelliteController: registerForSatelliteModemStateChanged: mSatelliteSessionController is not initialized yet
+09-09 13:50:45.650  2050  2050 E SQLiteLog: (10) POSIX Error : 11 SQLite Error : 3850
+09-09 13:50:45.650  2050  2050 E SQLiteLog: (10) LOCK : Getting lock (4) failed due to (11). The current owner is (3717).
+09-09 13:50:45.690  2026  2026 E SatelliteController: registerForSatelliteModemStateChanged: mSatelliteSessionController is not initialized yet
+09-09 13:50:45.701  2050  2723 E BufferQueueProducer: [Wallpaper#2(BLAST Consumer)2](id:80200000002,api:3,p:2050,c:2050) cancelBuffer: slot 6 is not owned by the producer (state = FREE)
+09-09 13:50:45.702  2050  2723 E BufferQueueProducer: [Wallpaper#2(BLAST Consumer)2](id:80200000002,api:3,p:2050,c:2050) cancelBuffer: slot 1 is not owned by the producer (state = FREE)
+09-09 13:50:45.702  2050  2723 E BufferQueueProducer: [Wallpaper#2(BLAST Consumer)2](id:80200000002,api:3,p:2050,c:2050) cancelBuffer: slot 5 is not owned by the producer (state = FREE)
+09-09 13:50:45.743  2026  2026 E SatelliteController: registerForSatelliteModemStateChanged: mSatelliteSessionController is not initialized yet
+09-09 13:50:45.760  1015  1107 E BatteryDump: !@new_battery_dump : 4131,-1761,475,550,90,363,344,375,363,0,363,380,0,Charging,NO_CHARGING,Normal,Good,USB,1,Normal,0,0,9593,0x0,0x20000,0x0,0,0,0000,0000,00000000,0,0,0,0,1064,4116,8923,990,0,
+09-09 13:50:45.775  2050 15103 E BufferQueueProducer: [Wallpaper#2(BLAST Consumer)2](id:80200000002,api:0,p:-1,c:2050) disconnect: not connected (req=3)
+09-09 13:50:45.831  2050 15103 E MediaCodec: Media Quality Service not found.
+09-09 13:50:45.837  2050 15106 E ndroid.systemui: Failed to query component interface for required system resources: 6
+09-09 13:50:45.907  1133  3051 E NativeCustomFrequencyManager: [NativeCFMS] BpCustomFrequencyManager::acquire()
+09-09 13:50:45.978  2050  2723 E BufferQueueProducer: [Wallpaper#2(BLAST Consumer)2](id:80200000002,api:3,p:2050,c:2050) cancelBuffer: slot 1 is not owned by the producer (state = FREE)
+09-09 13:50:46.027  2050 15130 E BufferQueueProducer: [Wallpaper#2(BLAST Consumer)2](id:80200000002,api:0,p:-1,c:2050) disconnect: not connected (req=3)
+09-09 13:50:46.069  2050 15130 E MediaCodec: Media Quality Service not found.
+09-09 13:50:46.077  2050 15133 E ndroid.systemui: Failed to query component interface for required system resources: 6
+09-09 13:50:46.155  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:46.160  1313  1951 E bauth_FPQCBAuthSensorControl: BAuthDeviceWaitIPC sys call failed : 4
+09-09 13:50:46.161  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:46.192  1423  2105 E KioskModeService: There's no matched data
+09-09 13:50:46.196  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.196  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.198  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.217  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.225  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.233  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.255  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.265  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.273  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.282  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.291  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.298  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.307  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.315  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.324  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.332  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.340  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.349  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.356  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.365  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.374  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.382  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.390  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.398  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.408  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.417  2050  2050 E KeyguardFingerPrintSwipe: mLongPressCallback canceled. Touch position is FP-InDisplay area!
+09-09 13:50:46.459  1313  1951 E bauth_FPQCBAuthSensorControl: BAuthDeviceWaitIPC sys call failed : 4
+09-09 13:50:46.464  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:46.464  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:46.468  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:46.469  2050  2050 E NowBarCardViewModel: updateExpandedClickPanelVisibility screen on = true expanded false isTopCardSettingViewOpened = false
+09-09 13:50:46.469  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:46.469  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:46.474  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - GoogleDiscoverWindow$_4054#435802
+09-09 13:50:46.474  1133  1133 E SurfaceFlinger: alpha changed 0.000 -> 0.000 - GoogleDiscoverWindow$_4054#435802
+09-09 13:50:46.474  1133  1133 E SurfaceFlinger: alpha changed 0.000 -> 0.000 - GoogleDiscoverWindow$_4054#435802
+09-09 13:50:46.479  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954646
+09-09 13:50:46.479  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:46.479  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:46.479  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:46.537  1423  4602 E PackageManager: replace res.nonLocalizedLabel(null) to newName(Messages) and activity.getPackageName() () UId(1000)
+09-09 13:50:46.571  2535  2535 E KNOXCORE::CACHE: clr value {old=1 new:1
+09-09 13:50:46.683  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - Surface(name=Task=1)/@0xdf20cc3_transition-leash#435805
+09-09 13:50:46.683  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - Surface(name=WallpaperWindowToken{e904ca4 showWhenLocked=false})/@0x136a079_transition-leash#435806
+09-09 13:50:46.699  4054  4054 E NetworkErrorMessage: (REDACTED) Invalid connectivity state: %s
+09-09 13:50:46.831  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:46.831  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:46.838  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:46.839  2050  2050 E NowBarCardViewModel: updateExpandedClickPanelVisibility screen on = true expanded false isTopCardSettingViewOpened = false
+09-09 13:50:46.839  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:46.839  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:46.860  2050  2343 E engmode_client_list: Cannot find client
+09-09 13:50:46.860  2050  2343 E engmode_hidl_client_service: Client error
+09-09 13:50:46.863   986 12287 E engmode_world: Unknown token(00/00/00)
+09-09 13:50:46.863   763   763 E engmode_hidl_service: error to server(0xd0060012)
+09-09 13:50:46.955 14750 14792 E PROFILER: jvm_info_monitor_start enter
+09-09 13:50:46.956  1423  1423 E PocketModeEvent: PocketModeSetting is off 
+09-09 13:50:46.964  1423  1796 E MotionRecognitionService: Receiver: ACTION_USER_PRESENT - UNLOCK SCREEN
+09-09 13:50:47.035  1423  1879 E AidlResponseHandler: Client monitor is not an instance of com.android.server.biometrics.sensors.AcquisitionClient
+09-09 13:50:47.043  1423  1796 E MotionRecognitionService: Receiver: ACTION_USER_PRESENT - UNLOCK SCREEN
+09-09 13:50:47.044  1423  1423 E PocketModeEvent: PocketModeSetting is off 
+09-09 13:50:47.072  1019  1704 E Sensors : Sensor : Meta event
+09-09 13:50:47.083  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - Surface(name=WallpaperWindowToken{332f377 showWhenLocked=false})/@0xfbd61be_transition-leash#435807
+09-09 13:50:47.170  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:47.170  2050  2050 E NowBarCardViewModel: updateExpandedClickPanelVisibility screen on = true expanded false isTopCardSettingViewOpened = false
+09-09 13:50:47.170  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:47.170  2050  2050 E NowBarCardStackView: getTopCard topCard is null view size = 0
+09-09 13:50:47.218  1423  4585 E WindowManager: win=Window{49d251c u0 NotificationShade} destroySurfaces: appStopped=true cleanupOnResume=false win.mWindowRemovalAllowed=false win.mRemoveOnExit=false win.mViewVisibility=4 caller=com.android.server.wm.WindowManagerService.tryStartExitingAnimation:134 com.android.server.wm.WindowManagerService.relayoutWindow:1160 com.android.server.wm.Session.relayout:27 android.view.IWindowSession$Stub.onTransact:829 com.android.server.wm.Session.onTransact:1 android.os.Binder.execTransactInternal:1462 android.os.Binder.execTransact:1401 
+09-09 13:50:47.230  2050  2723 E BufferQueueProducer: [Wallpaper#2(BLAST Consumer)2](id:80200000002,api:3,p:2050,c:2050) cancelBuffer: slot 0 is not owned by the producer (state = FREE)
+09-09 13:50:47.230  2050  2723 E BufferQueueProducer: [Wallpaper#2(BLAST Consumer)2](id:80200000002,api:3,p:2050,c:2050) cancelBuffer: slot 13 is not owned by the producer (state = FREE)
+09-09 13:50:47.235  2050  2723 E BufferQueueProducer: [Wallpaper#2(BLAST Consumer)2](id:80200000002,api:3,p:2050,c:2050) cancelBuffer: slot 12 is not owned by the producer (state = FREE)
+09-09 13:50:47.241  2050  2723 E BufferQueueProducer: [Wallpaper#2(BLAST Consumer)2](id:80200000002,api:3,p:2050,c:2050) cancelBuffer: slot 14 is not owned by the producer (state = FREE)
+09-09 13:50:47.241  2050  2723 E BufferQueueProducer: [Wallpaper#2(BLAST Consumer)2](id:80200000002,api:3,p:2050,c:2050) cancelBuffer: slot 11 is not owned by the producer (state = FREE)
+09-09 13:50:47.242  2050  2723 E BufferQueueProducer: [Wallpaper#2(BLAST Consumer)2](id:80200000002,api:3,p:2050,c:2050) cancelBuffer: slot 9 is not owned by the producer (state = FREE)
+09-09 13:50:47.242  2050  2723 E BufferQueueProducer: [Wallpaper#2(BLAST Consumer)2](id:80200000002,api:3,p:2050,c:2050) cancelBuffer: slot 8 is not owned by the producer (state = FREE)
+09-09 13:50:47.242 16151 16265 E ScanManager: [GSIM LOG]: gsimLogHandler, msg: MESSAGE_SCAN_START, appName: com.google.android.gms, scannerId: 2, reportDelayMillis=0
+09-09 13:50:47.245  2050  2723 E BufferQueueProducer: [Wallpaper#2(BLAST Consumer)2](id:80200000002,api:3,p:2050,c:2050) cancelBuffer: slot 1 is not owned by the producer (state = FREE)
+09-09 13:50:47.250 16151 16209 E bluetooth: system/gd/hci/le_scanning_manager.cc:1291 update_ad_type_filter: AD type filter isn't supported
+09-09 13:50:47.294  1423  4590 E WindowManager: win=Window{c3b27e5 u0 FP Iconview} destroySurfaces: appStopped=true cleanupOnResume=false win.mWindowRemovalAllowed=false win.mRemoveOnExit=false win.mViewVisibility=8 caller=com.android.server.wm.WindowManagerService.tryStartExitingAnimation:134 com.android.server.wm.WindowManagerService.relayoutWindow:1160 com.android.server.wm.Session.relayout:27 android.view.IWindowSession$Stub.onTransact:829 com.android.server.wm.Session.onTransact:1 android.os.Binder.execTransactInternal:1457 android.os.Binder.execTransact:1401 
+09-09 13:50:47.333 15160 15160 E ashmem  : Pinning is deprecated since Android Q. Please use trim or other methods.
+09-09 13:50:47.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954647
+09-09 13:50:47.476  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:47.476  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:47.476  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:47.489   760  7375 E keystore2: system/security/keystore2/src/error.rs:183 - system/security/keystore2/src/security_level.rs:343
+09-09 13:50:47.489   760  7375 E keystore2: 
+09-09 13:50:47.489   760  7375 E keystore2: Caused by:
+09-09 13:50:47.489   760  7375 E keystore2:     0: system/security/keystore2/src/enforcements.rs:609: matching auth token (challenge=0, userId=-1274572615902080890, authId=0, authType=0x1, timestamp=2427051444ms) rcved=BootTime(2421096877) for sids [-1274572615902080890] type Some(r#PASSWORD) is expired (253680s old > timeout=5s)
+09-09 13:50:47.489   760  7375 E keystore2:     1: Error::Km(r#KEY_USER_NOT_AUTHENTICATED)
+09-09 13:50:47.510 15187 15235 E ashmem  : Pinning is deprecated since Android Q. Please use trim or other methods.
+09-09 13:50:47.528  3378  3378 E wpa_sslib: diag_event:11	diag_buf:[11:50:47.501607][ROAM] SCAN_START reason=1 rssi=-76 cu=75 full_scan=0 rssi_thres=-75 [vdev_id=0 fw_time=3992639]
+09-09 13:50:47.528  3378  3378 E wpa_sslib: diag_event:12	diag_buf:[11:50:47.501669][ROAM] SCAN_DONE btcoex=0 ap_count=0 freq[5]=2412 2437 2462 5180 5500 [vdev_id=0 fw_time=3992639]
+09-09 13:50:47.528  3378  3378 E wpa_sslib: diag_event:13	diag_buf:[11:50:47.501709][ROAM] SCORE_CUR_AP bssid=f8:d0:0e:cb:c5:d8 freq=2437 rssi=-76 cu=10 score=57.70 [vdev_id=0 fw_time=3992639]
+09-09 13:50:47.528  3378  3378 E wpa_sslib: diag_event:15	diag_buf:[11:50:47.501709][ROAM] RESULT NO_ROAM bssid=f8:d0:0e:cb:c5:d8 [vdev_id=0 fw_time=3992924]
+09-09 13:50:47.663 15241 15254 E ActivityThread: Failed to find provider info for com.sec.android.log.diagmonagent
+09-09 13:50:48.042  1423  1423 E PocketModeEvent: PocketModeSetting is off 
+09-09 13:50:48.069 14750 14754 E gcblocker: too long request gcblock: 3020
+09-09 13:50:48.069 14750 14754 E gcblocker: gc block end, 1305493041,3020
+09-09 13:50:48.084 29875 14720 E CDC     : [API-CSC-0008-CDC-0009-com.google.android.gms] sendTextMessage - message discarded without payload or destination ID.
+09-09 13:50:48.171  1133  3051 E NativeCustomFrequencyManager: [NativeCFMS] BpCustomFrequencyManager::acquire()
+09-09 13:50:48.179  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.186  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.197  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.211  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.219  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.227  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.236  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.236 14750 14754 E jato    : free another free:12025856 alloc:3792896
+09-09 13:50:48.237 14750 14754 E jato    : free another 8232960
+09-09 13:50:48.244  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.252  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.261  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.269  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.278  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.286  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.294  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.303  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.311  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.319  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.328  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.336  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.344  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.353  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.361  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.369  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.378  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.386  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.394  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.403  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.411  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.419  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.428  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.436  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.444  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.453  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.462  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954648
+09-09 13:50:48.477  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:48.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:48.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:48.725  1423  1905 E SemWifiLinkQualityMonitor: Too old or invalid TMI: currentTime=1788954648724 lastDateWindow=1788773470000
+09-09 13:50:48.814  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.821  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.831  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.838  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.847  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.855  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.864  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.872  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.881  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.888  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.897  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.905  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.913  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.922  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.930  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.939  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.948  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.955  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.964  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.972  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.980  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.989  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:48.997  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.005  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.014  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.022  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.030  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.039  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.047  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.056  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.064  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.072  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.081  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.089  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.098  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.106  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.115  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.122  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.131  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.140  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.148  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.156  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.164  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.173  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.181  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.190  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.197  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.206  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.214  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.222  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.231  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.239  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.247  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.256  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.264  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.272  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.281  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.289  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.297  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.306  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.314  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.322  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.332  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.339  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.348  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.356  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.364  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.373  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.381  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.389  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.397  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.406  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.414  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.422  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.431  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.439  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.448  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.456  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.464  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.473  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954649
+09-09 13:50:49.477  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:49.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:49.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:49.481  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.490  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.498  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.506  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.514  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.523  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.532  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.539  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.548  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.557  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.565  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.573  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.582  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.590  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.598  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.607  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.615  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.623  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.631  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.640  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.648  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.657  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.665  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.673  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.682  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.690  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.698  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.707  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.715  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.724  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.732  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.740  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.748  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.757  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.765  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.773  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.782  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.790  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.799  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.807  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.815  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.824  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.832  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.840  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.848  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.857  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.865  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.873  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.882  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.890  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.899  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.907  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.916  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.924  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.932  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.941  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.949  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.957  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.966  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.974  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.982  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.991  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:49.999  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.007  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.016  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.024  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.032  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.040  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.049  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.057  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.066  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.074  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.082  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.091  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.099  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.107  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.116  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.124  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.133  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.141  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.149  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.157  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.166  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.174  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.183  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.191  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.199  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.208  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.216  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.224  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.233  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.241  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.250  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.258  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.266  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.274  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.283  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.291  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.300  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.308  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.317  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.325  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.333  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.341  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.350  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.358  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.366  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.375  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.383  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.392  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.400  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.408  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.417  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.425  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.433  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.442  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.453  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.459  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.468  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954650
+09-09 13:50:50.476  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.477  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:50.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:50.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:50.484  1133  3051 E NativeCustomFrequencyManager: [NativeCFMS] BpCustomFrequencyManager::acquire()
+09-09 13:50:50.484  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.492  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.500  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.509  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.517  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.525  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.534  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.542  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.550  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.567  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.577  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.585  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.589  3278  3278 E pageboostd: Received HALT command code 2
+09-09 13:50:50.591  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.600  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.611  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.619  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.628  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.637  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.644  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.651  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.663  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.671 15366 15366 E ashmem  : Pinning is deprecated since Android Q. Please use trim or other methods.
+09-09 13:50:50.673  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.678  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.681 14750 15388 E aoapp.musically: No package ID 6b found for resource ID 0x6b0b0013.
+09-09 13:50:50.684  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - Surface(name=Task=13666)/@0xf4bb88d_transition-leash#435820
+09-09 13:50:50.688  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.694  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.704  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.714  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.720  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.729  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.733  1133  1133 E SurfaceFlinger: alpha changed 0.000 -> 0.681 - Surface(name=Task=13666)/@0xf4bb88d_transition-leash#435820
+09-09 13:50:50.735  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.745  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.753  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.763  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.775  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.779  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.788  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.799  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.809  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.819  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.828  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.836  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.846  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.854  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.863  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.873  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.882  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.891  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.902  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.915  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.925  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.935  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.943  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.947  3278  3278 E pageboostd: Received HALT command code 2
+09-09 13:50:50.952  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.960  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.973  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.982  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:50.993  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.002  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - Surface(name=eb54256 InputMethod)/@0xc8807c4 - animation-leash of insets_animation#435830
+09-09 13:50:51.008  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.017  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.022  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.027  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.035  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.044  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.052  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.064  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.072  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.089  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.103  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.114  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.124  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.133  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.134 15427 15427 E libc    : SetHeapTaggingLevel: re-enabling tagging after it was disabled is not supported
+09-09 13:50:51.141  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.149  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.156  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.172  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.178  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.185  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.195  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.206  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.216  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.228  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.239  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.251  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.263  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.273  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.280  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.290  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.300  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.308  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.319  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.328  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.341  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.351  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.355  1133  1133 E CompositionEngine: [Wallpaper BBQ wrapper 5_system#88] Invalid device requested composition type change: Client (1) --> Client (1)
+09-09 13:50:51.367 15366 15366 E Beartify: onWebViewCreate() appelé — bridge en cours d'installation
+09-09 13:50:51.370 15366 15366 E Beartify: armWatchdog() — délai=25000ms (premier lancement=true)
+09-09 13:50:51.370 15366 15366 E Beartify: Demande de la permission POST_NOTIFICATIONS…
+09-09 13:50:51.383  3278  3278 E pageboostd: Received HALT command code 2
+09-09 13:50:51.477  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954651
+09-09 13:50:51.477  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:51.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:51.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:51.491  1423  4590 E WindowManager: win=Window{7c49236 u0 GoogleDiscoverWindow} destroySurfaces: appStopped=true cleanupOnResume=false win.mWindowRemovalAllowed=false win.mRemoveOnExit=false win.mViewVisibility=8 caller=com.android.server.wm.ActivityRecord.destroySurfaces:25 com.android.server.wm.ActivityRecord.activityStopped:192 com.android.server.wm.ActivityClientController.activityStopped:97 android.app.IActivityClientController$Stub.onTransact:740 com.android.server.wm.ActivityClientController.onTransact:1 android.os.Binder.execTransactInternal:1462 android.os.Binder.execTransact:1401 
+09-09 13:50:51.518  1423  4590 E WindowManager: win=Window{62c639d u0 com.sec.android.app.launcher/com.sec.android.app.launcher.activities.LauncherActivity} destroySurfaces: appStopped=true cleanupOnResume=false win.mWindowRemovalAllowed=false win.mRemoveOnExit=false win.mViewVisibility=8 caller=com.android.server.wm.ActivityRecord.destroySurfaces:25 com.android.server.wm.ActivityRecord.activityStopped:192 com.android.server.wm.ActivityClientController.activityStopped:97 android.app.IActivityClientController$Stub.onTransact:740 com.android.server.wm.ActivityClientController.onTransact:1 android.os.Binder.execTransactInternal:1462 android.os.Binder.execTransact:1401 
+09-09 13:50:51.592  5026 15479 E AtomicFile: Failed to rename /data/user_de/0/com.samsung.android.honeyboard/files/selected.json.new to /data/user_de/0/com.samsung.android.honeyboard/files/selected.json
+09-09 13:50:51.598  5026  5026 E HBD     : f metaData is null. 
+09-09 13:50:51.762 16151 16265 E ScanManager: [GSIM LOG]: gsimLogHandler, msg: MESSAGE_SCAN_STOP, appName: com.google.android.gms, scannerId: 1, reportDelayMillis=0
+09-09 13:50:51.766  1423  1905 E SemWifiLinkQualityMonitor: Too old or invalid TMI: currentTime=1788954651766 lastDateWindow=1788773470000
+09-09 13:50:51.833 16151 16265 E ScanManager: [GSIM LOG]: gsimLogHandler, msg: MESSAGE_SCAN_START, appName: com.google.android.gms, scannerId: 1, reportDelayMillis=0
+09-09 13:50:51.944  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - ActivityRecord{220657186 u0 com.google.android.permissioncontroller/com.android.permissioncontroller.permission.ui.GrantPermissionsActivity t13666}#435833
+09-09 13:50:51.953  1133  1133 E SurfaceFlinger: alpha changed 0.000 -> 1.000 - ActivityRecord{220657186 u0 com.google.android.permissioncontroller/com.android.permissioncontroller.permission.ui.GrantPermissionsActivity t13666}#435833
+09-09 13:50:51.993  1133  3051 E NativeCustomFrequencyManager: [NativeCFMS] BpCustomFrequencyManager::acquire()
+09-09 13:50:52.011  3278  3278 E pageboostd: Received HALT command code 2
+09-09 13:50:52.031  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - Dim Layer for - Task=13666#435841
+09-09 13:50:52.031  1133  1133 E SurfaceFlinger: alpha changed 0.000 -> 0.000 - Dim Layer for - Task=13666#435841
+09-09 13:50:52.047  1133  1133 E SurfaceFlinger: alpha changed 0.000 -> 0.026 - Dim Layer for - Task=13666#435841
+09-09 13:50:52.322  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - Surface(name=eb54256 InputMethod)/@0xc8807c4 - animation-leash of insets_animation#435842
+09-09 13:50:52.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954652
+09-09 13:50:52.476  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:52.476  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:52.476  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:52.751  1011  6330 E WVCdm   : [wv_content_decryption_module.cpp(426):GetMetricsInternal] Cdm Identifier not found
+09-09 13:50:52.759  1011  6330 E WVCdm   : [wv_content_decryption_module.cpp(486):CloseCdm] Cdm Identifier not found
+09-09 13:50:52.759  1011  6330 E WVCdm   : Failed to close cdm. status 12
+09-09 13:50:52.762  1011  6330 E WVCdm   : [oemcrypto_adapter_dynamic.cpp(832):Level1Terminate] L1 Terminate
+09-09 13:50:53.078  1423  1423 E PocketModeEvent: PocketModeSetting is off 
+09-09 13:50:53.092  1019  1019 E Sensors : inject_scontext_data: New ssp_data_injection_fd(45)
+09-09 13:50:53.100  1423  4824 E PackageManager: replace res.nonLocalizedLabel(null) to newName(Messages) and activity.getPackageName() () UId(1000)
+09-09 13:50:53.115 15366 15366 E Beartify: Permission POST_NOTIFICATIONS : accordée
+09-09 13:50:53.152  1019  1019 E Sensors : inject_scontext_data: New ssp_data_injection_fd(45)
+09-09 13:50:53.181  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - Surface(name=eb54256 InputMethod)/@0xc8807c4 - animation-leash of insets_animation#435846
+09-09 13:50:53.184  1423  3782 E PackageManager: replace res.nonLocalizedLabel(null) to newName(Messages) and activity.getPackageName() () UId(1000)
+09-09 13:50:53.229  5026  5026 E HBD     : f metaData is null. 
+09-09 13:50:53.229  5026 15609 E AtomicFile: Failed to rename /data/user_de/0/com.samsung.android.honeyboard/files/selected.json.new to /data/user_de/0/com.samsung.android.honeyboard/files/selected.json
+09-09 13:50:53.323 16151 16265 E ScanManager: [GSIM LOG]: gsimLogHandler, msg: MESSAGE_SCAN_STOP, appName: com.google.android.gms, scannerId: 2, reportDelayMillis=0
+09-09 13:50:53.349  1133  1133 E SurfaceFlinger: alpha changed 0.026 -> 0.000 - Dim Layer for - Task=13666#435841
+09-09 13:50:53.399 16151 16265 E ScanManager: [GSIM LOG]: gsimLogHandler, msg: MESSAGE_SCAN_START, appName: com.google.android.gms, scannerId: 2, reportDelayMillis=0
+09-09 13:50:53.404 16151 16209 E bluetooth: system/gd/hci/le_scanning_manager.cc:1291 update_ad_type_filter: AD type filter isn't supported
+09-09 13:50:53.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954653
+09-09 13:50:53.486  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:53.487  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:53.487  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:53.604  1423  4623 E TaskPersister: File error accessing recents directory (directory doesn't exist?).
+09-09 13:50:53.604  1423  4623 E TaskPersister: File error accessing recents directory (directory doesn't exist?).
+09-09 13:50:53.891 13286 15258 E FbnsAIDLClientManager: Max Try reached for binding to FbnsAIDLService, threadId 18685
+09-09 13:50:53.903 13286 15258 E FbnsAIDLClientManager: Fbns AIDL request got RemoteException
+09-09 13:50:53.903 13286 15258 E FbnsAIDLClientManager: android.os.RemoteException: AIDLService is not bound
+09-09 13:50:53.903 13286 15258 E FbnsAIDLClientManager: 	at X.08qO.call(:372)
+09-09 13:50:53.903 13286 15258 E FbnsAIDLClientManager: 	at java.util.concurrent.FutureTask.run(FutureTask.java:328)
+09-09 13:50:53.903 13286 15258 E FbnsAIDLClientManager: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1100)
+09-09 13:50:53.903 13286 15258 E FbnsAIDLClientManager: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+09-09 13:50:53.903 13286 15258 E FbnsAIDLClientManager: 	at java.lang.Thread.run(Thread.java:1572)
+09-09 13:50:53.990 14750 14756 E MediaDrm: Object Already unbinded 
+09-09 13:50:54.022  1423  1690 E PackageManager: replace res.nonLocalizedLabel(null) to newName(Messages) and activity.getPackageName() () UId(1000)
+09-09 13:50:54.061  1423  1690 E PackageManager: replace res.nonLocalizedLabel(null) to newName(Messages) and activity.getPackageName() () UId(1000)
+09-09 13:50:54.389  1423  4589 E PackageManager: replace res.nonLocalizedLabel(null) to newName(Messages) and activity.getPackageName() () UId(1000)
+09-09 13:50:54.431  1423  2645 E PackageManager: replace res.nonLocalizedLabel(null) to newName(Messages) and activity.getPackageName() () UId(1000)
+09-09 13:50:54.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954654
+09-09 13:50:54.477  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:54.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:54.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:54.637  1423  4782 E PackageManager: replace res.nonLocalizedLabel(null) to newName(Messages) and activity.getPackageName() () UId(1000)
+09-09 13:50:54.707  1423  4782 E PackageManager: replace res.nonLocalizedLabel(null) to newName(Messages) and activity.getPackageName() () UId(1000)
+09-09 13:50:54.774  1423  1905 E SemWifiLinkQualityMonitor: Too old or invalid TMI: currentTime=1788954654774 lastDateWindow=1788773470000
+09-09 13:50:55.195 14750 14785 E Forest_null: could not get any valid access key from remote settings
+09-09 13:50:55.216 15427 15505 E chromium: [ERROR:cc/tiles/tile_manager.cc:1046] WARNING: tile memory limits exceeded, some content may not draw
+09-09 13:50:55.216 15427 15505 E chromium: [ERROR:cc/tiles/tile_manager.cc:1046] WARNING: tile memory limits exceeded, some content may not draw
+09-09 13:50:55.350 14750 14840 E Bench-TAG: ====== JNI_OnLoad ======
+09-09 13:50:55.375 14750 14840 E PRIMJS  : Worker::Init 0x76f393b908
+09-09 13:50:55.376 14750 14840 E BX      : [void Java_com_benchmark_port_nativePort_BSModuleInvoker_nativeSetJsWorker(JNIEnv *, jclass, jlong):523] downloadJavaScript :/data/user/0/com.zhiliaoapp.musically/files/bytebench
+09-09 13:50:55.414 14750 15672 E Forest_GeckoFetcher: download failed with waitGeckoUpdate=false ,channel = tiktok_webview_hook,bundle = hook.js
+09-09 13:50:55.414 14750 15672 E Forest_GeckoFetcher: java.lang.Throwable: invalid channel
+09-09 13:50:55.414 14750 15672 E Forest_GeckoFetcher: 	at X.0Ak6.LJIIIIZZ(SourceFile:33554554)
+09-09 13:50:55.414 14750 15672 E Forest_GeckoFetcher: 	at X.0AkG.LIZ(SourceFile:1340)
+09-09 13:50:55.414 14750 15672 E Forest_GeckoFetcher: 	at X.0AkG.run(SourceFile:5)
+09-09 13:50:55.414 14750 15672 E Forest_GeckoFetcher: 	at X.08Sf.invoke(SourceFile:4)
+09-09 13:50:55.414 14750 15672 E Forest_GeckoFetcher: 	at X.02Wa.invoke(SourceFile:4)
+09-09 13:50:55.414 14750 15672 E Forest_GeckoFetcher: 	at X.0115.LIZ(SourceFile:50331890)
+09-09 13:50:55.414 14750 15672 E Forest_GeckoFetcher: 	at X.04Qn.LIZJ(SourceFile:85)
+09-09 13:50:55.414 14750 15672 E Forest_GeckoFetcher: 	at X.04Qn.run(SourceFile:0)
+09-09 13:50:55.414 14750 15672 E Forest_GeckoFetcher: 	at X.045l.run(SourceFile:2)
+09-09 13:50:55.414 14750 15672 E Forest_GeckoFetcher: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1100)
+09-09 13:50:55.414 14750 15672 E Forest_GeckoFetcher: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+09-09 13:50:55.414 14750 15672 E Forest_GeckoFetcher: 	at X.04Qp.run(SourceFile:9)
+09-09 13:50:55.414 14750 15672 E Forest_GeckoFetcher: 	at java.lang.Thread.run(Thread.java:1572)
+09-09 13:50:55.414 14750 15672 E Forest_GeckoFetcher: 	at com.bytedance.bpea.transmit.delegate.BPEAThread.com_bytedance_bpea_transmit_delegate_BPEAThread__run$___twin___(SourceFile:9)
+09-09 13:50:55.414 14750 15672 E Forest_GeckoFetcher: 	at com.bytedance.bpea.transmit.delegate.BPEAThread.com_bytedance_bpea_transmit_delegate_BPEAThread_com_ss_android_ugc_aweme_lancet_RunnableGuardLancet_run(SourceFile:16777216)
+09-09 13:50:55.414 14750 15672 E Forest_GeckoFetcher: 	at com.bytedance.bpea.transmit.delegate.BPEAThread.run(SourceFile:0)
+09-09 13:50:55.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954655
+09-09 13:50:55.476  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:55.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:55.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:55.964  1015  1107 E BatteryDump: !@new_battery_dump : 4086,-250,475,550,90,366,345,438,366,0,363,410,0,Charging,NO_CHARGING,Normal,Good,USB,1,Normal,0,0,9593,0x0,0x20000,0x0,0,0,0000,0000,00000000,0,0,0,0,1064,4116,8914,990,0,
+09-09 13:50:56.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954656
+09-09 13:50:56.477  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:56.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:56.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:57.076 14750 14754 E gcblocker: gc block end, 1305503200,1868
+09-09 13:50:57.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954657
+09-09 13:50:57.476  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:57.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:57.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:57.793  1423  1905 E SemWifiLinkQualityMonitor: Too old or invalid TMI: currentTime=1788954657793 lastDateWindow=1788773470000
+09-09 13:50:57.815  3378  3378 E wpa_sslib: diag_event:11	diag_buf:[11:50:57.795237][ROAM] SCAN_START reason=9 rssi=-73 cu=81 full_scan=0 rssi_thres=-81 [vdev_id=0 fw_time=4002932]
+09-09 13:50:57.816  3378  3378 E wpa_sslib: diag_event:12	diag_buf:[11:50:57.795392][ROAM] SCAN_DONE btcoex=0 ap_count=0 freq[5]=2412 2437 2462 5180 5500 [vdev_id=0 fw_time=4002932]
+09-09 13:50:57.816  3378  3378 E wpa_sslib: diag_event:13	diag_buf:[11:50:57.795506][ROAM] SCORE_CUR_AP bssid=f8:d0:0e:cb:c5:d8 freq=2437 rssi=-73 cu=33 score=55.03 [vdev_id=0 fw_time=4002932]
+09-09 13:50:57.816  3378  3378 E wpa_sslib: diag_event:15	diag_buf:[11:50:57.795510][ROAM] RESULT NO_ROAM bssid=f8:d0:0e:cb:c5:d8 [vdev_id=0 fw_time=4003217]
+09-09 13:50:58.477  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954658
+09-09 13:50:58.478  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:58.478  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:58.478  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:50:59.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954659
+09-09 13:50:59.478  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:50:59.478  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:50:59.478  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:00.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954660
+09-09 13:51:00.477  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:00.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:00.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:00.543  1019  1019 E Sensors : inject_scontext_data: New ssp_data_injection_fd(45)
+09-09 13:51:00.552  1423  4589 E SemContext.CaeProvider: setAttribute() : attribute is null!
+09-09 13:51:00.557  1423  4589 E SensorService: BigData:Pakage) 5 already enabled. 
+09-09 13:51:00.631  1423  4589 E SensorService: BigData:Pakage) 5 already disabled. 
+09-09 13:51:00.858  1019  1019 E Sensors : inject_scontext_data: New ssp_data_injection_fd(45)
+09-09 13:51:00.865  1423  1905 E SemWifiLinkQualityMonitor: Too old or invalid TMI: currentTime=1788954660865 lastDateWindow=1788773470000
+09-09 13:51:01.070  1423  1565 E Watchdog: !@Sync: 43473 heap(MB): 235 / 256 FD: 1538 [2026-09-09 13:51:01.070]
+09-09 13:51:01.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954661
+09-09 13:51:01.477  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:01.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:01.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:02.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954662
+09-09 13:51:02.476  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:02.476  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:02.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:03.417  1008 30461 E audio_hw_playback: mmap_out-out_set_volume: Don't support volume control for this stream
+09-09 13:51:03.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954663
+09-09 13:51:03.476  1008 27928 E audio_hw_proxy2: proxy-proxy_get_mmap_position: get_hw_ptr error pcm_sync_ptr failed: File descriptor in bad state 
+09-09 13:51:03.476  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:03.476  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:03.476  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:03.535  1008 30461 E audio_hw_playback: mmap_out-out_set_volume: Don't support volume control for this stream
+09-09 13:51:03.572  1423  4782 E AppOps  : attributionTag  not declared in manifest of org.beartify.player
+09-09 13:51:03.574  1423  4782 E AppOps  : attributionTag  not declared in manifest of org.beartify.player
+09-09 13:51:03.630  1008 27928 E audio_hw_playback: mmap_out-out_set_volume: Don't support volume control for this stream
+09-09 13:51:03.630  1008 30461 E audio_hw_proxy2: proxy-proxy_get_mmap_position: get_hw_ptr error invalid time stamp: Invalid argument 
+09-09 13:51:03.630  1008 30461 E audio_hw_proxy2: proxy-proxy_get_mmap_position: get_hw_ptr error invalid time stamp: Invalid argument 
+09-09 13:51:03.631  1008 30461 E audio_hw_proxy2: proxy-proxy_get_mmap_position: get_hw_ptr error invalid time stamp: Invalid argument 
+09-09 13:51:03.631  1008 30461 E audio_hw_proxy2: proxy-proxy_get_mmap_position: get_hw_ptr error invalid time stamp: Invalid argument 
+09-09 13:51:03.631  1008 30461 E audio_hw_proxy2: proxy-proxy_get_mmap_position: get_hw_ptr error invalid time stamp: Invalid argument 
+09-09 13:51:03.631  1008 30461 E audio_hw_proxy2: proxy-proxy_get_mmap_position: get_hw_ptr error invalid time stamp: Invalid argument 
+09-09 13:51:03.631  1008 30461 E audio_hw_proxy2: proxy-proxy_get_mmap_position: get_hw_ptr error invalid time stamp: Invalid argument 
+09-09 13:51:03.631  1008 30461 E audio_hw_proxy2: proxy-proxy_get_mmap_position: get_hw_ptr error invalid time stamp: Invalid argument 
+09-09 13:51:03.887  1423  1905 E SemWifiLinkQualityMonitor: Too old or invalid TMI: currentTime=1788954663887 lastDateWindow=1788773470000
+09-09 13:51:03.949 15792 15809 E ashmem  : Pinning is deprecated since Android Q. Please use trim or other methods.
+09-09 13:51:04.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954664
+09-09 13:51:04.477  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:04.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:04.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:04.868  3278  3278 E pageboostd: Received HALT command code 2
+09-09 13:51:04.923  3378  3378 E wpa_sslib: diag_event:22	diag_buf:[11:51:04.921000][DHCP] DISCOVER tx_status=TX_FAIL [vdev_id=0]
+09-09 13:51:04.925  3378  3378 E wpa_sslib: diag_event:24	diag_buf:[11:51:04.924000][DHCP] REQUEST tx_status=TX_FAIL [vdev_id=0]
+09-09 13:51:04.969  3278  3278 E pageboostd: Received HALT command code 2
+09-09 13:51:05.047  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - Task=13668#435849
+09-09 13:51:05.047  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - DimTransitionLayer for Surface(name=Task=13668)/@0xa98a417#435855
+09-09 13:51:05.047  1133  1133 E SurfaceFlinger: alpha changed 0.000 -> 1.000 - Task=13668#435849
+09-09 13:51:05.047  1133  1133 E SurfaceFlinger: alpha changed 0.000 -> 0.000 - DimTransitionLayer for Surface(name=Task=13668)/@0xa98a417#435855
+09-09 13:51:05.053  1133  3051 E NativeCustomFrequencyManager: [NativeCFMS] BpCustomFrequencyManager::acquire()
+09-09 13:51:05.063  1133  1133 E SurfaceFlinger: alpha changed 0.000 -> 0.011 - DimTransitionLayer for Surface(name=Task=13668)/@0xa98a417#435855
+09-09 13:51:05.279  3278  3278 E pageboostd: Received HALT command code 2
+09-09 13:51:05.399 15884 15884 E libc    : SetHeapTaggingLevel: re-enabling tagging after it was disabled is not supported
+09-09 13:51:05.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954665
+09-09 13:51:05.476  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:05.476  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:05.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:05.500  1019  1704 E Sensors : Sensor : Meta event
+09-09 13:51:05.607  1423  3771 E WindowManager: win=Window{2101352 u0 org.beartify.player/org.beartify.player.MainActivity} destroySurfaces: appStopped=true cleanupOnResume=false win.mWindowRemovalAllowed=false win.mRemoveOnExit=false win.mViewVisibility=8 caller=com.android.server.wm.ActivityRecord.destroySurfaces:25 com.android.server.wm.ActivityRecord.activityStopped:192 com.android.server.wm.ActivityClientController.activityStopped:97 android.app.IActivityClientController$Stub.onTransact:740 com.android.server.wm.ActivityClientController.onTransact:1 android.os.Binder.execTransactInternal:1462 android.os.Binder.execTransact:1401 
+09-09 13:51:05.719  5602  5628 E AtomicFile: Failed to sync file output stream
+09-09 13:51:05.945  5602  5602 E cr_CompositorSurfaceMgr: surfaceDestroyed format : 0
+09-09 13:51:05.996  1019  1019 E Sensors : inject_scontext_data: New ssp_data_injection_fd(45)
+09-09 13:51:06.011  1423  1423 E PocketModeEvent: PocketModeSetting is off 
+09-09 13:51:06.024  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - Surface(name=eb54256 InputMethod)/@0xc8807c4 - animation-leash of insets_animation#435870
+09-09 13:51:06.147  1015  1107 E BatteryDump: !@new_battery_dump : 3989,-1649,475,550,90,372,345,429,372,0,375,438,0,Charging,NO_CHARGING,Normal,Good,USB,1,Normal,0,0,9593,0x0,0x20000,0x0,0,0,0000,0000,00000000,0,0,0,0,1064,4116,8910,990,0,
+09-09 13:51:06.169 15897 15897 E ashmem  : Pinning is deprecated since Android Q. Please use trim or other methods.
+09-09 13:51:06.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954666
+09-09 13:51:06.476  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:06.476  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:06.476  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:06.608  1423  2128 E PackageManager: replace res.nonLocalizedLabel(null) to newName(Messages) and activity.getPackageName() () UId(1000)
+09-09 13:51:06.757 16038 16049 E ashmem  : Pinning is deprecated since Android Q. Please use trim or other methods.
+09-09 13:51:06.917  1423  1905 E SemWifiLinkQualityMonitor: Too old or invalid TMI: currentTime=1788954666917 lastDateWindow=1788773470000
+09-09 13:51:07.086 16069 16069 E libc    : SetHeapTaggingLevel: re-enabling tagging after it was disabled is not supported
+09-09 13:51:07.322  1019  1019 E Sensors : inject_scontext_data: New ssp_data_injection_fd(45)
+09-09 13:51:07.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954667
+09-09 13:51:07.477  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:07.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:07.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:07.488  1423  2127 E AppOps  : Operation not started: uid=10438 pkg=org.zwanoo.android.speedtest(null) op=MONITOR_LOCATION
+09-09 13:51:07.494  3160  3241 E RequestManager_FLP: [LocationManager] Location remove FA4BCBE4 from org.zwanoo.android.speedtest
+09-09 13:51:07.589  5602  5628 E AtomicFile: Failed to sync file output stream
+09-09 13:51:07.975  1423  4623 E TaskPersister: File error accessing recents directory (directory doesn't exist?).
+09-09 13:51:07.976  1423  4623 E TaskPersister: File error accessing recents directory (directory doesn't exist?).
+09-09 13:51:08.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954668
+09-09 13:51:08.476  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:08.476  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:08.476  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:09.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954669
+09-09 13:51:09.477  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:09.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:09.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:09.557  5602  5628 E AtomicFile: Failed to sync file output stream
+09-09 13:51:09.947  1423  1905 E SemWifiLinkQualityMonitor: Too old or invalid TMI: currentTime=1788954669947 lastDateWindow=1788773470000
+09-09 13:51:10.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954670
+09-09 13:51:10.477  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:10.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:10.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:10.657  1423  4589 E AppOps  : attributionTag  not declared in manifest of org.beartify.player
+09-09 13:51:10.658  1423  2127 E AppOps  : attributionTag  not declared in manifest of org.beartify.player
+09-09 13:51:10.985 16121 16121 E libc    : SetHeapTaggingLevel: re-enabling tagging after it was disabled is not supported
+09-09 13:51:11.212  3278  3278 E pageboostd: Received HALT command code 2
+09-09 13:51:11.216  3278  3278 E pageboostd: Received HALT command code 2
+09-09 13:51:11.294 16146 16146 E libc    : SetHeapTaggingLevel: re-enabling tagging after it was disabled is not supported
+09-09 13:51:11.408  1423  2127 E AppOps  : attributionTag  not declared in manifest of org.beartify.player
+09-09 13:51:11.409  1423  2127 E AppOps  : attributionTag  not declared in manifest of org.beartify.player
+09-09 13:51:11.439  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - Task=13666#435814
+09-09 13:51:11.439  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - DimTransitionLayer for Surface(name=Task=13666)/@0xa1e0a48#435881
+09-09 13:51:11.439  1133  1133 E SurfaceFlinger: alpha changed 0.000 -> 1.000 - Task=13666#435814
+09-09 13:51:11.439  1133  1133 E SurfaceFlinger: alpha changed 0.000 -> 0.000 - DimTransitionLayer for Surface(name=Task=13666)/@0xa1e0a48#435881
+09-09 13:51:11.446  1133  3051 E NativeCustomFrequencyManager: [NativeCFMS] BpCustomFrequencyManager::acquire()
+09-09 13:51:11.458  1133  1133 E SurfaceFlinger: alpha changed 0.000 -> 0.010 - DimTransitionLayer for Surface(name=Task=13666)/@0xa1e0a48#435881
+09-09 13:51:11.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954671
+09-09 13:51:11.476  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:11.476  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:11.476  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:11.700  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - Surface(name=eb54256 InputMethod)/@0xc8807c4 - animation-leash of insets_animation#435883
+09-09 13:51:11.749  5026  5026 E HBD     : f metaData is null. 
+09-09 13:51:11.911  5602  5602 E cr_CompositorSurfaceMgr: surfaceDestroyed format : -3
+09-09 13:51:12.057  5602  5602 E AtomicFile: Failed to sync file output stream
+09-09 13:51:12.125  1423  4588 E WindowManager: win=Window{89fcd46 u0 com.android.chrome/org.chromium.chrome.browser.ChromeTabbedActivity} destroySurfaces: appStopped=true cleanupOnResume=false win.mWindowRemovalAllowed=false win.mRemoveOnExit=false win.mViewVisibility=8 caller=com.android.server.wm.ActivityRecord.destroySurfaces:25 com.android.server.wm.ActivityRecord.activityStopped:192 com.android.server.wm.ActivityClientController.activityStopped:97 android.app.IActivityClientController$Stub.onTransact:740 com.android.server.wm.ActivityClientController.onTransact:1 android.os.Binder.execTransactInternal:1462 android.os.Binder.execTransact:1401 
+09-09 13:51:12.169  5602  5629 E AtomicFile: Failed to sync file output stream
+09-09 13:51:12.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954672
+09-09 13:51:12.476  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:12.476  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:12.476  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:12.971  1423  1905 E SemWifiLinkQualityMonitor: Too old or invalid TMI: currentTime=1788954672971 lastDateWindow=1788773470000
+09-09 13:51:13.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954673
+09-09 13:51:13.476  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:13.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:13.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:14.213  1423  4623 E TaskPersister: File error accessing recents directory (directory doesn't exist?).
+09-09 13:51:14.213  1423  4623 E TaskPersister: File error accessing recents directory (directory doesn't exist?).
+09-09 13:51:14.364  3278  3278 E pageboostd: Received HALT command code 2
+09-09 13:51:14.439  3278  3278 E pageboostd: Received HALT command code 2
+09-09 13:51:14.453  3278  3278 E pageboostd: Received HALT command code 2
+09-09 13:51:14.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954674
+09-09 13:51:14.476  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:14.476  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:14.476  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:14.531  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - Task=13668#435849
+09-09 13:51:14.531  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - DimTransitionLayer for Surface(name=Task=13668)/@0xc21579f#435889
+09-09 13:51:14.539  1133  1133 E SurfaceFlinger: alpha changed 0.000 -> 1.000 - Task=13668#435849
+09-09 13:51:14.551 16241 16241 E libc    : SetHeapTaggingLevel: re-enabling tagging after it was disabled is not supported
+09-09 13:51:14.558  1133  3051 E NativeCustomFrequencyManager: [NativeCFMS] BpCustomFrequencyManager::acquire()
+09-09 13:51:14.560  1133  1133 E SurfaceFlinger: alpha changed 0.000 -> 0.010 - DimTransitionLayer for Surface(name=Task=13668)/@0xc21579f#435889
+09-09 13:51:14.702  3278  3278 E pageboostd: Received HALT command code 2
+09-09 13:51:14.742  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - Surface(name=eb54256 InputMethod)/@0xc8807c4 - animation-leash of insets_animation#435905
+09-09 13:51:15.070  1423  2127 E WindowManager: win=Window{2101352 u0 org.beartify.player/org.beartify.player.MainActivity} destroySurfaces: appStopped=true cleanupOnResume=false win.mWindowRemovalAllowed=false win.mRemoveOnExit=false win.mViewVisibility=8 caller=com.android.server.wm.ActivityRecord.destroySurfaces:25 com.android.server.wm.ActivityRecord.activityStopped:192 com.android.server.wm.ActivityClientController.activityStopped:97 android.app.IActivityClientController$Stub.onTransact:740 com.android.server.wm.ActivityClientController.onTransact:1 android.os.Binder.execTransactInternal:1462 android.os.Binder.execTransact:1401 
+09-09 13:51:15.129 16301 16301 E libc    : SetHeapTaggingLevel: re-enabling tagging after it was disabled is not supported
+09-09 13:51:15.393  1133  1383 E HWComposer: getLuts: getLuts failed for display 4633128672291735999: UNSUPPORTED (8)
+09-09 13:51:15.433  5602  5628 E AtomicFile: Failed to sync file output stream
+09-09 13:51:15.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954675
+09-09 13:51:15.476  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:15.476  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:15.476  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:15.980  1423  1905 E SemWifiLinkQualityMonitor: Too old or invalid TMI: currentTime=1788954675980 lastDateWindow=1788773470000
+09-09 13:51:16.240  1423  1423 E PocketModeEvent: PocketModeSetting is off 
+09-09 13:51:16.358  1015  1107 E BatteryDump: !@new_battery_dump : 4053,-191,475,550,89,375,346,453,375,0,385,447,0,Charging,NO_CHARGING,Normal,Good,USB,1,Normal,0,0,9593,0x0,0x20000,0x0,0,0,0000,0000,00000000,0,0,0,0,1064,4115,8903,990,0,
+09-09 13:51:16.370 15366 15366 E Beartify: WATCHDOG déclenché (occurrence #1) — aucun signal JS reçu sous 8000ms, clearApplicationUserData()
+09-09 13:51:16.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954676
+09-09 13:51:16.476  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:16.476  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:16.476  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:16.629  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - Surface(name=683ce0f Toast)/@0x975e888 - animation-leash of window_animation#435909
+09-09 13:51:16.629  1133  1133 E SurfaceFlinger: alpha changed 0.000 -> 0.000 - Surface(name=683ce0f Toast)/@0x975e888 - animation-leash of window_animation#435909
+09-09 13:51:16.637  1133  1133 E SurfaceFlinger: alpha changed 0.000 -> 0.032 - Surface(name=683ce0f Toast)/@0x975e888 - animation-leash of window_animation#435909
+09-09 13:51:16.909  5602  5628 E AtomicFile: Failed to sync file output stream
+09-09 13:51:17.447  1423  4623 E TaskPersister: File error accessing recents directory (directory doesn't exist?).
+09-09 13:51:17.447  1423  4623 E TaskPersister: File error accessing recents directory (directory doesn't exist?).
+09-09 13:51:17.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954677
+09-09 13:51:17.476  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:17.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:17.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:17.662  1423  4591 E AppOps  : attributionTag  not declared in manifest of org.beartify.player
+09-09 13:51:17.663  1423  4591 E AppOps  : Operation not started: uid=11197 pkg=org.beartify.player(null) op=CONTROL_AUDIO_PARTIAL
+09-09 13:51:17.663  1423  2645 E AppOps  : attributionTag  not declared in manifest of org.beartify.player
+09-09 13:51:17.663  1423  2645 E AppOps  : Operation not started: uid=11197 pkg=org.beartify.player(null) op=CONTROL_AUDIO
+09-09 13:51:17.704  1423  4623 E TaskPersister: File error accessing recents directory (directory doesn't exist?).
+09-09 13:51:17.704  1423  4623 E TaskPersister: File error accessing recents directory (directory doesn't exist?).
+09-09 13:51:17.705  1423  1616 E AppOps  : package pm not found, can't check for attributionTag null
+09-09 13:51:17.705  1423  1616 E AppOps  : Bad call made by uid 1000. Package "pm" does not belong to uid 1000.
+09-09 13:51:17.706  1423  1616 E AppOps  : Cannot noteOperation: non-application UID 1000
+09-09 13:51:17.742  1423  4585 E PackageManager: replace res.nonLocalizedLabel(null) to newName(Messages) and activity.getPackageName() () UId(1000)
+09-09 13:51:17.769  1423  4589 E PackageManager: replace res.nonLocalizedLabel(null) to newName(Messages) and activity.getPackageName() () UId(1000)
+09-09 13:51:17.881  1008  6218 E audio_hw_playback: mmap_out-out_set_volume: Don't support volume control for this stream
+09-09 13:51:17.900   760   782 E keystore2: system/security/keystore2/src/keystore2_main.rs:74 - !@ [SQLITE3] 30: open db: flags=33554438, /data/misc/keystore/vpnprofilestore.sqlite
+09-09 13:51:17.905   760   782 E keystore2: system/security/keystore2/src/keystore2_main.rs:74 - !@ [SQLITE3] 30: close db /data/misc/keystore/vpnprofilestore.sqlite.
+09-09 13:51:17.948 29875 15018 E LoadedApk: Exception : java.lang.NullPointerException: Attempt to invoke virtual method 'boolean android.os.Looper.isPerfLogEnable()' on a null object reference
+09-09 13:51:18.173  2050  9238 E AbsSettings: refreshInner: refreshedSettingsDBItem key all_profiles_enabled_widget_id_list val = [10,22,24]
+09-09 13:51:18.257 16374 16416 E ashmem  : Pinning is deprecated since Android Q. Please use trim or other methods.
+09-09 13:51:18.269  1423  4591 E PackageManager: replace res.nonLocalizedLabel(null) to newName(Messages) and activity.getPackageName() () UId(1000)
+09-09 13:51:18.299  1423  2645 E PackageManager: replace res.nonLocalizedLabel(null) to newName(Messages) and activity.getPackageName() () UId(1000)
+09-09 13:51:18.371 16388 16388 E AODSettingsHelper: HashMap CollisionException!! Please don't add same setting uri!!! NewKey:remove_animations, OriKey:remove_animations
+09-09 13:51:18.423 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.423 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.424 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.424 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.424 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.424 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.424 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.424 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.424 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.424 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.424 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.424 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.424 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.424 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.424 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.424 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.424 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.425 16388 16388 E getBitmap : FileNotFoundException: /data/user/0/com.samsung.android.app.aodservice/files/sub_home_wallpaper_bitmap: open failed: ENOENT (No such file or directory)
+09-09 13:51:18.425 16388 16388 E getBitmap : FileNotFoundException: /data/user/0/com.samsung.android.app.aodservice/files/sub_home_theme_wallpaper_bitmap: open failed: ENOENT (No such file or directory)
+09-09 13:51:18.425 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.425 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.425 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.425 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.425 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.425 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.425 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.425 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.426 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.426 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.426 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.426 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.426 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.426 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.426 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.427 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.427 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.427 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.427 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.427 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.427 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.427 16388 16388 E getBitmap : FileNotFoundException: /data/user/0/com.samsung.android.app.aodservice/files/sub_home_wallpaper_bitmap: open failed: ENOENT (No such file or directory)
+09-09 13:51:18.427 16388 16388 E getBitmap : FileNotFoundException: /data/user/0/com.samsung.android.app.aodservice/files/sub_home_theme_wallpaper_bitmap: open failed: ENOENT (No such file or directory)
+09-09 13:51:18.427 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.427 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.428 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.428 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.428 16388 16388 E DBManager: query: mDBAdapter is null. please init first.
+09-09 13:51:18.450 16388 16388 E ashmem  : Pinning is deprecated since Android Q. Please use trim or other methods.
+09-09 13:51:18.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954678
+09-09 13:51:18.476  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:18.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:18.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:18.519 16388 16388 E ActivityThread: Failed to find provider info for com.nhn.android.search.nowbarsettingprovider
+09-09 13:51:18.639 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key SELECTED_PALETTE_INDEX val = 1
+09-09 13:51:18.640 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key SELECTED_CUSTOM_COLOR val = -10736128
+09-09 13:51:18.647 16440 16440 E libc    : SetHeapTaggingLevel: re-enabling tagging after it was disabled is not supported
+09-09 13:51:18.650 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key lock_theme_clock_package val = 
+09-09 13:51:18.650 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key lock_theme_clock_trial_package val = null
+09-09 13:51:18.654 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key lock_theme_clock_restore_pending_package val = 
+09-09 13:51:18.659 16349 16425 E FirebaseCrashlytics: Settings request failed.
+09-09 13:51:18.663 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key CLOCK_VERSION val = 17
+09-09 13:51:18.665 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key PALETTE_VERSION val = 400000
+09-09 13:51:18.666 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key lock_clock_scale_rate val = 1.0901823
+09-09 13:51:18.666 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key lock_clock_font_type val = 503
+09-09 13:51:18.666 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key lock_clock_font_path val = 
+09-09 13:51:18.666 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key lock_clock_font_weight val = 700
+09-09 13:51:18.667 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key lock_clock_font_variation_settings val = 'wght' 700, 'RNDN' 20
+09-09 13:51:18.667 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key lock_clock_visibility val = 0
+09-09 13:51:18.669 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key profile_id val = 0
+09-09 13:51:18.671 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key clock_gravity val = 1
+09-09 13:51:18.672 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key clock_bottom_margin_ratio val = 0.119352
+09-09 13:51:18.672 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key clock_horizontal_margin_ratio val = -5.353319E-4
+09-09 13:51:18.672 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key clock_position_based_on_movable_area val = 1
+09-09 13:51:18.672 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key clock_movable_area_ratio_rect val = {"bottom":710,"left":73,"right":1007,"top":266}
+09-09 13:51:18.674 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key clock_show_weather_info val = 0
+09-09 13:51:18.674 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key lock_clock_show_date_info_first val = 0
+09-09 13:51:18.674 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key lock_world_clock_city_list val = 
+09-09 13:51:18.674 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key lock_clock_color_data val = {"adaptiveColor":-461842,"fontColorType":0,"isAdaptiveColor":true,"isThemeWallpaper":false,"shadowStyle":{"shadowColor":0,"shadowDx":0.0,"shadowDy":0.0,"shadowRadius":0.0}}
+09-09 13:51:18.674 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key lock_shortcut_color_data val = {"fontColorType":0}
+09-09 13:51:18.675 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key lock_widget_color_data val = {"backgroundColor":-6582392}
+09-09 13:51:18.675 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key SELECTED_CLOCK_TYPE val = 2
+09-09 13:51:18.694 16349 16436 E ashmem  : Pinning is deprecated since Android Q. Please use trim or other methods.
+09-09 13:51:18.703 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key SELECTED_THEME_CLOCK_TYPE val = 0
+09-09 13:51:18.703 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key CLOCK_VERSION val = 300000
+09-09 13:51:18.705 16388 16388 E AbsSettings: refreshInner: refreshedSettingsDBItem key PALETTE_VERSION val = 90000
+09-09 13:51:18.848  2050  2050 E AbsSettings: refreshInner: refreshedSettingsDBItem key profile_id val = 0
+09-09 13:51:18.850  2050  2050 E AbsSettings: refreshInner: refreshedSettingsDBItem key lock_theme_clock_package val = 
+09-09 13:51:18.888 16349 16470 E ge.myorange.obe: No package ID 6b found for resource ID 0x6b0b0013.
+09-09 13:51:18.957  5602  5628 E AtomicFile: Failed to sync file output stream
+09-09 13:51:18.998  1423  1905 E SemWifiLinkQualityMonitor: Too old or invalid TMI: currentTime=1788954678998 lastDateWindow=1788773470000
+09-09 13:51:19.046  1423  2645 E PackageManager: replace res.nonLocalizedLabel(null) to newName(Messages) and activity.getPackageName() () UId(1000)
+09-09 13:51:19.291 16481 16506 E ashmem  : Pinning is deprecated since Android Q. Please use trim or other methods.
+09-09 13:51:19.354 16481 16515 E ge.obe:equalone: No package ID 6b found for resource ID 0x6b0b0013.
+09-09 13:51:19.408 16349 16349 E EmergencyUtils: error on mcc 244, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.409 16349 16349 E EmergencyUtils: error on mcc 213, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.409 16349 16349 E EmergencyUtils: error on mcc 232, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.409 16349 16349 E EmergencyUtils: error on mcc 284, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.409 16349 16349 E EmergencyUtils: error on mcc 219, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.410 16349 16349 E EmergencyUtils: error on mcc 280, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.410 16349 16349 E EmergencyUtils: error on mcc 230, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.410 16349 16349 E EmergencyUtils: error on mcc 238, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.410 16349 16349 E EmergencyUtils: error on mcc 248, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.410 16349 16349 E EmergencyUtils: error on mcc 288, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.411 16349 16349 E EmergencyUtils: error on mcc 244, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.411 16349 16349 E EmergencyUtils: error on mcc 262, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.411 16349 16349 E EmergencyUtils: error on mcc 266, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.411 16349 16349 E EmergencyUtils: error on mcc 202, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.412 16349 16349 E EmergencyUtils: error on mcc 290, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.412 16349 16349 E EmergencyUtils: error on mcc 234, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.413 16349 16349 E EmergencyUtils: error on mcc 216, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.413 16349 16349 E EmergencyUtils: error on mcc 272, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.414 16349 16349 E EmergencyUtils: error on mcc 234, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.414 16349 16349 E EmergencyUtils: error on mcc 222, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.414 16349 16349 E EmergencyUtils: error on mcc 234, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.414 16349 16349 E EmergencyUtils: error on mcc 247, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.414 16349 16349 E EmergencyUtils: error on mcc 246, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.414 16349 16349 E EmergencyUtils: error on mcc 278, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.415 16349 16349 E EmergencyUtils: error on mcc 212, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.415 16349 16349 E EmergencyUtils: error on mcc 204, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.415 16349 16349 E EmergencyUtils: error on mcc 242, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.415 16349 16349 E EmergencyUtils: error on mcc 268, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.415 16349 16349 E EmergencyUtils: error on mcc 293, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.416 16349 16349 E EmergencyUtils: error on mcc 240, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.416 16349 16349 E EmergencyUtils: error on mcc 228, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.416 16349 16349 E EmergencyUtils: error on mcc 234, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.416 16349 16349 E EmergencyUtils: error on mcc 235, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.416 16349 16349 E EmergencyUtils: error on mcc 225, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.417 16349 16349 E EmergencyUtils: error on mcc 208, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.417 16349 16349 E EmergencyUtils: error on mcc 340, number 15 : bad assetName icn_emergency_15
+09-09 13:51:19.417 16349 16349 E EmergencyUtils: error on mcc 340, number 15 : bad assetName icn_emergency_15
+09-09 13:51:19.417 16349 16349 E EmergencyUtils: error on mcc 340, number 15 : bad assetName icn_emergency_15
+09-09 13:51:19.418 16349 16349 E EmergencyUtils: error on mcc 647, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.418 16349 16349 E EmergencyUtils: error on mcc 647, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.418 16349 16349 E EmergencyUtils: error on mcc 547, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.418 16349 16349 E EmergencyUtils: error on mcc 546, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.418 16349 16349 E EmergencyUtils: error on mcc 308, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.418 16349 16349 E EmergencyUtils: error on mcc 214, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.419 16349 16349 E EmergencyUtils: error on mcc 231, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.419 16349 16349 E EmergencyUtils: error on mcc 260, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.419 16349 16349 E EmergencyUtils: error on mcc 226, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.419 16349 16349 E EmergencyUtils: error on mcc 270, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.419 16349 16349 E EmergencyUtils: error on mcc 206, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.420 16349 16349 E EmergencyUtils: error on mcc 259, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.420 16349 16349 E EmergencyUtils: error on mcc 652, number 997 : bad assetName icn_emergency_15
+09-09 13:51:19.420 16349 16349 E EmergencyUtils: error on mcc 610, number 80331 : bad assetName icn_emergency_police
+09-09 13:51:19.421 16349 16349 E EmergencyUtils: error on mcc 612, number 111 : bad assetName icn_emergency_police
+09-09 13:51:19.421 16349 16349 E EmergencyUtils: error on mcc 629, number 117 : bad assetName icn_emergency_police
+09-09 13:51:19.422 16349 16349 E EmergencyUtils: error on mcc 630, number 112 : bad assetName icn_emergency_police
+09-09 13:51:19.422 16349 16349 E EmergencyUtils: error on mcc 624, number 113 : bad assetName icn_emergency_police
+09-09 13:51:19.423 16349 16349 E EmergencyUtils: error on mcc 608, number 17 : bad assetName icn_emergency_police
+09-09 13:51:19.423 16349 16349 E EmergencyUtils: error on mcc 416, number 191 : bad assetName icn_emergency_police
+09-09 13:51:19.423 16349 16349 E EmergencyUtils: error on mcc 613, number 16 : bad assetName icn_emergency_police
+09-09 13:51:19.423  1423  2128 E PackageManager: replace res.nonLocalizedLabel(null) to newName(Messages) and activity.getPackageName() () UId(1000)
+09-09 13:51:19.423 16349 16349 E EmergencyUtils: error on mcc 619, number 117 : bad assetName icn_emergency_15
+09-09 13:51:19.424 16349 16349 E EmergencyUtils: error on mcc 646, number 117 : bad assetName icn_emergency_police
+09-09 13:51:19.425 16349 16349 E EmergencyUtils: error on mcc 618, number 911 : bad assetName icn_emergency_police
+09-09 13:51:19.425 16349 16349 E EmergencyUtils: error on mcc 614, number 17 : bad assetName icn_emergency_police
+09-09 13:51:19.425 16349 16349 E EmergencyUtils: error on mcc 604, number 190 : bad assetName icn_emergency_police
+09-09 13:51:19.426 16349 16349 E EmergencyUtils: error on mcc 611, number 122 : bad assetName icn_emergency_police
+09-09 13:51:19.426 16349 16349 E EmergencyUtils: error on mcc 632, number 112 : bad assetName icn_emergency_112
+09-09 13:51:19.426 16349 16349 E EmergencyUtils: error on mcc 623, number 117 : bad assetName icn_emergency_police
+09-09 13:51:19.426 16349 16349 E EmergencyUtils: error on mcc 602, number 126 : bad assetName icn_emergency_police
+09-09 13:51:19.426 16349 16349 E EmergencyUtils: error on mcc 605, number 197 : bad assetName icn_emergency_police
+09-09 13:51:19.427 16349 16349 E EmergencyUtils: error on mcc 617, number 112 : bad assetName icn_emergency_police
+09-09 13:51:19.440  1423  2128 E PackageManager: replace res.nonLocalizedLabel(null) to newName(Messages) and activity.getPackageName() () UId(1000)
+09-09 13:51:19.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954679
+09-09 13:51:19.476  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:19.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:19.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:19.603 16481 16513 E DatabaseRegistry: [KERNEL_FULL] initialize
+09-09 13:51:19.713 16533 16533 E ashmem  : Pinning is deprecated since Android Q. Please use trim or other methods.
+09-09 13:51:19.995  5602  5629 E AtomicFile: Failed to sync file output stream
+09-09 13:51:20.062 16564 16564 E libc    : SetHeapTaggingLevel: re-enabling tagging after it was disabled is not supported
+09-09 13:51:20.085 15915 15945 E chromium: [ERROR:gpu/command_buffer/service/shared_image/shared_image_manager.cc:254] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+09-09 13:51:20.086 15915 15945 E chromium: [ERROR:gpu/command_buffer/service/raster_decoder.cc:2338] [.BrowserCompositor-0x72053dbe00]GL ERROR :GL_INVALID_VALUE : glReadbackImagePixels: Unknown mailbox
+09-09 13:51:20.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954680
+09-09 13:51:20.477  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:20.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:20.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:20.503 16553 16594 E ashmem  : Pinning is deprecated since Android Q. Please use trim or other methods.
+09-09 13:51:20.718 16553 16553 E ActivityThread: Failed to find provider info for com.microsoft.yourphonecompanion.contentprovider.featureoverride
+09-09 13:51:21.060 16628 16656 E ashmem  : Pinning is deprecated since Android Q. Please use trim or other methods.
+09-09 13:51:21.369  1044  1044 E SecVibrator-HAL-AIDL-EXT: V_5_0: performPrebakedHapticPattern 14 : 4000 : 0
+09-09 13:51:21.370  1044  1044 E SecVibrator-HAL-AIDL-CORE: HW_API: [setForceFeedbackAmplitude]amplitude: 4000
+09-09 13:51:21.389  1044  1044 E SecVibrator-HAL-AIDL-CORE: HW_API: [uploadForceFeedbackeffect]ioctl success ,uploaded effect with ID: 0
+09-09 13:51:21.389  1044  1044 E SecVibrator-HAL-AIDL-CORE: HW_API: do_on for timeoutMs: 1000
+09-09 13:51:21.389  1044  1044 E SecVibrator-HAL-AIDL-CORE: HW_API: [triggerForceFeedbackVibration]on: 1
+09-09 13:51:21.463  1044  1044 E SecVibrator-HAL-AIDL-CORE: V_2_0: Vibrator off
+09-09 13:51:21.463  1044  1044 E SecVibrator-HAL-AIDL-CORE: HW_API: do_off
+09-09 13:51:21.463  1044  1044 E SecVibrator-HAL-AIDL-CORE: HW_API: [triggerForceFeedbackVibration]on: 0
+09-09 13:51:21.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954681
+09-09 13:51:21.476  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:21.476  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:21.476  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:21.685  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - Surface(name=TransientLaunchOverlayToken{addb3fa token=android.os.BinderProxy@5d02625})/@0x807c6cc_transition-leash#435915
+09-09 13:51:21.685  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - Surface(name=Task=7530)/@0x7a9fd15_transition-leash#435916
+09-09 13:51:21.692  1133  3051 E NativeCustomFrequencyManager: [NativeCFMS] BpCustomFrequencyManager::acquire()
+09-09 13:51:21.800 16662 16677 E ashmem  : Pinning is deprecated since Android Q. Please use trim or other methods.
+09-09 13:51:21.802  1133  1133 E SurfaceFlinger: alpha changed 0.000 -> 1.000 - Surface(name=Task=7530)/@0x7a9fd15_transition-leash#435916
+09-09 13:51:21.802  1133  1133 E SurfaceFlinger: alpha changed 0.000 -> 1.000 - Surface(name=TransientLaunchOverlayToken{addb3fa token=android.os.BinderProxy@5d02625})/@0x807c6cc_transition-leash#435915
+09-09 13:51:22.041  1423  1905 E SemWifiLinkQualityMonitor: Too old or invalid TMI: currentTime=1788954682041 lastDateWindow=1788773470000
+09-09 13:51:22.079  1423  2104 E TransitionChain: Can't collect into a chain with no transition
+09-09 13:51:22.082 16662 16744 E RoutineRunningReason: fromValue: unknown reason value=null
+09-09 13:51:22.098 16662 16744 E RoutineRunningReason: fromValue: unknown reason value=null
+09-09 13:51:22.245  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - Surface(name=eb54256 InputMethod)/@0xc8807c4 - animation-leash of insets_animation#435920
+09-09 13:51:22.277  5602  5602 E cr_CompositorSurfaceMgr: surfaceDestroyed format : -3
+09-09 13:51:22.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954682
+09-09 13:51:22.476  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:22.476  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:22.476  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:22.576 16481 16766 E ge.obe:equalone: hiddenapi: Accessing hidden method Landroid/telephony/ServiceState;->getNrState()I (runtime_flags=0, domain=platform, api=blocked) from Lcom/v3d/android/library/core/reflection/ReflectionHelper; (domain=app, TargetSdkVersion=35) using reflection: denied
+09-09 13:51:22.581 16715 16779 E ashmem  : Pinning is deprecated since Android Q. Please use trim or other methods.
+09-09 13:51:22.642  1423  4737 E WindowManager: win=Window{89fcd46 u0 com.android.chrome/org.chromium.chrome.browser.ChromeTabbedActivity} destroySurfaces: appStopped=true cleanupOnResume=false win.mWindowRemovalAllowed=false win.mRemoveOnExit=false win.mViewVisibility=4 caller=com.android.server.wm.ActivityRecord.destroySurfaces:25 com.android.server.wm.ActivityRecord.activityStopped:192 com.android.server.wm.ActivityClientController.activityStopped:97 android.app.IActivityClientController$Stub.onTransact:740 com.android.server.wm.ActivityClientController.onTransact:1 android.os.Binder.execTransactInternal:1462 android.os.Binder.execTransact:1401 
+09-09 13:51:22.680 16662 16746 E Routine@Core[4.9.07.7]: WearNodeManagerImpl: getNodeOfCompanionWatchSupportModeMirror: onFailure - com.google.android.gms.common.api.ApiException: 17: API: Wearable.API is not available on this device. Connection failed with: ConnectionResult{statusCode=API_UNAVAILABLE, resolution=null, message=null}
+09-09 13:51:22.680 16662 16746 E Routine@Core[4.9.07.7]: WearNodeManagerImpl: getNodeOfCompanionWatchSupportModeMirror return null
+09-09 13:51:22.851 16783 16798 E ashmem  : Pinning is deprecated since Android Q. Please use trim or other methods.
+09-09 13:51:23.020 16783 16783 E BCL@CoreSvc: (EmClassHelper) Failed to instantiate EmActionHandler : java.lang.ClassNotFoundException: com.samsung.android.bixby.agent2.cphandler.EmActionHandler
+09-09 13:51:23.021 16783 16783 E BCL@Vendor: (SecConfigurationService) Null SemDesktopModeManager
+09-09 13:51:23.032  2050  3392 E AbsSettings: refreshInner: refreshedSettingsDBItem key all_profiles_enabled_widget_id_list val = [10,22,24]
+09-09 13:51:23.039 16783 16783 E BCL@CoreSvc: (EmClassHelper) Failed to get ActorNormalAccessibilityService class
+09-09 13:51:23.046   986 12287 E engmode_world: Unknown token(00/00/00)
+09-09 13:51:23.047   763   763 E engmode_hidl_service: error to server(0xd0060012)
+09-09 13:51:23.097  2050  2050 E AbsSettings: refreshInner: refreshedSettingsDBItem key profile_id val = 0
+09-09 13:51:23.097  2050  2050 E AbsSettings: refreshInner: refreshedSettingsDBItem key lock_theme_clock_package val = 
+09-09 13:51:23.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954683
+09-09 13:51:23.477  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:23.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:23.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:23.505 16837 16864 E ashmem  : Pinning is deprecated since Android Q. Please use trim or other methods.
+09-09 13:51:23.581 16863 16880 E ashmem  : Pinning is deprecated since Android Q. Please use trim or other methods.
+09-09 13:51:23.710 16893 16893 E ashmem  : Pinning is deprecated since Android Q. Please use trim or other methods.
+09-09 13:51:24.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954684
+09-09 13:51:24.477  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:24.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:24.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:24.547 16973 16986 E ashmem  : Pinning is deprecated since Android Q. Please use trim or other methods.
+09-09 13:51:24.996  2050  2181 E FrameTracker: force finish cuj, time out: J<SPLASHSCREEN_EXIT_ANIM>
+09-09 13:51:25.068  1423  1905 E SemWifiLinkQualityMonitor: Too old or invalid TMI: currentTime=1788954685068 lastDateWindow=1788773470000
+09-09 13:51:25.476  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954685
+09-09 13:51:25.476  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:25.477  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:25.477  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:26.408  1423  1423 E PocketModeEvent: PocketModeSetting is off 
+09-09 13:51:26.447  3278  3278 E pageboostd: Received HALT command code 2
+09-09 13:51:26.477  1109  1130 E HeatmapThread: ECT Thread time in milliseconds: 1788954686
+09-09 13:51:26.478  1109  1130 E HeatmapThread: !@Could not open '/efs/FactoryApp/bsoh', errno = 13
+09-09 13:51:26.478  1109  1130 E HeatmapThread: !@ CAM Could not access BSOH EFS
+09-09 13:51:26.478  1109  1130 E HeatmapThread: !@ CAM New BSOH: 0
+09-09 13:51:26.497  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - GoogleDiscoverWindow$_4054#435924
+09-09 13:51:26.497  1133  1133 E SurfaceFlinger: alpha changed 0.000 -> 0.000 - GoogleDiscoverWindow$_4054#435924
+09-09 13:51:26.497  1133  1133 E SurfaceFlinger: alpha changed 0.000 -> 0.000 - GoogleDiscoverWindow$_4054#435924
+09-09 13:51:26.497  1133  1133 E SurfaceFlinger: alpha changed 0.000 -> 0.000 - GoogleDiscoverWindow$_4054#435924
+09-09 13:51:26.510  1423  4590 E PackageManager: replace res.nonLocalizedLabel(null) to newName(Messages) and activity.getPackageName() () UId(1000)
+09-09 13:51:26.547  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - Surface(name=Task=1)/@0xde46867_transition-leash#435926
+09-09 13:51:26.547  1133  1133 E SurfaceFlinger: alpha changed 0.000 -> 0.000 - Surface(name=Task=1)/@0xde46867_transition-leash#435926
+09-09 13:51:26.547  1133  1133 E SurfaceFlinger: alpha changed 0.000 -> 0.000 - Surface(name=Task=1)/@0xde46867_transition-leash#435926
+09-09 13:51:26.557  1015  1107 E BatteryDump: !@new_battery_dump : 4135,310,475,550,89,379,344,450,379,0,392,459,0,Charging,NO_CHARGING,Normal,Good,USB,1,Normal,0,0,9593,0x0,0x20000,0x0,0,0,0000,0000,00000000,0,0,0,0,1064,4115,8898,990,0,
+09-09 13:51:26.564  1133  1133 E SurfaceFlinger: alpha changed 0.000 -> 0.003 - Surface(name=Task=1)/@0xde46867_transition-leash#435926
+09-09 13:51:26.570  4054  4054 E NetworkErrorMessage: (REDACTED) Invalid connectivity state: %s
+09-09 13:51:26.606  1133  1133 E SurfaceFlinger: alpha changed 1.000 -> 0.000 - Surface(name=eb54256 InputMethod)/@0xc8807c4 - animation-leash of insets_animation#435928
