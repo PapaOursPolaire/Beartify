@@ -344,7 +344,7 @@ beartify.duckdns.org {
 		reverse_proxy 127.0.0.1:8096 {
 			flush_interval -1
 
-			header_up X-Emby-Token "92e090fcf61646d391ddc92387a44a1d"
+			header_up Authorization "MediaBrowser Token=\"92e090fcf61646d391ddc92387a44a1d\""
 			header_up Host grizzly-stream.duckdns.org
 			header_up X-Real-IP {remote_host}
 			header_up X-Forwarded-For {remote_host}
@@ -549,7 +549,7 @@ http://192.168.0.18 {
 		reverse_proxy 127.0.0.1:8096 {
 			flush_interval -1
 
-			header_up X-Emby-Token "92e090fcf61646d391ddc92387a44a1d"
+			header_up Authorization "MediaBrowser Token=\"92e090fcf61646d391ddc92387a44a1d\""
 			header_up Host grizzly-stream.duckdns.org
 			header_up X-Real-IP {remote_host}
 			header_up X-Forwarded-For {remote_host}
@@ -723,7 +723,7 @@ http://192.168.0.2 {
 		reverse_proxy 127.0.0.1:8096 {
 			flush_interval -1
 
-			header_up X-Emby-Token "92e090fcf61646d391ddc92387a44a1d"
+			header_up Authorization "MediaBrowser Token=\"92e090fcf61646d391ddc92387a44a1d\""
 			header_up Host grizzly-stream.duckdns.org
 			header_up X-Real-IP {remote_host}
 			header_up X-Forwarded-For {remote_host}
