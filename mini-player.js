@@ -119,30 +119,50 @@
     };
   }
 
-  // Lit la ligne active + prev/next directement dans #lyricsDisplay (document
-  // principal), avec les vraies classes générées par spicy-lyrics-engine.js
-  // (préfixe "sl2-"). Utilisée à la fois par la sync Tauri périodique et par
-  // la réponse à 'getState'. Ne dépend d'aucune variable globale du moteur
-  // (ex. un éventuel "window.spicy" non défini) — uniquement du DOM rendu.
-  function _readActiveLyricTriplet() {
+  // ── Sync paroles Tauri : miroir DOM réel par IPC ──────────────────
+  // On ne peut pas cloner un nœud DOM entre deux fenêtres/process Tauri
+  // séparés (contrairement au PiP web, même document/contexte). Donc on
+  // sérialise le même principe que _buildMirror() : HTML complet envoyé
+  // à chaque reconstruction structurelle (nouvelle piste…), puis de
+  // simples mises à jour d'index→className à chaque tick d'animation
+  // (Active/Sung/NotSung) — bien plus léger qu'un renvoi de HTML complet
+  // à 100ms, et surtout un rendu FIDÈLE (mêmes classes sl2-, donc mêmes
+  // styles CSS) au lieu du triplet texte prev/cur/next précédent.
+  let _tauriLyricsObs  = null;
+  let _tauriLyricsFlat = null; // Map<Element, index> — même ordre que le flatten côté HTML
+
+  function _tLyricsRebuild() {
     const ld = $('lyricsDisplay');
-    if (!ld) return { text: '', prev: '', next: '' };
-    const lines = [...ld.querySelectorAll('.sl2-line:not(.sl2-musical-line)')];
-    if (!lines.length) return { text: '', prev: '', next: '' };
-    let ai = lines.findIndex(l => l.classList.contains('sl2-Active'));
-    if (ai < 0) {
-      // Repli : dernière ligne marquée "sl2-Sung" (déjà chantée)
-      for (let i = lines.length - 1; i >= 0; i--) {
-        if (lines[i].classList.contains('sl2-Sung')) { ai = i; break; }
+    _tSend('lyricsRebuild', { html: ld ? ld.innerHTML : '' });
+    _tauriLyricsFlat = ld
+    ? new Map([ld, ...ld.querySelectorAll('*')].map((el, i) => [el, i]))
+    : null;
+  }
+
+  function _tStartLyricsSync() {
+    const ld = $('lyricsDisplay');
+    if (!ld) return;
+    _tLyricsRebuild();
+    _tauriLyricsObs = new MutationObserver(muts => {
+      let needRebuild = false;
+      const updates = [];
+      for (const m of muts) {
+        if (m.type === 'childList' && m.target === ld) { needRebuild = true; }
+        else if (!needRebuild && m.type === 'attributes' && m.attributeName === 'class') {
+          const idx = _tauriLyricsFlat?.get(m.target);
+          if (idx != null) updates.push({ index: idx, className: m.target.className });
+        }
       }
-    }
-    if (ai < 0) return { text: '', prev: '', next: '' };
-    const getText = el => el?.textContent?.trim() || '';
-    return {
-      text: getText(lines[ai]),
- prev: ai > 0 ? getText(lines[ai - 1]) : '',
- next: ai < lines.length - 1 ? getText(lines[ai + 1]) : '',
-    };
+      if (needRebuild) requestAnimationFrame(_tLyricsRebuild);
+      else if (updates.length) _tSend('lyricsClass', { updates });
+    });
+    _tauriLyricsObs.observe(ld, {
+      childList: true, subtree: true,
+      attributes: true, attributeFilter: ['class'],
+    });
+  }
+  function _tStopLyricsSync() {
+    _tauriLyricsObs?.disconnect(); _tauriLyricsObs = null; _tauriLyricsFlat = null;
   }
 
   function _tStartSync() {
@@ -163,13 +183,6 @@
       _tauriTimer = setInterval(() => {
         if (!_tauriWin) { clearInterval(_tauriTimer); return; }
         _tSend('progress', { currentTime: ap.currentTime||0, duration: ap.duration||0 });
-        // Lire les paroles directement depuis #lyricsDisplay (source de vérité —
-        // rendu par spicy-lyrics-engine.js). Les classes réelles sont préfixées
-        // "sl2-" (sl2-line, sl2-Active, sl2-Sung, sl2-musical-line) — l'ancien
-        // div "lyricsMiniContent" n'est jamais peuplé par le moteur, donc il ne
-        // fournissait jamais de paroles ici.
-        const { text: lyric, prev: prevLyric, next: nextLyric } = _readActiveLyricTriplet();
-        _tSend('lyric', { text: lyric, prev: prevLyric, next: nextLyric });
       }, 100); // 100ms = sync avec SpicyLyrics (vs 500ms trop lent)
 _tSend('state', _tState());
 _tSend('progress', { currentTime: ap.currentTime||0, duration: ap.duration||0 });
@@ -210,16 +223,9 @@ _tSend('progress', { currentTime: ap.currentTime||0, duration: ap.duration||0 })
         case 'getState': {
           _tSend('state', _tState());
           _tSend('progress', { currentTime: $('audioPlayer')?.currentTime||0, duration: $('audioPlayer')?.duration||0 });
-          // Paroles : envoyer la ligne active (prev/cur/next), lues depuis
-          // #lyricsDisplay comme _readActiveLyricTriplet() (voir plus haut) —
-          // remplace l'ancienne dépendance à un objet global "spicy" qui
-          // n'est défini nulle part dans le projet.
-          {
-            const triplet = _readActiveLyricTriplet();
-            if (triplet.text) {
-              _tSend('lyrics', triplet);
-            }
-          }
+          // Paroles : renvoyer le miroir DOM complet (HTML + classes réelles),
+          // pas juste un triplet texte — voir _tLyricsRebuild()/_tStartLyricsSync().
+          _tLyricsRebuild();
           break;
         }
         case 'repeat': $('repeatBtn')?.click(); setTimeout(()=>{ _tSend('state', _tState()); }, 80); break;
@@ -257,6 +263,7 @@ _tSend('progress', { currentTime: ap.currentTime||0, duration: ap.duration||0 })
 
     _tauriWin.once('tauri://created', () => {
       _tStartSync();
+      _tStartLyricsSync();
       setTimeout(() => {
         const s = _tState();
         _tSend('state', s);
@@ -264,12 +271,13 @@ _tSend('progress', { currentTime: ap.currentTime||0, duration: ap.duration||0 })
       }, 300);
     });
     _tauriWin.once('tauri://error', err => { console.error('[MiniPlayer] tauri://error:', err); _tauriWin = null; });
-    _tauriWin.once('tauri://destroyed', () => { _tStopSync(); if(_tauriUnlisten){_tauriUnlisten();_tauriUnlisten=null;} _tauriWin=null; });
+    _tauriWin.once('tauri://destroyed', () => { _tStopSync(); _tStopLyricsSync(); if(_tauriUnlisten){_tauriUnlisten();_tauriUnlisten=null;} _tauriWin=null; });
     _tauriWin.once('tauri://close-requested', () => { _tauriWin?.close().catch(()=>{}); });
   }
 
   async function _closeTauri() {
     _tStopSync();
+    _tStopLyricsSync();
     if (_tauriUnlisten) { try { _tauriUnlisten(); } catch(_){} _tauriUnlisten = null; }
     if (_tauriWin) { try { await _tauriWin.close(); } catch(_){} _tauriWin = null; }
   }
