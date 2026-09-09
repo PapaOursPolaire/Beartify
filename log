@@ -1,9 +1,61 @@
-Applying inline style violates the following Content Security Policy directive 'style-src 'self' 'unsafe-inline' <URL> 'nonce-9783401380022317728''. Note that 'unsafe-inline' is ignored if either a hash or nonce value is present in the source list. The action has been blocked.
-spicy-lyrics-engine.js:1996 [Lyrics] spicy-lyrics-engine.js — beta-22 chargé.
-spicy-lyrics-engine.js:2000 [Lyrics] Diagnostic : window.__spicyLyricsDebug.getState() dans la console pour l'état live.
-Warning: Don’t paste code into the DevTools Console that you don’t understand or haven’t reviewed yourself. This could allow attackers to steal your identity or take control of your computer. Type "allow pasting" below and press Enter to allow pasting.
-allow pastibg
-VM22291:1 Uncaught SyntaxError: Unexpected identifier 'pastibg' (at VM22291:1:7)
-allow pasting
-window.__spicyLyricsDebug.getState()
-{version: 'beta-22', type: 'None', lineCount: 0, processedPos: 44352.698, containerFound: true, …}containerClientHeight: 0containerFound: truecontainerScrollHeight: 0containerScrollTop: 0lastActiveLineIndex: -1lineCount: 0lines: []processedPos: 44352.698scrollDebouncePending: falsetype: "None"version: "beta-22"[[Prototype]]: Object
+[Info] Successfully preconnected to https://lrclib.net/
+[Info] Successfully preconnected to https://fonts.googleapis.com/
+[Info] Successfully preconnected to https://www.gstatic.com/
+[Info] Successfully preconnected to https://cdn.jsdelivr.net/
+[Log] [Firebase] Stub gapi installé (origine Tauri détectée via location : tauri://localhost) (localhost, line 78)
+[Log] [DevTools] – "DevTools actifs↵  F12 / Ctrl+Shift+I → Ouvrir/fermer DevTools↵  Ctrl+Shift+R       → Recharger la WebView↵  Ctrl+Shift+D       → Pannea…" (tauri-devtools.js, line 181)
+"DevTools actifs
+  F12 / Ctrl+Shift+I → Ouvrir/fermer DevTools
+  Ctrl+Shift+R       → Recharger la WebView
+  Ctrl+Shift+D       → Panneau debug Beartify
+  Ctrl+Shift+L       → Exporter les logs console
+  Ctrl+Shift+P       → Infos plateforme"
+[Log] [FirebaseSyncNative] Module chargé ✅ (Tauri: – true – ")" (tauri-devtools.js, line 181)
+[Log] [FirebasePlaylistsNative] Module chargé ✅ (tauri-devtools.js, line 181)
+[Log] [FirebaseReportsNative] Module chargé ✅ (tauri-devtools.js, line 181)
+[Log] [FirebaseSocialNative] Module chargé ✅ (tauri-devtools.js, line 181)
+[Log] [PocketBaseConfig] Client PocketBase initialisé ✅ (tauri-devtools.js, line 181)
+[Log] [PocketBaseAuthBridge] Module chargé ✅ (tauri-devtools.js, line 181)
+[Log] [PocketBaseSync → PocketBase] Module chargé ✅ (tauri-devtools.js, line 181)
+[Log] [PocketBaseParty] Module chargé ✅ (file normalisée en party_queue_entries) (tauri-devtools.js, line 181)
+[Log] [PocketBasePlaylists → PocketBase] Module chargé ✅ (échappement filtres activé, collaboration P3-3 activée, titres normalisés en playlist_tracks) (tauri-devtools.js, line 181)
+[Log] [PocketBaseReports → PocketBase] Module chargé ✅ (tauri-devtools.js, line 181)
+[Log] [PocketBaseSocial → PocketBase] Module chargé ✅ (normalisation docId + échappement filtres activés) (tauri-devtools.js, line 181)
+[Log] [PocketBaseAvatar] Module chargé ✅ (tauri-devtools.js, line 181)
+[Log] [FallbackRouter] Module chargé ✅ (tauri-devtools.js, line 181)
+[Error] SyntaxError: Parser error
+	(anonymous function) (playback-engine.js:472)
+[Log] [ShareLinkRouter] Module chargé ✅ (tauri-devtools.js, line 181)
+[Info] [Lyrics] spicy-lyrics-engine.js — beta-22 chargé. (spicy-lyrics-engine.js, line 1996)
+[Info] [Lyrics] Diagnostic : window.__spicyLyricsDebug.getState() dans la console pour l'état live. (spicy-lyrics-engine.js, line 2000)
+[Log] [FriendsPanel] Module chargé ✅ (tauri-devtools.js, line 181)
+[Log] [BeartifyI18n] Fichier i18n.js atteint et en cours d'exécution… (tauri-devtools.js, line 181)
+[Log] [BeartifyI18n] Module chargé ✅ (périmètre : navigation + titres de section des Réglages). Diagnostic disponible via window.debugI18n() dans la console. (tauri-devtools.js, line 181)
+[Log] [FallbackRouter] ✅ PocketBase disponible — mode nominal (tauri-devtools.js, line 181)
+[Log] [PocketBaseConfig] 🔄 Session rafraîchie (tauri-devtools.js, line 181)
+[Log] [FriendsPanel] ✅ Présence audio patchée (5s interval + événements immédiats) (tauri-devtools.js, line 181)
+[Log] [FriendsPanel] ✅ Panel initialisé (tauri-devtools.js, line 181)
+[Log] [MARQUEUR_INDEX_HTML_v2] listener load déclenché (tauri-devtools.js, line 181)
+[Error] Failed to load resource: the server responded with a status of 404 (Not Found) (certified, line 0)
+[Error] Failed to load resource: the server responded with a status of 404 (Not Found) (config, line 0)
+[Error] Failed to load resource: the server responded with a status of 401 (Unauthorized) (search, line 0)
+[Warning] [Marketplace] GitHub search "beartify-extensions" → HTTP 401 (tauri-devtools.js, line 181)
+[Error] Failed to load resource: the server responded with a status of 401 (Unauthorized) (search, line 0)
+[Warning] [Marketplace] GitHub search "beartify-themes" → HTTP 401 (tauri-devtools.js, line 181)
+[Log] [Beartify] 64875 titres chargés depuis le cache - actualisation en arrière-plan… (tauri-devtools.js, line 181)
+[Error] ReferenceError: Can't find variable: _fisherYates
+	renderDynamicCarousels (home-page.js:488)
+[Log] [Firebase] Persistance Auth : LOCAL (tauri-devtools.js, line 181)
+[Log] ✅ Firebase initialisé avec succès (Tauri: – true – "/ Android:" – false – ")" (tauri-devtools.js, line 181)
+[Log] ✅ Utilisateur connecté : – "papaourslinuxserver@gmail.com" (tauri-devtools.js, line 181)
+[Log] ✅ Firebase prêt (tauri-devtools.js, line 181)
+[Log] [Sync] ✅ Présence activée (interval unique, 30s) (tauri-devtools.js, line 181)
+[Log] [AuthBridge] ✅ Session PocketBase ouverte pour – "Linux Server" (tauri-devtools.js, line 181)
+[Log] [Auth] ✅ Données PocketBase chargées après login Google (tauri-devtools.js, line 181)
+[Error] ReferenceError: Can't find variable: playCurrentTrack
+	(anonymous function) (home-page.js:904)
+[Log] [Beartify] Delta sync : 2000 titre(s) mis à jour depuis 2026-09-09T12:10:46.096Z (tauri-devtools.js, line 181)
+[Error] ReferenceError: Can't find variable: _fisherYates
+	renderDynamicCarousels (home-page.js:488)
+> Selected Element
+< <div class="lib-items" id="trackList">…</div>
