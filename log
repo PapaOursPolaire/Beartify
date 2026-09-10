@@ -1,8 +1,4 @@
-[Lyrics] spicy-lyrics-engine.js — beta-22 chargé.
-spicy-lyrics-engine.js:2000 [Lyrics] Diagnostic : window.__spicyLyricsDebug.getState() dans la console pour l'état live.
-window.__spicyLyricsDebug.getState()
-{version: 'beta-22', type: 'Syllable', lineCount: 52, processedPos: 15440, containerFound: true, …}containerClientHeight: 267containerFound: truecontainerScrollHeight: 3869containerScrollTop: 443lastActiveLineIndex: 5lineCount: 52lines: (52) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]processedPos: 15440scrollDebouncePending: falsetype: "Syllable"version: "beta-22"[[Prototype]]: Object
-window.__spicyLyricsDebug.getState()
-{version: 'beta-22', type: 'Line', lineCount: 83, processedPos: 3982.222, containerFound: true, …}
-window.__spicyLyricsDebug.getState()
-{version: 'beta-22', type: 'Line', lineCount: 83, processedPos: 8681.361, containerFound: true, …}
+typeof window._ImmersiveBgRenderer
+typeof _syncAutoDynBg
+document.getElementById('mpDynBgCanvas')
+_dynBgMode
