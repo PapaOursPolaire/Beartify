@@ -1,4 +1,10 @@
+[Lyrics] spicy-lyrics-engine.js — beta-22 chargé.
+spicy-lyrics-engine.js:2000 [Lyrics] Diagnostic : window.__spicyLyricsDebug.getState() dans la console pour l'état live.
 typeof window._ImmersiveBgRenderer
 typeof _syncAutoDynBg
 document.getElementById('mpDynBgCanvas')
 _dynBgMode
+
+VM338:4 Uncaught ReferenceError: _dynBgMode is not defined
+    at <anonymous>:4:1
+(anonymous) @ VM338:4
