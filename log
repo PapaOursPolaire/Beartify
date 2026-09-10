@@ -1,61 +1,8 @@
-[Info] Successfully preconnected to https://lrclib.net/
-[Info] Successfully preconnected to https://fonts.googleapis.com/
-[Info] Successfully preconnected to https://www.gstatic.com/
-[Info] Successfully preconnected to https://cdn.jsdelivr.net/
-[Log] [Firebase] Stub gapi installé (origine Tauri détectée via location : tauri://localhost) (localhost, line 78)
-[Log] [DevTools] – "DevTools actifs↵  F12 / Ctrl+Shift+I → Ouvrir/fermer DevTools↵  Ctrl+Shift+R       → Recharger la WebView↵  Ctrl+Shift+D       → Pannea…" (tauri-devtools.js, line 181)
-"DevTools actifs
-  F12 / Ctrl+Shift+I → Ouvrir/fermer DevTools
-  Ctrl+Shift+R       → Recharger la WebView
-  Ctrl+Shift+D       → Panneau debug Beartify
-  Ctrl+Shift+L       → Exporter les logs console
-  Ctrl+Shift+P       → Infos plateforme"
-[Log] [FirebaseSyncNative] Module chargé ✅ (Tauri: – true – ")" (tauri-devtools.js, line 181)
-[Log] [FirebasePlaylistsNative] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [FirebaseReportsNative] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [FirebaseSocialNative] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [PocketBaseConfig] Client PocketBase initialisé ✅ (tauri-devtools.js, line 181)
-[Log] [PocketBaseAuthBridge] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [PocketBaseSync → PocketBase] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [PocketBaseParty] Module chargé ✅ (file normalisée en party_queue_entries) (tauri-devtools.js, line 181)
-[Log] [PocketBasePlaylists → PocketBase] Module chargé ✅ (échappement filtres activé, collaboration P3-3 activée, titres normalisés en playlist_tracks) (tauri-devtools.js, line 181)
-[Log] [PocketBaseReports → PocketBase] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [PocketBaseSocial → PocketBase] Module chargé ✅ (normalisation docId + échappement filtres activés) (tauri-devtools.js, line 181)
-[Log] [PocketBaseAvatar] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [FallbackRouter] Module chargé ✅ (tauri-devtools.js, line 181)
-[Error] SyntaxError: Parser error
-	(anonymous function) (playback-engine.js:472)
-[Log] [ShareLinkRouter] Module chargé ✅ (tauri-devtools.js, line 181)
-[Info] [Lyrics] spicy-lyrics-engine.js — beta-22 chargé. (spicy-lyrics-engine.js, line 1996)
-[Info] [Lyrics] Diagnostic : window.__spicyLyricsDebug.getState() dans la console pour l'état live. (spicy-lyrics-engine.js, line 2000)
-[Log] [FriendsPanel] Module chargé ✅ (tauri-devtools.js, line 181)
-[Log] [BeartifyI18n] Fichier i18n.js atteint et en cours d'exécution… (tauri-devtools.js, line 181)
-[Log] [BeartifyI18n] Module chargé ✅ (périmètre : navigation + titres de section des Réglages). Diagnostic disponible via window.debugI18n() dans la console. (tauri-devtools.js, line 181)
-[Log] [FallbackRouter] ✅ PocketBase disponible — mode nominal (tauri-devtools.js, line 181)
-[Log] [PocketBaseConfig] 🔄 Session rafraîchie (tauri-devtools.js, line 181)
-[Log] [FriendsPanel] ✅ Présence audio patchée (5s interval + événements immédiats) (tauri-devtools.js, line 181)
-[Log] [FriendsPanel] ✅ Panel initialisé (tauri-devtools.js, line 181)
-[Log] [MARQUEUR_INDEX_HTML_v2] listener load déclenché (tauri-devtools.js, line 181)
-[Error] Failed to load resource: the server responded with a status of 404 (Not Found) (certified, line 0)
-[Error] Failed to load resource: the server responded with a status of 404 (Not Found) (config, line 0)
-[Error] Failed to load resource: the server responded with a status of 401 (Unauthorized) (search, line 0)
-[Warning] [Marketplace] GitHub search "beartify-extensions" → HTTP 401 (tauri-devtools.js, line 181)
-[Error] Failed to load resource: the server responded with a status of 401 (Unauthorized) (search, line 0)
-[Warning] [Marketplace] GitHub search "beartify-themes" → HTTP 401 (tauri-devtools.js, line 181)
-[Log] [Beartify] 64875 titres chargés depuis le cache - actualisation en arrière-plan… (tauri-devtools.js, line 181)
-[Error] ReferenceError: Can't find variable: _fisherYates
-	renderDynamicCarousels (home-page.js:488)
-[Log] [Firebase] Persistance Auth : LOCAL (tauri-devtools.js, line 181)
-[Log] ✅ Firebase initialisé avec succès (Tauri: – true – "/ Android:" – false – ")" (tauri-devtools.js, line 181)
-[Log] ✅ Utilisateur connecté : – "papaourslinuxserver@gmail.com" (tauri-devtools.js, line 181)
-[Log] ✅ Firebase prêt (tauri-devtools.js, line 181)
-[Log] [Sync] ✅ Présence activée (interval unique, 30s) (tauri-devtools.js, line 181)
-[Log] [AuthBridge] ✅ Session PocketBase ouverte pour – "Linux Server" (tauri-devtools.js, line 181)
-[Log] [Auth] ✅ Données PocketBase chargées après login Google (tauri-devtools.js, line 181)
-[Error] ReferenceError: Can't find variable: playCurrentTrack
-	(anonymous function) (home-page.js:904)
-[Log] [Beartify] Delta sync : 2000 titre(s) mis à jour depuis 2026-09-09T12:10:46.096Z (tauri-devtools.js, line 181)
-[Error] ReferenceError: Can't find variable: _fisherYates
-	renderDynamicCarousels (home-page.js:488)
-> Selected Element
-< <div class="lib-items" id="trackList">…</div>
+[Lyrics] spicy-lyrics-engine.js — beta-22 chargé.
+spicy-lyrics-engine.js:2000 [Lyrics] Diagnostic : window.__spicyLyricsDebug.getState() dans la console pour l'état live.
+window.__spicyLyricsDebug.getState()
+{version: 'beta-22', type: 'Syllable', lineCount: 52, processedPos: 15440, containerFound: true, …}containerClientHeight: 267containerFound: truecontainerScrollHeight: 3869containerScrollTop: 443lastActiveLineIndex: 5lineCount: 52lines: (52) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]processedPos: 15440scrollDebouncePending: falsetype: "Syllable"version: "beta-22"[[Prototype]]: Object
+window.__spicyLyricsDebug.getState()
+{version: 'beta-22', type: 'Line', lineCount: 83, processedPos: 3982.222, containerFound: true, …}
+window.__spicyLyricsDebug.getState()
+{version: 'beta-22', type: 'Line', lineCount: 83, processedPos: 8681.361, containerFound: true, …}
