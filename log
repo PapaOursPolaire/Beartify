@@ -1,22 +1,10 @@
-Mon erreur — `_dynBgMode` (sans `typeof`) plante forcément, peu importe si le script a chargé : c'est une variable privée à l'intérieur du script, pas accessible depuis la console globale. Ça n'a rien révélé du tout, désolé pour le faux départ.
-
-Peux-tu retaper ces 4 lignes **une par une, en appuyant sur Entrée après chacune** (pas collées en bloc, sinon seul le résultat de la dernière s'affiche) :
-
-```js
+[Lyrics] spicy-lyrics-engine.js — beta-22 chargé.
+spicy-lyrics-engine.js:2000 [Lyrics] Diagnostic : window.__spicyLyricsDebug.getState() dans la console pour l'état live.
 typeof window._ImmersiveBgRenderer
-```
-*(Entrée, note le résultat)*
-```js
+'function'
 typeof _syncAutoDynBg
-```
-*(Entrée, note le résultat)*
-```js
+'undefined'
 document.getElementById('mpDynBgCanvas')
-```
-*(Entrée, note le résultat)*
-```js
+<canvas class=​"mp-dynbg-canvas" id=​"mpDynBgCanvas" width=​"320" height=​"320" style=​"opacity:​ 1;​">​
 typeof _dynBgMode
-```
-*(Entrée, note le résultat — avec `typeof` cette fois, ça ne plantera pas)*
-
-Colle-moi les 4 résultats affichés par la console, un par ligne.
+'undefined'
