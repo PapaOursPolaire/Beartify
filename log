@@ -1,10 +1,30 @@
 [Lyrics] spicy-lyrics-engine.js — beta-22 chargé.
 spicy-lyrics-engine.js:2000 [Lyrics] Diagnostic : window.__spicyLyricsDebug.getState() dans la console pour l'état live.
-typeof window._ImmersiveBgRenderer
-'function'
-typeof _syncAutoDynBg
-'undefined'
-document.getElementById('mpDynBgCanvas')
-<canvas class=​"mp-dynbg-canvas" id=​"mpDynBgCanvas" width=​"320" height=​"320" style=​"opacity:​ 1;​">​
-typeof _dynBgMode
-'undefined'
+11WebGL: INVALID_OPERATION: bindTexture: attempt to use a deleted object
+mini-player-bg.js:369 WebGL: INVALID_OPERATION: texImage2D: no texture bound to target
+img.onload @ mini-player-bg.js:369
+mini-player-bg.js:557 WebGL: INVALID_OPERATION: useProgram: attempt to use a deleted object
+blurSourceInto @ mini-player-bg.js:557
+mini-player-bg.js:594 WebGL: INVALID_OPERATION: bindBuffer: attempt to use a deleted object
+_attr @ mini-player-bg.js:594
+mini-player-bg.js:597 WebGL: INVALID_OPERATION: bindBuffer: attempt to use a deleted object
+_attr @ mini-player-bg.js:597
+10WebGL: INVALID_OPERATION: bindFramebuffer: attempt to use a deleted object
+mini-player-bg.js:563 WebGL: INVALID_OPERATION: uniform1i: location is not from the associated program
+blurSourceInto @ mini-player-bg.js:563
+mini-player-bg.js:564 WebGL: INVALID_OPERATION: uniform3fv: location is not from the associated program
+blurSourceInto @ mini-player-bg.js:564
+10WebGL: INVALID_OPERATION: uniform1f: location is not from the associated program
+10WebGL: INVALID_OPERATION: drawArrays: no valid shader program in use
+mini-player-bg.js:568 WebGL: INVALID_OPERATION: useProgram: attempt to use a deleted object
+blurSourceInto @ mini-player-bg.js:568
+mini-player-bg.js:594 WebGL: INVALID_OPERATION: bindBuffer: attempt to use a deleted object
+_attr @ mini-player-bg.js:594
+mini-player-bg.js:597 WebGL: INVALID_OPERATION: bindBuffer: attempt to use a deleted object
+_attr @ mini-player-bg.js:597
+mini-player-bg.js:570 WebGL: INVALID_OPERATION: uniform2f: location is not from the associated program
+blurSourceInto @ mini-player-bg.js:570
+mini-player-bg.js:571 WebGL: INVALID_OPERATION: uniform1i: location is not from the associated program
+blurSourceInto @ mini-player-bg.js:571
+mini-player.html:387 Uncaught (in promise) TypeError: Cannot read properties of null (reading 'start')
+    at _startDynBg (mini-player.html:387:13)
