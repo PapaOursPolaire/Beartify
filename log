@@ -1,1 +1,168 @@
+ Vencord   PluginManager  Starting plugins (stage Init)
+Logger.ts:40  Vencord   PluginManager  Starting plugin NoTrack
+Logger.ts:40  Vencord   PluginManager  Starting plugin ConsoleJanitor
+Logger.ts:40  Vencord   PluginManager  Starting plugin ConsoleShortcuts
+ [FAST CONNECT] wss://gateway.discord.gg/?encoding=etf&v=9&compress=zstd-stream, encoding: etf, version: 9
+Logger.ts:40  Vencord   NoTrack  Disabling Sentry by erroring its WebpackInstance
+noTrack.ts:125 Uncaught Error: Sentry successfully disabled
+    at l.set (noTrack.ts:130:23)
+    at sentry.b3003d6221a989b2.js:1:2900
+    at sentry.b3003d6221a989b2.js:1:4181
+Logger.ts:40  Vencord   WebpackPatcher  Main WebpackInstance found in web.f34f869e4c648af0.js, initializing internal references to WebpackRequire
+Logger.ts:40  Vencord   WebpackPatcher  Found Webpack module factories in web.f34f869e4c648af0.js
+Logger.ts:40  Vencord   PluginManager  Starting plugins (stage DOMContentLoaded)
+Logger.ts:40  Vencord   PluginManager  Starting plugin ClientTheme
+web.f34f869e4c648af0.js:172 [libdiscore] [experiment_manager] Loaded experiments from cache
+VM141 C:\Users\papao\AppData\Local\Discord\app-1.0.9257\modules\discord_desktop_core-1\discord_desktop_core\core.asar\mainScreenPreload.js:502 Initializing voice engine with audio subsystem: experimental
+VM141 C:\Users\papao\AppData\Local\Discord\app-1.0.9257\modules\discord_desktop_core-1\discord_desktop_core\core.asar\mainScreenPreload.js:502 service release channel: stable
+web.f34f869e4c648af0.js:172 [default] [BUILD INFO] Release Channel: stable, Build Number: 611316, Version Hash: 1caa9c60fd83f350723e372c8528ec432f41b9d2
+web.f34f869e4c648af0.js:172 [default] [NATIVE INFO] host 1.0.9257, modules: discord_erlpack: 1, discord_modules: 1, discord_krisp: 1, discord_voice: 1, discord_utils: 1, discord_notifications: 1, discord_zstd: 1, discord_overlay2: 1, discord_game_utils: 1, discord_spellcheck: 1, discord_hook: 1, discord_desktop_core: 1, discord_rpc: 1, discord_desktop_overlay: 1, discord_media: 1, discord_cloudsync: 1, discord_dispatch: 1, build: 90413
+web.f34f869e4c648af0.js:172 [libdiscore] The answer for life the universe and everything is: 42
+fast-connect.c25997b89eb6c17e.js:1 [FAST CONNECT] sending identify
+724295.602c6e300da84170.js:1 Requested message E+Q26x does not have a value in the requested locale fr nor the default locale en-US
+get @ 724295.602c6e300da84170.js:1
+724295.602c6e300da84170.js:1 Requested message 06/jqP does not have a value in the requested locale fr nor the default locale en-US
+get @ 724295.602c6e300da84170.js:1
+724295.602c6e300da84170.js:1 Requested message 3gSfUa does not have a value in the requested locale fr nor the default locale en-US
+get @ 724295.602c6e300da84170.js:1
+web.f34f869e4c648af0.js:172 [RPCServer:WSS] Starting on 6463
+web.f34f869e4c648af0.js:172 [RPCServer:IPC] Starting on \\?\pipe\discord-ipc-0
+web.f34f869e4c648af0.js:128 [scriptCost] retained URL count exceeded maxUrls (1000); evicting lowest-cost entries.
+afterFold @ web.f34f869e4c648af0.js:128
+web.f34f869e4c648af0.js:172 [KeybindsStore] Default overlay keybind is unsupported Object
+web.f34f869e4c648af0.js:172 [KeybindsStore] Default overlay keybind is unsupported Object
+web.f34f869e4c648af0.js:172 [GatewaySocket] [CONNECT] wss://gateway.discord.gg, encoding: etf, version: 9, compression: zstd-stream
+web.f34f869e4c648af0.js:172 [GatewaySocket] [FAST CONNECT] successfully took over websocket, state: Object
+web.f34f869e4c648af0.js:172 [GatewaySocket] [CONNECTED] wss://gateway.discord.gg/?encoding=etf&v=9&compress=zstd-stream in 0 ms
+web.f34f869e4c648af0.js:172 [GatewaySocket] [READY] took 209ms, as 2c5507309258ed3002af1c37639383a5
+web.f34f869e4c648af0.js:172 [Flux] Dispatching CONNECTION_OPEN
+web.f34f869e4c648af0.js:172 [DatabaseManager] removing database (user: 732914514068242512, database: undefined)
+VM141 C:\Users\papao\AppData\Local\Discord\app-1.0.9257\modules\discord_desktop_core-1\discord_desktop_core\core.asar\mainScreenPreload.js:502 Deferring audio subsystem switch to experimental until next restart.
+web.f34f869e4c648af0.js:172 [OverlayV3NativeModule] Loading Out of Process Overlay Module
+web.f34f869e4c648af0.js:172 [OverlayRenderStore] setOverlayEnabled: supported Object
+web.f34f869e4c648af0.js:172 [OverlayRenderStore] setOverlayEnabled Object
+web.f34f869e4c648af0.js:172 [KeybindsStore] Default overlay keybind is unsupported Object
+Logger.ts:40  Vencord   PluginManager  Starting plugins (stage WebpackReady)
+Logger.ts:40  Vencord   PluginManager  Starting plugin BadgeAPI
+Logger.ts:40  Vencord   PluginManager  Starting plugin AutoDNDWhilePlaying
+Logger.ts:40  Vencord   PluginManager  Starting plugin BetterRoleContext
+Logger.ts:40  Vencord   PluginManager  Starting plugin BetterSessions
+Logger.ts:40  Vencord   PluginManager  Starting plugin BetterSettings
+Logger.ts:40  Vencord   PluginManager  Starting plugin BlurNSFW
+Logger.ts:40  Vencord   PluginManager  Starting plugin ClearURLs
+Logger.ts:40  Vencord   PluginManager  Starting plugin CustomCommands
+Logger.ts:40  Vencord   PluginManager  Starting plugin CustomRPC
+Logger.ts:40  Vencord   PluginManager  Starting plugin Decor
+Logger.ts:40  Vencord   PluginManager  Starting plugin DontRoundMyTimestamps
+Logger.ts:40  Vencord   PluginManager  Starting plugin F8Break
+Logger.ts:40  Vencord   PluginManager  Starting plugin FakeNitro
+Logger.ts:40  Vencord   PluginManager  Starting plugin HideMedia
+Logger.ts:40  Vencord   PluginManager  Starting plugin IgnoreActivities
+Logger.ts:40  Vencord   PluginManager  Starting plugin ImageZoom
+Logger.ts:40  Vencord   PluginManager  Starting plugin ImplicitRelationships
+Logger.ts:40  Vencord   PluginManager  Starting plugin KeepCurrentChannel
+Logger.ts:40  Vencord   PluginManager  Starting plugin MessageClickActions
+Logger.ts:40  Vencord   PluginManager  Starting plugin MessageLinkEmbeds
+Logger.ts:40  Vencord   PluginManager  Starting plugin MessageLogger
+Logger.ts:40  Vencord   PluginManager  Starting plugin MusicRichPresence
+Logger.ts:40  Vencord   PluginManager  Starting plugin oneko
+Logger.ts:40  Vencord   PluginManager  Starting plugin PinDMs
+Logger.ts:40  Vencord   PluginManager  Starting plugin PlatformIndicators
+Logger.ts:40  Vencord   PluginManager  Starting plugin QuickReply
+Logger.ts:40  Vencord   PluginManager  Starting plugin ReactErrorDecoder
+Logger.ts:40  Vencord   PluginManager  Starting plugin ReadAllNotificationsButton
+Logger.ts:40  Vencord   PluginManager  Starting plugin RelationshipNotifier
+Logger.ts:40  Vencord   PluginManager  Starting plugin ReviewDB
+Logger.ts:40  Vencord   PluginManager  Starting plugin Summaries
+Logger.ts:40  Vencord   PluginManager  Starting plugin ServerListIndicators
+Logger.ts:40  Vencord   PluginManager  Starting plugin ShikiCodeblocks
+Logger.ts:40  Vencord   PluginManager  Starting plugin SpotifyControls
+Logger.ts:40  Vencord   PluginManager  Starting plugin StartupTimings
+Logger.ts:40  Vencord   PluginManager  Starting plugin TenorGifSearch
+Logger.ts:40  Vencord   PluginManager  Starting plugin TextReplace
+Logger.ts:40  Vencord   PluginManager  Starting plugin UserVoiceShow
+Logger.ts:40  Vencord   PluginManager  Starting plugin USRBG
+Logger.ts:40  Vencord   PluginManager  Starting plugin VcNarrator
+Logger.ts:40  Vencord   PluginManager  Starting plugin XSOverlay
+web.f34f869e4c648af0.js:172 [discord_protos.discord_users.v1.PreloadedUserSettings] Updating appearance with delay 0
+web.f34f869e4c648af0.js:172 [discord_protos.discord_users.v1.PreloadedUserSettings] Scheduling save from markDirty
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetching messages for 1473379739086487604 between undefined and undefined. jump={"jumpType":"ANIMATED"}
+web.f34f869e4c648af0.js:172 [GatewaySocket] [READY_SUPPLEMENTAL] took 997ms
+/api/v9/users/@me/referrals/eligibility:1  Failed to load resource: the server responded with a status of 404 ()
+web.f34f869e4c648af0.js:172 [discord_protos.discord_users.v1.PreloadedUserSettings] Persisting proto
+web.f34f869e4c648af0.js:172 [OverlayV3NativeModule] OverlayV3 Module Loaded
+web.f34f869e4c648af0.js:172 [Spellchecker] Switching to fr-FR (available)
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetching messages for 1522308942204637325 between undefined and undefined. jump={"jumpType":"ANIMATED"}
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetched 0 messages for 1473379739086487604 isBefore:false isAfter:false
+web.f34f869e4c648af0.js:172 [ChannelMessages] loadComplete: resetting state for channelId=1473379739086487604, sending.length=0
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetching messages for 590463450124124171 between undefined and undefined. jump={"jumpType":"ANIMATED"}
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetched 1 messages for 1522308942204637325 isBefore:false isAfter:false
+web.f34f869e4c648af0.js:172 [ChannelMessages] loadComplete: resetting state for channelId=1522308942204637325, sending.length=0
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetching messages for 909556677844533338 between undefined and undefined. jump={"jumpType":"ANIMATED"}
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetched 1 messages for 590463450124124171 isBefore:false isAfter:false
+web.f34f869e4c648af0.js:172 [ChannelMessages] loadComplete: resetting state for channelId=590463450124124171, sending.length=0
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetching messages for 1369993406910304377 between undefined and undefined. jump={"jumpType":"ANIMATED"}
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetched 3 messages for 909556677844533338 isBefore:false isAfter:false
+web.f34f869e4c648af0.js:172 [ChannelMessages] loadComplete: resetting state for channelId=909556677844533338, sending.length=0
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetching messages for 1356379356947157233 between undefined and undefined. jump={"jumpType":"ANIMATED"}
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetched 2 messages for 1369993406910304377 isBefore:false isAfter:false
+web.f34f869e4c648af0.js:172 [ChannelMessages] loadComplete: resetting state for channelId=1369993406910304377, sending.length=0
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetching messages for 976563980074115142 between undefined and undefined. jump={"jumpType":"ANIMATED"}
+web.f34f869e4c648af0.js:172 [OverlayRenderStore] Retracking 0 games (0 already tracked)
+web.f34f869e4c648af0.js:172 [OverlayRenderStore] Retracked 0 games
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetched 4 messages for 1356379356947157233 isBefore:false isAfter:false
+web.f34f869e4c648af0.js:172 [ChannelMessages] loadComplete: resetting state for channelId=1356379356947157233, sending.length=0
+index.tsx:181 WebSocket connection to 'ws://127.0.0.1:42070/?client=Vencord' failed: 
+start @ index.tsx:181
+@me:1 Uncaught (in promise) Event
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetching messages for 1459601271836114995 between undefined and undefined. jump={"jumpType":"ANIMATED"}
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetched 3 messages for 976563980074115142 isBefore:false isAfter:false
+web.f34f869e4c648af0.js:172 [ChannelMessages] loadComplete: resetting state for channelId=976563980074115142, sending.length=0
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetching messages for 1288799604770340864 between undefined and undefined. jump={"jumpType":"ANIMATED"}
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetched 1 messages for 1459601271836114995 isBefore:false isAfter:false
+web.f34f869e4c648af0.js:172 [ChannelMessages] loadComplete: resetting state for channelId=1459601271836114995, sending.length=0
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetching messages for 1251326334920032347 between undefined and undefined. jump={"jumpType":"ANIMATED"}
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetched 13 messages for 1288799604770340864 isBefore:false isAfter:false
+web.f34f869e4c648af0.js:172 [ChannelMessages] loadComplete: resetting state for channelId=1288799604770340864, sending.length=0
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetching messages for 927939725283700746 between undefined and undefined. jump={"jumpType":"ANIMATED"}
+web.f34f869e4c648af0.js:172 [Clips] clips ml flags pushed: ml=false (was null), autoclipping=false (was null)
+web.f34f869e4c648af0.js:172 [Clips] clips v3 ml flag set ml=false (was null)
+web.f34f869e4c648af0.js:172 [OverlayKeybindExperimentManager] Experiments initializing...
+web.f34f869e4c648af0.js:172 [OverlayKeybindExperimentManager] Experiments initialized
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetched 1 messages for 1251326334920032347 isBefore:false isAfter:false
+web.f34f869e4c648af0.js:172 [ChannelMessages] loadComplete: resetting state for channelId=1251326334920032347, sending.length=0
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetching messages for 1192108727189389442 between undefined and undefined. jump={"jumpType":"ANIMATED"}
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetched 1 messages for 1192108727189389442 isBefore:false isAfter:false
+web.f34f869e4c648af0.js:172 [ChannelMessages] loadComplete: resetting state for channelId=1192108727189389442, sending.length=0
+web.f34f869e4c648af0.js:172 [SystemServiceNativeUtils] input-service initialized.
+web.f34f869e4c648af0.js:172 [SystemServiceNativeUtils] tool-service initialized.
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetching messages for 755793019873001494 between undefined and undefined. jump={"jumpType":"ANIMATED"}
+web.f34f869e4c648af0.js:172 [SignalHelpers.web] signalAllAcceptedCredentials Object
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetched 16 messages for 927939725283700746 isBefore:false isAfter:false
+web.f34f869e4c648af0.js:172 [ChannelMessages] loadComplete: resetting state for channelId=927939725283700746, sending.length=0
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetching messages for 1023345075163512954 between undefined and undefined. jump={"jumpType":"ANIMATED"}
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetched 1 messages for 755793019873001494 isBefore:false isAfter:false
+web.f34f869e4c648af0.js:172 [ChannelMessages] loadComplete: resetting state for channelId=755793019873001494, sending.length=0
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetching messages for 1462400365776605276 between undefined and undefined. jump={"jumpType":"ANIMATED"}
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetching messages for 1229485968621310073 between undefined and undefined. jump={"jumpType":"ANIMATED"}
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetched 4 messages for 1023345075163512954 isBefore:false isAfter:false
+web.f34f869e4c648af0.js:172 [ChannelMessages] loadComplete: resetting state for channelId=1023345075163512954, sending.length=0
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetched 0 messages for 1462400365776605276 isBefore:false isAfter:false
+web.f34f869e4c648af0.js:172 [ChannelMessages] loadComplete: resetting state for channelId=1462400365776605276, sending.length=0
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetching messages for 698988847773777933 between undefined and undefined. jump={"jumpType":"ANIMATED"}
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetched 16 messages for 1229485968621310073 isBefore:false isAfter:false
+web.f34f869e4c648af0.js:172 [ChannelMessages] loadComplete: resetting state for channelId=1229485968621310073, sending.length=0
+web.f34f869e4c648af0.js:172 [MessageActionCreators] Fetched 16 messages for 698988847773777933 isBefore:false isAfter:false
+web.f34f869e4c648af0.js:172 [ChannelMessages] loadComplete: resetting state for channelId=698988847773777933, sending.length=0
+web.f34f869e4c648af0.js:172 [RunningGameStore] Running Games Changed Object
+web.f34f869e4c648af0.js:172 [RunningGameStore] Running Non-Games Changed Object
+web.f34f869e4c648af0.js:172 [OverlayBridgeStore] updateIntendedOverlayPIDs Object
+web.f34f869e4c648af0.js:172 [Clips] decider: handleRunningGamesChange visibleGame=null newPrimaryKey=null currentSessionGameKey=null currentSessionId=undefined pendingSessionGameKey=null
+web.f34f869e4c648af0.js:172 [Clips] decider: handleRunningGamesChange — not starting session (newPrimaryKey=null)
+web.f34f869e4c648af0.js:172 [libdiscore] [BlockedDomainsStore] Successfully fetched blocked domains
+web.f34f869e4c648af0.js:172 [KeybindsStore] Default overlay keybind is unsupported Object
+Warning: Don’t paste code into the DevTools Console that you don’t understand or haven’t reviewed yourself. This could allow attackers to steal your identity or take control of your computer. Please type ‘allow pasting’ below and press Enter to allow pasting.
+allow pasting
 getComputedStyle(document.documentElement).getPropertyValue('--background-primary')
+
+'transparent'
