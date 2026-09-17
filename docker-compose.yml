@@ -37,7 +37,12 @@ services:
     - /media/papaours/MUSIC:/data/music
     - /media/papaours/HDD:/data/hdd
     - /media/papaours/HDD 2:/data/hdd2
-    - /media/partage_windows:/data/disque_d:ro
+    - type: bind
+      source: /media/partage_windows
+      target: /data/disque_d
+      read_only: true
+      bind:
+        propagation: rslave
     deploy:
       resources:
         reservations:
