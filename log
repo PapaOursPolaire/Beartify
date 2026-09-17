@@ -1,1 +1,7 @@
---background-image: url('https://cdn.pixabay.com/animation/2024/07/23/19/52/19-52-56-478_512.gif');
+[Admin] ✅ Authentifié PocketBase superuser : Object
+api/pb/api/collections/reports/records?page=1&perPage=500&skipTotal=1&sort=-created&expand=user:1  Failed to load resource: the server responded with a status of 400 (Bad Request)
+admin.html:1691 [Admin] loadReports: requête complète refusée, repli sans sort : Something went wrong while processing your request.
+loadReports @ admin.html:1691
+content.js:1 Uncaught (in promise) Error: Uncaught Error: No Listener: tabs:outgoing.message.ready
+Primary:1  Failed to load resource: the server responded with a status of 404 (Not Found)
+api/pb/api/collections/vipCodes/records?page=1&perPage=500&skipTotal=1&sort=-created:1  Failed to load resource: the server responded with a status of 400 (Bad Request)
