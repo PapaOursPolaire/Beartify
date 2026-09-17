@@ -1,0 +1,319 @@
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    ports:
+    - 9000:9000
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - portainer_data:/data
+
+  homarr:
+    image: ghcr.io/ajnart/homarr:latest
+    container_name: homarr
+    restart: unless-stopped
+    ports:
+    - 7575:7575
+    volumes:
+    - homarr_data:/app/data/configs
+
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+    - PUID=1000
+    - PGID=1000
+    - TZ=Europe/Paris
+    security_opt:
+    - apparmor:unconfined
+    ports:
+    - 8096:8096
+    dns:
+    - 1.1.1.1
+    - 8.8.8.8
+    volumes:
+    - /docker/jellyfin/config:/config
+    - /media/papaours/MUSIC:/data/music
+    - /media/papaours/HDD:/data/hdd
+    - /media/papaours/HDD 2:/data/hdd2
+    - /media/partage_windows:/data/disque_d:ro
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: all
+            capabilities:
+            - gpu
+            - video
+    restart: unless-stopped
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    restart: unless-stopped
+    ports:
+    - 8989:8989
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    restart: unless-stopped
+    ports:
+    - 7878:7878
+
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    restart: unless-stopped
+    ports:
+    - 5055:5055
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    restart: unless-stopped
+    ports:
+    - 8081:8080
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    restart: unless-stopped
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+
+  netdata:
+    image: netdata/netdata:latest
+    container_name: netdata
+    restart: unless-stopped
+    ports:
+    - 19999:19999
+
+  scrutiny:
+    image: ghcr.io/analogj/scrutiny:master-web
+    container_name: scrutiny
+    restart: unless-stopped
+    ports:
+    - 8086:8080
+
+  beszel:
+    image: henrygd/beszel:latest
+    container_name: beszel
+    restart: unless-stopped
+    ports:
+    - 8093:8090
+    volumes:
+    - ./beszel_data:/beszel_data
+
+  beszel-agent:
+    image: henrygd/beszel-agent:alpine # <--- Utiliser l'image Alpine (contient smartctl)
+    container_name: beszel-agent
+    restart: unless-stopped
+    network_mode: host
+    privileged: true
+    devices:
+      - /dev/nvme0n1:/dev/nvme0n1 # Disque NVMe principal
+      - /dev/sda:/dev/sda         # Disque HDD/SSD 1 (à ajuster selon tes disques)
+      - /dev/sdb:/dev/sdb         # Disque HDD/SSD 2 (à ajuster)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./beszel_agent_data:/var/lib/beszel-agent
+      - /dev:/dev:ro
+    environment:
+      LISTEN: 45876
+      KEY: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJ+4LOBMJ221TcPt6YSwHv+79fGmxXWjRBJXXLZnCjfo'
+      TOKEN: 563-507ae7f6efc-865-8f809b8726
+      HUB_URL: http://192.168.0.18:8093
+
+  guacamole_guacd:
+    image: guacamole/guacd:latest
+    container_name: guacamole_guacd
+    restart: unless-stopped
+
+  guacamole_db:
+    image: postgres:15-alpine
+    container_name: guacamole_db
+    restart: unless-stopped
+    environment:
+    - POSTGRES_DB=guacamole_db
+    - POSTGRES_USER=guacamole_user
+    - POSTGRES_PASSWORD=CHANGE_MOI_MOT_DE_PASSE
+    volumes:
+    - guacamole_db_data:/var/lib/postgresql/data
+    - ./guacamole/initdb.sql:/docker-entrypoint-initdb.d/initdb.sql:ro
+
+  guacamole:
+    image: guacamole/guacamole:latest
+    container_name: guacamole
+    restart: unless-stopped
+    ports:
+    - 8082:8080
+    environment:
+    - GUACD_HOSTNAME=guacamole_guacd
+    - POSTGRES_HOSTNAME=guacamole_db
+    - POSTGRES_DATABASE=guacamole_db
+    - POSTGRES_USER=guacamole_user
+    - POSTGRES_PASSWORD=CHANGE_MOI_MOT_DE_PASSE
+    depends_on:
+    - guacamole_guacd
+    - guacamole_db
+
+  libretranslate:
+    image: libretranslate/libretranslate:latest
+    container_name: libretranslate
+    restart: unless-stopped
+    ports:
+    - 5000:5000
+
+  dockhand:
+    image: fnsys/dockhand:latest
+    container_name: dockhand
+    restart: unless-stopped
+    ports:
+    - 3100:3000
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - dockhand_data:/app/data
+
+  adguardhome:
+    image: adguard/adguardhome:latest
+    container_name: adguardhome
+    restart: unless-stopped
+    ports:
+    - 53:53/tcp
+    - 53:53/udp
+    - 3001:3000/tcp
+    volumes:
+    - adguard_work:/opt/adguardhome/work
+    - adguard_conf:/opt/adguardhome/conf
+
+  immich-database:
+    image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0
+    container_name: immich_postgres
+    restart: unless-stopped
+    shm_size: 128mb
+    environment:
+      POSTGRES_DB: immich
+      POSTGRES_USER: papaours
+      POSTGRES_PASSWORD: '290809'
+      POSTGRES_INITDB_ARGS: --data-checksums
+    volumes:
+    - /docker/immich/postgres:/var/lib/postgresql/data
+
+  immich-redis:
+    image: docker.io/valkey/valkey:9
+    container_name: immich_redis
+    restart: unless-stopped
+    healthcheck:
+      test:
+      - CMD
+      - redis-cli
+      - ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  immich-machine-learning:
+    image: ghcr.io/immich-app/immich-machine-learning:release
+    container_name: immich_machine_learning
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Paris
+    volumes:
+    - immich_model_cache:/cache
+
+  immich-server:
+    image: ghcr.io/immich-app/immich-server:release
+    container_name: immich
+    restart: unless-stopped
+    depends_on:
+    - immich-database
+    - immich-redis
+    environment:
+      DB_HOSTNAME: immich-database
+      DB_USERNAME: papaours
+      DB_PASSWORD: '290809'
+      DB_DATABASE_NAME: immich
+      REDIS_HOSTNAME: immich-redis
+      TZ: Europe/Paris
+    ports:
+    - 2283:2283
+    volumes:
+    - /media/papaours/HDD/Immich:/data
+    - /etc/localtime:/etc/localtime:ro
+
+  odoo_db:
+    image: postgres:15
+    container_name: odoo_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: papaours
+      POSTGRES_PASSWORD: '290809'
+    volumes:
+    - odoo_db_data:/var/lib/postgresql/data
+
+  odoo:
+    image: odoo:19
+    container_name: odoo
+    restart: unless-stopped
+    depends_on:
+    - odoo_db
+    environment:
+      HOST: odoo_db
+      USER: papaours
+      PASSWORD: '290809'
+    ports:
+    - 8069:8069
+    volumes:
+    - odoo_data:/var/lib/odoo
+    - /home/papaours/odoo/config:/etc/odoo
+    - /home/papaours/odoo/addons:/mnt/extra-addons
+
+  omni-tools:
+    image: iib0011/omni-tools:latest
+    container_name: omni-tools
+    restart: unless-stopped
+    ports:
+    - 7080:80
+
+  komga:
+    image: gotson/komga:latest
+    container_name: komga
+    restart: unless-stopped
+    user: 1000:1000
+    environment:
+      TZ: Europe/Paris
+    ports:
+    - 25600:25600
+    volumes:
+    - /docker/komga/config:/config
+    - /media/papaours/HDD:/data/hdd
+    - /media/papaours/HDD 2:/data/hdd2
+
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    restart: unless-stopped
+    ports:
+    - 7576:3000
+    environment:
+      PUID: '1000'
+      PGID: '1000'
+      HOMEPAGE_ALLOWED_HOSTS: homepage
+    volumes:
+    - /home/papaours/homepage:/app/config
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+
+volumes:
+  portainer_data: null
+  homarr_data: null
+  guacamole_db_data: null
+  dockhand_data: {}
+  adguard_work: {}
+  adguard_conf: {}
+  immich_model_cache: {}
+  odoo_data: {}
+  odoo_db_data: {}
