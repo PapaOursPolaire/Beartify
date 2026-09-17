@@ -1,7 +1,77 @@
-[Admin] ✅ Authentifié PocketBase superuser : Object
-api/pb/api/collections/reports/records?page=1&perPage=500&skipTotal=1&sort=-created&expand=user:1  Failed to load resource: the server responded with a status of 400 (Bad Request)
-admin.html:1691 [Admin] loadReports: requête complète refusée, repli sans sort : Something went wrong while processing your request.
-loadReports @ admin.html:1691
+Uncaught SyntaxError: Unexpected token '<'
+firebase-playlists.js:1 Uncaught SyntaxError: Unexpected token '<'
+firebase-reports.js:1 Uncaught SyntaxError: Unexpected token '<'
+firebase-social.js:1 Uncaught SyntaxError: Unexpected token '<'
+pocketbase-config.js:262 [PocketBaseConfig] Client PocketBase initialisé ✅
+pocketbase-auth-bridge.js:84 [PocketBaseAuthBridge] Module chargé ✅
+pocketbase-sync.js:397 [PocketBaseSync → PocketBase] Module chargé ✅
+pocketbase-party.js:296 [PocketBaseParty] Module chargé ✅ (file normalisée en party_queue_entries)
+pocketbase-playlists.js:543 [PocketBasePlaylists → PocketBase] Module chargé ✅ (échappement filtres activé, collaboration P3-3 activée, titres normalisés en playlist_tracks)
+pocketbase-wrapped.js:320 [PocketBaseWrapped] Module chargé ✅
+pocketbase-reports.js:205 [PocketBaseReports → PocketBase] Module chargé ✅
+pocketbase-social.js:383 [PocketBaseSocial → PocketBase] Module chargé ✅ (normalisation docId + échappement filtres activés)
+pocketbase-avatar.js:127 [PocketBaseAvatar] Module chargé ✅
+fallback-router.js:306 [FallbackRouter] Module chargé ✅
+sidebar-resize.js:137 [SidebarResize] Module chargé ✅
+recommendation-engine.js:132 [RecommendationEngine] Module chargé ✅
+share-link-router.js:177 [ShareLinkRouter] Module chargé ✅
+wrapped-view.js:808 [WrappedView] Module chargé ✅ (v3 — inspirée de Spotify Wrapped 2025)
+spicy-lyrics-engine.js:1996 [Lyrics] spicy-lyrics-engine.js — beta-22 chargé.
+spicy-lyrics-engine.js:2000 [Lyrics] Diagnostic : window.__spicyLyricsDebug.getState() dans la console pour l'état live.
+friends-panel.js:1834 [FriendsPanel] Module chargé ✅
+i18n.js:38 [BeartifyI18n] Fichier i18n.js atteint et en cours d'exécution…
+i18n.js:8078 [BeartifyI18n] Module chargé ✅ (périmètre : navigation + titres de section des Réglages). Diagnostic disponible via window.debugI18n() dans la console.
+ [discord-rpc] Hors contexte Tauri (_IS_TAURI=false) — RPC désactivé.
+(anonymous) @ discord-rpc.js:31
+(anonymous) @ discord-rpc.js:135
+pocketbase-config.js:202 [PocketBaseConfig] 🔄 Session rafraîchie
+fallback-router.js:300 [FallbackRouter] ✅ PocketBase disponible — mode nominal
+friends-panel.js:1779 [FriendsPanel] ✅ Présence audio patchée (5s interval + événements immédiats)
+friends-panel.js:1825 [FriendsPanel] ✅ Panel initialisé
+:3000/api/certified:1  Failed to load resource: the server responded with a status of 404 (Not Found)
+marketplace.js:164 [Marketplace] /api/certified indisponible (HTTP 404) — nouvel essai dans 5 min.
+(anonymous) @ marketplace.js:164
+_recordFailure @ marketplace.js:103
+_discoverCertifiedIds @ marketplace.js:164
+:3000/api/lastfm/config:1  Failed to load resource: the server responded with a status of 404 (Not Found)
+:3000/api/github/search?topic=beartify-extensions:1  Failed to load resource: the server responded with a status of 401 (Unauthorized)
+marketplace.js:195 [Marketplace] GitHub search "beartify-extensions" → HTTP 401 — nouvel essai dans 5 min.
+(anonymous) @ marketplace.js:195
+_recordFailure @ marketplace.js:103
+_discoverCommunity @ marketplace.js:195
+mobile-friends.js:173 [MobileFriends] Module chargé ✅ — 3 compte(s) suivi(s)
+(index):1 Error while trying to use the following icon from the Manifest: http://localhost:3000/icons/icon-192.png (Download error or resource isn't a valid image)
+:3000/api/github/search?topic=beartify-themes:1  Failed to load resource: the server responded with a status of 401 (Unauthorized)
+marketplace.js:195 [Marketplace] GitHub search "beartify-themes" → HTTP 401 — nouvel essai dans 5 min.
+(anonymous) @ marketplace.js:195
+_recordFailure @ marketplace.js:103
+_discoverCommunity @ marketplace.js:195
+(index):1230 [MARQUEUR_INDEX_HTML_v2] listener load déclenché
+mobile-friends.js:213 [MobileFriends] Présence reçue pour papaourspolairegithub@gmail.com → stopped
+mobile-friends.js:213 [MobileFriends] Présence reçue pour actini2008gamer@gmail.com → offline
+mobile-friends.js:213 [MobileFriends] Présence reçue pour stargrrrlbear@gmail.com → stopped
+track-data.js:382 [Beartify] 81745 titres chargés depuis le cache - actualisation en arrière-plan…
+firebase-config.js:158 [Firebase] Persistance Auth : LOCAL
+firebase-config.js:166 ✅ Firebase initialisé avec succès (Tauri: false / Android: false )
+firebase-config.js:170 ✅ Utilisateur connecté : martin2008gamer@gmail.com
+(index):1233 ✅ Firebase prêt
+pocketbase-sync.js:279 [Sync] ℹ️ enableAutoSync : no-op côté PocketBase (déjà actif en permanence)
+pocketbase-sync.js:112 [Sync] ✅ Présence activée (interval unique, 30s)
+pocketbase-auth-bridge.js:74 [AuthBridge] ✅ Session PocketBase ouverte pour Papa Ours
+firebase-config.js:236 [Auth] ✅ Données PocketBase chargées après login Google
 content.js:1 Uncaught (in promise) Error: Uncaught Error: No Listener: tabs:outgoing.message.ready
-Primary:1  Failed to load resource: the server responded with a status of 404 (Not Found)
-api/pb/api/collections/vipCodes/records?page=1&perPage=500&skipTotal=1&sort=-created:1  Failed to load resource: the server responded with a status of 400 (Bad Request)
+track-data.js:446 [Beartify] Delta sync : 1 titre(s) mis à jour depuis 2026-09-17T20:11:38.521Z
+:3000/api/pb/api/realtime:1  Failed to load resource: the server responded with a status of 403 (Forbidden)
+Client.ts:439 Uncaught (in promise) ClientResponseError 403: The current and the previous request authorization don't match.
+(anonymous) @ Client.ts:439
+:3000/api/pb/api/realtime:1  Failed to load resource: the server responded with a status of 403 (Forbidden)
+pocketbase-config.js:252 [PocketBaseConfig] ⚠️ Abonnement temps réel users échoué : The current and the previous request authorization don't match.
+_subscribeOwnRecord @ pocketbase-config.js:252
+:3000/api/pb/api/collections/users/auth-refresh:1  Failed to load resource: the server responded with a status of 403 (Forbidden)
+pocketbase-config.js:205 [PocketBaseConfig] ⚠️ Refresh échoué, session invalidée : The request requires auth record from _superusers collection.
+refreshSession @ pocketbase-config.js:205
+:3000/api/pb/api/collections/users/records/2kz4gmptq5ev3p8:1  Failed to load resource: the server responded with a status of 404 (Not Found)
+pocketbase-sync.js:350 [Sync] ❌ Erreur activation VIP : The requested resource wasn't found.
+window.PocketBaseSync.activateVip @ pocketbase-sync.js:350
+pocketbase-sync.js:327 [Sync] Code VIP déjà utilisé
+window.PocketBaseSync.activateVip @ pocketbase-sync.js:327
