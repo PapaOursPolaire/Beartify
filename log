@@ -1,1 +1,106 @@
 JSON.parse(localStorage.getItem('pocketbase_auth')).record.collectionName
+
+'users'
+network-patches.js:34  POST http://localhost:3000/api/pb/api/realtime 403 (Forbidden)
+window.fetch @ network-patches.js:34
+send @ Client.ts:409
+submitSubscriptions @ RealtimeService.ts:283
+subscribe @ RealtimeService.ts:104
+subscribe @ RecordService.ts:159
+_subscribeOwnRecord @ pocketbase-config.js:242
+(anonymous) @ pocketbase-config.js:260
+triggerChange @ BaseAuthStore.ts:235
+save @ BaseAuthStore.ts:98
+(anonymous) @ LocalAuthStore.ts:138
+pocketbase-config.js:252 [PocketBaseConfig] ⚠️ Abonnement temps réel users échoué : The current and the previous request authorization don't match.
+_subscribeOwnRecord @ pocketbase-config.js:252
+await in _subscribeOwnRecord
+(anonymous) @ pocketbase-config.js:260
+triggerChange @ BaseAuthStore.ts:235
+save @ BaseAuthStore.ts:98
+(anonymous) @ LocalAuthStore.ts:138
+network-patches.js:34  POST http://localhost:3000/api/pb/api/beartify/activate-vip 403 (Forbidden)
+window.fetch @ network-patches.js:34
+send @ Client.ts:409
+window.PocketBaseSync.activateVip @ pocketbase-sync.js:329
+(anonymous) @ fallback-router.js:86
+await in (anonymous)
+(anonymous) @ (index):1390
+pocketbase-sync.js:360 [Sync] ❌ Activation VIP refusée : The authorized record is not allowed to perform this action.
+window.PocketBaseSync.activateVip @ pocketbase-sync.js:360
+await in window.PocketBaseSync.activateVip
+(anonymous) @ fallback-router.js:86
+await in (anonymous)
+(anonymous) @ (index):1390
+network-patches.js:34  POST http://localhost:3000/api/pb/api/beartify/activate-vip 403 (Forbidden)
+window.fetch @ network-patches.js:34
+send @ Client.ts:409
+window.PocketBaseSync.activateVip @ pocketbase-sync.js:329
+(anonymous) @ fallback-router.js:86
+await in (anonymous)
+(anonymous) @ (index):1390
+pocketbase-sync.js:360 [Sync] ❌ Activation VIP refusée : The authorized record is not allowed to perform this action.
+window.PocketBaseSync.activateVip @ pocketbase-sync.js:360
+await in window.PocketBaseSync.activateVip
+(anonymous) @ fallback-router.js:86
+await in (anonymous)
+(anonymous) @ (index):1390
+network-patches.js:34  POST http://localhost:3000/api/pb/api/beartify/activate-vip 403 (Forbidden)
+window.fetch @ network-patches.js:34
+send @ Client.ts:409
+window.PocketBaseSync.activateVip @ pocketbase-sync.js:329
+(anonymous) @ fallback-router.js:86
+await in (anonymous)
+(anonymous) @ (index):1390
+pocketbase-sync.js:360 [Sync] ❌ Activation VIP refusée : The authorized record is not allowed to perform this action.
+window.PocketBaseSync.activateVip @ pocketbase-sync.js:360
+await in window.PocketBaseSync.activateVip
+(anonymous) @ fallback-router.js:86
+await in (anonymous)
+(anonymous) @ (index):1390
+network-patches.js:34  POST http://localhost:3000/api/pb/api/beartify/activate-vip 403 (Forbidden)
+window.fetch @ network-patches.js:34
+send @ Client.ts:409
+window.PocketBaseSync.activateVip @ pocketbase-sync.js:329
+(anonymous) @ fallback-router.js:86
+await in (anonymous)
+(anonymous) @ (index):1390
+pocketbase-sync.js:360 [Sync] ❌ Activation VIP refusée : The authorized record is not allowed to perform this action.
+window.PocketBaseSync.activateVip @ pocketbase-sync.js:360
+await in window.PocketBaseSync.activateVip
+(anonymous) @ fallback-router.js:86
+await in (anonymous)
+(anonymous) @ (index):1390
+network-patches.js:34  POST http://localhost:3000/api/pb/api/beartify/activate-vip 403 (Forbidden)
+window.fetch @ network-patches.js:34
+send @ Client.ts:409
+window.PocketBaseSync.activateVip @ pocketbase-sync.js:329
+(anonymous) @ fallback-router.js:86
+await in (anonymous)
+(anonymous) @ (index):1390
+pocketbase-sync.js:360 [Sync] ❌ Activation VIP refusée : The authorized record is not allowed to perform this action.
+window.PocketBaseSync.activateVip @ pocketbase-sync.js:360
+await in window.PocketBaseSync.activateVip
+(anonymous) @ fallback-router.js:86
+await in (anonymous)
+(anonymous) @ (index):1390
+network-patches.js:34  POST http://localhost:3000/api/pb/api/beartify/activate-vip 403 (Forbidden)
+window.fetch @ network-patches.js:34
+send @ Client.ts:409
+window.PocketBaseSync.activateVip @ pocketbase-sync.js:329
+(anonymous) @ fallback-router.js:86
+await in (anonymous)
+(anonymous) @ (index):1390
+pocketbase-sync.js:360 [Sync] ❌ Activation VIP refusée : The authorized record is not allowed to perform this action.
+window.PocketBaseSync.activateVip @ pocketbase-sync.js:360
+await in window.PocketBaseSync.activateVip
+(anonymous) @ fallback-router.js:86
+await in (anonymous)
+(anonymous) @ (index):1390
+network-patches.js:34  POST http://localhost:3000/api/pb/api/collections/users/auth-refresh 403 (Forbidden)
+window.fetch @ network-patches.js:34
+send @ Client.ts:409
+authRefresh @ RecordService.ts:729
+refreshSession @ pocketbase-config.js:195
+pocketbase-config.js:205 [PocketBaseConfig] ⚠️ Refresh échoué, session invalidée : The request requires auth record from _superusers collection.
+refreshSession @ pocketbase-config.js:205
