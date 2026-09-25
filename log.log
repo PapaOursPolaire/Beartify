@@ -1,0 +1,1422 @@
+PS C:\Users\papao\Downloads> .\Reorganiser_Cest_pas_sorcier.ps1
+============================================================
+REORGANISATION C'EST PAS SORCIER
+============================================================
+Source : D:\Séries\C'est pas sorcier
+Destination : D:\Séries\C'est pas sorcier
+Mode simulation : True
+
+[SIMULATION] Création : D:\Séries\C'est pas sorcier\Season 00
+[SIMULATION] Création : D:\Séries\C'est pas sorcier\Season 01
+[SIMULATION] Création : D:\Séries\C'est pas sorcier\Season 02
+[SIMULATION] Création : D:\Séries\C'est pas sorcier\Season 03
+[SIMULATION] Création : D:\Séries\C'est pas sorcier\Season 04
+[SIMULATION] Création : D:\Séries\C'est pas sorcier\Season 05
+[SIMULATION] Création : D:\Séries\C'est pas sorcier\Season 06
+[SIMULATION] Création : D:\Séries\C'est pas sorcier\Season 07
+[SIMULATION] Création : D:\Séries\C'est pas sorcier\Season 08
+[SIMULATION] Création : D:\Séries\C'est pas sorcier\Season 09
+[SIMULATION] Création : D:\Séries\C'est pas sorcier\Season 10
+[SIMULATION] Création : D:\Séries\C'est pas sorcier\Season 11
+[SIMULATION] Création : D:\Séries\C'est pas sorcier\Season 12
+[SIMULATION] Création : D:\Séries\C'est pas sorcier\Season 13
+[SIMULATION] Création : D:\Séries\C'est pas sorcier\Season 14
+[SIMULATION] Création : D:\Séries\C'est pas sorcier\Season 15
+[SIMULATION] Création : D:\Séries\C'est pas sorcier\Season 16
+[SIMULATION] Création : D:\Séries\C'est pas sorcier\Season 17
+[SIMULATION] Création : D:\Séries\C'est pas sorcier\Season 18
+[SIMULATION] Création : D:\Séries\C'est pas sorcier\Season 19
+[SIMULATION] Création : D:\Séries\C'est pas sorcier\Season 20
+
+============================================================
+RECHERCHE DES CATEGORIES
+============================================================
+
+
+Recherche : Emissions speciales ...
+[TROUVE] Emissions speciales
+    D:\Séries\C'est pas sorcier\Emissions speciales
+  -> D:\Séries\C'est pas sorcier\Emissions speciales
+
+Recherche : Histoire et Archéologie ...
+[TROUVE] Histoire et Archéologie
+    D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie
+  -> D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie
+
+Recherche : Arts et Spectacles ...
+[TROUVE] Arts et Spectacles
+    D:\Séries\C'est pas sorcier\Histoire culture et société\Arts et Spectacles
+  -> D:\Séries\C'est pas sorcier\Histoire culture et société\Arts et Spectacles
+
+Recherche : Economie et société ...
+[TROUVE] Economie et société
+    D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société
+  -> D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société
+
+Recherche : La médecine ...
+[TROUVE] La médecine
+    D:\Séries\C'est pas sorcier\Sport et santé\La médecine
+  -> D:\Séries\C'est pas sorcier\Sport et santé\La médecine
+
+Recherche : Alimentation et Agronomie ...
+[TROUVE] Alimentation et Agronomie
+    D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie
+  -> D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie
+
+Recherche : Sport ...
+[TROUVE] Sport
+    D:\Séries\C'est pas sorcier\Sport et santé\Sport
+  -> D:\Séries\C'est pas sorcier\Sport et santé\Sport
+
+Recherche : Espace et Astronomie ...
+[TROUVE] Espace et Astronomie
+    D:\Séries\C'est pas sorcier\Terre et l'univers\Espace et Astronomie
+  -> D:\Séries\C'est pas sorcier\Terre et l'univers\Espace et Astronomie
+
+Recherche : Géologie ...
+[TROUVE] Géologie
+    D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie
+  -> D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie
+
+Recherche : Faune ...
+[TROUVE] Faune
+    D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune
+  -> D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune
+
+Recherche : Botanique ...
+[TROUVE] Botanique
+    D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Botanique
+  -> D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Botanique
+
+Recherche : Ecologie et climat ...
+[TROUVE] Ecologie et climat
+    D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat
+  -> D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat
+
+Recherche : Transport ...
+[TROUVE] Transport
+    D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport
+  -> D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport
+
+Recherche : Defense ...
+[TROUVE] Defense
+    D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Defense
+  -> D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Defense
+
+Recherche : Communication ...
+[TROUVE] Communication
+    D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication
+  -> D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication
+
+Recherche : Grands travaux et Architecture ...
+[TROUVE] Grands travaux et Architecture
+    D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Grands travaux et Architecture
+  -> D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Grands travaux et Architecture
+
+Recherche : Technologie et industrie ...
+[TROUVE] Technologie et industrie
+    D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie
+  -> D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie
+
+Recherche : Energie ...
+[TROUVE] Energie
+    D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Energie
+  -> D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Energie
+
+Recherche : Le corps humain ...
+[TROUVE] Le corps humain
+    D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain
+  -> D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain
+
+Recherche : Physique & Chimie ...
+[TROUVE] Physique & Chimie
+    D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Physique & Chimie
+  -> D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Physique & Chimie
+
+Recherche : Géographie et les découvertes ...
+[TROUVE] Géographie et les découvertes
+    D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes
+  -> D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes
+
+============================================================
+RESUME DE LA RECHERCHE
+============================================================
+[OK] Emissions speciales
+     D:\Séries\C'est pas sorcier\Emissions speciales
+[OK] Histoire et Archéologie
+     D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie
+[OK] Arts et Spectacles
+     D:\Séries\C'est pas sorcier\Histoire culture et société\Arts et Spectacles
+[OK] Economie et société
+     D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société
+[OK] La médecine
+     D:\Séries\C'est pas sorcier\Sport et santé\La médecine
+[OK] Alimentation et Agronomie
+     D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie
+[OK] Sport
+     D:\Séries\C'est pas sorcier\Sport et santé\Sport
+[OK] Espace et Astronomie
+     D:\Séries\C'est pas sorcier\Terre et l'univers\Espace et Astronomie
+[OK] Géologie
+     D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie
+[OK] Faune
+     D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune
+[OK] Botanique
+     D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Botanique
+[OK] Ecologie et climat
+     D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat
+[OK] Transport
+     D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport
+[OK] Defense
+     D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Defense
+[OK] Communication
+     D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication
+[OK] Grands travaux et Architecture
+     D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Grands travaux et Architecture
+[OK] Technologie et industrie
+     D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie
+[OK] Energie
+     D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Energie
+[OK] Le corps humain
+     D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain
+[OK] Physique & Chimie
+     D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Physique & Chimie
+[OK] Géographie et les découvertes
+     D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes
+
+============================================================
+DEPLACEMENT DES FICHIERS
+============================================================
+
+[Emissions speciales] -> Season 00
+Source : D:\Séries\C'est pas sorcier\Emissions speciales
+Destination : D:\Séries\C'est pas sorcier\Season 00
+[SIMULATION] D:\Séries\C'est pas sorcier\Emissions speciales\Best of événements scientifiques 2009.mkv
+    -> D:\Séries\C'est pas sorcier\Season 00\Best of événements scientifiques 2009.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Emissions speciales\Bonne année, bons sorciers (la Villette 2).mkv
+    -> D:\Séries\C'est pas sorcier\Season 00\Bonne année, bons sorciers (la Villette 2).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Emissions speciales\Clef à molette, smoking, cambouis.mkv
+    -> D:\Séries\C'est pas sorcier\Season 00\Clef à molette, smoking, cambouis.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Emissions speciales\Emission spéciale les évenements scientifiques de 2010.mkv
+    -> D:\Séries\C'est pas sorcier\Season 00\Emission spéciale les évenements scientifiques de 2010.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Emissions speciales\En route pour la jungle 104 minutes.mkv
+    -> D:\Séries\C'est pas sorcier\Season 00\En route pour la jungle 104 minutes.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Emissions speciales\Joyeux sorciers (la Villette.1).mkv
+    -> D:\Séries\C'est pas sorcier\Season 00\Joyeux sorciers (la Villette.1).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Emissions speciales\L'année des sorciers.mkv
+    -> D:\Séries\C'est pas sorcier\Season 00\L'année des sorciers.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Emissions speciales\L'école est finie.mkv
+    -> D:\Séries\C'est pas sorcier\Season 00\L'école est finie.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Emissions speciales\Le bêtisier c'est pas sorcier.mkv
+    -> D:\Séries\C'est pas sorcier\Season 00\Le bêtisier c'est pas sorcier.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Emissions speciales\Noël, c'est complètement dinde !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 00\Noël, c'est complètement dinde !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Emissions speciales\Paillotes et crustacés.mkv
+    -> D:\Séries\C'est pas sorcier\Season 00\Paillotes et crustacés.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Emissions speciales\Tous a la neige.mkv
+    -> D:\Séries\C'est pas sorcier\Season 00\Tous a la neige.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Emissions speciales\Un petit coin de France sous les tropiques.mkv
+    -> D:\Séries\C'est pas sorcier\Season 00\Un petit coin de France sous les tropiques.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Emissions speciales\Un zoo pas si bête (Best Of).mkv
+    -> D:\Séries\C'est pas sorcier\Season 00\Un zoo pas si bête (Best Of).mkv
+
+[Histoire et Archéologie] -> Season 01
+Source : D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie
+Destination : D:\Séries\C'est pas sorcier\Season 01
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Atacama, un désert entre les Andes et le Pacifique.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Atacama, un désert entre les Andes et le Pacifique.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Au cœur de l'empire inca 52 minutes.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Au cœur de l'empire inca 52 minutes.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Au temps des gaulois.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Au temps des gaulois.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Carcassonne; une citée au temps des chevaliers.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Carcassonne; une citée au temps des chevaliers.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Chasseurs d'épaves - L'archéologie sous-marine.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Chasseurs d'épaves - L'archéologie sous-marine.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Christianisme, un dieu parmi les hommes.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Christianisme, un dieu parmi les hommes.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Des dinosaures sous nos pieds.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Des dinosaures sous nos pieds.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Istanbul, c'est Byzance !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Istanbul, c'est Byzance !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Judaïsme, un peuple, une religion.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Judaïsme, un peuple, une religion.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\L'homme de Néandertal.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\L'homme de Néandertal.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\L'islam, de Mahomet a aujourd’hui.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\L'islam, de Mahomet a aujourd’hui.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\La Corse, toute une histoire.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\La Corse, toute une histoire.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\La guerre de 14-18.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\La guerre de 14-18.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\La mer morte ... morte de soif !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\La mer morte ... morte de soif !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Le débarquement de normandie.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Le débarquement de normandie.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Le Grand Palais épate la galerie.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Le Grand Palais épate la galerie.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Le Louvre, du château-fort au grand musée.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Le Louvre, du château-fort au grand musée.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Le musée Grévin, des célébrités de chair et de cire.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Le musée Grévin, des célébrités de chair et de cire.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Le néolithique, un tournant pour l'humanité.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Le néolithique, un tournant pour l'humanité.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Le Père Noël, on ne lui fait pas de cadeaux!.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Le Père Noël, on ne lui fait pas de cadeaux!.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Les amérindiens de Guyane, des peuples oubliés.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Les amérindiens de Guyane, des peuples oubliés.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Les bâtisseurs de cathédrales.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Les bâtisseurs de cathédrales.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Les calendriers  ça date !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Les calendriers  ça date !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Les canaries; les sorciers explorent un paradis.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Les canaries; les sorciers explorent un paradis.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Les chateaux de la Loire (la renaissance).mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Les chateaux de la Loire (la renaissance).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Les cites englouties d'egypte.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Les cites englouties d'egypte.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Les fortifications de Vauban.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Les fortifications de Vauban.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Les gaulois.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Les gaulois.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Les hommes préhistoriques.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Les hommes préhistoriques.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Les incas - L'empire du soleil.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Les incas - L'empire du soleil.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Les Mayas.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Les Mayas.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Les pygmées; les génies de la forêt.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Les pygmées; les génies de la forêt.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Les templiers partent en croisade.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Les templiers partent en croisade.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Les trésors du grand Louvre.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Les trésors du grand Louvre.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Lucy, Néanderthal, Cro-Magnon.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Lucy, Néanderthal, Cro-Magnon.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Paris lumières (d'Haussmann au périphérique).mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Paris lumières (d'Haussmann au périphérique).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Paris s’éveille (des origines a Napoléon).mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Paris s’éveille (des origines a Napoléon).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Petra  une cité surgie en plein désert.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Petra  une cité surgie en plein désert.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Pompéi.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Pompéi.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Pont du Gard et arènes de Nîmes, l'architecture Gallo-romaine.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Pont du Gard et arènes de Nîmes, l'architecture Gallo-romaine.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Sous le soleil de Versailles.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Sous le soleil de Versailles.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Un château très très fort - Le retour des chevaliers de castelnaud.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Un château très très fort - Le retour des chevaliers de castelnaud.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Un dieu, trois religions.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Un dieu, trois religions.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Histoire et Archéologie\Venise, une cité sortie des eaux.mkv
+    -> D:\Séries\C'est pas sorcier\Season 01\Venise, une cité sortie des eaux.mkv
+
+[Arts et Spectacles] -> Season 02
+Source : D:\Séries\C'est pas sorcier\Histoire culture et société\Arts et Spectacles
+Destination : D:\Séries\C'est pas sorcier\Season 02
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Arts et Spectacles\Accordons nos violons! (l'orchestre symphonique).mkv
+    -> D:\Séries\C'est pas sorcier\Season 02\Accordons nos violons! (l'orchestre symphonique).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Arts et Spectacles\Dans les coulisses de l'opéra.mkv
+    -> D:\Séries\C'est pas sorcier\Season 02\Dans les coulisses de l'opéra.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Arts et Spectacles\Faire un disque… ça vous chante.mkv
+    -> D:\Séries\C'est pas sorcier\Season 02\Faire un disque… ça vous chante.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Arts et Spectacles\Grandes orgues, les sorciers ont un tuyau.mkv
+    -> D:\Séries\C'est pas sorcier\Season 02\Grandes orgues, les sorciers ont un tuyau.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Arts et Spectacles\Il étais toon fois... le dessin animé.mkv
+    -> D:\Séries\C'est pas sorcier\Season 02\Il étais toon fois... le dessin animé.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Arts et Spectacles\IMAX, le cinéma en très grand format.mkv
+    -> D:\Séries\C'est pas sorcier\Season 02\IMAX, le cinéma en très grand format.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Arts et Spectacles\La magie des effets spéciaux.mkv
+    -> D:\Séries\C'est pas sorcier\Season 02\La magie des effets spéciaux.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Arts et Spectacles\La peinture.mkv
+    -> D:\Séries\C'est pas sorcier\Season 02\La peinture.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Arts et Spectacles\La restauration des œuvres d'art.mkv
+    -> D:\Séries\C'est pas sorcier\Season 02\La restauration des œuvres d'art.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Arts et Spectacles\La sculpture, les sorciers sur la sellette.mkv
+    -> D:\Séries\C'est pas sorcier\Season 02\La sculpture, les sorciers sur la sellette.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Arts et Spectacles\Le musée des inventions.mkv
+    -> D:\Séries\C'est pas sorcier\Season 02\Le musée des inventions.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Arts et Spectacles\Le son en concert.mkv
+    -> D:\Séries\C'est pas sorcier\Season 02\Le son en concert.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Arts et Spectacles\Les coulisses d'un concert, faite parler les décibels !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 02\Les coulisses d'un concert, faite parler les décibels !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Arts et Spectacles\Les feux d'artifice, c' est le bouquet !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 02\Les feux d'artifice, c' est le bouquet !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Arts et Spectacles\Les luthiers de l'arbre au violon.mkv
+    -> D:\Séries\C'est pas sorcier\Season 02\Les luthiers de l'arbre au violon.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Arts et Spectacles\Silence, On Tourne ! (Le Cinéma).mkv
+    -> D:\Séries\C'est pas sorcier\Season 02\Silence, On Tourne ! (Le Cinéma).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Arts et Spectacles\Tous en Piste (Le Cirque).mkv
+    -> D:\Séries\C'est pas sorcier\Season 02\Tous en Piste (Le Cirque).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Arts et Spectacles\Voyage en 3D sur les traces du Petit Prince.mkv
+    -> D:\Séries\C'est pas sorcier\Season 02\Voyage en 3D sur les traces du Petit Prince.mkv
+
+[Economie et société] -> Season 03
+Source : D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société
+Destination : D:\Séries\C'est pas sorcier\Season 03
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\Au feu, les pompiers !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\Au feu, les pompiers !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\Au nom de la loi.mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\Au nom de la loi.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\Au pays des jouets .mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\Au pays des jouets .mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\D'où viennent les Français.mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\D'où viennent les Français.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\Dans la peau d'un maire.mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\Dans la peau d'un maire.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\Des hommes de toutes les couleurs.mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\Des hommes de toutes les couleurs.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\Histoire(s) de banlieues.mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\Histoire(s) de banlieues.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\L'euro est arrivé !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\L'euro est arrivé !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\L'Europe.mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\L'Europe.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\La banque,  les sorciers demandent des comptes.mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\La banque,  les sorciers demandent des comptes.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\La justice pénale internationale.mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\La justice pénale internationale.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\La police scientifique contre le crime organise.mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\La police scientifique contre le crime organise.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\La police scientifique traque les faussaires.mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\La police scientifique traque les faussaires.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\Le budget de l'état, les sorciers font les comptes.mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\Le budget de l'état, les sorciers font les comptes.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\Le jeu de la loi (Les institutions de la 5ème République).mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\Le jeu de la loi (Les institutions de la 5ème République).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\Les casques bleus, des soldats pour la paix.mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\Les casques bleus, des soldats pour la paix.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\Les courses hippiques.mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\Les courses hippiques.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\Les espions.mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\Les espions.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\Les jeux de hasard.mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\Les jeux de hasard.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\Par ici la monnaie.mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\Par ici la monnaie.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\Police scientifique, les sorciers jouent les experts.mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\Police scientifique, les sorciers jouent les experts.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\Police scientifique, les sorciers mènent l’enquête .mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\Police scientifique, les sorciers mènent l’enquête .mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\Quand un pays a faim.mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\Quand un pays a faim.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\Que fait la police dans ses laboratoires.mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\Que fait la police dans ses laboratoires.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\Qui tient les cordons de la bourse.mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\Qui tient les cordons de la bourse.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\Special Kosovo.mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\Special Kosovo.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Histoire culture et société\Economie et société\Sécurité routière, tous responsables.mkv
+    -> D:\Séries\C'est pas sorcier\Season 03\Sécurité routière, tous responsables.mkv
+
+[La médecine] -> Season 04
+Source : D:\Séries\C'est pas sorcier\Sport et santé\La médecine
+Destination : D:\Séries\C'est pas sorcier\Season 04
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\Comment vaincre la faim dans le monde.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\Comment vaincre la faim dans le monde.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\De l'eau potable pour toute la planête.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\De l'eau potable pour toute la planête.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\Greffe d'organes c'est la vie.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\Greffe d'organes c'est la vie.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\Grippes, virus sous surveillance.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\Grippes, virus sous surveillance.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\l'anesthesie; vous pouvez dormir tranquille.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\l'anesthesie; vous pouvez dormir tranquille.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\L'hospital de la tete aux pieds.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\L'hospital de la tete aux pieds.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\L'obésité, nous risquons gros.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\L'obésité, nous risquons gros.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\La fécondation in vitro, un enfant nommé désir.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\La fécondation in vitro, un enfant nommé désir.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\La maladie d’Alzheimer.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\La maladie d’Alzheimer.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\La plage et ses dangers.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\La plage et ses dangers.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\Le cannabis  fumer n'est pas jouer !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\Le cannabis  fumer n'est pas jouer !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\Le clonage.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\Le clonage.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\Le diabète, sucres sous surveillance.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\Le diabète, sucres sous surveillance.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\Le secourisme, les gestes qui sauvent.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\Le secourisme, les gestes qui sauvent.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\Le sida, la lutte continue.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\Le sida, la lutte continue.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\Le sida.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\Le sida.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\Le Sommeil a rendez-vous avec la lune.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\Le Sommeil a rendez-vous avec la lune.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\Le Tabac.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\Le Tabac.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\Les antibiotiques, les bactéries font de la résistance.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\Les antibiotiques, les bactéries font de la résistance.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\Les bébés, l'histoire d'une naissance.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\Les bébés, l'histoire d'une naissance.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\Les maladies génétiques.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\Les maladies génétiques.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\Les médicaments.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\Les médicaments.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\Les prothèses  comment ça marche .mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\Les prothèses  comment ça marche .mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\Notre cœur; un muscle fragile.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\Notre cœur; un muscle fragile.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\Nouvelles thérapies, l'espoir est dans la cellule.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\Nouvelles thérapies, l'espoir est dans la cellule.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\Ostéopathie, acupuncture, comment ça marche .mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\Ostéopathie, acupuncture, comment ça marche .mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\Paralysie, une vie en fauteuil roulant.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\Paralysie, une vie en fauteuil roulant.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\Rhumes, otites, angines des maladies plein la tête.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\Rhumes, otites, angines des maladies plein la tête.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\Réparer l'oeil, un défi pour demain.mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\Réparer l'oeil, un défi pour demain.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\La médecine\Tous allergiques (medecine).mkv
+    -> D:\Séries\C'est pas sorcier\Season 04\Tous allergiques (medecine).mkv
+
+[Alimentation et Agronomie] -> Season 05
+Source : D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie
+Destination : D:\Séries\C'est pas sorcier\Season 05
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\Bio et compagnie, vers une autre agriculture.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\Bio et compagnie, vers une autre agriculture.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\Bière qui roule n'amasse pas mousse.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\Bière qui roule n'amasse pas mousse.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\Cacao et chocolat.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\Cacao et chocolat.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\Champagne!.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\Champagne!.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\Cuisine des chefs. la science des saveurs.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\Cuisine des chefs. la science des saveurs.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\Du blé au pain.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\Du blé au pain.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\L'huile d'olive, l'huile aux trésors.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\L'huile d'olive, l'huile aux trésors.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\La canne a sucre.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\La canne a sucre.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\La conservation des aliments, c'est dans la boite !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\La conservation des aliments, c'est dans la boite !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\La truffe, à la poursuite du diamant noir.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\La truffe, à la poursuite du diamant noir.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\La vanille un goût qui viens de loin.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\La vanille un goût qui viens de loin.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\Le café, les sorciers veillent au grain.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\Le café, les sorciers veillent au grain.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\Le sucre, la culture de la betterave.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\Le sucre, la culture de la betterave.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\Les agrumes.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\Les agrumes.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\Les bananes, les sorciers à  plein régime!.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\Les bananes, les sorciers à  plein régime!.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\Les bonbons, c'est si bon ... !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\Les bonbons, c'est si bon ... !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\Les filières de la viande.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\Les filières de la viande.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\Les produits laitiers.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\Les produits laitiers.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\Les secrets du chocolat.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\Les secrets du chocolat.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\Les trésors des salins du midi.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\Les trésors des salins du midi.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\Manon, Charlotte, Pompadour ... histoire de pommes de terre.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\Manon, Charlotte, Pompadour ... histoire de pommes de terre.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\Pesticides - Attention danger.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\Pesticides - Attention danger.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\Tout un fromage.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\Tout un fromage.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\Une journée a la ferme.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\Une journée a la ferme.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\Une nuit à Rungis,le plus grand marché du monde.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\Une nuit à Rungis,le plus grand marché du monde.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Alimentation et Agronomie\Vin sur vin.mkv
+    -> D:\Séries\C'est pas sorcier\Season 05\Vin sur vin.mkv
+
+[Sport] -> Season 06
+Source : D:\Séries\C'est pas sorcier\Sport et santé\Sport
+Destination : D:\Séries\C'est pas sorcier\Season 06
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Sport\Bille en Tête (Le Billard).mkv
+    -> D:\Séries\C'est pas sorcier\Season 06\Bille en Tête (Le Billard).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Sport\Faire du sport c'est physique et chimique.mkv
+    -> D:\Séries\C'est pas sorcier\Season 06\Faire du sport c'est physique et chimique.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Sport\L'escalade, la bonne voix.mkv
+    -> D:\Séries\C'est pas sorcier\Season 06\L'escalade, la bonne voix.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Sport\La fin des records.mkv
+    -> D:\Séries\C'est pas sorcier\Season 06\La fin des records.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Sport\La plongée sous-marine, un bol d'air dans le Grand Bleu.mkv
+    -> D:\Séries\C'est pas sorcier\Season 06\La plongée sous-marine, un bol d'air dans le Grand Bleu.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Sport\Le grand schuss.mkv
+    -> D:\Séries\C'est pas sorcier\Season 06\Le grand schuss.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Sport\Le marathon de Paris.mkv
+    -> D:\Séries\C'est pas sorcier\Season 06\Le marathon de Paris.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Sport\Le rallye dans les désert, les sorciers roulent des mécaniques.mkv
+    -> D:\Séries\C'est pas sorcier\Season 06\Le rallye dans les désert, les sorciers roulent des mécaniques.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Sport\Le tennis.mkv
+    -> D:\Séries\C'est pas sorcier\Season 06\Le tennis.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Sport\Les coulisses du football.mkv
+    -> D:\Séries\C'est pas sorcier\Season 06\Les coulisses du football.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Sport\Les fous du velo.mkv
+    -> D:\Séries\C'est pas sorcier\Season 06\Les fous du velo.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Sport\Les hommes volants.mkv
+    -> D:\Séries\C'est pas sorcier\Season 06\Les hommes volants.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Sport\Les sorciers font du ski.mkv
+    -> D:\Séries\C'est pas sorcier\Season 06\Les sorciers font du ski.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Sport\Les stations de ski, les sorciers ouvrent la piste.mkv
+    -> D:\Séries\C'est pas sorcier\Season 06\Les stations de ski, les sorciers ouvrent la piste.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Sport\Parachute, parapente, le grand frisson.mkv
+    -> D:\Séries\C'est pas sorcier\Season 06\Parachute, parapente, le grand frisson.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Sport\Roller, skate et BMX, comme sur des roulettes.mkv
+    -> D:\Séries\C'est pas sorcier\Season 06\Roller, skate et BMX, comme sur des roulettes.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Sport\Rugby, au cœur de la mêlée.mkv
+    -> D:\Séries\C'est pas sorcier\Season 06\Rugby, au cœur de la mêlée.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Sport\Ski, surf and sun.mkv
+    -> D:\Séries\C'est pas sorcier\Season 06\Ski, surf and sun.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Sport\Sélection pour les jeux olympiques d'hiver.mkv
+    -> D:\Séries\C'est pas sorcier\Season 06\Sélection pour les jeux olympiques d'hiver.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Sport\Transat en solitaire.mkv
+    -> D:\Séries\C'est pas sorcier\Season 06\Transat en solitaire.mkv
+
+[Espace et Astronomie] -> Season 07
+Source : D:\Séries\C'est pas sorcier\Terre et l'univers\Espace et Astronomie
+Destination : D:\Séries\C'est pas sorcier\Season 07
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Espace et Astronomie\Ariane V.mkv
+    -> D:\Séries\C'est pas sorcier\Season 07\Ariane V.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Espace et Astronomie\Comètes et astéroïdes.mkv
+    -> D:\Séries\C'est pas sorcier\Season 07\Comètes et astéroïdes.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Espace et Astronomie\Dans la ligne de mir.mkv
+    -> D:\Séries\C'est pas sorcier\Season 07\Dans la ligne de mir.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Espace et Astronomie\Homo orbitus, comment aller dans l'espace et y vivre  .mkv
+    -> D:\Séries\C'est pas sorcier\Season 07\Homo orbitus, comment aller dans l'espace et y vivre  .mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Espace et Astronomie\Kourou, aux portes de l'espace.mkv
+    -> D:\Séries\C'est pas sorcier\Season 07\Kourou, aux portes de l'espace.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Espace et Astronomie\L'homme dans l'espace, histoire d'une conquête.mkv
+    -> D:\Séries\C'est pas sorcier\Season 07\L'homme dans l'espace, histoire d'une conquête.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Espace et Astronomie\La Terre vue de l'espace.mkv
+    -> D:\Séries\C'est pas sorcier\Season 07\La Terre vue de l'espace.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Espace et Astronomie\La tête dans les étoiles.mkv
+    -> D:\Séries\C'est pas sorcier\Season 07\La tête dans les étoiles.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Espace et Astronomie\La vie extraterrestre.mkv
+    -> D:\Séries\C'est pas sorcier\Season 07\La vie extraterrestre.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Espace et Astronomie\Le port spatial de Kourou.mkv
+    -> D:\Séries\C'est pas sorcier\Season 07\Le port spatial de Kourou.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Espace et Astronomie\Le soleil, les sorciers en connaissent un rayon.mkv
+    -> D:\Séries\C'est pas sorcier\Season 07\Le soleil, les sorciers en connaissent un rayon.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Espace et Astronomie\Le système solaire revisité.mkv
+    -> D:\Séries\C'est pas sorcier\Season 07\Le système solaire revisité.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Espace et Astronomie\Le Very Large Telescope, l'univers dans un miroir.mkv
+    -> D:\Séries\C'est pas sorcier\Season 07\Le Very Large Telescope, l'univers dans un miroir.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Espace et Astronomie\Le vol en impesanteur.mkv
+    -> D:\Séries\C'est pas sorcier\Season 07\Le vol en impesanteur.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Espace et Astronomie\Les exoplanètes, à la recherche d'autres mondes.mkv
+    -> D:\Séries\C'est pas sorcier\Season 07\Les exoplanètes, à la recherche d'autres mondes.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Espace et Astronomie\Les mystères de l'univers.mkv
+    -> D:\Séries\C'est pas sorcier\Season 07\Les mystères de l'univers.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Espace et Astronomie\Les satellites.mkv
+    -> D:\Séries\C'est pas sorcier\Season 07\Les satellites.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Espace et Astronomie\Les sorciers décrochent la lune.mkv
+    -> D:\Séries\C'est pas sorcier\Season 07\Les sorciers décrochent la lune.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Espace et Astronomie\Pleins feux sur le système solaire.mkv
+    -> D:\Séries\C'est pas sorcier\Season 07\Pleins feux sur le système solaire.mkv
+
+[Géologie] -> Season 08
+Source : D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie
+Destination : D:\Séries\C'est pas sorcier\Season 08
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\Etretat, les sorciers attaquent la falaise.mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\Etretat, les sorciers attaquent la falaise.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\Grottes, gouffres et abîmes.mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\Grottes, gouffres et abîmes.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\Géologie de la France - les Sorciers en font des montagnes.mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\Géologie de la France - les Sorciers en font des montagnes.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\Géologie de la France - les Sorciers font parler les cailloux.mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\Géologie de la France - les Sorciers font parler les cailloux.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\L'Auvergne, une région qui a du cratère.mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\L'Auvergne, une région qui a du cratère.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\L'Etna sous haute surveillance.mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\L'Etna sous haute surveillance.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\L'Islande, terre de glace et de feu.mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\L'Islande, terre de glace et de feu.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\L'or c'est l'or .mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\L'or c'est l'or .mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\La France Souterraine.mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\La France Souterraine.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\La mer attaque la terre.mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\La mer attaque la terre.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\La pierre, les sorciers font carrière.mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\La pierre, les sorciers font carrière.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\La Réunion dans les entrailles du volcan.mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\La Réunion dans les entrailles du volcan.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\Le cuivre, les bons tuyaux.mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\Le cuivre, les bons tuyaux.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\Le mystère des grottes de l’Ardèche.mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\Le mystère des grottes de l’Ardèche.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\Le sable, les sorciers veillent au grain.mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\Le sable, les sorciers veillent au grain.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\Le sel, de la terre a la mer .mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\Le sel, de la terre a la mer .mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\Les chasseurs dor.mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\Les chasseurs dor.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\Les gorges de l’Ardèche, quelle descente !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\Les gorges de l’Ardèche, quelle descente !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\Les ocres annoncent la couleur.mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\Les ocres annoncent la couleur.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\Les sorciers refont le monde (histoire géologique de la terre).mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\Les sorciers refont le monde (histoire géologique de la terre).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\Les Volcans. le grand show.mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\Les Volcans. le grand show.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\Quand la Terre Tremble (Les Séismes).mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\Quand la Terre Tremble (Les Séismes).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\Risque sismique aux Antilles  des iles sous la menace d'une catastrophe.mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\Risque sismique aux Antilles  des iles sous la menace d'une catastrophe.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\Sahara, la grande traversée.mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\Sahara, la grande traversée.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\Sahara, le plus grand des déserts.mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\Sahara, le plus grand des déserts.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\Un tour de France spécial géologie (52 minutes).mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\Un tour de France spécial géologie (52 minutes).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géologie\Île d'Ouessant, les sorciers sont a l'Ouest .mkv
+    -> D:\Séries\C'est pas sorcier\Season 08\Île d'Ouessant, les sorciers sont a l'Ouest .mkv
+
+[Faune] -> Season 09
+Source : D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune
+Destination : D:\Séries\C'est pas sorcier\Season 09
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Ah ! Les vaches..mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Ah ! Les vaches..mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Baleines en danger, c'est assez.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Baleines en danger, c'est assez.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Baleines, cachalots... plongée avec les grands cétacés.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Baleines, cachalots... plongée avec les grands cétacés.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Chiens experts.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Chiens experts.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Drôles d'oiseaux (le parc ornithologique du Marquenterre).mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Drôles d'oiseaux (le parc ornithologique du Marquenterre).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Du nouveau dans les zoos.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Du nouveau dans les zoos.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Entre chiens et loups.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Entre chiens et loups.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Face aux phasmes.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Face aux phasmes.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Fourmis fourmidables.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Fourmis fourmidables.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Hannetons, coccinelles et scarabées, les coléoptères.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Hannetons, coccinelles et scarabées, les coléoptères.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Herisson; une vie qui ne manque pas de piquant.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Herisson; une vie qui ne manque pas de piquant.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\L'esturgeon, le poisson aux œufs d'or.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\L'esturgeon, le poisson aux œufs d'or.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\La pisciculture, des poissons bien élevés.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\La pisciculture, des poissons bien élevés.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\La pêche en mer; du filet à la criée.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\La pêche en mer; du filet à la criée.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\La pêche, les poissons ont le mal de mer.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\La pêche, les poissons ont le mal de mer.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\La pêche, qui est au bout du fil.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\La pêche, qui est au bout du fil.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\La savane au fond des bois.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\La savane au fond des bois.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\La transhumance.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\La transhumance.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\La vie d'un cheval.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\La vie d'un cheval.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Le cadre noir, les sorciers montent sur leurs grands chevaux.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Le cadre noir, les sorciers montent sur leurs grands chevaux.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Le déclin des abeilles.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Le déclin des abeilles.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Le genie des fourmis .mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Le genie des fourmis .mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Le grand retour du loup.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Le grand retour du loup.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Le grand voyage des tortues de mer.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Le grand voyage des tortues de mer.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les amphibiens.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les amphibiens.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les araignées.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les araignées.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les cervidés, drôle de brame.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les cervidés, drôle de brame.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les chauves-souris, le monde a l'envers.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les chauves-souris, le monde a l'envers.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les chiens de traîneau, marathoniens des neiges.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les chiens de traîneau, marathoniens des neiges.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les coraux, les sorciers cherchent la petite bête.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les coraux, les sorciers cherchent la petite bête.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les coulisses du muséum (L'évolution).mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les coulisses du muséum (L'évolution).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les crocodiles larmes fatales.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les crocodiles larmes fatales.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les dauphins mammifères malins.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les dauphins mammifères malins.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les félins.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les félins.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les grands aquariums, une fenêtre sur l'océan.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les grands aquariums, une fenêtre sur l'océan.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les grands cétacés, des géants vulnérables 52 minutes.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les grands cétacés, des géants vulnérables 52 minutes.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les huîtres, un coquillage bien élevé.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les huîtres, un coquillage bien élevé.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les mammouths, la parole est a la défense.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les mammouths, la parole est a la défense.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les méduses, qui s'y frotte s'y pique.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les méduses, qui s'y frotte s'y pique.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les oeufs.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les oeufs.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les ours.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les ours.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les papillons.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les papillons.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les perroquets.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les perroquets.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les primates.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les primates.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les rapaces.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les rapaces.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les requins.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les requins.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les récifs coralliens, trésors en péril !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les récifs coralliens, trésors en péril !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les Serpents; des reptiles qui ont du charme.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les Serpents; des reptiles qui ont du charme.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les sorciers en pincent pour les crustacés.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les sorciers en pincent pour les crustacés.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les sorciers passent l'éponge... marine!.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les sorciers passent l'éponge... marine!.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les sorciers prennent la mouche.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les sorciers prennent la mouche.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les termites.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les termites.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les tortues, quand les carapaces passent.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les tortues, quand les carapaces passent.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Les vers, seigneurs des anneaux.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Les vers, seigneurs des anneaux.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Mammifères, nés dans l'ombre des dinosaures.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Mammifères, nés dans l'ombre des dinosaures.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Mouettes, goélands & cie, les oiseaux de mer.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Mouettes, goélands & cie, les oiseaux de mer.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Moustiques, dangereux envahisseurs.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Moustiques, dangereux envahisseurs.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Opération escargot.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Opération escargot.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Pandas geants superstars.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Pandas geants superstars.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Perles de Tahiti; le trésor des huitres.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Perles de Tahiti; le trésor des huitres.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Peur des araignées.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Peur des araignées.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Phoques et otaries, à qui la palme.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Phoques et otaries, à qui la palme.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Poules et coqs en stock.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Poules et coqs en stock.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Poulpe fiction.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Poulpe fiction.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Pourquois les requins attaquent .mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Pourquois les requins attaquent .mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Qui miel me suive (les abeilles).mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Qui miel me suive (les abeilles).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Rats, souris, hamsters, les rongeurs se font les dents.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Rats, souris, hamsters, les rongeurs se font les dents.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Rencontre avec les Gorilles.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Rencontre avec les Gorilles.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Sur le plancher des vaches.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Sur le plancher des vaches.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Sur les traces des dinosaures.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Sur les traces des dinosaures.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Théorie de l'évolution, de Darwin a la génétique.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Théorie de l'évolution, de Darwin a la génétique.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Faune\Un moustique ça trompe énormément.mkv
+    -> D:\Séries\C'est pas sorcier\Season 09\Un moustique ça trompe énormément.mkv
+
+[Botanique] -> Season 10
+Source : D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Botanique
+Destination : D:\Séries\C'est pas sorcier\Season 10
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Botanique\Au coeur de la forêt tropicale.mkv
+    -> D:\Séries\C'est pas sorcier\Season 10\Au coeur de la forêt tropicale.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Botanique\Bois, hêtre ou ne pas hêtre.mkv
+    -> D:\Séries\C'est pas sorcier\Season 10\Bois, hêtre ou ne pas hêtre.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Botanique\D'où viennent nos fleurs.mkv
+    -> D:\Séries\C'est pas sorcier\Season 10\D'où viennent nos fleurs.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Botanique\Fruits et légumes - Un jardin extraordinaire.mkv
+    -> D:\Séries\C'est pas sorcier\Season 10\Fruits et légumes - Un jardin extraordinaire.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Botanique\L'odyssée des plantes.mkv
+    -> D:\Séries\C'est pas sorcier\Season 10\L'odyssée des plantes.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Botanique\La forêt enchantée, ça vous branche.mkv
+    -> D:\Séries\C'est pas sorcier\Season 10\La forêt enchantée, ça vous branche.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Botanique\Le bambou, une herbe géante !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 10\Le bambou, une herbe géante !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Botanique\Le cèpe a sorcier (Les Champignons).mkv
+    -> D:\Séries\C'est pas sorcier\Season 10\Le cèpe a sorcier (Les Champignons).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Botanique\Le trésor des tourbières.mkv
+    -> D:\Séries\C'est pas sorcier\Season 10\Le trésor des tourbières.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Botanique\Les algues, une forêt sous la mer.mkv
+    -> D:\Séries\C'est pas sorcier\Season 10\Les algues, une forêt sous la mer.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Botanique\Les cactus, un sujet épineux.mkv
+    -> D:\Séries\C'est pas sorcier\Season 10\Les cactus, un sujet épineux.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Botanique\Les OGM, du rififi dans les gènes.mkv
+    -> D:\Séries\C'est pas sorcier\Season 10\Les OGM, du rififi dans les gènes.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Botanique\Mystérieuse mangrove.mkv
+    -> D:\Séries\C'est pas sorcier\Season 10\Mystérieuse mangrove.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Botanique\Pas de saison pour les fleurs.mkv
+    -> D:\Séries\C'est pas sorcier\Season 10\Pas de saison pour les fleurs.mkv
+
+[Ecologie et climat] -> Season 11
+Source : D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat
+Destination : D:\Séries\C'est pas sorcier\Season 11
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\A l'heure des marées.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\A l'heure des marées.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\A quoi servent nos forêts.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\A quoi servent nos forêts.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\Alerte Avalanche!.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\Alerte Avalanche!.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\Atmosphère, atmosphère (la pollution de l'air).mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\Atmosphère, atmosphère (la pollution de l'air).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\Avalanches, neige à haut risque !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\Avalanches, neige à haut risque !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\C'est le printemps.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\C'est le printemps.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\Ecologie d'une mare.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\Ecologie d'une mare.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\Faire la pluie et le beau temps.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\Faire la pluie et le beau temps.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\Forêt du Congo, sur la piste des bois tropicaux.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\Forêt du Congo, sur la piste des bois tropicaux.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\L'automne.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\L'automne.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\L'eau en danger.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\L'eau en danger.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\L'eau ça coule de source.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\L'eau ça coule de source.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\L'effet de serre, coup de chaud sur la planète.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\L'effet de serre, coup de chaud sur la planète.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\L'histoire du climat.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\L'histoire du climat.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\La meteo, le bulletin des sorciers.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\La meteo, le bulletin des sorciers.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\La méditerranée, de la plage aux abysses.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\La méditerranée, de la plage aux abysses.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\La Plage.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\La Plage.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\La réserve sous-marine de Port-Cros.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\La réserve sous-marine de Port-Cros.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\La Vanoise, la montagne a tous les étages.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\La Vanoise, la montagne a tous les étages.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\Le Bruit.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\Le Bruit.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\Le Carbone  les sorciers font leur bilan.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\Le Carbone  les sorciers font leur bilan.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\Le recul des glaciers.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\Le recul des glaciers.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\Les inondations, les sorciers prennent l'eau.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\Les inondations, les sorciers prennent l'eau.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\Les orage. les sorciers ont le coup de foudre.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\Les orage. les sorciers ont le coup de foudre.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\Ma poubelle vaut de l'or.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\Ma poubelle vaut de l'or.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\Mer mediterranée des envahisseurs venus du chaud.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\Mer mediterranée des envahisseurs venus du chaud.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\Méditerranée, sous le béton, la plage.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\Méditerranée, sous le béton, la plage.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\Ski et réchauffement climatique, les stations sous les canons.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\Ski et réchauffement climatique, les stations sous les canons.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\Sécheresse, la France en alerte.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\Sécheresse, la France en alerte.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\Tout feu, tout flamme (les feux de forêts).mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\Tout feu, tout flamme (les feux de forêts).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\Une journée au bord de la mer (coquillages et crustacés).mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\Une journée au bord de la mer (coquillages et crustacés).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Biodiversité, l'agronomie et environnement\Ecologie et climat\Une seconde vie pour nos poubelles.mkv
+    -> D:\Séries\C'est pas sorcier\Season 11\Une seconde vie pour nos poubelles.mkv
+
+[Transport] -> Season 12
+Source : D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport
+Destination : D:\Séries\C'est pas sorcier\Season 12
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\A pied, à mob, en voiture... (la sécurité routière) .mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\A pied, à mob, en voiture... (la sécurité routière) .mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\A380, le nouveau géant du ciel.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\A380, le nouveau géant du ciel.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Alerte au froid, le trafic continue !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Alerte au froid, le trafic continue !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Au rythme d'une croisière.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Au rythme d'une croisière.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\De l'hydravion au canadairs .mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\De l'hydravion au canadairs .mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Du Normandy au Queen Mary  la légende des paquebots.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Du Normandy au Queen Mary  la légende des paquebots.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Du vent dans les voiles (le Belem).mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Du vent dans les voiles (le Belem).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Franchir les alpes, le plus grand tunnel du monde.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Franchir les alpes, le plus grand tunnel du monde.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Il était un... très gros paquebot !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Il était un... très gros paquebot !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\La sécurité routière, les sorciers savent se conduire.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\La sécurité routière, les sorciers savent se conduire.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Le métro.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Le métro.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Le naufrage de l'Erika, la marée était en noir.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Le naufrage de l'Erika, la marée était en noir.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Le TGV.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Le TGV.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Le vol a voile, ça plane pour les sorciers !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Le vol a voile, ça plane pour les sorciers !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Les  acrobates du ciel.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Les  acrobates du ciel.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Les autoroutes, les sorciers font sauter les bouchons.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Les autoroutes, les sorciers font sauter les bouchons.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Les aventuriers du solaire.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Les aventuriers du solaire.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Les aéroports 1.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Les aéroports 1.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Les aéroports 2.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Les aéroports 2.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Les ballons, c'est gonflé !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Les ballons, c'est gonflé !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Les dirigeables, navires du ciel.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Les dirigeables, navires du ciel.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Les ferries.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Les ferries.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Les gares, les sorciers mènent bon train.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Les gares, les sorciers mènent bon train.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Les grands vaisseaux des rois.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Les grands vaisseaux des rois.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Les grands voiliers de course  les sorciers vont plus vite que le vent.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Les grands voiliers de course  les sorciers vont plus vite que le vent.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Les hélicoptères.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Les hélicoptères.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Les marees noires.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Les marees noires.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Les moteurs d'avion, ça vas décoller !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Les moteurs d'avion, ça vas décoller !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Les motos.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Les motos.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Les phares.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Les phares.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Les plus gros navires du monde.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Les plus gros navires du monde.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Les sorciers ne manquent pas d'air ! (l'aérodynamique).mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Les sorciers ne manquent pas d'air ! (l'aérodynamique).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Les voitures de course, les sorciers ont la formule .mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Les voitures de course, les sorciers ont la formule .mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Quand les camions prennent le train (le ferroutage).mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Quand les camions prennent le train (le ferroutage).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Que fait-on des vieux avions.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Que fait-on des vieux avions.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Quel Trafic !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Quel Trafic !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Roissy l'envolée du trafic.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Roissy l'envolée du trafic.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Roulez branchés, les voitures électriques.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Roulez branchés, les voitures électriques.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Roulez plus Propre!.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Roulez plus Propre!.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Sauveteurs des mers (des mers sous surveillance).mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Sauveteurs des mers (des mers sous surveillance).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Sécurité aérienne  Les sorciers contrôlent !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Sécurité aérienne  Les sorciers contrôlent !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Transport en commun, quand la ville change d'air.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Transport en commun, quand la ville change d'air.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Une affaire qui roule (l'automobile).mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Une affaire qui roule (l'automobile).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Voitures électriques; la batterie donne le rythme.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Voitures électriques; la batterie donne le rythme.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\Vol au dessus d'un nid d'avions.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\Vol au dessus d'un nid d'avions.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Transport\À fond de train.mkv
+    -> D:\Séries\C'est pas sorcier\Season 12\À fond de train.mkv
+
+[Defense] -> Season 13
+Source : D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Defense
+Destination : D:\Séries\C'est pas sorcier\Season 13
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Defense\Avions de chasse.mkv
+    -> D:\Séries\C'est pas sorcier\Season 13\Avions de chasse.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Defense\Dans le secret des commandos.mkv
+    -> D:\Séries\C'est pas sorcier\Season 13\Dans le secret des commandos.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Defense\Drôle de drones.mkv
+    -> D:\Séries\C'est pas sorcier\Season 13\Drôle de drones.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Defense\Forces Aériennes, les Sorciers partent en mission.mkv
+    -> D:\Séries\C'est pas sorcier\Season 13\Forces Aériennes, les Sorciers partent en mission.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Defense\La dissuasion nucléaire.mkv
+    -> D:\Séries\C'est pas sorcier\Season 13\La dissuasion nucléaire.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Defense\Le porte avions Charles de Gaulle  Les sorcier sur le pont d'envol.mkv
+    -> D:\Séries\C'est pas sorcier\Season 13\Le porte avions Charles de Gaulle  Les sorcier sur le pont d'envol.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Defense\Les pieges de la montagne.mkv
+    -> D:\Séries\C'est pas sorcier\Season 13\Les pieges de la montagne.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Defense\Les porte-avions.mkv
+    -> D:\Séries\C'est pas sorcier\Season 13\Les porte-avions.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Defense\Les sous-marins de la dissuasion.mkv
+    -> D:\Séries\C'est pas sorcier\Season 13\Les sous-marins de la dissuasion.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Defense\Les sous-marins nucléaires.mkv
+    -> D:\Séries\C'est pas sorcier\Season 13\Les sous-marins nucléaires.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Defense\Mission internationale pour le Charles-de-Gaulle.mkv
+    -> D:\Séries\C'est pas sorcier\Season 13\Mission internationale pour le Charles-de-Gaulle.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Defense\Silence, on coule ! (Les sous-marins).mkv
+    -> D:\Séries\C'est pas sorcier\Season 13\Silence, on coule ! (Les sous-marins).mkv
+
+[Communication] -> Season 14
+Source : D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication
+Destination : D:\Séries\C'est pas sorcier\Season 14
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication\Au bout du fil... le téléphone.mkv
+    -> D:\Séries\C'est pas sorcier\Season 14\Au bout du fil... le téléphone.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication\Bibliothèque Nationale  La mémoire à livre ouvert.mkv
+    -> D:\Séries\C'est pas sorcier\Season 14\Bibliothèque Nationale  La mémoire à livre ouvert.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication\Comme une lettre à la poste.mkv
+    -> D:\Séries\C'est pas sorcier\Season 14\Comme une lettre à la poste.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication\De la caméra au téléviseur, le voyage de l'image.mkv
+    -> D:\Séries\C'est pas sorcier\Season 14\De la caméra au téléviseur, le voyage de l'image.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication\Ici l'onde (la radio).mkv
+    -> D:\Séries\C'est pas sorcier\Season 14\Ici l'onde (la radio).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication\INA, la mémoire audiovisuellel.mkv
+    -> D:\Séries\C'est pas sorcier\Season 14\INA, la mémoire audiovisuellel.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication\Internet, les pirates tissent leur toile.mkv
+    -> D:\Séries\C'est pas sorcier\Season 14\Internet, les pirates tissent leur toile.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication\L'imprimerie noir sur blanc... et en couleur .mkv
+    -> D:\Séries\C'est pas sorcier\Season 14\L'imprimerie noir sur blanc... et en couleur .mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication\L'ordinateur, tout un programme.mkv
+    -> D:\Séries\C'est pas sorcier\Season 14\L'ordinateur, tout un programme.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication\L'écriture de A à Z.mkv
+    -> D:\Séries\C'est pas sorcier\Season 14\L'écriture de A à Z.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication\La photo numérique, les sorciers prennent une bonne résolution.mkv
+    -> D:\Séries\C'est pas sorcier\Season 14\La photo numérique, les sorciers prennent une bonne résolution.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication\La télévision numérique.mkv
+    -> D:\Séries\C'est pas sorcier\Season 14\La télévision numérique.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication\Le livre dans tous ses états.mkv
+    -> D:\Séries\C'est pas sorcier\Season 14\Le livre dans tous ses états.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication\Le téléphone portable.mkv
+    -> D:\Séries\C'est pas sorcier\Season 14\Le téléphone portable.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication\Les coulisses d'un journal télévisé.mkv
+    -> D:\Séries\C'est pas sorcier\Season 14\Les coulisses d'un journal télévisé.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication\Les recettes du marketing.mkv
+    -> D:\Séries\C'est pas sorcier\Season 14\Les recettes du marketing.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication\Les sorciers jouent sur les mots.mkv
+    -> D:\Séries\C'est pas sorcier\Season 14\Les sorciers jouent sur les mots.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication\Presse et internet, les sorciers remontent à la source.mkv
+    -> D:\Séries\C'est pas sorcier\Season 14\Presse et internet, les sorciers remontent à la source.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication\Télévision numérique et haute définition, les sorciers s’adaptent.mkv
+    -> D:\Séries\C'est pas sorcier\Season 14\Télévision numérique et haute définition, les sorciers s’adaptent.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication\Tous à vos postes (la télévision).mkv
+    -> D:\Séries\C'est pas sorcier\Season 14\Tous à vos postes (la télévision).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication\Tu veux ma photo.mkv
+    -> D:\Séries\C'est pas sorcier\Season 14\Tu veux ma photo.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication\Vive la Presse (La Fabrication d'un Journal).mkv
+    -> D:\Séries\C'est pas sorcier\Season 14\Vive la Presse (La Fabrication d'un Journal).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Communication\Voyage dans le cyber espace.mkv
+    -> D:\Séries\C'est pas sorcier\Season 14\Voyage dans le cyber espace.mkv
+
+[Grands travaux et Architecture] -> Season 15
+Source : D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Grands travaux et Architecture
+Destination : D:\Séries\C'est pas sorcier\Season 15
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Grands travaux et Architecture\Aux Champs Elysées; histoire de la plus belle avenue du monde.mkv
+    -> D:\Séries\C'est pas sorcier\Season 15\Aux Champs Elysées; histoire de la plus belle avenue du monde.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Grands travaux et Architecture\Bio habitat, la maison se met au vert.mkv
+    -> D:\Séries\C'est pas sorcier\Season 15\Bio habitat, la maison se met au vert.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Grands travaux et Architecture\La grande arche de la défense .mkv
+    -> D:\Séries\C'est pas sorcier\Season 15\La grande arche de la défense .mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Grands travaux et Architecture\La tour Eiffel des pieds a la tête .mkv
+    -> D:\Séries\C'est pas sorcier\Season 15\La tour Eiffel des pieds a la tête .mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Grands travaux et Architecture\La tour Eiffel.mkv
+    -> D:\Séries\C'est pas sorcier\Season 15\La tour Eiffel.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Grands travaux et Architecture\Le béton, les sorciers au pied du mur.mkv
+    -> D:\Séries\C'est pas sorcier\Season 15\Le béton, les sorciers au pied du mur.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Grands travaux et Architecture\Le stade de France.mkv
+    -> D:\Séries\C'est pas sorcier\Season 15\Le stade de France.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Grands travaux et Architecture\Le tunnel sous la manche (l’eurotunnel).mkv
+    -> D:\Séries\C'est pas sorcier\Season 15\Le tunnel sous la manche (l’eurotunnel).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Grands travaux et Architecture\Le viaduc de Millau, les sorciers font le pont.mkv
+    -> D:\Séries\C'est pas sorcier\Season 15\Le viaduc de Millau, les sorciers font le pont.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Grands travaux et Architecture\Les canaux.mkv
+    -> D:\Séries\C'est pas sorcier\Season 15\Les canaux.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Grands travaux et Architecture\Les ponts.mkv
+    -> D:\Séries\C'est pas sorcier\Season 15\Les ponts.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Grands travaux et Architecture\Les sorciers se renvoient l'ascenseur.mkv
+    -> D:\Séries\C'est pas sorcier\Season 15\Les sorciers se renvoient l'ascenseur.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Grands travaux et Architecture\Les sorciers taillent la route.mkv
+    -> D:\Séries\C'est pas sorcier\Season 15\Les sorciers taillent la route.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Grands travaux et Architecture\Les tours infernales.mkv
+    -> D:\Séries\C'est pas sorcier\Season 15\Les tours infernales.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Grands travaux et Architecture\Nos maisons de demain.mkv
+    -> D:\Séries\C'est pas sorcier\Season 15\Nos maisons de demain.mkv
+
+[Technologie et industrie] -> Season 16
+Source : D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie
+Destination : D:\Séries\C'est pas sorcier\Season 16
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie\Attention aux usines à risques !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 16\Attention aux usines à risques !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie\Dans le coton, tout est bon !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 16\Dans le coton, tout est bon !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie\L'aluminium.mkv
+    -> D:\Séries\C'est pas sorcier\Season 16\L'aluminium.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie\La grande lessive.mkv
+    -> D:\Séries\C'est pas sorcier\Season 16\La grande lessive.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie\Le caoutchouc, les sorciers mettent la gomme.mkv
+    -> D:\Séries\C'est pas sorcier\Season 16\Le caoutchouc, les sorciers mettent la gomme.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie\Le dernier charbon.mkv
+    -> D:\Séries\C'est pas sorcier\Season 16\Le dernier charbon.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie\Le dire c'est bien, le fer c'est mieux.mkv
+    -> D:\Séries\C'est pas sorcier\Season 16\Le dire c'est bien, le fer c'est mieux.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie\Le grand voyage de l'électricité.mkv
+    -> D:\Séries\C'est pas sorcier\Season 16\Le grand voyage de l'électricité.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie\Le nanomonde se secoue les puces.mkv
+    -> D:\Séries\C'est pas sorcier\Season 16\Le nanomonde se secoue les puces.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie\Le papier, il n'a pas toujours la fibre écologique.mkv
+    -> D:\Séries\C'est pas sorcier\Season 16\Le papier, il n'a pas toujours la fibre écologique.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie\Le plastique, ça nous emballe.mkv
+    -> D:\Séries\C'est pas sorcier\Season 16\Le plastique, ça nous emballe.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie\Le verre dans tous ses états.mkv
+    -> D:\Séries\C'est pas sorcier\Season 16\Le verre dans tous ses états.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie\Les céramiques, les sorciers tournent autour du pot.mkv
+    -> D:\Séries\C'est pas sorcier\Season 16\Les céramiques, les sorciers tournent autour du pot.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie\Les lasers.mkv
+    -> D:\Séries\C'est pas sorcier\Season 16\Les lasers.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie\Les nano-technologies, où se cachent-elles.mkv
+    -> D:\Séries\C'est pas sorcier\Season 16\Les nano-technologies, où se cachent-elles.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie\Les parfums.mkv
+    -> D:\Séries\C'est pas sorcier\Season 16\Les parfums.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie\Les pneus, les sorciers mettent la pression.mkv
+    -> D:\Séries\C'est pas sorcier\Season 16\Les pneus, les sorciers mettent la pression.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie\Les robots.mkv
+    -> D:\Séries\C'est pas sorcier\Season 16\Les robots.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie\Les sorciers se mettent au verre.mkv
+    -> D:\Séries\C'est pas sorcier\Season 16\Les sorciers se mettent au verre.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie\Les vêtements du futur, les sorciers sortent leurs griffes.mkv
+    -> D:\Séries\C'est pas sorcier\Season 16\Les vêtements du futur, les sorciers sortent leurs griffes.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie\L’électroménager, les sorciers font bon ménage.mkv
+    -> D:\Séries\C'est pas sorcier\Season 16\L’électroménager, les sorciers font bon ménage.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie\Manèges; le grand frisson.mkv
+    -> D:\Séries\C'est pas sorcier\Season 16\Manèges; le grand frisson.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie\Nos Vêtements. de fil en aiguille.mkv
+    -> D:\Séries\C'est pas sorcier\Season 16\Nos Vêtements. de fil en aiguille.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Technologie et industrie\Peut-on boire l'eau du robinet.mkv
+    -> D:\Séries\C'est pas sorcier\Season 16\Peut-on boire l'eau du robinet.mkv
+
+[Energie] -> Season 17
+Source : D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Energie
+Destination : D:\Séries\C'est pas sorcier\Season 17
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Energie\Alerte nucléaire !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 17\Alerte nucléaire !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Energie\Ca gaz.mkv
+    -> D:\Séries\C'est pas sorcier\Season 17\Ca gaz.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Energie\Du solaire au pays de l'or noir.mkv
+    -> D:\Séries\C'est pas sorcier\Season 17\Du solaire au pays de l'or noir.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Energie\Energie de la mer; des océans au courant !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 17\Energie de la mer; des océans au courant !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Energie\L'aventure de l'électricité.mkv
+    -> D:\Séries\C'est pas sorcier\Season 17\L'aventure de l'électricité.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Energie\L'hydrogène, combustible du futur.mkv
+    -> D:\Séries\C'est pas sorcier\Season 17\L'hydrogène, combustible du futur.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Energie\L'électricité, quand les branchés disjonctent.mkv
+    -> D:\Séries\C'est pas sorcier\Season 17\L'électricité, quand les branchés disjonctent.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Energie\L'énergie nuclaire.mkv
+    -> D:\Séries\C'est pas sorcier\Season 17\L'énergie nuclaire.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Energie\Le pétrole.mkv
+    -> D:\Séries\C'est pas sorcier\Season 17\Le pétrole.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Energie\Les barrages.mkv
+    -> D:\Séries\C'est pas sorcier\Season 17\Les barrages.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Energie\Les centrales nucleaires.mkv
+    -> D:\Séries\C'est pas sorcier\Season 17\Les centrales nucleaires.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Energie\Les déchets nucléaires.mkv
+    -> D:\Séries\C'est pas sorcier\Season 17\Les déchets nucléaires.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Energie\Les plate-formes pétrolières.mkv
+    -> D:\Séries\C'est pas sorcier\Season 17\Les plate-formes pétrolières.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Energie\Lumières de la ville; les sorciers nous éclairent.mkv
+    -> D:\Séries\C'est pas sorcier\Season 17\Lumières de la ville; les sorciers nous éclairent.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Energie\Nouvelles énergie,  la planète carbure au vert.mkv
+    -> D:\Séries\C'est pas sorcier\Season 17\Nouvelles énergie,  la planète carbure au vert.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Energie\Que faire des déchets nucléaires.mkv
+    -> D:\Séries\C'est pas sorcier\Season 17\Que faire des déchets nucléaires.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Energie\Tous au charbon.mkv
+    -> D:\Séries\C'est pas sorcier\Season 17\Tous au charbon.mkv
+
+[Le corps humain] -> Season 18
+Source : D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain
+Destination : D:\Séries\C'est pas sorcier\Season 18
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\A boire et à manger (le goût).mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\A boire et à manger (le goût).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Dent pour dent.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Dent pour dent.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Des sorciers bien dans leur peau.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Des sorciers bien dans leur peau.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Epilepsie, orage sur le cerveau.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Epilepsie, orage sur le cerveau.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Histoires de coeur.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Histoires de coeur.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Joie, peur, tristesse, colère... que d'émotions!.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Joie, peur, tristesse, colère... que d'émotions!.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\L'adolescence, vive la crise !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\L'adolescence, vive la crise !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\La bipedie, c'est le pied.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\La bipedie, c'est le pied.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\La nutrition, mangeons équilibré !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\La nutrition, mangeons équilibré !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Le cerveau 1, les sorciers se prennent la tête.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Le cerveau 1, les sorciers se prennent la tête.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Le cerveau 2, j'ai la mémoire qui flanche.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Le cerveau 2, j'ai la mémoire qui flanche.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Le monde des sourds.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Le monde des sourds.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Le mystères des jumeaux.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Le mystères des jumeaux.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Le squelette, les sorciers tombent sur un os.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Le squelette, les sorciers tombent sur un os.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Les ages de la vie.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Les ages de la vie.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Les eaux minerales, les sorciers prennent de la bouteille.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Les eaux minerales, les sorciers prennent de la bouteille.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Les mystères du sommeil.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Les mystères du sommeil.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Les secrets du vertige.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Les secrets du vertige.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Les sorciers coupent le cheveux en quatre.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Les sorciers coupent le cheveux en quatre.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\les sorciers se font la main.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\les sorciers se font la main.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Les troubles DYS.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Les troubles DYS.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Muscles et souplesse, c'est pas de la gonflette !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Muscles et souplesse, c'est pas de la gonflette !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Nos poumons, sources d'inspiration.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Nos poumons, sources d'inspiration.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Peut-on améliorer sa mémoire .mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Peut-on améliorer sa mémoire .mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Résister au froid.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Résister au froid.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Sang pour sang.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Sang pour sang.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Vivre cent ans.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Vivre cent ans.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Voix de fête.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Voix de fête.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Écoute ce que je vois, les aveugles.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Écoute ce que je vois, les aveugles.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Sport et santé\Le corps humain\Œil pour œil.mkv
+    -> D:\Séries\C'est pas sorcier\Season 18\Œil pour œil.mkv
+
+[Physique & Chimie] -> Season 19
+Source : D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Physique & Chimie
+Destination : D:\Séries\C'est pas sorcier\Season 19
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Physique & Chimie\Attention, ça glace !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 19\Attention, ça glace !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Physique & Chimie\Au feu !.mkv
+    -> D:\Séries\C'est pas sorcier\Season 19\Au feu !.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Physique & Chimie\Chimie verte, des végétaux pour remplacer le pétrole..mkv
+    -> D:\Séries\C'est pas sorcier\Season 19\Chimie verte, des végétaux pour remplacer le pétrole..mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Physique & Chimie\Coups de projecteur sur la lumèire.mkv
+    -> D:\Séries\C'est pas sorcier\Season 19\Coups de projecteur sur la lumèire.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Physique & Chimie\La radioactivité.mkv
+    -> D:\Séries\C'est pas sorcier\Season 19\La radioactivité.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Physique & Chimie\Le magnétisme.mkv
+    -> D:\Séries\C'est pas sorcier\Season 19\Le magnétisme.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Physique & Chimie\Les plus grands manèges au monde.mkv
+    -> D:\Séries\C'est pas sorcier\Season 19\Les plus grands manèges au monde.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Physique & Chimie\Lumières et illusions.mkv
+    -> D:\Séries\C'est pas sorcier\Season 19\Lumières et illusions.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Physique & Chimie\Mètre, kilo, seconde, les sorciers prennent des mesures.mkv
+    -> D:\Séries\C'est pas sorcier\Season 19\Mètre, kilo, seconde, les sorciers prennent des mesures.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Physique & Chimie\Piles et batteries, les sorciers se mettent au courant.mkv
+    -> D:\Séries\C'est pas sorcier\Season 19\Piles et batteries, les sorciers se mettent au courant.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Physique & Chimie\Remettons nos pendules à l'heure.mkv
+    -> D:\Séries\C'est pas sorcier\Season 19\Remettons nos pendules à l'heure.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Physique & Chimie\Voyage au coeur de la matière.mkv
+    -> D:\Séries\C'est pas sorcier\Season 19\Voyage au coeur de la matière.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Physique, chimie et Technologie\Physique & Chimie\Voyage dans l'invisible.mkv
+    -> D:\Séries\C'est pas sorcier\Season 19\Voyage dans l'invisible.mkv
+
+[Géographie et les découvertes] -> Season 20
+Source : D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes
+Destination : D:\Séries\C'est pas sorcier\Season 20
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\Ascension du Mont Blanc.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\Ascension du Mont Blanc.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\Descente au cœur d'un glacier.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\Descente au cœur d'un glacier.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\Islande, une île qui souffle le chaud et le froid.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\Islande, une île qui souffle le chaud et le froid.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\L'estuaire de la Gironde.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\L'estuaire de la Gironde.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\L'oasis, une escale dans le désert.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\L'oasis, une escale dans le désert.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\La Camargue, entre sel et terre.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\La Camargue, entre sel et terre.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\La Cappadoce, une région féérique.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\La Cappadoce, une région féérique.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\La cartographie.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\La cartographie.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\La Corse, l'ile aux mille beautés.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\La Corse, l'ile aux mille beautés.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\La Loire 1 (Des Sources à Orléans).mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\La Loire 1 (Des Sources à Orléans).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\La Loire 2 (D'Orléans à  l'Estuaire).mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\La Loire 2 (D'Orléans à  l'Estuaire).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\La planète sous toutes ses latitudes.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\La planète sous toutes ses latitudes.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\La Polynésie, bienvenue au paradis.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\La Polynésie, bienvenue au paradis.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\La Provence.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\La Provence.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\La Réunion, une île sortie de l'océan.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\La Réunion, une île sortie de l'océan.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\La traversée du désert.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\La traversée du désert.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\La vie d'un fleuve (la Seine).mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\La vie d'un fleuve (la Seine).mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\Le marais Poitevin.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\Le marais Poitevin.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\Le Mercantour, entre monts et merveilles.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\Le Mercantour, entre monts et merveilles.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\Le mont Saint-Michel, contre vents et marées.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\Le mont Saint-Michel, contre vents et marées.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\Le Pérou, à la découverte des Andes.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\Le Pérou, à la découverte des Andes.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\Les Landes, sous la forêt, la plage.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\Les Landes, sous la forêt, la plage.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\Les sorciers jouent Robinson Crusoë.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\Les sorciers jouent Robinson Crusoë.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\Nouvelle-Calédonie, un caillou sous les tropiques.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\Nouvelle-Calédonie, un caillou sous les tropiques.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\Noël à Saint-Véran.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\Noël à Saint-Véran.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\Oasis, les champs du désert .mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\Oasis, les champs du désert .mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\Quand les déboussolés perdent le nord.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\Quand les déboussolés perdent le nord.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\Rotterdam, le plus grand port du monde.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\Rotterdam, le plus grand port du monde.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\Réveillon sous la neige.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\Réveillon sous la neige.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\Sauver Venise.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\Sauver Venise.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\Sur la route de Ouagadougou.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\Sur la route de Ouagadougou.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\Thau, une lagune fragile.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\Thau, une lagune fragile.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\Viva Mexico.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\Viva Mexico.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\Vivre en plein désert.mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\Vivre en plein désert.mkv
+[SIMULATION] D:\Séries\C'est pas sorcier\Terre et l'univers\Géographie et les découvertes\Îles polder, de la terre gagnée sur la mer .mkv
+    -> D:\Séries\C'est pas sorcier\Season 20\Îles polder, de la terre gagnée sur la mer .mkv
+
+[SIMULATION] Création prévue : D:\Séries\C'est pas sorcier\tvshow.nfo
+
+============================================================
+TERMINE
+============================================================
+Fichiers MKV détectés : 558
+Déplacés             : 0
+Bloqués (collision)  : 0
+Erreurs              : 0
+Simulation           : True
+Log                  : D:\Séries\C'est pas sorcier\reorganisation_cest_pas_sorcier.log
+CSV                  : D:\Séries\C'est pas sorcier\reorganisation_cest_pas_sorcier.csv
+NFO                  : D:\Séries\C'est pas sorcier\tvshow.nfo
+============================================================
+
+============================================================
+SIMULATION TERMINEE
+============================================================
+
+RIEN N'A ETE DEPLACE.
+
+Verifie le CSV et le log.
+
+Si tout est correct, modifie :
+
+    $DryRun = $true
+
+en :
+
+    $DryRun = $false
+
+Appuyez sur Entrée pour fermer:
