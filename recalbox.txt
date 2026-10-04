@@ -1,0 +1,40 @@
+ANALYSE DE DOSSIER
+============================================================
+Dossier racine: F:/
+Mode: Arborescence complète
+============================================================
+
+ARBORESCENCE COMPLETE
+----------------------------------------
+/
+└── EFI/
+    ├── BOOT/
+    │   └── bootia32.efi
+    │   └── bootx64.efi
+    │   └── grub.cfg
+└── System Volume Information/
+    ├── IndexerVolumeGuid
+    ├── WPSettings.dat
+└── boot/
+    ├── grub/
+    │   ├── grub.cfg
+    ├── initrd.gz
+    ├── linux
+    ├── recalbox
+└── update/
+└── .system-migrations
+└── BOOTEX.LOG
+└── asound.state
+└── boot.lst
+└── boot.md5
+└── pre-upgrade.sh
+└── recalbox-backup.conf
+└── recalbox-boot.backup
+└── recalbox-boot.conf
+
+============================================================
+STATISTIQUES
+============================================================
+Dossiers: 6
+Fichiers: 18
+Taille totale: 1.49 GB
